@@ -154,14 +154,14 @@ class _ClickableImage extends StatelessWidget {
           width: imageWidth,
           height: imageHeight,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(40),
             child: Container(
               width: imageWidth,
               height: imageHeight,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(40),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
@@ -180,7 +180,7 @@ class _ClickableImage extends StatelessWidget {
                     height: imageHeight,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(40),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.2),
                       ),

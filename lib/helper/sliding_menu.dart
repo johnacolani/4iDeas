@@ -141,16 +141,6 @@ class _SlidingMenuState extends State<SlidingMenu>
                           const Color(0xFF2D3748).withValues(alpha: 0.25),
                         ],
                       ),
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.white,
-                          width: 2.5,
-                        ),
-                        right: BorderSide(
-                          color: Colors.white,
-                          width: 2.5,
-                        ),
-                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.2),
@@ -383,29 +373,20 @@ class _SlidingMenuState extends State<SlidingMenu>
             },
             child: Align(
               alignment: const Alignment(0, -0.5),
-              child: Stack(
-                children: [
-                  ClipPath(
-                    clipper: CustomMenuClipper(),
-                    child: Container(
-                      width: 35,
-                      height: 110,
-                      color: const Color(0xFF4B556E),
-                      alignment: Alignment.center,
-                      child: AnimatedIcon(
-                        color: ColorManager.white,
-                        size: 25,
-                        icon: AnimatedIcons.menu_close,
-                        progress: _animationController.view,
-                      ),
-                    ),
+              child: ClipPath(
+                clipper: CustomMenuClipper(),
+                child: Container(
+                  width: 35,
+                  height: 110,
+                  color: const Color(0xFF4B556E),
+                  alignment: Alignment.center,
+                  child: AnimatedIcon(
+                    color: ColorManager.white,
+                    size: 25,
+                    icon: AnimatedIcons.menu_close,
+                    progress: _animationController.view,
                   ),
-                  // White border on front (right), top, and bottom
-                  CustomPaint(
-                    size: const Size(35, 110),
-                    painter: _MenuBorderPainter(),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -574,52 +555,4 @@ class CustomMenuClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
   }
-}
-
-class _MenuBorderPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final width = size.width;
-    final height = size.height;
-    
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
-    
-    final path = Path();
-    
-    // Start from top-left curve (where it curves to the right)
-    path.moveTo(10, 16);
-    
-    // Top border - along the top curve to right edge
-    path.quadraticBezierTo(width, width, width, height / 2);
-    
-    // Right border (front) - continue down the right side
-    path.quadraticBezierTo(width, height - width, 10, height - 16);
-    
-    // Draw the path
-    canvas.drawPath(path, paint);
-    
-    // Draw top border line (horizontal at the top)
-    final topPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
-    canvas.drawLine(
-      Offset(0, 0),
-      Offset(10, 16),
-      topPaint,
-    );
-    
-    // Draw bottom border line (horizontal at the bottom)
-    canvas.drawLine(
-      Offset(0, height),
-      Offset(10, height - 16),
-      topPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

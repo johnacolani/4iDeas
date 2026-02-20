@@ -46,14 +46,17 @@ class PortfolioAppCard extends StatelessWidget {
       child: isMobile
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
                   height: 180,
                   child: _buildImageBlock(mobileVertical: true),
                 ),
                 SizedBox(height: 8),
-                _buildTextAndButtons(titleSize, bodySize),
+                Expanded(
+                  child: _buildTextContent(titleSize, bodySize),
+                ),
+                SizedBox(height: 8),
+                _buildButtons(),
               ],
             )
           : Row(
@@ -61,7 +64,17 @@ class PortfolioAppCard extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: _buildTextAndButtons(titleSize, bodySize),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: _buildTextContent(titleSize, bodySize),
+                      ),
+                      SizedBox(height: 8),
+                      _buildButtons(),
+                    ],
+                  ),
                 ),
                 SizedBox(width: 12),
                 Expanded(
@@ -73,7 +86,7 @@ class PortfolioAppCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTextAndButtons(double titleSize, double bodySize) {
+  Widget _buildTextContent(double titleSize, double bodySize) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -92,29 +105,31 @@ class PortfolioAppCard extends StatelessWidget {
           style: GoogleFonts.albertSans(
             color: Colors.white,
             fontSize: bodySize,
-            height: 1.35,
+            height: 1.3,
           ),
         ),
-        SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            // Show platform-specific store button first, then others
-            if (!kIsWeb)
-              ..._buildPlatformStoreButtons()
-            else
-              ..._buildAllStoreButtons(),
-            // Show web URL button if available
-            if (app.webUrl != null)
-              _LinkChip(
-                label: 'Web App',
-                icon: Icons.language,
-                onTap: () => _launch(app.webUrl!),
-                isMobile: isMobile,
-              ),
-          ],
-        ),
+      ],
+    );
+  }
+
+  Widget _buildButtons() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        // Show web URL button first if available
+        if (app.webUrl != null)
+          _LinkChip(
+            label: 'Web App',
+            icon: Icons.language,
+            onTap: () => _launch(app.webUrl!),
+            isMobile: isMobile,
+          ),
+        // Show platform-specific store buttons after web app button
+        if (!kIsWeb)
+          ..._buildPlatformStoreButtons()
+        else
+          ..._buildAllStoreButtons(),
       ],
     );
   }
@@ -262,6 +277,36 @@ class PortfolioAppCard extends StatelessWidget {
       );
     }
     return buttons;
+  }
+
+  List<Widget> _buildPlatformStoreButtonsWithSpacing() {
+    final List<Widget> buttons = _buildPlatformStoreButtons();
+    return buttons.asMap().entries.map((entry) {
+      final index = entry.key;
+      final button = entry.value;
+      if (index > 0) {
+        return Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: button,
+        );
+      }
+      return button;
+    }).toList();
+  }
+
+  List<Widget> _buildAllStoreButtonsWithSpacing() {
+    final List<Widget> buttons = _buildAllStoreButtons();
+    return buttons.asMap().entries.map((entry) {
+      final index = entry.key;
+      final button = entry.value;
+      if (index > 0) {
+        return Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: button,
+        );
+      }
+      return button;
+    }).toList();
   }
 
   Future<void> _launch(String url) async {

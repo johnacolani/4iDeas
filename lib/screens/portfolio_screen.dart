@@ -113,7 +113,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               spacing = 18;
                             } else if (availableWidth > 600) {
                               crossAxisCount = 2;
-                              mainAxisExtent = 305;
+                              mainAxisExtent = 350;
                               spacing = 16;
                             } else {
                               crossAxisCount = 1;
