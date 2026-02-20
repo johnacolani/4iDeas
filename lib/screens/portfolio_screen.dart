@@ -72,8 +72,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           bodySize: bodySize,
                           isMobile: isMobile,
                           sectionTitleSize: sectionTitleSize,
-                          onVideoTap: () =>
-                              _launchUrl(PortfolioData.portfolioVideoUrl),
                         ),
                         SizedBox(height: he * 0.05),
 
@@ -247,7 +245,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     required double bodySize,
     required bool isMobile,
     required double sectionTitleSize,
-    required VoidCallback onVideoTap,
   }) {
     return Center(
       child: Column(
@@ -270,43 +267,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 color: ColorManager.orange,
                 fontSize: bodySize,
                 fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          SizedBox(height: he * 0.02),
-          InkWell(
-            onTap: onVideoTap,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 20 : 28,
-                vertical: isMobile ? 14 : 18,
-              ),
-              decoration: BoxDecoration(
-                color: ColorManager.blue.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: ColorManager.blue.withValues(alpha: 0.5),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.play_circle_filled,
-                    color: ColorManager.orange,
-                    size: sectionTitleSize,
-                  ),
-                  SizedBox(width: 10),
-                  SelectableText(
-                    'Watch Portfolio 2024 Video',
-                    style: GoogleFonts.albertSans(
-                      color: Colors.white,
-                      fontSize: bodySize,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
               ),
             ),
           ),

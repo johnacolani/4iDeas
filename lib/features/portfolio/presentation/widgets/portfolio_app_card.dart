@@ -52,11 +52,14 @@ class PortfolioAppCard extends StatelessWidget {
                   child: _buildImageBlock(mobileVertical: true),
                 ),
                 SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildButtons(),
+                ),
+                SizedBox(height: 8),
                 Expanded(
                   child: _buildTextContent(titleSize, bodySize),
                 ),
-                SizedBox(height: 8),
-                _buildButtons(),
               ],
             )
           : Row(
@@ -64,22 +67,22 @@ class PortfolioAppCard extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        child: _buildTextContent(titleSize, bodySize),
-                      ),
-                      SizedBox(height: 8),
-                      _buildButtons(),
-                    ],
-                  ),
+                  child: _buildTextContent(titleSize, bodySize),
                 ),
                 SizedBox(width: 12),
                 Expanded(
                   flex: 4,
-                  child: _buildImageBlock(mobileVertical: false),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildImageBlock(mobileVertical: false),
+                      SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: _buildButtons(),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -116,6 +119,7 @@ class PortfolioAppCard extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
+      alignment: WrapAlignment.start,
       children: [
         // Show web URL button first if available
         if (app.webUrl != null)

@@ -5,6 +5,7 @@ import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/helper/sliding_menu.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
+import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
@@ -145,36 +146,57 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ProfileScreen(),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ProfileScreen(),
+                                            ),
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: wi < 400 ? 2 : 4,
+                                            vertical: wi < 400 ? 2 : 4,
+                                          ),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
                                         ),
-                                      );
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: wi < 400 ? 2 : 4,
-                                        vertical: wi < 400 ? 2 : 4,
+                                        child: Text(
+                                          state.user.email ?? 'User',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: wi < 400 ? 8 : 9,
+                                            color:
+                                                Colors.white.withValues(alpha: 0.9),
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
                                       ),
-                                      minimumSize: Size.zero,
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    child: Text(
-                                      state.user.email ?? 'User',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontSize: wi < 400 ? 8 : 9,
-                                        color:
-                                            Colors.white.withValues(alpha: 0.9),
-                                        decoration: TextDecoration.underline,
+                                      SizedBox(width: wi < 400 ? 4 : 6),
+                                      IconButton(
+                                        onPressed: () {
+                                          context.read<AuthBloc>().add(
+                                                const AuthLogoutRequested(),
+                                              );
+                                        },
+                                        icon: Icon(
+                                          Icons.logout,
+                                          size: wi < 400 ? 12 : 14,
+                                          color: ColorManager.orange,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(),
+                                        tooltip: 'Sign Out',
                                       ),
-                                    ),
+                                    ],
                                   ),
                                   SizedBox(height: 6),
                                   Row(
@@ -211,33 +233,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ProfileScreen(),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ProfileScreen(),
+                                            ),
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 8,
+                                          ),
                                         ),
-                                      );
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 8,
+                                        child: Text(
+                                          state.user.email ?? 'User',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: isTablet ? 14 : 16,
+                                            color:
+                                                Colors.white.withValues(alpha: 0.9),
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    child: Text(
-                                      state.user.email ?? 'User',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontSize: isTablet ? 14 : 16,
-                                        color:
-                                            Colors.white.withValues(alpha: 0.9),
-                                        decoration: TextDecoration.underline,
+                                      SizedBox(width: 8),
+                                      IconButton(
+                                        onPressed: () {
+                                          context.read<AuthBloc>().add(
+                                                const AuthLogoutRequested(),
+                                              );
+                                        },
+                                        icon: Icon(
+                                          Icons.logout,
+                                          size: isTablet ? 18 : 20,
+                                          color: ColorManager.orange,
+                                        ),
+                                        padding: EdgeInsets.all(4),
+                                        constraints: BoxConstraints(),
+                                        tooltip: 'Sign Out',
                                       ),
-                                    ),
+                                    ],
                                   ),
                                   SizedBox(height: 6),
                                   Row(
