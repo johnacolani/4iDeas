@@ -22,9 +22,17 @@ A cross-platform Flutter application showcasing product design and development w
 
 For detailed portfolio information including apps, case studies, publications, and open source projects, see **[PORTFOLIO.md](PORTFOLIO.md)**.
 
+**Portfolio Highlights - Senior-Level Capabilities:**
+- **Complex Multi-Role Workflows** - Orchestrated workflows across 5 distinct user roles
+- **Systems Thinking** - Unified data models serving multiple roles with role-specific views
+- **AI Governance** - Human-in-the-loop AI with audit trails and knowledge base management
+- **Ecosystem Integration** - Hardware, payments, GPS, and notification integrations
+- **Cross-Functional Alignment** - Workflows aligning Sales, Operations, Field, and Client needs
+- **Before/After Impact** - Quantifiable metrics: 70% reduction in coordination overhead, 95% error reduction
+
 **Quick Overview:**
 - **10+ Mobile & Web Apps** - Published on App Store, Play Store, and Web
-- **Featured Case Study** - Absolute Stone Design (ASD) multi-role platform
+- **Featured Case Study** - Absolute Stone Design (ASD) multi-role platform with detailed systems thinking
 - **6 Technical Publications** - Medium articles on Flutter development
 - **Open Source Projects** - Packages and repositories on GitHub and Pub.dev
 

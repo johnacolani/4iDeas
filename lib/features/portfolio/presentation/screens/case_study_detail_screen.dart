@@ -331,15 +331,23 @@ class _SectionBlock extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.15),
-                Colors.white.withValues(alpha: 0.08),
-                Colors.white.withValues(alpha: 0.12),
-              ],
+              colors: title == 'The Solution'
+                  ? [
+                      const Color(0xFFD81B60).withValues(alpha: 0.25),
+                      const Color(0xFFB0154F).withValues(alpha: 0.15),
+                      const Color(0xFFD81B60).withValues(alpha: 0.20),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.15),
+                      Colors.white.withValues(alpha: 0.08),
+                      Colors.white.withValues(alpha: 0.12),
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: title == 'The Solution'
+                  ? const Color(0xFFD81B60).withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.3),
               width: 1.5,
             ),
             boxShadow: [

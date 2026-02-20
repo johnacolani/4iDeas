@@ -295,8 +295,8 @@ class GlassOutlinedText extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color.fromRGBO(255, 255, 255, 0.75), // light hit
-                      Color.fromRGBO(255, 255, 255, 0.20), // shadow side
+                      Color(0xFFD81B60), // dark pink light hit
+                      Color(0xFFB0154F), // darker pink shadow side
                     ],
                   ).createShader(rect),
               ),

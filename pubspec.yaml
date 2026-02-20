@@ -83,6 +83,7 @@ flutter:
     - assets/images/installer/
     - assets/images/scheduler/
     - assets/images/Clients/
+    - assets/images/on_boarding_image/
     - assets/icons/
     - assets/waveloop.json
   # assets:

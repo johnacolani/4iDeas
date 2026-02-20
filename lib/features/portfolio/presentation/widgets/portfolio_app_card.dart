@@ -26,24 +26,26 @@ class PortfolioAppCard extends StatelessWidget {
     final double titleSize = isMobile ? 15 : (isTablet ? 17 : 18);
     final double bodySize = isMobile ? 12 : (isTablet ? 13 : 14);
 
-    return Container(
-      padding: EdgeInsets.all(cardPadding),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.all(cardPadding),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1.5,
           ),
-        ],
-      ),
-      child: isMobile
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: isMobile
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -52,40 +54,39 @@ class PortfolioAppCard extends StatelessWidget {
                   child: _buildImageBlock(mobileVertical: true),
                 ),
                 SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: _buildButtons(),
-                ),
+                _buildButtons(),
                 SizedBox(height: 8),
                 Expanded(
                   child: _buildTextContent(titleSize, bodySize),
                 ),
               ],
             )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Top half: Text and Image side by side
                 Expanded(
-                  flex: 5,
-                  child: _buildTextContent(titleSize, bodySize),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  flex: 4,
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildImageBlock(mobileVertical: false),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: _buildButtons(),
+                      Expanded(
+                        flex: 5,
+                        child: _buildTextContent(titleSize, bodySize),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        flex: 4,
+                        child: _buildImageBlock(mobileVertical: false),
                       ),
                     ],
                   ),
                 ),
+                SizedBox(height: 8),
+                // Bottom half: Buttons in full-width container
+                _buildButtons(),
               ],
             ),
+      ),
     );
   }
 
@@ -116,25 +117,32 @@ class PortfolioAppCard extends StatelessWidget {
   }
 
   Widget _buildButtons() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      alignment: WrapAlignment.start,
-      children: [
-        // Show web URL button first if available
-        if (app.webUrl != null)
-          _LinkChip(
-            label: 'Web App',
-            icon: Icons.language,
-            onTap: () => _launch(app.webUrl!),
-            isMobile: isMobile,
-          ),
-        // Show platform-specific store buttons after web app button
-        if (!kIsWeb)
-          ..._buildPlatformStoreButtons()
-        else
-          ..._buildAllStoreButtons(),
-      ],
+    return Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Show web URL button first if available
+            if (app.webUrl != null)
+              Padding(
+                padding: EdgeInsets.only(right: 6),
+                child: _LinkChip(
+                  label: 'Web App',
+                  icon: Icons.language,
+                  onTap: () => _launch(app.webUrl!),
+                  isMobile: isMobile,
+                ),
+              ),
+            // Show platform-specific store buttons after web app button
+            if (!kIsWeb)
+              ..._buildPlatformStoreButtonsWithSpacing()
+            else
+              ..._buildAllStoreButtonsWithSpacing(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -290,7 +298,7 @@ class PortfolioAppCard extends StatelessWidget {
       final button = entry.value;
       if (index > 0) {
         return Padding(
-          padding: EdgeInsets.only(left: 8),
+          padding: EdgeInsets.only(left: 6),
           child: button,
         );
       }
@@ -305,7 +313,7 @@ class PortfolioAppCard extends StatelessWidget {
       final button = entry.value;
       if (index > 0) {
         return Padding(
-          padding: EdgeInsets.only(left: 8),
+          padding: EdgeInsets.only(left: 6),
           child: button,
         );
       }
@@ -341,8 +349,8 @@ class _LinkChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 10 : 12,
-          vertical: isMobile ? 6 : 8,
+          horizontal: isMobile ? 6 : 8,
+          vertical: isMobile ? 4 : 5,
         ),
         decoration: BoxDecoration(
           color: ColorManager.orange.withValues(alpha: 0.2),
@@ -352,13 +360,13 @@ class _LinkChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: isMobile ? 16 : 18, color: ColorManager.orange),
-            SizedBox(width: 6),
+            Icon(icon, size: isMobile ? 12 : 14, color: ColorManager.orange),
+            SizedBox(width: 4),
             SelectableText(
               label,
               style: GoogleFonts.albertSans(
                 color: ColorManager.orange,
-                fontSize: isMobile ? 12 : 13,
+                fontSize: isMobile ? 10 : 11,
                 fontWeight: FontWeight.w600,
               ),
             ),

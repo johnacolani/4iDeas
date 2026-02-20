@@ -356,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: TextStyle(
                                           fontSize:
                                               wi < 400 ? 8 * 1.3 : 9 * 1.3,
-                                          color: Colors.white,
+                                          color: const Color(0xFFD81B60),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -458,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ' / ',
                                         style: TextStyle(
                                           fontSize: isTablet ? 16 : 18,
-                                          color: Colors.white,
+                                          color: const Color(0xFFD81B60),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
