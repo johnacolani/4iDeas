@@ -151,7 +151,7 @@ class HomeWidget extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: he * 0.02,
+                      height: he * 0.01,
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -172,7 +172,7 @@ class HomeWidget extends StatelessWidget {
                     ),
 
                     Padding(
-                      padding: EdgeInsets.only(top: isMobile ? he * 0.02 : he * 0.03),
+                      padding: EdgeInsets.only(top: isMobile ? he * 0.01 : he * 0.015),
                       child: SizedBox(
                         width: wi * 0.9,
                         child: const AutoScrollImage(),
@@ -180,7 +180,7 @@ class HomeWidget extends StatelessWidget {
                     ),
 
                     SizedBox(
-                      height: he * 0.03,
+                      height: he * 0.015,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),

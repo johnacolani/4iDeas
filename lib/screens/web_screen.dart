@@ -149,14 +149,14 @@ class _WebScreenState extends State<WebScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: he * 0.02,
+                    height: he * 0.01,
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile
                           ? wi * 0.05
                           : (isTablet ? wi * 0.08 : wi * 0.1),
-                      vertical: isMobile ? he * 0.05 : (isTablet ? he * 0.1 : he * 0.1),
+                      vertical: isMobile ? he * 0.025 : (isTablet ? he * 0.05 : he * 0.05),
                     ),
                     child: SelectableText(
                       'that give you and your customers the best experience possible',
@@ -169,7 +169,7 @@ class _WebScreenState extends State<WebScreen> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: isMobile ? he * 0.02 : he * 0.03),
+                    padding: EdgeInsets.only(top: isMobile ? he * 0.01 : he * 0.015),
                     child: SizedBox(
                       width: isMobile
                           ? wi * 0.9
@@ -178,7 +178,7 @@ class _WebScreenState extends State<WebScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: he * 0.05,
+                    height: he * 0.025,
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: isMobile ? 8.0 : 16.0),
