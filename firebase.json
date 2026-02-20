@@ -1,0 +1,84 @@
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|js|css|eot|otf|ttf|ttc|woff|woff2|font.css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          }
+        ]
+      },
+      {
+        "source": "**/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/flutter_service_worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "my-web-page-ef286",
+          "appId": "1:68544054220:android:9ddee97ac1a357655d9369",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "my-web-page-ef286",
+          "appId": "1:68544054220:ios:a294c604e3b3cfbd5d9369",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "my-web-page-ef286",
+          "appId": "1:68544054220:ios:a294c604e3b3cfbd5d9369",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "my-web-page-ef286",
+          "configurations": {
+            "android": "1:68544054220:android:9ddee97ac1a357655d9369",
+            "ios": "1:68544054220:ios:a294c604e3b3cfbd5d9369",
+            "macos": "1:68544054220:ios:a294c604e3b3cfbd5d9369",
+            "web": "1:68544054220:web:3986ff51628f4c925d9369",
+            "windows": "1:68544054220:web:f8ec22ac1148c1cf5d9369"
+          }
+        }
+      }
+    }
+  }
+}

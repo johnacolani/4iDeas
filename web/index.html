@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Google Sign-In Client ID -->
+  <!-- TODO: Replace YOUR_CLIENT_ID with your actual Google OAuth Client ID from Firebase Console -->
+  <!-- Get it from: Firebase Console > Authentication > Sign-in method > Google > Web SDK configuration -->
+  <meta name="google-signin-client_id" content="68544054220-79l4f4aiijvh7ed0at19tp19c4bjsvm8.apps.googleusercontent.com">
+  
+  <!-- Primary Meta Tags -->
+  <title>4iDeas - Flutter App Development & Backend Services</title>
+  <meta name="title" content="4iDeas - Flutter App Development & Backend Services">
+  <meta name="description" content="4iDeas provides custom iOS, Android, macOS, and web app development using Flutter. We offer Firebase and AWS backend services, SEO optimization, and full-stack solutions with a single codebase.">
+  <meta name="keywords" content="Flutter development, mobile app development, web app development, Firebase services, AWS services, app development company, custom app development, cross-platform development, iOS apps, Android apps, backend services, SEO optimization">
+  <meta name="author" content="4iDeas">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="revisit-after" content="7 days">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://4ideas.com/">
+  <meta property="og:title" content="4iDeas - Flutter App Development & Backend Services">
+  <meta property="og:description" content="Custom iOS, Android, macOS, and web app development using Flutter. Firebase and AWS backend services with SEO optimization.">
+  <meta property="og:image" content="https://4ideas.com/icons/icon-512.png">
+  <meta property="og:site_name" content="4iDeas">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://4ideas.com/">
+  <meta property="twitter:title" content="4iDeas - Flutter App Development & Backend Services">
+  <meta property="twitter:description" content="Custom iOS, Android, macOS, and web app development using Flutter. Firebase and AWS backend services with SEO optimization.">
+  <meta property="twitter:image" content="https://4ideas.com/icons/icon-512.png">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="4iDeas">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://4ideas.com/">
+  <link rel="manifest" href="manifest.json">
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    const serviceWorkerVersion = null;
+  </script>
+  
+  <!-- Firebase SDK - Commented out until configured -->
+  <!-- Uncomment and add your Firebase config below once you've set up Firebase -->
+  <!--
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    // Replace with your actual Firebase config from Firebase Console
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    if (typeof firebase !== 'undefined') {
+      firebase.initializeApp(firebaseConfig);
+    }
+  </script>
+  -->
+  
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
+</head>
+<body>
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
