@@ -79,50 +79,15 @@ class _HomeScreenState extends State<HomeScreen> {
             vertical: isMobile ? 12.0 : (isTablet ? 24.0 : 28.0),
           ),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.15),
-                Colors.white.withValues(alpha: 0.08),
-                Colors.white.withValues(alpha: 0.12),
-              ],
-            ),
+            color: Colors.transparent,
             border: Border(
               bottom: BorderSide(
                 color: Colors.white.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                spreadRadius: 2,
-                offset: const Offset(0, 4),
-              ),
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.1),
-                blurRadius: 15,
-                spreadRadius: -5,
-                offset: const Offset(0, -2),
-              ),
-            ],
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const [0.0, 0.5, 1.0],
-                colors: [
-                  Colors.white.withValues(alpha: 0.2),
-                  Colors.white.withValues(alpha: 0.0),
-                  Colors.white.withValues(alpha: 0.05),
-                ],
-              ),
-            ),
-            child: Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -518,7 +483,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
       ),
     );
   }

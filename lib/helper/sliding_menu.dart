@@ -381,7 +381,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                   color: const Color(0xFF4B556E),
                   alignment: Alignment.center,
                   child: AnimatedIcon(
-                    color: ColorManager.white,
+                    color: const Color(0xFFD81B60), // Dark pink/red color
                     size: 25,
                     icon: AnimatedIcons.menu_close,
                     progress: _animationController.view,
