@@ -1,27 +1,172 @@
-<img width="1792" alt="Screenshot 2024-01-15 at 5 08 01 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/8ed465fd-28c1-4da9-af35-014fc2844706"># my_web_site
+# 4iDeas - Product Design & Development Portfolio
 
-My Website Flutter project with all platform(iOS, Android, macOS, Web & Windows)
+A cross-platform Flutter application showcasing product design and development work across iOS, Android, macOS, Web, and Windows platforms.
 
-# iOS
-<img width="456" alt="Screenshot 2024-01-15 at 5 00 03 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/69505726-6581-4fc9-92e3-ca3250221de9">
-<img width="446" alt="Screenshot 2024-01-15 at 4 59 25 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/17c352fb-d4cd-4933-b4da-a5f41cb22b58">
+![Logo](assets/images/logo.png)
 
-# Android
-<img width="230" alt="Screenshot 2024-01-15 at 4 58 41 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/dbbddf23-c548-4b0e-b19f-fb287eaab6ad">
-<img width="229" alt="Screenshot 2024-01-15 at 4 55 04 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/9c93e7fd-f1e0-4623-a4f9-520c4295cbfe">
+## 🚀 Features
 
+- **Cross-Platform Support**: Single codebase for iOS, Android, macOS, Web, and Windows
+- **Portfolio Showcase**: Interactive portfolio with case studies, app showcases, and publications
+- **User Authentication**: Firebase-based authentication with email/password, Google Sign-In, and Apple Sign-In
+- **Order Management**: Full order management system with admin capabilities
+- **Responsive Design**: Beautiful, responsive UI that adapts to different screen sizes
+- **Modern UI/UX**: Glassmorphism effects, smooth animations, and intuitive navigation
 
-# macOS
-<img width="1792" alt="Screenshot 2024-01-15 at 5 07 08 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/5320b308-e73e-481a-b800-1e70880dc85e">
-<img width="1792" alt="Screenshot 2024-01-15 at 5 08 25 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/398f14c6-74b9-4b51-aa1f-324354f88a3f">
-<img width="1792" alt="Screenshot 2024-01-15 at 5 08 01 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/dd7b2f1d-ae02-4d00-8dfa-64de7e156cf9">
-<img width="1792" alt="Screenshot 2024-01-15 at 5 07 08 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/60d067b2-f452-4149-92f3-82aadf239263">
+## 📱 Screenshots
 
-# Web
-<img width="1792" alt="Screenshot 2024-01-15 at 5 02 46 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/29a4283a-4edb-45fd-80b3-a9c4c52e03d9">
-<img width="1792" alt="Screenshot 2024-01-15 at 5 04 36 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/7632ae34-905b-451f-9356-33b7520e83e3">
-<img width="1792" alt="Screenshot 2024-01-15 at 5 03 33 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/abe60d03-d50c-4b95-bbdd-a91b234fe3f4">
-<img width="1792" alt="Screenshot 2024-01-15 at 5 02 46 PM" src="https://github.com/johnhcolani/MyWebSite/assets/91166301/eb6a6879-60a7-420c-903b-26475caad848">
+### Home Screen
+![Home Screen](assets/images/top-web-apps.png)
 
+### Portfolio
 
-# Windows
+For detailed portfolio information including apps, case studies, publications, and open source projects, see **[PORTFOLIO.md](PORTFOLIO.md)**.
+
+**Quick Overview:**
+- **10+ Mobile & Web Apps** - Published on App Store, Play Store, and Web
+- **Featured Case Study** - Absolute Stone Design (ASD) multi-role platform
+- **6 Technical Publications** - Medium articles on Flutter development
+- **Open Source Projects** - Packages and repositories on GitHub and Pub.dev
+
+![App Showcase](assets/images/app_store/asd-app.png)
+
+## 🛠️ Tech Stack
+
+- **Framework**: Flutter
+- **State Management**: BLoC (flutter_bloc)
+- **Backend**: Firebase (Authentication, Firestore)
+- **Architecture**: Clean Architecture with Domain-Driven Design
+- **UI Components**: Custom widgets with glassmorphism effects
+- **Fonts**: Google Fonts (Albert Sans)
+- **Icons**: Material Icons
+
+## 📦 Dependencies
+
+Key dependencies include:
+- `firebase_core` & `firebase_auth` - Authentication
+- `cloud_firestore` - Database
+- `flutter_bloc` - State management
+- `google_fonts` - Typography
+- `url_launcher` - External links
+- `webview_flutter` - In-app web views
+- `google_sign_in` & `sign_in_with_apple` - Social authentication
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK (latest stable version)
+- Dart SDK
+- Firebase account and project setup
+- Platform-specific requirements:
+  - **iOS**: Xcode and CocoaPods
+  - **Android**: Android Studio and Android SDK
+  - **Web**: Chrome or any modern browser
+  - **macOS**: Xcode
+  - **Windows**: Visual Studio with C++ tools
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/johnhcolani/MyWebSite.git
+cd MyWebSite
+```
+
+2. Install dependencies:
+```bash
+flutter pub get
+```
+
+3. Configure Firebase:
+   - Add your `google-services.json` (Android) to `android/app/`
+   - Add your `GoogleService-Info.plist` (iOS) to `ios/Runner/`
+   - Update `lib/firebase_options.dart` with your Firebase configuration
+
+4. Run the app:
+```bash
+# For web
+flutter run -d chrome
+
+# For Android
+flutter run -d android
+
+# For iOS
+flutter run -d ios
+```
+
+## 🌐 Deployment
+
+### Web Deployment (Firebase Hosting)
+
+1. Build the web app:
+```bash
+flutter build web --release
+```
+
+2. Deploy to Firebase:
+```bash
+firebase deploy --only hosting
+```
+
+Your app will be live at:
+- `https://my-web-page-ef286.web.app`
+- `https://my-web-page-ef286.firebaseapp.com`
+
+## 📱 Platform Support
+
+- ✅ **iOS** - Full support with App Store deployment
+- ✅ **Android** - Full support with Play Store deployment
+- ✅ **Web** - Responsive web application
+- ✅ **macOS** - Native macOS application
+- ✅ **Windows** - Native Windows application
+
+## 🎨 Design Features
+
+- **Glassmorphism UI**: Modern glass-like effects with backdrop filters
+- **Smooth Animations**: Custom animations and transitions
+- **Responsive Layout**: Adapts to mobile, tablet, and desktop screens
+- **Dark Theme**: Beautiful dark theme with orange and blue accents
+- **Custom Drawer**: Sliding menu with smooth animations
+
+## 📚 Project Structure
+
+```
+lib/
+├── core/              # Core utilities and widgets
+├── features/          # Feature modules
+│   ├── auth/         # Authentication feature
+│   ├── portfolio/    # Portfolio feature
+│   └── contract/     # Contract management
+├── screens/           # Main screens
+├── helper/           # Helper utilities
+├── data/             # Data models and repositories
+└── services/         # Business logic services
+```
+
+## 🔐 Authentication
+
+The app supports multiple authentication methods:
+- Email/Password authentication
+- Google Sign-In
+- Apple Sign-In
+- Email verification
+
+## 📝 License
+
+This project is private and proprietary.
+
+## 👤 Author
+
+**John Colani**
+- Portfolio: [4iDeas](https://my-web-page-ef286.web.app)
+- Email: Contact through the app
+- Location: Richmond, VA
+
+## 🙏 Acknowledgments
+
+Built with Flutter and Firebase, showcasing modern cross-platform development practices.
+
+---
+
+**Note**: This is a portfolio application demonstrating product design and development capabilities across multiple platforms.
