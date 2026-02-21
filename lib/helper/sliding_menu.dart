@@ -11,6 +11,7 @@ import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart'
 import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_orders_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_portfolio_screen.dart';
 import 'package:four_ideas/services/admin_service.dart';
 import 'package:four_ideas/screens/about_us_screen.dart';
 import 'package:four_ideas/screens/order_here_screen.dart';
@@ -307,8 +308,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           );
                                         },
                                       ),
-                                      // Admin menu item (only visible to admins)
-                                      if (AdminService.isAdmin())
+                                      // Admin menu items (only visible to admins)
+                                      if (AdminService.isAdmin()) ...[
                                         MenuItem(
                                           icon: Icons.admin_panel_settings,
                                           title: 'Admin - Orders',
@@ -321,6 +322,19 @@ class _SlidingMenuState extends State<SlidingMenu>
                                             );
                                           },
                                         ),
+                                        MenuItem(
+                                          icon: Icons.info_outline,
+                                          title: 'Admin - Portfolio & Info',
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => const AdminPortfolioScreen(),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ],
                                   );
                                 }

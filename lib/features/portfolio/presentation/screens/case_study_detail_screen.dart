@@ -1,10 +1,51 @@
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
+
+/// Corner radius (in logical pixels) used for all case study images in this screen.
+const double kCaseStudyImageCornerRadius = 30;
+
+/// Onboarding flow order: English (1st), Persian (2nd), Turkish (3rd), then rest by trailing number.
+const List<String> _onboardingFlowFirstPaths = [
+  'assets/images/on_boarding_image/on_boarding_en_1.png',  // 1st: English
+  'assets/images/on_boarding_image/on_boarding_fa_2.png',  // 2nd: Persian
+  'assets/images/on_boarding_image/on_boarding_tr_3.png', // 3rd: Turkish
+];
+
+/// Order images: first the three onboarding flows (EN, FA, TR), then rest by numbers at end of filename.
+List<CaseStudyImage> _sortImagesByTrailingNumber(List<CaseStudyImage> images) {
+  double orderFromPath(String path) {
+    final name = path.split('/').last.replaceAll(RegExp(r'\.(png|jpg|jpeg|webp)$', caseSensitive: false), '');
+    final parts = name.split('_');
+    final numerics = <int>[];
+    for (var i = parts.length - 1; i >= 0; i--) {
+      final n = int.tryParse(parts[i]);
+      if (n == null) break;
+      numerics.insert(0, n);
+    }
+    if (numerics.isEmpty) return 999.0;
+    double order = 0.0;
+    double divisor = 1.0;
+    for (final n in numerics) {
+      order += n / divisor;
+      divisor *= 10;
+    }
+    return order;
+  }
+  final pathToImage = {for (final img in images) img.path: img};
+  final result = <CaseStudyImage>[];
+  for (final path in _onboardingFlowFirstPaths) {
+    final img = pathToImage.remove(path);
+    if (img != null) result.add(img);
+  }
+  final rest = pathToImage.values.toList();
+  rest.sort((a, b) => orderFromPath(a.path).compareTo(orderFromPath(b.path)));
+  result.addAll(rest);
+  return result;
+}
 
 class CaseStudyDetailScreen extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
@@ -104,17 +145,26 @@ class CaseStudyDetailScreen extends StatelessWidget {
                               height: 1.6,
                             ),
                           ),
+                          if (caseStudy.designApproach != null && caseStudy.designApproach!.isNotEmpty) ...[
+                            SizedBox(height: he * 0.03),
+                            _DesignApproachBlock(
+                              content: caseStudy.designApproach!,
+                              bodySize: bodySize,
+                              he: he,
+                              isMobile: isMobile,
+                            ),
+                          ],
                           SizedBox(height: he * 0.04),
                           ...caseStudy.sections.map(
                             (s) => _SectionBlock(
                               title: s.title,
                               content: s.content,
-                              imagePaths: s.imagePaths,
+                              displayImages: s.displayImages,
                               bodySize: bodySize,
                               he: he,
                               isMobile: isMobile,
                               wi: wi,
-                              onImageHover: (imagePath) => _showImageDialog(context, imagePath, wi, he),
+                              onImageTap: (imagePath) => _showImageDialog(context, imagePath, wi, he),
                             ),
                           ),
                         ],
@@ -126,6 +176,64 @@ class CaseStudyDetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DesignApproachBlock extends StatelessWidget {
+  final String content;
+  final double bodySize;
+  final double he;
+  final bool isMobile;
+
+  const _DesignApproachBlock({
+    required this.content,
+    required this.bodySize,
+    required this.he,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(isMobile ? 16 : 20),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: ColorManager.orange.withValues(alpha: 0.35),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SelectableText(
+                'Design approach & principles',
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.orange,
+                  fontSize: bodySize + 2,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: he * 0.012),
+              SelectableText(
+                content,
+                style: GoogleFonts.albertSans(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: bodySize,
+                  height: 1.55,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -154,14 +262,14 @@ class _ClickableImage extends StatelessWidget {
           width: imageWidth,
           height: imageHeight,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
             child: Container(
               width: imageWidth,
               height: imageHeight,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(40),
+                borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
@@ -180,7 +288,7 @@ class _ClickableImage extends StatelessWidget {
                     height: imageHeight,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.2),
                       ),
@@ -212,6 +320,68 @@ class _ClickableImage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Wraps a case study image with optional description and corner radius caption.
+class _ImageWithCaption extends StatelessWidget {
+  final String imagePath;
+  final String? description;
+  final double imageWidth;
+  final double imageHeight;
+  final double bodySize;
+  final VoidCallback onTap;
+
+  const _ImageWithCaption({
+    required this.imagePath,
+    this.description,
+    required this.imageWidth,
+    required this.imageHeight,
+    required this.bodySize,
+    required this.onTap,
+  });
+
+  /// Display name from path: filename without extension, underscores to spaces, title case.
+  static String _imageNameFromPath(String path) {
+    final name = path.split('/').last.replaceAll(RegExp(r'\.(png|jpg|jpeg|webp)$', caseSensitive: false), '');
+    return name.replaceAll('_', ' ').split(' ').map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.length > 1 ? w.substring(1).toLowerCase() : ''}').join(' ');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayDescription = (description != null && description!.isNotEmpty) ? description! : _imageNameFromPath(imagePath);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _ClickableImage(
+          imagePath: imagePath,
+          imageWidth: imageWidth,
+          imageHeight: imageHeight,
+          onTap: onTap,
+        ),
+        SizedBox(height: 8),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SelectableText(
+                displayDescription,
+                style: GoogleFonts.albertSans(
+                  color: Colors.white,
+                  fontSize: bodySize * 0.9,
+                  height: 1.35,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -299,22 +469,22 @@ class _FullScreenImage extends StatelessWidget {
 class _SectionBlock extends StatelessWidget {
   final String title;
   final String content;
-  final List<String>? imagePaths;
+  final List<CaseStudyImage> displayImages;
   final double bodySize;
   final double he;
   final bool isMobile;
   final double wi;
-  final Function(String) onImageHover;
+  final Function(String) onImageTap;
 
   const _SectionBlock({
     required this.title,
     required this.content,
-    this.imagePaths,
+    required this.displayImages,
     required this.bodySize,
     required this.he,
     required this.isMobile,
     required this.wi,
-    required this.onImageHover,
+    required this.onImageTap,
   });
 
   @override
@@ -333,9 +503,9 @@ class _SectionBlock extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: title == 'The Solution'
                   ? [
-                      const Color(0xFFD81B60).withValues(alpha: 0.25),
-                      const Color(0xFFB0154F).withValues(alpha: 0.15),
-                      const Color(0xFFD81B60).withValues(alpha: 0.20),
+                      const Color(0xFFD81B60).withValues(alpha: 0.08),
+                      const Color(0xFFB0154F).withValues(alpha: 0.05),
+                      const Color(0xFFD81B60).withValues(alpha: 0.06),
                     ]
                   : [
                       Colors.white.withValues(alpha: 0.15),
@@ -346,7 +516,7 @@ class _SectionBlock extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: title == 'The Solution'
-                  ? const Color(0xFFD81B60).withValues(alpha: 0.5)
+                  ? const Color(0xFFD81B60).withValues(alpha: 0.18)
                   : Colors.white.withValues(alpha: 0.3),
               width: 1.5,
             ),
@@ -385,54 +555,100 @@ class _SectionBlock extends StatelessWidget {
                   height: 1.6,
                 ),
               ),
-              if (imagePaths != null && imagePaths!.isNotEmpty) ...[
+              if (displayImages.isNotEmpty) ...[
                 SizedBox(height: he * 0.02),
                 LayoutBuilder(
                   builder: (context, constraints) {
+                    final List<CaseStudyImage> sortedImages = _sortImagesByTrailingNumber(displayImages);
                     final double availableWidth = constraints.maxWidth;
-                    // Design system images: larger landscape size, other roles: mobile portrait size
                     final bool isDesignSystem = title == 'Design System (v3.0.11)';
+                    final bool isSolutionSection = title == 'The Solution';
                     
                     double imageWidth;
                     double imageHeight;
                     int crossAxisCount;
                     
                     if (isDesignSystem) {
-                      // Design system: landscape format
                       imageHeight = isMobile ? 240 : 320;
                       crossAxisCount = isMobile ? 1 : (availableWidth > 900 ? 3 : 2);
                       imageWidth = isMobile 
                           ? availableWidth 
                           : (availableWidth - (crossAxisCount - 1) * 12) / crossAxisCount;
+                    } else if (isSolutionSection) {
+                      crossAxisCount = isMobile ? 2 : (availableWidth > 900 ? 4 : (availableWidth > 600 ? 3 : 2));
+                      final double spacing = 12;
+                      final double totalGaps = (crossAxisCount - 1) * spacing;
+                      final double cellWidth = (availableWidth - totalGaps) / crossAxisCount;
+                      imageWidth = cellWidth;
+                      imageHeight = cellWidth * (2796 / 1290);
                     } else {
-                      // Role images: portrait mobile format (standing rectangle)
-                      // Actual image dimensions: 1290 x 2796
-                      // Aspect ratio: 1290/2796 ≈ 0.4614 (width:height)
-                      // Calculate height first, then width based on actual aspect ratio
                       imageHeight = isMobile 
-                          ? 450  // Mobile: larger height
+                          ? 450
                           : (availableWidth > 1200 ? 550 : (availableWidth > 800 ? 500 : 450));
-                      // Use actual image aspect ratio (1290/2796 = 0.4614)
-                      imageWidth = imageHeight * (1290 / 2796); // Exact aspect ratio from image dimensions
+                      imageWidth = imageHeight * (1290 / 2796);
                       crossAxisCount = isMobile 
-                          ? 2 
+                          ? 1
                           : (availableWidth > 1200 ? 4 : (availableWidth > 900 ? 3 : 2));
                     }
                     
                     final double spacing = 12;
-                    
+                    final bool showOneByOneCentered = isMobile && !isDesignSystem && !isSolutionSection;
+                    final bool hasDescriptions = sortedImages.any((img) => img.description != null && img.description!.isNotEmpty);
+
+                    Widget buildImageItem(CaseStudyImage item) {
+                      return _ImageWithCaption(
+                        imagePath: item.path,
+                        description: item.description,
+                        imageWidth: imageWidth,
+                        imageHeight: imageHeight,
+                        bodySize: bodySize,
+                        onTap: () => onImageTap(item.path),
+                      );
+                    }
+
+                    if (showOneByOneCentered) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: List.generate(sortedImages.length, (index) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: index < sortedImages.length - 1 ? spacing : 0,
+                            ),
+                            child: Center(
+                              child: buildImageItem(sortedImages[index]),
+                            ),
+                          );
+                        }),
+                      );
+                    }
+
+                    if (isSolutionSection && sortedImages.length > 1) {
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisSpacing: spacing,
+                          crossAxisSpacing: spacing,
+                          childAspectRatio: imageWidth / (imageHeight + (hasDescriptions ? 88 : 48)),
+                        ),
+                        itemCount: sortedImages.length,
+                        itemBuilder: (context, index) {
+                          return Center(
+                            child: buildImageItem(sortedImages[index]),
+                          );
+                        },
+                      );
+                    }
+
                     return Wrap(
                       spacing: spacing,
                       runSpacing: spacing,
-                      alignment: WrapAlignment.start,
-                      children: imagePaths!.map((imagePath) {
-                        return _ClickableImage(
-                          imagePath: imagePath,
-                          imageWidth: imageWidth,
-                          imageHeight: imageHeight,
-                          onTap: () => onImageHover(imagePath),
-                        );
-                      }).toList(),
+                      alignment: isSolutionSection ? WrapAlignment.center : WrapAlignment.start,
+                      children: List.generate(sortedImages.length, (index) {
+                        return buildImageItem(sortedImages[index]);
+                      }),
                     );
                   },
                 ),

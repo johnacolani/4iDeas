@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/features/portfolio/presentation/screens/design_philosophy_screen.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/case_study_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/helper/app_background.dart';
-import 'package:four_ideas/screens/portfolio_webview_screen.dart';
+import 'package:four_ideas/services/portfolio_content_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -17,6 +18,30 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
+  final PortfolioContentService _portfolioService = PortfolioContentService();
+  List<PortfolioApp>? _appsFromFirestore;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPortfolioApps();
+  }
+
+  Future<void> _loadPortfolioApps() async {
+    try {
+      final hasAny = await _portfolioService.hasApps();
+      if (hasAny) {
+        final apps = await _portfolioService.getApps();
+        if (mounted) setState(() => _appsFromFirestore = apps);
+      }
+    } catch (_) {}
+  }
+
+  List<PortfolioApp> get _displayApps =>
+      (_appsFromFirestore != null && _appsFromFirestore!.isNotEmpty)
+          ? _appsFromFirestore!
+          : PortfolioData.apps;
+
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
@@ -73,7 +98,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           isMobile: isMobile,
                           sectionTitleSize: sectionTitleSize,
                         ),
-                        SizedBox(height: he * 0.05),
+                        SizedBox(height: he * 0.04),
+
+                        // Design Philosophy
+                        _DesignPhilosophyCard(
+                          bodySize: bodySize,
+                          isMobile: isMobile,
+                        ),
+                        SizedBox(height: he * 0.04),
 
                         // Featured Case Studies
                         _SectionTitle(
@@ -128,10 +160,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 crossAxisSpacing: spacing,
                                 mainAxisSpacing: spacing,
                               ),
-                              itemCount: PortfolioData.apps.length,
+                              itemCount: _displayApps.length,
                               itemBuilder: (context, index) {
                                 return PortfolioAppCard(
-                                  app: PortfolioData.apps[index],
+                                  app: _displayApps[index],
                                   isMobile: isMobile,
                                   isTablet: isTablet,
                                 );
@@ -271,6 +303,84 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DesignPhilosophyCard extends StatelessWidget {
+  final double bodySize;
+  final bool isMobile;
+
+  const _DesignPhilosophyCard({
+    required this.bodySize,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => const DesignPhilosophyScreen(),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(isMobile ? 18 : 22),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: ColorManager.orange.withValues(alpha: 0.4),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                color: ColorManager.orange,
+                size: isMobile ? 32 : 36,
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectableText(
+                      'Design Philosophy & Principles',
+                      style: GoogleFonts.albertSans(
+                        color: Colors.white,
+                        fontSize: bodySize + 2,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    SelectableText(
+                      'How I approach product design: empathy, process, and principles.',
+                      style: GoogleFonts.albertSans(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: bodySize,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: ColorManager.orange.withValues(alpha: 0.9),
+                size: 18,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

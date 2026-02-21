@@ -1,4 +1,5 @@
 /// Portfolio data models and content for the product design showcase.
+library;
 
 class PortfolioApp {
   final String id;
@@ -20,6 +21,30 @@ class PortfolioApp {
     this.playStoreUrl,
     this.webUrl,
   });
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        'imagePath': imagePath,
+        'useComingSoonPlaceholder': useComingSoonPlaceholder,
+        'appStoreUrl': appStoreUrl,
+        'playStoreUrl': playStoreUrl,
+        'webUrl': webUrl,
+      };
+
+  static PortfolioApp fromMap(String docId, Map<String, dynamic> map) {
+    return PortfolioApp(
+      id: map['id'] as String? ?? docId,
+      name: map['name'] as String? ?? '',
+      description: map['description'] as String? ?? '',
+      imagePath: map['imagePath'] as String?,
+      useComingSoonPlaceholder: map['useComingSoonPlaceholder'] as bool? ?? false,
+      appStoreUrl: map['appStoreUrl'] as String?,
+      playStoreUrl: map['playStoreUrl'] as String?,
+      webUrl: map['webUrl'] as String?,
+    );
+  }
 }
 
 class PortfolioPublication {
@@ -34,6 +59,8 @@ class PortfolioCaseStudy {
   final String title;
   final String subtitle;
   final String overview;
+  /// Optional: design philosophy & principles applied in this case study.
+  final String? designApproach;
   final List<CaseStudySection> sections;
 
   const PortfolioCaseStudy({
@@ -41,7 +68,20 @@ class PortfolioCaseStudy {
     required this.title,
     required this.subtitle,
     required this.overview,
+    this.designApproach,
     required this.sections,
+  });
+}
+
+/// A case study image with optional caption.
+/// All case study images use the same corner radius (see [CaseStudyDetailScreen]).
+class CaseStudyImage {
+  final String path;
+  final String? description;
+
+  const CaseStudyImage({
+    required this.path,
+    this.description,
   });
 }
 
@@ -49,12 +89,24 @@ class CaseStudySection {
   final String title;
   final String content;
   final List<String>? imagePaths;
+  /// When set, used instead of [imagePaths]; allows a description per image.
+  final List<CaseStudyImage>? images;
 
   const CaseStudySection({
     required this.title,
     required this.content,
     this.imagePaths,
+    this.images,
   });
+
+  /// Images to display: [images] if set, otherwise [imagePaths] as [CaseStudyImage] with no description.
+  List<CaseStudyImage> get displayImages {
+    if (images != null && images!.isNotEmpty) return images!;
+    if (imagePaths != null && imagePaths!.isNotEmpty) {
+      return imagePaths!.map((p) => CaseStudyImage(path: p)).toList();
+    }
+    return [];
+  }
 }
 
 class PortfolioData {
@@ -175,7 +227,7 @@ class PortfolioData {
           id: 'my-web-site',
           name: '4iDeas - Portfolio Website',
           description:
-              'Personal portfolio website showcasing Flutter app development, backend services, and product design work. Features responsive design, interactive portfolio showcase, order form with Formspree integration, and modern UI with liquid glass effects. Built with Flutter Web and deployed on Firebase Hosting.',
+              'Portfolio site: Flutter apps, backend services, product design. Responsive showcase, order form, modern UI. Flutter Web on Firebase.',
           imagePath: 'assets/images/app_store/my-web-site-01.png',
           appStoreUrl: null,
           playStoreUrl: null,
@@ -234,6 +286,12 @@ class PortfolioData {
           overview:
               'Absolute Stone Design (ASD) is a production‑ready, multi‑role operations platform built for a real stone fabrication and installation business. The product replaces fragmented workflows such as phone calls, text messages, spreadsheets, and disconnected tools with a single, unified system supporting Admins, Sales Representatives, Schedulers, Installers, and Clients. I owned the product end‑to‑end: strategy, UX/UI, design system, AI governance, data architecture, and cross‑platform delivery on iOS, Android, and Web.\n\n'
               '**Senior-Level Highlights:** Complex multi-role workflows, systems thinking with unified data models, AI governance with human oversight, ecosystem integration, cross-functional alignment, and regulated flows with audit trails.',
+          designApproach:
+              'Design principles applied — Circle Method (Comprehend → Identify Users → Report Needs → Cut & Prioritize → List Solutions → Evaluate Trade-offs → Recommend). '
+              'User types considered: Typical users (intuitive nav, clear labels), Frequent users (shortcuts, analytics), First-time users (onboarding, progressive disclosure). '
+              'STAR framing: Situation (fragmented workflows), Task (unified platform), Action (role-based dashboards, AI governance, design system), Result (70% less coordination overhead, 60% inquiries handled by AI). '
+              'WCAG 2.2 AA target: perceivable (contrast, typography), operable (keyboard, focus, touch targets), understandable (consistent nav, error messages), robust (semantic widgets, cross-platform). '
+              'Problem-first thinking, collaboration with PM/eng, iteration over perfection.',
           sections: [
             CaseStudySection(
               title: 'Problem Statement',
@@ -568,6 +626,12 @@ class PortfolioData {
           subtitle: 'Consumer Spiritual App',
           overview:
               'Scripture reading experience that feels personal, emotionally resonant, and culturally respectful. Supports Persian–English and Turkish–English with visual preference selection instead of text forms. "Show, Don\'t Ask" design philosophy.',
+          designApproach:
+              'Design philosophy applied — Empathy as foundation: respect users, avoid long forms, prefer visual choice over surveys. '
+              'Progressive personalization: invite users to personalize via short onboarding; adaptation feels like understanding, not surveillance. '
+              'Context-aware design: seasonal and emotional themes (time of year, state of mind) build trust and comfort. '
+              '"Show, Don\'t Ask": image-based preference selection (seasons, emotions, holidays, fonts) instead of text forms; 85–90% onboarding completion vs. ~40% industry average. '
+              'Principles: problem-first thinking, safety and privacy by design, collaboration over ego, ethics over trends.',
           sections: [
             CaseStudySection(
               title: 'The Problem',
@@ -578,30 +642,30 @@ class PortfolioData {
               title: 'The Solution',
               content:
                   '"Show, Don\'t Ask" — Users select preferences through beautiful visual choices (seasons, emotions, holidays, fonts) instead of forms. Estimated 85–90% onboarding completion vs. 40% for text forms. Visual personalization creates ownership.',
-              imagePaths: [
-                'assets/images/on_boarding_image/access_camera.png',
-                'assets/images/on_boarding_image/book_mark_home.png',
-                'assets/images/on_boarding_image/choos_fonts.png',
-                'assets/images/on_boarding_image/christmas_image.png',
-                'assets/images/on_boarding_image/color_theme.png',
-                'assets/images/on_boarding_image/complete_on_boarding.png',
-                'assets/images/on_boarding_image/create_new_color.png',
-                'assets/images/on_boarding_image/custome_home_screen.png',
-                'assets/images/on_boarding_image/default_app.png',
-                'assets/images/on_boarding_image/emotional_state.png',
-                'assets/images/on_boarding_image/fall_image.png',
-                'assets/images/on_boarding_image/import_image.png',
-                'assets/images/on_boarding_image/navigate_book_mark.png',
-                'assets/images/on_boarding_image/new_year_image.png',
-                'assets/images/on_boarding_image/nowruz_image.png',
-                'assets/images/on_boarding_image/on_boarding_en.png',
-                'assets/images/on_boarding_image/on_boarding_fa.png',
-                'assets/images/on_boarding_image/on_boarding_tr.png',
-                'assets/images/on_boarding_image/seasonal_theme.png',
-                'assets/images/on_boarding_image/spring_image.png',
-                'assets/images/on_boarding_image/summer_image.png',
-                'assets/images/on_boarding_image/system_theme.png',
-                'assets/images/on_boarding_image/winter_image.png',
+              images: [
+                CaseStudyImage(path: 'assets/images/on_boarding_image/access_camera_10_1.png', description: 'Permission to access device camera for importing personal images.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/book_mark_home_17.png', description: 'Bookmarks and home screen with quick access to saved verses.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/choos_fonts_15.png', description: 'Font selection for English and Persian to personalize reading comfort.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/christmas_image_13.png', description: 'Christmas seasonal theme option for the reading experience.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/color_theme_4.png', description: 'Color theme picker for app accent and background.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/complete_on_boarding.png', description: 'Completion screen: "Everything is Ready!" with summary of choices.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/create_new_color_4_1.png', description: 'Create a custom color for themes.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/custome_home_screen_16.png', description: 'Customizable home screen layout and preferences.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/default_app_00.png', description: 'Default app appearance before personalization.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/emotional_state_14.png', description: 'Emotional state selection (e.g. peaceful, joyful) for matching content.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/fall_image_8.png', description: 'Fall / autumn seasonal theme.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/import_image_10.png', description: 'Import personal images for backgrounds or themes.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/navigate_book_mark_18.png', description: 'Navigation to bookmarks and saved content.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/new_year_image_11.png', description: 'New Year seasonal theme option.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/nowruz_image_12.png', description: 'Nowruz (Persian New Year) cultural theme.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/on_boarding_en_1.png', description: 'Onboarding flow in English.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/on_boarding_fa_2.png', description: 'Onboarding flow in Persian (Farsi) with RTL.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/on_boarding_tr_3.png', description: 'Onboarding flow in Turkish.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/seasonal_theme_5.png', description: 'Seasonal theme selector (Spring, Summer, Fall, Winter).'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/spring_image_6.png', description: 'Spring seasonal theme.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/summer_image_7.png', description: 'Summer seasonal theme.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/system_theme_4_2.png', description: 'Follow system light/dark theme.'),
+                CaseStudyImage(path: 'assets/images/on_boarding_image/winter_image_9.png', description: 'Winter seasonal theme.'),
               ],
             ),
             CaseStudySection(

@@ -282,7 +282,7 @@ class GlassOutlinedText extends StatelessWidget {
               ),
             ),
 
-            // 💎 Thin glass edge with directional light
+            // 💎 Thin glass edge with directional light (very light pink, subtle)
             SelectableText(
               text,
               style: GoogleFonts.albertSans(
@@ -291,12 +291,12 @@ class GlassOutlinedText extends StatelessWidget {
                 foreground: Paint()
                   ..style = PaintingStyle.stroke
                   ..strokeWidth = 0.8 // thinner, realistic glass
-                  ..shader = const LinearGradient(
+                  ..shader = LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xFFD81B60), // dark pink light hit
-                      Color(0xFFB0154F), // darker pink shadow side
+                      const Color(0xFFD81B60).withOpacity(0.35), // light pink
+                      const Color(0xFFB0154F).withOpacity(0.22), // lighter pink shadow
                     ],
                   ).createShader(rect),
               ),
