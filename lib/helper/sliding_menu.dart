@@ -13,11 +13,9 @@ import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart
 import 'package:four_ideas/features/admin/presentation/screens/admin_orders_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_portfolio_screen.dart';
 import 'package:four_ideas/services/admin_service.dart';
-import 'package:four_ideas/screens/about_us_screen.dart';
-import 'package:four_ideas/screens/order_here_screen.dart';
-import 'package:four_ideas/screens/portfolio_screen.dart';
-import 'package:four_ideas/screens/services_screen.dart';
+import 'package:four_ideas/app_router.dart';
 import 'package:sizer/sizer.dart';
+import 'package:go_router/go_router.dart';
 
 import 'alert_dialog_data.dart';
 
@@ -52,6 +50,14 @@ class _SlidingMenuState extends State<SlidingMenu>
       _animationController.reverse();
     });
     Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+  }
+
+  void _closeDrawerAndGo(String path) {
+    setState(() {
+      isSlideOpen = false;
+      _animationController.reverse();
+    });
+    context.go(path);
   }
 
   @override
@@ -270,21 +276,21 @@ class _SlidingMenuState extends State<SlidingMenu>
                               icon: Icons.design_services,
                               title: 'Services',
                               onPressed: () {
-                                _closeDrawerAndNavigate(ServicesScreen());
+                                _closeDrawerAndGo(AppRoutes.services);
                               },
                             ),
                             MenuItem(
                               icon: Icons.people,
                               title: 'About Us',
                               onPressed: () {
-                                _closeDrawerAndNavigate(const AboutUsScreen());
+                                _closeDrawerAndGo(AppRoutes.about);
                               },
                             ),
                             MenuItem(
                               icon: Icons.note,
                               title: 'Portfolio',
                               onPressed: () {
-                                _closeDrawerAndNavigate(const PortfolioScreen());
+                                _closeDrawerAndGo(AppRoutes.portfolio);
                               },
                             ),
                             MenuItem(
@@ -293,7 +299,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                               onPressed: () {
                                 final authState = context.read<AuthBloc>().state;
                                 if (authState is Authenticated) {
-                                  _closeDrawerAndNavigate(const OrderHereScreen());
+                                  _closeDrawerAndGo(AppRoutes.orderHere);
                                 } else {
                                   setState(() {
                                     isSlideOpen = false;

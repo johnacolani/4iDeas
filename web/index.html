@@ -63,11 +63,6 @@
   <link rel="canonical" href="https://4ideas.com/">
   <link rel="manifest" href="manifest.json">
 
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = null;
-  </script>
-  
   <!-- Firebase SDK - Commented out until configured -->
   <!-- Uncomment and add your Firebase config below once you've set up Firebase -->
   <!--
@@ -91,25 +86,9 @@
     }
   </script>
   -->
-  
-  <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer></script>
 </head>
 <body>
-  <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
+  <!-- Flutter bootstrap (uses FlutterLoader.load; service worker is optional) -->
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

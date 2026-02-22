@@ -10,6 +10,8 @@ import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
 import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
 import 'package:four_ideas/services/order_service.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1394,6 +1396,10 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xff020923),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRoutes.home),
+        ),
         title: Text(
           'Order Here',
           style: GoogleFonts.albertSans(

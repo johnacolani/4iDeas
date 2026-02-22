@@ -8,6 +8,8 @@ import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/portfolio_content_service.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -65,6 +67,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         iconTheme: IconThemeData(color: Colors.amber[100]),
         centerTitle: true,
         backgroundColor: const Color(0xff020923),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRoutes.home),
+        ),
         title: Text(
           'Portfolio',
           style: GoogleFonts.albertSans(

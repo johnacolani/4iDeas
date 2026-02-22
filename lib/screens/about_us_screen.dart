@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/helper/app_background.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsScreen extends StatefulWidget {
@@ -34,6 +36,10 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xff020923),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRoutes.home),
+        ),
         title: SelectableText(
           'About Us',
           style: GoogleFonts.albertSans(

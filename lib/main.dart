@@ -8,6 +8,8 @@ import 'package:four_ideas/injection/injection_container.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/screens/home_screen.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 
 void main() async {
@@ -30,11 +32,14 @@ void main() async {
     debugPrint('App will continue but authentication features may not work');
   }
   
-  runApp(const MyApp());
+  final goRouter = createAppRouter();
+  runApp(MyApp(router: goRouter));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.router});
+
+  final GoRouter router;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +63,8 @@ class MyApp extends StatelessWidget {
         },
         child: Sizer(
           builder: (context, orientation, deviceType) {
-            return MaterialApp(
+            return MaterialApp.router(
+              routerConfig: router,
               debugShowCheckedModeBanner: false,
               title: 'My Web Page',
               theme: ThemeData(
@@ -71,7 +77,6 @@ class MyApp extends StatelessWidget {
                   trackColor: WidgetStateProperty.all(Colors.white.withValues(alpha: 0.12)),
                 ),
               ),
-              home: const HomeScreen(),
             );
           },
         ),

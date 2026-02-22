@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 
 import '../core/ColorManager.dart';
-import '../screens/portfolio_screen.dart';
+import '../app_router.dart';
 
 class AlertDialogData extends StatelessWidget {
   const AlertDialogData({
@@ -198,11 +199,7 @@ class AlertDialogData extends StatelessWidget {
                         value: 'View Portfolio',
                         onTap: () {
                           Navigator.of(context).pop();
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (context) => const PortfolioScreen(),
-                            ),
-                          );
+                          context.go(AppRoutes.portfolio);
                         },
                         isMobile: isMobile,
                       ),

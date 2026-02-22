@@ -401,12 +401,15 @@ class _LinkChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double minTouchTarget = 48.0;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: ConstrainedBox(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: ConstrainedBox(
           constraints: const BoxConstraints(
             minWidth: minTouchTarget,
             minHeight: minTouchTarget,
@@ -439,6 +442,7 @@ class _LinkChip extends StatelessWidget {
               ),
             ),
           ),
+        ),
         ),
       ),
     );

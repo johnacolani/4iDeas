@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/helper/app_background.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -32,6 +34,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xff020923),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRoutes.home),
+        ),
         title: SelectableText(
           'Services',
           style: GoogleFonts.albertSans(
