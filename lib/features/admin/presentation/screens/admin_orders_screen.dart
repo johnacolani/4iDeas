@@ -166,13 +166,16 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               ),
             )
           else
-            ListView.builder(
-              padding: EdgeInsets.all(isMobile ? 16 : 24),
-              itemCount: _orders.length,
-              itemBuilder: (context, index) {
-                final order = _orders[index];
-                return _buildOrderCard(order, isMobile);
-              },
+            Scrollbar(
+              thumbVisibility: true,
+              child: ListView.builder(
+                padding: EdgeInsets.all(isMobile ? 16 : 24),
+                itemCount: _orders.length,
+                itemBuilder: (context, index) {
+                  final order = _orders[index];
+                  return _buildOrderCard(order, isMobile);
+                },
+              ),
             ),
         ],
       ),

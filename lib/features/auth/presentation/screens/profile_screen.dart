@@ -106,12 +106,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     : (state as EmailNotVerified).user;
 
                 return SafeArea(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 16.0 : 24.0,
-                      vertical: 20.0,
-                    ),
-                    child: Column(
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 16.0 : 24.0,
+                        vertical: 20.0,
+                      ),
+                      child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // User Info Card
@@ -121,6 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         // My Orders Section
                         _buildMyOrdersSection(isMobile, he),
                       ],
+                    ),
                     ),
                   ),
                 );

@@ -78,8 +78,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         children: [
           const AppBackground(),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: CustomScrollView(
+                slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
@@ -263,6 +265,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   ),
                 ),
               ],
+              ),
             ),
           ),
         ],

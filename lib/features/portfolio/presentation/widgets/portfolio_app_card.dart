@@ -26,9 +26,17 @@ class PortfolioAppCard extends StatelessWidget {
     final double titleSize = isMobile ? 15 : (isTablet ? 17 : 18);
     final double bodySize = isMobile ? 12 : (isTablet ? 13 : 14);
 
+    final String? primaryUrl = app.webUrl ?? app.appStoreUrl ?? app.playStoreUrl;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Container(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: primaryUrl != null ? () => _launch(primaryUrl) : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+        width: double.infinity,
         padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.08),
@@ -86,6 +94,8 @@ class PortfolioAppCard extends StatelessWidget {
                 _buildButtons(),
               ],
             ),
+          ),
+        ),
       ),
     );
   }
@@ -118,9 +128,11 @@ class PortfolioAppCard extends StatelessWidget {
 
   Widget _buildButtons() {
     return Center(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
+      child: Scrollbar(
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -142,6 +154,7 @@ class PortfolioAppCard extends StatelessWidget {
               ..._buildAllStoreButtonsWithSpacing(),
           ],
         ),
+        ),
       ),
     );
   }
@@ -161,11 +174,54 @@ class PortfolioAppCard extends StatelessWidget {
             ),
           )
         : app.imagePath != null
-            ? Image.asset(
-                app.imagePath!,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => _buildPlaceholder(),
-              )
+            ? (app.showComingSoonOverlay
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Container(
+                        color: ColorManager.blue.withValues(alpha: 0.12),
+                        child: Center(
+                          child: Image.asset(
+                            app.imagePath!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: isMobile ? 6 : 8,
+                            horizontal: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ColorManager.orange.withValues(alpha: 0.9),
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(8),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Coming Soon',
+                              style: GoogleFonts.albertSans(
+                                color: Colors.white,
+                                fontSize: isMobile ? 12 : 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Image.asset(
+                    app.imagePath!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                  ))
             : _buildPlaceholder();
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
@@ -344,33 +400,45 @@ class _LinkChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 6 : 8,
-          vertical: isMobile ? 4 : 5,
-        ),
-        decoration: BoxDecoration(
-          color: ColorManager.orange.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: ColorManager.orange.withValues(alpha: 0.5)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: isMobile ? 12 : 14, color: ColorManager.orange),
-            SizedBox(width: 4),
-            SelectableText(
-              label,
-              style: GoogleFonts.albertSans(
-                color: ColorManager.orange,
-                fontSize: isMobile ? 10 : 11,
-                fontWeight: FontWeight.w600,
+    const double minTouchTarget = 48.0;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: minTouchTarget,
+            minHeight: minTouchTarget,
+          ),
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 10 : 12,
+                vertical: isMobile ? 8 : 10,
+              ),
+              decoration: BoxDecoration(
+                color: ColorManager.orange.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: ColorManager.orange.withValues(alpha: 0.5)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: isMobile ? 12 : 14, color: ColorManager.orange),
+                  SizedBox(width: 4),
+                  SelectableText(
+                    label,
+                    style: GoogleFonts.albertSans(
+                      color: ColorManager.orange,
+                      fontSize: isMobile ? 10 : 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

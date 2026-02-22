@@ -33,8 +33,7 @@ class CaseStudyCard extends StatelessWidget {
           );
         },
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: EdgeInsets.all(isMobile ? 20 : 24),
+        child: Ink(
           decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -54,7 +53,10 @@ class CaseStudyCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(isMobile ? 20 : 24),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SelectableText(
@@ -104,7 +106,8 @@ class CaseStudyCard extends StatelessWidget {
               ],
             ),
           ],
-          ),
+        ),
+        ),
         ),
       ),
     );

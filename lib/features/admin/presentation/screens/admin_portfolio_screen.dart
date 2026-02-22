@@ -182,8 +182,10 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
               ),
             )
           else
-            CustomScrollView(
-              slivers: [
+            Scrollbar(
+              thumbVisibility: true,
+              child: CustomScrollView(
+                slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -234,6 +236,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                   ),
                 const SliverToBoxAdapter(child: SizedBox(height: 80)),
               ],
+              ),
             ),
         ],
       ),

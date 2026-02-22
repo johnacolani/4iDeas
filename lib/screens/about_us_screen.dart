@@ -47,8 +47,10 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         children: [
           const AppBackground(),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: CustomScrollView(
+                slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
@@ -223,6 +225,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   ),
                 ),
               ],
+              ),
             ),
           ),
         ],

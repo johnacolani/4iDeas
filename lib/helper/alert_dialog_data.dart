@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/ColorManager.dart';
+import '../screens/portfolio_screen.dart';
 
 class AlertDialogData extends StatelessWidget {
   const AlertDialogData({
@@ -195,8 +196,14 @@ class AlertDialogData extends StatelessWidget {
                         icon: Icons.public,
                         label: 'Portfolio',
                         value: 'View Portfolio',
-                        onTap: () => _launchURL(
-                            'https://sites.google.com/view/senior-interaction-product-d/home'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (context) => const PortfolioScreen(),
+                            ),
+                          );
+                        },
                         isMobile: isMobile,
                       ),
                     ],

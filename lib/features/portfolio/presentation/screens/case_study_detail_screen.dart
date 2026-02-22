@@ -113,8 +113,10 @@ class CaseStudyDetailScreen extends StatelessWidget {
         children: [
           const AppBackground(),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: CustomScrollView(
+                slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
@@ -146,7 +148,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             ),
                           ),
                           if (caseStudy.designApproach != null && caseStudy.designApproach!.isNotEmpty) ...[
-                            SizedBox(height: he * 0.03),
+                            SizedBox(height: he * 0.025),
                             _DesignApproachBlock(
                               content: caseStudy.designApproach!,
                               bodySize: bodySize,
@@ -154,9 +156,9 @@ class CaseStudyDetailScreen extends StatelessWidget {
                               isMobile: isMobile,
                             ),
                           ],
-                          SizedBox(height: he * 0.04),
-                          ...caseStudy.sections.map(
-                            (s) => _SectionBlock(
+                          ...caseStudy.sections.expand((s) => [
+                            SizedBox(height: he * 0.025),
+                            _SectionBlock(
                               title: s.title,
                               content: s.content,
                               displayImages: s.displayImages,
@@ -166,13 +168,27 @@ class CaseStudyDetailScreen extends StatelessWidget {
                               wi: wi,
                               onImageTap: (imagePath) => _showImageDialog(context, imagePath, wi, he),
                             ),
+                          ]),
+                          SizedBox(height: he * 0.06),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(5, (i) => Padding(
+                              padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 10),
+                              child: Icon(
+                                Icons.star_rounded,
+                                color: Colors.amber.withValues(alpha: 0.7 - i * 0.08),
+                                size: isMobile ? 28 : 36,
+                              ),
+                            )),
                           ),
+                          SizedBox(height: he * 0.06),
                         ],
                       ),
                     ),
                   ),
                 ),
               ],
+              ),
             ),
           ),
         ],
@@ -495,7 +511,6 @@ class _SectionBlock extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
           width: double.infinity,
-          margin: EdgeInsets.only(bottom: he * 0.03),
           padding: EdgeInsets.all(isMobile ? 16 : 20),
           decoration: BoxDecoration(
             gradient: LinearGradient(

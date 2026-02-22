@@ -72,12 +72,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             builder: (context, state) {
               return SafeArea(
                 child: Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 24.0 : 32.0,
-                      vertical: 20.0,
-                    ),
-                    child: ConstrainedBox(
+                  child: Scrollbar(
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 24.0 : 32.0,
+                          vertical: 20.0,
+                        ),
+                        child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: isMobile ? double.infinity : 500,
                       ),
@@ -250,6 +252,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       ),
                     ),
                   ),
+                ),
                 ),
               );
             },

@@ -84,11 +84,13 @@ class _LoginScreenState extends State<LoginScreen> {
             builder: (context, state) {
               return SafeArea(
                 child: Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 24.0 : 32.0,
-                      vertical: 20.0,
-                    ),
+                  child: Scrollbar(
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 24.0 : 32.0,
+                          vertical: 20.0,
+                        ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: isMobile ? double.infinity : 400,
@@ -371,6 +373,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                ),
                 ),
               );
             },

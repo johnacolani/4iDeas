@@ -7,6 +7,8 @@ class PortfolioApp {
   final String description;
   final String? imagePath;
   final bool useComingSoonPlaceholder;
+  /// When true, show the image (if any) with a "Coming Soon" overlay.
+  final bool showComingSoonOverlay;
   final String? appStoreUrl;
   final String? playStoreUrl;
   final String? webUrl;
@@ -17,6 +19,7 @@ class PortfolioApp {
     required this.description,
     this.imagePath,
     this.useComingSoonPlaceholder = false,
+    this.showComingSoonOverlay = false,
     this.appStoreUrl,
     this.playStoreUrl,
     this.webUrl,
@@ -28,6 +31,7 @@ class PortfolioApp {
         'description': description,
         'imagePath': imagePath,
         'useComingSoonPlaceholder': useComingSoonPlaceholder,
+        'showComingSoonOverlay': showComingSoonOverlay,
         'appStoreUrl': appStoreUrl,
         'playStoreUrl': playStoreUrl,
         'webUrl': webUrl,
@@ -40,6 +44,7 @@ class PortfolioApp {
       description: map['description'] as String? ?? '',
       imagePath: map['imagePath'] as String?,
       useComingSoonPlaceholder: map['useComingSoonPlaceholder'] as bool? ?? false,
+      showComingSoonOverlay: map['showComingSoonOverlay'] as bool? ?? false,
       appStoreUrl: map['appStoreUrl'] as String?,
       playStoreUrl: map['playStoreUrl'] as String?,
       webUrl: map['webUrl'] as String?,
@@ -238,8 +243,9 @@ class PortfolioData {
           name: 'Vision Exercise',
           description:
               'Vision therapy app for people with crossed eyes (strabismus). Guided eye-muscle exercises to strengthen coordination and alignment. Directional focus tasks, motion tracking, progressive difficulty. Accessible home-based supplement to clinical therapy.',
-          imagePath: null,
-          useComingSoonPlaceholder: true,
+          imagePath: 'assets/images/vision_exercise.png',
+          useComingSoonPlaceholder: false,
+          showComingSoonOverlay: true,
           appStoreUrl: null,
           playStoreUrl: null,
         ),
@@ -625,10 +631,12 @@ class PortfolioData {
           title: 'Twin Scriptures',
           subtitle: 'Consumer Spiritual App',
           overview:
-              'Scripture reading experience that feels personal, emotionally resonant, and culturally respectful. Supports Persian–English and Turkish–English with visual preference selection instead of text forms. "Show, Don\'t Ask" design philosophy.',
+              'Scripture reading experience that feels personal, emotionally resonant, and culturally respectful. Supports Persian–English and Turkish–English with visual preference selection instead of text forms. '
+              'We added the onboarding theme so users can design their own UI — themes, fonts, seasons, and emotions — making the app feel personal. "Show, Don\'t Ask" design philosophy.',
           designApproach:
               'Design philosophy applied — Empathy as foundation: respect users, avoid long forms, prefer visual choice over surveys. '
               'Progressive personalization: invite users to personalize via short onboarding; adaptation feels like understanding, not surveillance. '
+              'Why we added the onboarding theme: so users can design their UI (themes, fonts, seasons, emotions); this puts design in their hands and drives 85–90% completion. '
               'Context-aware design: seasonal and emotional themes (time of year, state of mind) build trust and comfort. '
               '"Show, Don\'t Ask": image-based preference selection (seasons, emotions, holidays, fonts) instead of text forms; 85–90% onboarding completion vs. ~40% industry average. '
               'Principles: problem-first thinking, safety and privacy by design, collaboration over ego, ethics over trends.',
@@ -667,6 +675,14 @@ class PortfolioData {
                 CaseStudyImage(path: 'assets/images/on_boarding_image/system_theme_4_2.png', description: 'Follow system light/dark theme.'),
                 CaseStudyImage(path: 'assets/images/on_boarding_image/winter_image_9.png', description: 'Winter seasonal theme.'),
               ],
+            ),
+            CaseStudySection(
+              title: 'Why We Added the Onboarding Theme',
+              content:
+                  'We added the onboarding theme so that users can design their own UI. '
+                  'Instead of a one-size-fits-all experience, each person chooses themes, fonts, seasons, and emotions that reflect their taste and context. '
+                  'This puts design in the user\'s hands: they shape the app to feel personal, which drives engagement and the high completion rates we see. '
+                  'Letting users design their UI is a core reason we achieved 85–90% onboarding completion (vs. ~40% industry average) and why users report a "personal feel."',
             ),
             CaseStudySection(
               title: 'Research & Insights',

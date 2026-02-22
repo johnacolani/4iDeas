@@ -46,6 +46,14 @@ class _SlidingMenuState extends State<SlidingMenu>
     super.dispose();
   }
 
+  void _closeDrawerAndNavigate(Widget screen) {
+    setState(() {
+      isSlideOpen = false;
+      _animationController.reverse();
+    });
+    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+  }
+
   @override
   Widget build(BuildContext context) {
     double he = MediaQuery.of(context).size.height;
@@ -250,8 +258,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                       SizedBox(height: isMobile ? 20 : 24),
                       Expanded(
                         child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Padding(
+                            physics: const BouncingScrollPhysics(),
+                            child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: isMobile ? 4.0 : 8.0,
                             ),
@@ -262,21 +270,21 @@ class _SlidingMenuState extends State<SlidingMenu>
                               icon: Icons.design_services,
                               title: 'Services',
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>ServicesScreen()));
+                                _closeDrawerAndNavigate(ServicesScreen());
                               },
                             ),
                             MenuItem(
                               icon: Icons.people,
                               title: 'About Us',
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const AboutUsScreen()));
+                                _closeDrawerAndNavigate(const AboutUsScreen());
                               },
                             ),
                             MenuItem(
                               icon: Icons.note,
                               title: 'Portfolio',
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>const PortfolioScreen()));
+                                _closeDrawerAndNavigate(const PortfolioScreen());
                               },
                             ),
                             MenuItem(
@@ -285,8 +293,12 @@ class _SlidingMenuState extends State<SlidingMenu>
                               onPressed: () {
                                 final authState = context.read<AuthBloc>().state;
                                 if (authState is Authenticated) {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const OrderHereScreen()));
+                                  _closeDrawerAndNavigate(const OrderHereScreen());
                                 } else {
+                                  setState(() {
+                                    isSlideOpen = false;
+                                    _animationController.reverse();
+                                  });
                                   _showSignUpRequiredDialog(context, isMobile);
                                 }
                               },
@@ -300,12 +312,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         icon: Icons.person,
                                         title: 'Profile',
                                         onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const ProfileScreen(),
-                                            ),
-                                          );
+                                          _closeDrawerAndNavigate(const ProfileScreen());
                                         },
                                       ),
                                       // Admin menu items (only visible to admins)
@@ -314,24 +321,14 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           icon: Icons.admin_panel_settings,
                                           title: 'Admin - Orders',
                                           onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => const AdminOrdersScreen(),
-                                              ),
-                                            );
+                                            _closeDrawerAndNavigate(const AdminOrdersScreen());
                                           },
                                         ),
                                         MenuItem(
                                           icon: Icons.info_outline,
                                           title: 'Admin - Portfolio & Info',
                                           onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => const AdminPortfolioScreen(),
-                                              ),
-                                            );
+                                            _closeDrawerAndNavigate(const AdminPortfolioScreen());
                                           },
                                         ),
                                       ],
@@ -345,7 +342,10 @@ class _SlidingMenuState extends State<SlidingMenu>
                               icon: Icons.connect_without_contact,
                               title: 'Contact Us',
                               onPressed: () {
-                                // Show a dialog when the button is pressed
+                                setState(() {
+                                  isSlideOpen = false;
+                                  _animationController.reverse();
+                                });
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {

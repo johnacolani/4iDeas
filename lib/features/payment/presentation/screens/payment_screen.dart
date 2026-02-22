@@ -129,9 +129,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          SingleChildScrollView(
-            padding: EdgeInsets.all(isMobile ? 16 : 24),
-            child: Column(
+          Scrollbar(
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(isMobile ? 16 : 24),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Order Info Card
@@ -416,6 +418,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 SizedBox(height: isMobile ? 20 : 24),
               ],
+            ),
             ),
           ),
         ],

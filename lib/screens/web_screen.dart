@@ -29,8 +29,10 @@ class _WebScreenState extends State<WebScreen> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: SafeArea(
-        child: CustomScrollView(
-          slivers: [
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: CustomScrollView(
+            slivers: [
             SliverToBoxAdapter(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -210,6 +212,16 @@ class _WebScreenState extends State<WebScreen> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? wi * 0.12 : (isTablet ? wi * 0.2 : wi * 0.25),
+                      vertical: isMobile ? 12 : 16,
+                    ),
+                    child: Divider(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      thickness: 1.5,
+                    ),
+                  ),
                   SizedBox(height: isMobile ? 20 : 32),
                   // Firebase Backend Section
                   FirebaseBackendSection(
@@ -230,6 +242,7 @@ class _WebScreenState extends State<WebScreen> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );
@@ -250,22 +263,6 @@ class GlassOutlinedText extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Guard against invalid constraints
-        final width = constraints.maxWidth.isFinite && constraints.maxWidth > 0
-            ? constraints.maxWidth
-            : 100.0;
-        final height =
-            constraints.maxHeight.isFinite && constraints.maxHeight > 0
-                ? constraints.maxHeight
-                : 100.0;
-
-        final rect = Rect.fromLTWH(
-          0,
-          0,
-          width,
-          height,
-        );
-
         return Stack(
           alignment: Alignment.center,
           children: [
@@ -282,7 +279,7 @@ class GlassOutlinedText extends StatelessWidget {
               ),
             ),
 
-            // 💎 Thin glass edge with directional light (very light pink, subtle)
+            // 💎 Thin glass edge (white border)
             SelectableText(
               text,
               style: GoogleFonts.albertSans(
@@ -290,15 +287,8 @@ class GlassOutlinedText extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 foreground: Paint()
                   ..style = PaintingStyle.stroke
-                  ..strokeWidth = 0.8 // thinner, realistic glass
-                  ..shader = LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFFD81B60).withOpacity(0.35), // light pink
-                      const Color(0xFFB0154F).withOpacity(0.22), // lighter pink shadow
-                    ],
-                  ).createShader(rect),
+                  ..strokeWidth = 0.8
+                  ..color = Colors.white.withValues(alpha: 0.70),
               ),
             ),
 

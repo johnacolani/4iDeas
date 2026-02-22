@@ -1412,8 +1412,10 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 horizontal: isMobile ? 4.w : 8.w,
                 vertical: isMobile ? 1.h : 1.2.h,
               ),
-              child: CustomScrollView(
-                slivers: [
+              child: Scrollbar(
+                thumbVisibility: true,
+                child: CustomScrollView(
+                  slivers: [
                   SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1660,6 +1662,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                   ),
                 ],
               ),
+            ),
             ),
           ),
         ],

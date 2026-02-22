@@ -39,9 +39,11 @@ class ContractViewScreen extends StatelessWidget {
       body: Stack(
         children: [
           const AppBackground(),
-          SingleChildScrollView(
-            padding: EdgeInsets.all(isMobile ? 16 : 24),
-            child: Column(
+          Scrollbar(
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(isMobile ? 16 : 24),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Contract Header
@@ -265,6 +267,7 @@ class ContractViewScreen extends StatelessWidget {
                 SizedBox(height: 32),
               ],
             ),
+          ),
           ),
         ],
       ),

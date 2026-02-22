@@ -132,8 +132,10 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
         children: [
           const AppBackground(),
           SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(isMobile ? 16 : 24),
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(isMobile ? 16 : 24),
               child: Form(
                 key: _formKey,
                 child: ConstrainedBox(
@@ -219,6 +221,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
                 ),
               ),
             ),
+          ),
           ),
         ],
       ),

@@ -95,16 +95,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
             builder: (context, state) {
               return SafeArea(
                 child: Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 24.0 : 32.0,
-                      vertical: 20.0,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: isMobile ? double.infinity : 400,
-                      ),
-                      child: Form(
+                  child: Scrollbar(
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 24.0 : 32.0,
+                          vertical: 20.0,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                          maxWidth: isMobile ? double.infinity : 400,
+                        ),
+                        child: Form(
                         key: _formKey,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -310,6 +312,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+                ),
                 ),
               );
             },

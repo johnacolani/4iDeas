@@ -65,6 +65,11 @@ class MyApp extends StatelessWidget {
                 primarySwatch: Colors.blue,
                 useMaterial3: false,
                 fontFamily: GoogleFonts.albertSans().fontFamily,
+                scrollbarTheme: ScrollbarThemeData(
+                  thumbVisibility: WidgetStateProperty.resolveWith((_) => true),
+                  thumbColor: WidgetStateProperty.all(Colors.white.withValues(alpha: 0.5)),
+                  trackColor: WidgetStateProperty.all(Colors.white.withValues(alpha: 0.12)),
+                ),
               ),
               home: const HomeScreen(),
             );
