@@ -8,6 +8,14 @@ import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/portfolio_content_service.dart';
+import 'package:four_ideas/services/publication_content_service.dart';
+import 'package:four_ideas/services/admin_service.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_portfolio_app_edit_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_publication_edit_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_open_source_edit_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_case_study_edit_screen.dart';
+import 'package:four_ideas/services/open_source_content_service.dart';
+import 'package:four_ideas/services/case_study_content_service.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,12 +29,21 @@ class PortfolioScreen extends StatefulWidget {
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
   final PortfolioContentService _portfolioService = PortfolioContentService();
+  final PublicationContentService _publicationService = PublicationContentService();
+  final OpenSourceContentService _openSourceService = OpenSourceContentService();
+  final CaseStudyContentService _caseStudyService = CaseStudyContentService();
   List<PortfolioApp>? _appsFromFirestore;
+  List<PortfolioPublication>? _publicationsFromFirestore;
+  List<OpenSourceItem>? _openSourceFromFirestore;
+  List<PortfolioCaseStudy>? _caseStudiesFromFirestore;
 
   @override
   void initState() {
     super.initState();
     _loadPortfolioApps();
+    _loadPublications();
+    _loadOpenSource();
+    _loadCaseStudies();
   }
 
   Future<void> _loadPortfolioApps() async {
@@ -44,10 +61,287 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ? _appsFromFirestore!
           : PortfolioData.apps;
 
+  Future<void> _loadPublications() async {
+    try {
+      final hasAny = await _publicationService.hasPublications();
+      if (hasAny) {
+        final list = await _publicationService.getPublications();
+        if (mounted) setState(() => _publicationsFromFirestore = list);
+      }
+    } catch (_) {}
+  }
+
+  List<PortfolioPublication> get _displayPublications =>
+      (_publicationsFromFirestore != null && _publicationsFromFirestore!.isNotEmpty)
+          ? _publicationsFromFirestore!
+          : PortfolioData.publications;
+
+  Future<void> _loadOpenSource() async {
+    try {
+      final hasAny = await _openSourceService.hasItems();
+      if (hasAny) {
+        final list = await _openSourceService.getItems();
+        if (mounted) setState(() => _openSourceFromFirestore = list);
+      }
+    } catch (_) {}
+  }
+
+  List<OpenSourceItem> get _displayOpenSourceItems =>
+      (_openSourceFromFirestore != null && _openSourceFromFirestore!.isNotEmpty)
+          ? _openSourceFromFirestore!
+          : PortfolioData.openSourceItems;
+
+  Future<void> _loadCaseStudies() async {
+    try {
+      final hasAny = await _caseStudyService.hasCaseStudies();
+      if (hasAny) {
+        final list = await _caseStudyService.getCaseStudies();
+        if (mounted) setState(() => _caseStudiesFromFirestore = list);
+      }
+    } catch (_) {}
+  }
+
+  List<PortfolioCaseStudy> get _displayCaseStudies =>
+      (_caseStudiesFromFirestore != null && _caseStudiesFromFirestore!.isNotEmpty)
+          ? _caseStudiesFromFirestore!
+          : PortfolioData.caseStudies;
+
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _navigateToAddApp() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminPortfolioAppEditScreen(docId: null, initialApp: null),
+      ),
+    );
+    if (result == true) _loadPortfolioApps();
+  }
+
+  Future<void> _navigateToEditApp(PortfolioApp app) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminPortfolioAppEditScreen(docId: app.id, initialApp: app),
+      ),
+    );
+    if (result == true) _loadPortfolioApps();
+  }
+
+  Future<void> _deleteApp(PortfolioApp app) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xff1a1a2e),
+        title: Text('Delete "${app.name}"?', style: GoogleFonts.albertSans(color: Colors.white)),
+        content: Text(
+          'This will remove the app from the portfolio. You can add it again later.',
+          style: GoogleFonts.albertSans(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    try {
+      await _portfolioService.deleteApp(app.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('App removed'), backgroundColor: Colors.orange),
+        );
+        _loadPortfolioApps();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _navigateToAddPublication() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminPublicationEditScreen(docId: null, initialPublication: null),
+      ),
+    );
+    if (result == true) _loadPublications();
+  }
+
+  Future<void> _navigateToEditPublication(PortfolioPublication p) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminPublicationEditScreen(docId: p.id, initialPublication: p),
+      ),
+    );
+    if (result == true) _loadPublications();
+  }
+
+  Future<void> _deletePublication(PortfolioPublication p) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xff1a1a2e),
+        title: Text('Delete "${p.title}"?', style: GoogleFonts.albertSans(color: Colors.white)),
+        content: Text(
+          'This will remove the publication from the list.',
+          style: GoogleFonts.albertSans(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    try {
+      await _publicationService.deletePublication(p.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Publication removed'), backgroundColor: Colors.orange),
+        );
+        _loadPublications();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _navigateToAddOpenSource() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminOpenSourceEditScreen(docId: null, initialItem: null),
+      ),
+    );
+    if (result == true) _loadOpenSource();
+  }
+
+  Future<void> _navigateToEditOpenSource(OpenSourceItem item) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminOpenSourceEditScreen(docId: item.id, initialItem: item),
+      ),
+    );
+    if (result == true) _loadOpenSource();
+  }
+
+  Future<void> _deleteOpenSource(OpenSourceItem item) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xff1a1a2e),
+        title: Text('Delete "${item.title}"?', style: GoogleFonts.albertSans(color: Colors.white)),
+        content: Text(
+          'This will remove the item from the list.',
+          style: GoogleFonts.albertSans(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    try {
+      await _openSourceService.deleteItem(item.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Open source item removed'), backgroundColor: Colors.orange),
+        );
+        _loadOpenSource();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _navigateToAddCaseStudy() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminCaseStudyEditScreen(docId: null, initialCaseStudy: null),
+      ),
+    );
+    if (result == true) _loadCaseStudies();
+  }
+
+  Future<void> _navigateToEditCaseStudy(PortfolioCaseStudy cs) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => AdminCaseStudyEditScreen(docId: cs.id, initialCaseStudy: cs),
+      ),
+    );
+    if (result == true) _loadCaseStudies();
+  }
+
+  Future<void> _deleteCaseStudy(PortfolioCaseStudy cs) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xff1a1a2e),
+        title: Text('Delete "${cs.title}"?', style: GoogleFonts.albertSans(color: Colors.white)),
+        content: Text(
+          'This will remove the case study from the list.',
+          style: GoogleFonts.albertSans(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    try {
+      await _caseStudyService.deleteCaseStudy(cs.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Case study removed'), backgroundColor: Colors.orange),
+        );
+        _loadCaseStudies();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
@@ -120,14 +414,31 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           title: 'Featured Case Studies',
                           sectionTitleSize: sectionTitleSize,
                         ),
+                        if (AdminService.isAdmin()) ...[
+                          SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            onPressed: _navigateToAddCaseStudy,
+                            icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                            label: Text(
+                              'Add case study',
+                              style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: ColorManager.orange),
+                            ),
+                          ),
+                        ],
                         SizedBox(height: 16),
-                        ...PortfolioData.caseStudies.map(
+                        ..._displayCaseStudies.map(
                           (cs) => Padding(
                             padding: EdgeInsets.only(bottom: 16),
                             child: CaseStudyCard(
                               caseStudy: cs,
                               isMobile: isMobile,
                               isTablet: isTablet,
+                              showAdminActions: AdminService.isAdmin() && _caseStudiesFromFirestore != null,
+                              onEdit: AdminService.isAdmin() && _caseStudiesFromFirestore != null ? () => _navigateToEditCaseStudy(cs) : null,
+                              onDelete: AdminService.isAdmin() && _caseStudiesFromFirestore != null ? () => _deleteCaseStudy(cs) : null,
                             ),
                           ),
                         ),
@@ -138,10 +449,29 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           title: 'App Showcase',
                           sectionTitleSize: sectionTitleSize,
                         ),
+                        if (AdminService.isAdmin()) ...[
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: ElevatedButton.icon(
+                                onPressed: _navigateToAddApp,
+                                icon: Icon(Icons.add, size: 18, color: Colors.white),
+                                label: Text('Add app', style: GoogleFonts.albertSans(color: Colors.white, fontWeight: FontWeight.w600)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorManager.orange,
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                         SizedBox(height: 16),
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final double availableWidth = constraints.maxWidth;
+                            final bool isAdmin = AdminService.isAdmin();
+                            final bool appsFromFirestore = _appsFromFirestore != null && _appsFromFirestore!.isNotEmpty;
                             int crossAxisCount;
                             double mainAxisExtent;
                             double spacing;
@@ -170,10 +500,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               ),
                               itemCount: _displayApps.length,
                               itemBuilder: (context, index) {
+                                final app = _displayApps[index];
                                 return PortfolioAppCard(
-                                  app: _displayApps[index],
+                                  app: app,
                                   isMobile: isMobile,
                                   isTablet: isTablet,
+                                  showAdminActions: isAdmin && appsFromFirestore,
+                                  onEdit: isAdmin && appsFromFirestore ? () => _navigateToEditApp(app) : null,
+                                  onDelete: isAdmin && appsFromFirestore ? () => _deleteApp(app) : null,
                                 );
                               },
                             );
@@ -186,14 +520,31 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           title: 'Publications',
                           sectionTitleSize: sectionTitleSize,
                         ),
+                        if (AdminService.isAdmin()) ...[
+                          SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            onPressed: _navigateToAddPublication,
+                            icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                            label: Text(
+                              'Add publication',
+                              style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: ColorManager.orange),
+                            ),
+                          ),
+                        ],
                         SizedBox(height: 12),
-                        ...PortfolioData.publications.map(
+                        ..._displayPublications.map(
                           (p) => Padding(
                             padding: EdgeInsets.only(bottom: 10),
                             child: PortfolioPublicationCard(
                               publication: p,
                               isMobile: isMobile,
                               isTablet: isTablet,
+                              showAdminActions: AdminService.isAdmin() && _publicationsFromFirestore != null,
+                              onEdit: AdminService.isAdmin() && _publicationsFromFirestore != null ? () => _navigateToEditPublication(p) : null,
+                              onDelete: AdminService.isAdmin() && _publicationsFromFirestore != null ? () => _deletePublication(p) : null,
                             ),
                           ),
                         ),
@@ -225,25 +576,35 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           title: 'Open Source & Package',
                           sectionTitleSize: sectionTitleSize,
                         ),
+                        if (AdminService.isAdmin()) ...[
+                          SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            onPressed: _navigateToAddOpenSource,
+                            icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                            label: Text(
+                              'Add open source item',
+                              style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: ColorManager.orange),
+                            ),
+                          ),
+                        ],
                         SizedBox(height: 16),
-                        _OpenSourceCard(
-                          icon: Icons.widgets_outlined,
-                          title: 'auto_scroll_image',
-                          subtitle: 'Pub.dev package',
-                          url: PortfolioData.pubDevPackage,
-                          isMobile: isMobile,
-                          bodySize: bodySize,
-                        ),
-                        SizedBox(height: 12),
-                        _OpenSourceCard(
-                          icon: Icons.code,
-                          title: 'Weather App',
-                          subtitle:
-                              'BLoC, Clean Architecture, SOLID, Unit/Widget/Integration tests, Mockito',
-                          url: PortfolioData.weatherAppRepo,
-                          isMobile: isMobile,
-                          bodySize: bodySize,
-                        ),
+                        ..._displayOpenSourceItems.asMap().entries.map((e) {
+                          final item = e.value;
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: e.key < _displayOpenSourceItems.length - 1 ? 12 : 0),
+                            child: _OpenSourceCard(
+                              item: item,
+                              isMobile: isMobile,
+                              bodySize: bodySize,
+                              showAdminActions: AdminService.isAdmin() && _openSourceFromFirestore != null,
+                              onEdit: AdminService.isAdmin() && _openSourceFromFirestore != null ? () => _navigateToEditOpenSource(item) : null,
+                              onDelete: AdminService.isAdmin() && _openSourceFromFirestore != null ? () => _deleteOpenSource(item) : null,
+                            ),
+                          );
+                        }),
                         SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerRight,
@@ -417,28 +778,44 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+IconData _iconFromName(String name) {
+  switch (name) {
+    case 'widgets_outlined':
+      return Icons.widgets_outlined;
+    case 'code':
+      return Icons.code;
+    case 'article_outlined':
+      return Icons.article_outlined;
+    case 'github':
+      return Icons.code;
+    default:
+      return Icons.code;
+  }
+}
+
 class _OpenSourceCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String url;
+  final OpenSourceItem item;
   final bool isMobile;
   final double bodySize;
+  final bool showAdminActions;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const _OpenSourceCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.url,
+    required this.item,
     required this.isMobile,
     required this.bodySize,
+    this.showAdminActions = false,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    final icon = _iconFromName(item.iconName);
+    Widget cardContent = InkWell(
       onTap: () async {
-        final uri = Uri.parse(url);
+        final uri = Uri.parse(item.url);
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         }
@@ -460,7 +837,7 @@ class _OpenSourceCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SelectableText(
-                    title,
+                    item.title,
                     style: GoogleFonts.albertSans(
                       color: Colors.white,
                       fontSize: bodySize + 2,
@@ -469,7 +846,7 @@ class _OpenSourceCard extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   SelectableText(
-                    subtitle,
+                    item.subtitle,
                     style: GoogleFonts.albertSans(
                       color: Colors.white.withValues(alpha: 0.8),
                       fontSize: bodySize - 1,
@@ -483,5 +860,38 @@ class _OpenSourceCard extends StatelessWidget {
         ),
       ),
     );
+
+    if (showAdminActions && (onEdit != null || onDelete != null)) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          cardContent,
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onEdit != null)
+                  IconButton(
+                    icon: Icon(Icons.edit, size: 20, color: ColorManager.orange),
+                    onPressed: onEdit,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                    onPressed: onDelete,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    return cardContent;
   }
 }

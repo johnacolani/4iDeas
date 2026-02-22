@@ -53,10 +53,70 @@ class PortfolioApp {
 }
 
 class PortfolioPublication {
+  final String id;
   final String title;
   final String url;
+  final int order;
 
-  const PortfolioPublication({required this.title, required this.url});
+  const PortfolioPublication({
+    required this.id,
+    required this.title,
+    required this.url,
+    this.order = 0,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'url': url,
+        'order': order,
+      };
+
+  static PortfolioPublication fromMap(String docId, Map<String, dynamic> map) {
+    return PortfolioPublication(
+      id: map['id'] as String? ?? docId,
+      title: map['title'] as String? ?? '',
+      url: map['url'] as String? ?? '',
+      order: (map['order'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+class OpenSourceItem {
+  final String id;
+  final String title;
+  final String subtitle;
+  final String url;
+  /// Icon name for Icons (e.g. 'widgets_outlined', 'code').
+  final String iconName;
+  final int order;
+
+  const OpenSourceItem({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.url,
+    this.iconName = 'code',
+    this.order = 0,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'subtitle': subtitle,
+        'url': url,
+        'iconName': iconName,
+        'order': order,
+      };
+
+  static OpenSourceItem fromMap(String docId, Map<String, dynamic> map) {
+    return OpenSourceItem(
+      id: map['id'] as String? ?? docId,
+      title: map['title'] as String? ?? '',
+      subtitle: map['subtitle'] as String? ?? '',
+      url: map['url'] as String? ?? '',
+      iconName: map['iconName'] as String? ?? 'code',
+      order: (map['order'] as num?)?.toInt() ?? 0,
+    );
+  }
 }
 
 class PortfolioCaseStudy {
@@ -67,6 +127,7 @@ class PortfolioCaseStudy {
   /// Optional: design philosophy & principles applied in this case study.
   final String? designApproach;
   final List<CaseStudySection> sections;
+  final int order;
 
   const PortfolioCaseStudy({
     required this.id,
@@ -75,7 +136,33 @@ class PortfolioCaseStudy {
     required this.overview,
     this.designApproach,
     required this.sections,
+    this.order = 0,
   });
+
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'subtitle': subtitle,
+        'overview': overview,
+        'designApproach': designApproach,
+        'sections': sections.map((s) => s.toMap()).toList(),
+        'order': order,
+      };
+
+  static PortfolioCaseStudy fromMap(String docId, Map<String, dynamic> map) {
+    final sectionsList = map['sections'] as List<dynamic>?;
+    final sections = sectionsList != null
+        ? sectionsList.map((e) => CaseStudySection.fromMap(Map<String, dynamic>.from(e as Map))).toList()
+        : <CaseStudySection>[];
+    return PortfolioCaseStudy(
+      id: map['id'] as String? ?? docId,
+      title: map['title'] as String? ?? '',
+      subtitle: map['subtitle'] as String? ?? '',
+      overview: map['overview'] as String? ?? '',
+      designApproach: map['designApproach'] as String?,
+      sections: sections,
+      order: (map['order'] as num?)?.toInt() ?? 0,
+    );
+  }
 }
 
 /// A case study image with optional caption.
@@ -88,6 +175,18 @@ class CaseStudyImage {
     required this.path,
     this.description,
   });
+
+  Map<String, dynamic> toMap() => {
+        'path': path,
+        'description': description,
+      };
+
+  static CaseStudyImage fromMap(Map<String, dynamic> map) {
+    return CaseStudyImage(
+      path: map['path'] as String? ?? '',
+      description: map['description'] as String?,
+    );
+  }
 }
 
 class CaseStudySection {
@@ -111,6 +210,24 @@ class CaseStudySection {
       return imagePaths!.map((p) => CaseStudyImage(path: p)).toList();
     }
     return [];
+  }
+
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'content': content,
+        'imagePaths': imagePaths,
+        'images': images?.map((i) => i.toMap()).toList(),
+      };
+
+  static CaseStudySection fromMap(Map<String, dynamic> map) {
+    final imagePaths = map['imagePaths'] as List<dynamic>?;
+    final imagesList = map['images'] as List<dynamic>?;
+    return CaseStudySection(
+      title: map['title'] as String? ?? '',
+      content: map['content'] as String? ?? '',
+      imagePaths: imagePaths?.map((e) => e.toString()).toList(),
+      images: imagesList?.map((e) => CaseStudyImage.fromMap(Map<String, dynamic>.from(e as Map))).toList(),
+    );
   }
 }
 
@@ -253,34 +370,58 @@ class PortfolioData {
 
   static List<PortfolioPublication> get publications => [
         PortfolioPublication(
+          id: 'static-0',
           title: 'How Flutter Works Under the Hood',
           url:
               'https://medium.com/@johnacolani_22987/how-flutter-works-architecture-and-internals-581b629a55f3',
         ),
         PortfolioPublication(
+          id: 'static-1',
           title: 'Understanding Golden Image Tests in Flutter',
           url:
               'https://medium.com/@johnacolani_22987/understanding-golden-image-tests-in-flutter-a-step-by-step-guide-3838287c44ce',
         ),
         PortfolioPublication(
+          id: 'static-2',
           title: 'Integrating Native Code in Flutter: Battery Level',
           url:
               'https://medium.com/@johnacolani_22987/integrating-native-code-in-flutter-a-step-by-step-guide-to-retrieving-battery-level-methodchannel-82604061bd35',
         ),
         PortfolioPublication(
+          id: 'static-3',
           title: 'Test-Driven Development (TDD) in Flutter',
           url:
               'https://medium.com/@johnacolani_22987/a-step-by-step-guide-to-test-driven-development-tdd-in-flutter-8d6edb3dcf2b',
         ),
         PortfolioPublication(
+          id: 'static-4',
           title: 'Unit, Widget, and Integration Testing in < 3 Minutes',
           url:
               'https://medium.com/@johnacolani_22987/testing-flutter-app-in-less-than-3-minutes-1797ddf88c85',
         ),
         PortfolioPublication(
+          id: 'static-5',
           title: 'Understanding Isolates in Flutter',
           url:
               'https://medium.com/@johnacolani_22987/understanding-isolates-in-flutter-a-step-by-step-guide-79bf16db96cd',
+        ),
+      ];
+
+  static List<OpenSourceItem> get openSourceItems => [
+        OpenSourceItem(
+          id: 'static-0',
+          title: 'auto_scroll_image',
+          subtitle: 'Pub.dev package',
+          url: pubDevPackage,
+          iconName: 'widgets_outlined',
+        ),
+        OpenSourceItem(
+          id: 'static-1',
+          title: 'Weather App',
+          subtitle:
+              'BLoC, Clean Architecture, SOLID, Unit/Widget/Integration tests, Mockito',
+          url: weatherAppRepo,
+          iconName: 'code',
         ),
       ];
 

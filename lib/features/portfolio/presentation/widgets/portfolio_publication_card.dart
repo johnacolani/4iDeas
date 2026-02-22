@@ -8,61 +8,100 @@ class PortfolioPublicationCard extends StatelessWidget {
   final PortfolioPublication publication;
   final bool isMobile;
   final bool isTablet;
+  final bool showAdminActions;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const PortfolioPublicationCard({
     super.key,
     required this.publication,
     required this.isMobile,
     required this.isTablet,
+    this.showAdminActions = false,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     final double titleSize = isMobile ? 14 : (isTablet ? 15 : 16);
 
-    return Material(
+    Widget cardContent = Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _launch(publication.url),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 14 : 18,
-          vertical: isMobile ? 12 : 16,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.article_outlined,
-              color: ColorManager.orange,
-              size: isMobile ? 22 : 26,
-            ),
-            SizedBox(width: 12),
-            Expanded(
-              child: SelectableText(
-                publication.title,
-                style: GoogleFonts.albertSans(
-                  color: Colors.white,
-                  fontSize: titleSize,
-                  fontWeight: FontWeight.w500,
+            horizontal: isMobile ? 14 : 18,
+            vertical: isMobile ? 12 : 16,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.article_outlined,
+                color: ColorManager.orange,
+                size: isMobile ? 22 : 26,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: SelectableText(
+                  publication.title,
+                  style: GoogleFonts.albertSans(
+                    color: Colors.white,
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-            Icon(
-              Icons.open_in_new,
-              color: ColorManager.blue,
-              size: isMobile ? 18 : 20,
-            ),
-          ],
-        ),
+              Icon(
+                Icons.open_in_new,
+                color: ColorManager.blue,
+                size: isMobile ? 18 : 20,
+              ),
+            ],
+          ),
         ),
       ),
     );
+
+    if (showAdminActions && (onEdit != null || onDelete != null)) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          cardContent,
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onEdit != null)
+                  IconButton(
+                    icon: Icon(Icons.edit, size: 20, color: ColorManager.orange),
+                    onPressed: onEdit,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                    onPressed: onDelete,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    return cardContent;
   }
 
   Future<void> _launch(String url) async {

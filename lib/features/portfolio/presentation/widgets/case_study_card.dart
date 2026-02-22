@@ -8,12 +8,18 @@ class CaseStudyCard extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
   final bool isMobile;
   final bool isTablet;
+  final bool showAdminActions;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const CaseStudyCard({
     super.key,
     required this.caseStudy,
     required this.isMobile,
     required this.isTablet,
+    this.showAdminActions = false,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -21,7 +27,7 @@ class CaseStudyCard extends StatelessWidget {
     final double titleSize = isMobile ? 20 : (isTablet ? 22 : 24);
     final double subtitleSize = isMobile ? 14 : (isTablet ? 15 : 16);
 
-    return Material(
+    Widget cardContent = Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
@@ -111,5 +117,38 @@ class CaseStudyCard extends StatelessWidget {
         ),
       ),
     );
+
+    if (showAdminActions && (onEdit != null || onDelete != null)) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          cardContent,
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onEdit != null)
+                  IconButton(
+                    icon: Icon(Icons.edit, size: 22, color: ColorManager.orange),
+                    onPressed: onEdit,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 36, minHeight: 36),
+                  ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: 22, color: Colors.red),
+                    onPressed: onDelete,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 36, minHeight: 36),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    return cardContent;
   }
 }

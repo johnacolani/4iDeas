@@ -12,12 +12,18 @@ class PortfolioAppCard extends StatelessWidget {
   final PortfolioApp app;
   final bool isMobile;
   final bool isTablet;
+  final bool showAdminActions;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const PortfolioAppCard({
     super.key,
     required this.app,
     required this.isMobile,
     required this.isTablet,
+    this.showAdminActions = false,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -28,7 +34,7 @@ class PortfolioAppCard extends StatelessWidget {
 
     final String? primaryUrl = app.webUrl ?? app.appStoreUrl ?? app.playStoreUrl;
 
-    return ClipRRect(
+    final Widget cardContent = ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Material(
         color: Colors.transparent,
@@ -36,68 +42,103 @@ class PortfolioAppCard extends StatelessWidget {
           onTap: primaryUrl != null ? () => _launch(primaryUrl) : null,
           borderRadius: BorderRadius.circular(12),
           child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(cardPadding),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: isMobile
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  height: 180,
-                  child: _buildImageBlock(mobileVertical: true),
-                ),
-                SizedBox(height: 8),
-                _buildButtons(),
-                SizedBox(height: 8),
-                Expanded(
-                  child: _buildTextContent(titleSize, bodySize),
+            width: double.infinity,
+            padding: EdgeInsets.all(cardPadding),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.2),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Top half: Text and Image side by side
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: _buildTextContent(titleSize, bodySize),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        flex: 4,
-                        child: _buildImageBlock(mobileVertical: false),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 8),
-                // Bottom half: Buttons in full-width container
-                _buildButtons(),
-              ],
             ),
+            child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: 180,
+                      child: _buildImageBlock(mobileVertical: true),
+                    ),
+                    SizedBox(height: 8),
+                    _buildButtons(),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: _buildTextContent(titleSize, bodySize),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 5,
+                            child: _buildTextContent(titleSize, bodySize),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            flex: 4,
+                            child: _buildImageBlock(mobileVertical: false),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    _buildButtons(),
+                  ],
+                ),
           ),
         ),
       ),
     );
+
+    if (showAdminActions && (onEdit != null || onDelete != null)) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          cardContent,
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onEdit != null)
+                  IconButton(
+                    icon: Icon(Icons.edit, size: isMobile ? 18 : 20, color: ColorManager.orange),
+                    onPressed: onEdit,
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black.withValues(alpha: 0.5),
+                      padding: EdgeInsets.all(isMobile ? 4 : 6),
+                    ),
+                  ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: isMobile ? 18 : 20, color: Colors.red[300]),
+                    onPressed: onDelete,
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black.withValues(alpha: 0.5),
+                      padding: EdgeInsets.all(isMobile ? 4 : 6),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    return cardContent;
   }
 
   Widget _buildTextContent(double titleSize, double bodySize) {

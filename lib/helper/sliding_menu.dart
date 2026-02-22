@@ -11,7 +11,6 @@ import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart'
 import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_orders_screen.dart';
-import 'package:four_ideas/features/admin/presentation/screens/admin_portfolio_screen.dart';
 import 'package:four_ideas/services/admin_service.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:sizer/sizer.dart';
@@ -328,13 +327,6 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           title: 'Admin - Orders',
                                           onPressed: () {
                                             _closeDrawerAndNavigate(const AdminOrdersScreen());
-                                          },
-                                        ),
-                                        MenuItem(
-                                          icon: Icons.info_outline,
-                                          title: 'Admin - Portfolio & Info',
-                                          onPressed: () {
-                                            _closeDrawerAndNavigate(const AdminPortfolioScreen());
                                           },
                                         ),
                                       ],
