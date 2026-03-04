@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/design_philosophy_screen.dart';
@@ -36,14 +37,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   List<PortfolioPublication>? _publicationsFromFirestore;
   List<OpenSourceItem>? _openSourceFromFirestore;
   List<PortfolioCaseStudy>? _caseStudiesFromFirestore;
+  bool _isLoadingPortfolio = true;
 
   @override
   void initState() {
     super.initState();
-    _loadPortfolioApps();
-    _loadPublications();
-    _loadOpenSource();
-    _loadCaseStudies();
+    _loadAllPortfolioData();
+  }
+
+  Future<void> _loadAllPortfolioData() async {
+    setState(() => _isLoadingPortfolio = true);
+    await Future.wait([
+      _loadPortfolioApps(),
+      _loadPublications(),
+      _loadOpenSource(),
+      _loadCaseStudies(),
+    ]);
+    if (mounted) setState(() => _isLoadingPortfolio = false);
   }
 
   Future<void> _loadPortfolioApps() async {
@@ -119,7 +129,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         builder: (context) => AdminPortfolioAppEditScreen(docId: null, initialApp: null),
       ),
     );
-    if (result == true) _loadPortfolioApps();
+    if (result == true) _loadAllPortfolioData();
   }
 
   Future<void> _navigateToEditApp(PortfolioApp app) async {
@@ -128,7 +138,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         builder: (context) => AdminPortfolioAppEditScreen(docId: app.id, initialApp: app),
       ),
     );
-    if (result == true) _loadPortfolioApps();
+    if (result == true) _loadAllPortfolioData();
   }
 
   Future<void> _deleteApp(PortfolioApp app) async {
@@ -361,9 +371,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         iconTheme: IconThemeData(color: Colors.amber[100]),
         centerTitle: true,
         backgroundColor: const Color(0xff020923),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+        leading: Semantics(
+          label: 'Back to home',
+          button: true,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go(AppRoutes.home),
+          ),
         ),
         title: Text(
           'Portfolio',
@@ -382,11 +396,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               thumbVisibility: true,
               child: CustomScrollView(
                 slivers: [
+                if (_isLoadingPortfolio)
+                  SliverToBoxAdapter(
+                    child: LinearProgressIndicator(
+                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                      valueColor: AlwaysStoppedAnimation<Color>(ColorManager.orange),
+                    ),
+                  ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 16 : (isTablet ? 24 : 32),
-                      vertical: isMobile ? 20 : 28,
+                    padding: EdgeInsets.only(
+                      left: isMobile ? 16 : (isTablet ? 24 : 32),
+                      right: isMobile ? 16 : (isTablet ? 24 : 32),
+                      top: 0,
+                      bottom: isMobile ? 20 : 28,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,22 +423,28 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           isMobile: isMobile,
                           sectionTitleSize: sectionTitleSize,
                         ),
-                        SizedBox(height: he * 0.04),
+                        SizedBox(height: he * 0.0015),
 
                         // Design Philosophy
-                        _DesignPhilosophyCard(
-                          bodySize: bodySize,
-                          isMobile: isMobile,
+                        Transform.translate(
+                          offset: Offset(0, -160),
+                          child: _DesignPhilosophyCard(
+                            bodySize: bodySize,
+                            isMobile: isMobile,
+                          ),
                         ),
-                        SizedBox(height: he * 0.04),
+                        SizedBox(height: he * 0.012),
 
                         // Featured Case Studies
-                        _SectionTitle(
-                          title: 'Featured Case Studies',
-                          sectionTitleSize: sectionTitleSize,
+                        Transform.translate(
+                          offset: Offset(0, -20),
+                          child: _SectionTitle(
+                            title: 'Featured Case Studies',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
-                          SizedBox(height: 8),
+                          SizedBox(height: 4),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddCaseStudy,
                             icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
@@ -428,10 +457,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ],
-                        SizedBox(height: 16),
+                        SizedBox(height: 0),
                         ..._displayCaseStudies.map(
                           (cs) => Padding(
-                            padding: EdgeInsets.only(bottom: 16),
+                            padding: EdgeInsets.only(bottom: 36),
                             child: CaseStudyCard(
                               caseStudy: cs,
                               isMobile: isMobile,
@@ -445,9 +474,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         SizedBox(height: he * 0.04),
 
                         // App Showcase
-                        _SectionTitle(
-                          title: 'App Showcase',
-                          sectionTitleSize: sectionTitleSize,
+                        Transform.translate(
+                          offset: Offset(0, 0),
+                          child: _SectionTitle(
+                            title: 'App Showcase',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           Padding(
@@ -516,9 +548,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         SizedBox(height: he * 0.04),
 
                         // Publications
-                        _SectionTitle(
-                          title: 'Publications',
-                          sectionTitleSize: sectionTitleSize,
+                        Transform.translate(
+                          offset: Offset(0, 0),
+                          child: _SectionTitle(
+                            title: 'Publications',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           SizedBox(height: 8),
@@ -572,9 +607,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         SizedBox(height: he * 0.04),
 
                         // Open Source & Package
-                        _SectionTitle(
-                          title: 'Open Source & Package',
-                          sectionTitleSize: sectionTitleSize,
+                        Transform.translate(
+                          offset: Offset(0, 0),
+                          child: _SectionTitle(
+                            title: 'Open Source & Package',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           SizedBox(height: 8),
@@ -640,6 +678,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     );
   }
 
+  static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
+
   Widget _buildHero({
     required double he,
     required double wi,
@@ -648,31 +688,226 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     required bool isMobile,
     required double sectionTitleSize,
   }) {
+    final double designSystemTitleSize = isMobile ? 22 : (sectionTitleSize + 4);
+    final double designSystemSubSize = isMobile ? 14 : (bodySize - 1);
+
+    // Lottie behind title — 9× the title line size (3× larger again), shifted up
+    final double lottieHeight = titleSize * 1.3 * 9;
+    final double lottieWidth = titleSize * 12 * 9;
+
     return Center(
       child: Column(
         children: [
-          Center(
-            child: SelectableText(
-              'Product Design & Development',
-              style: GoogleFonts.albertSans(
-                color: Colors.white,
-                fontSize: titleSize,
-                fontWeight: FontWeight.bold,
+          Transform.translate(
+            offset: Offset(0, -he * 0.20),
+            child: Center(
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  SizedBox(
+                    width: lottieWidth*0.3,
+                    height: lottieHeight,
+                    child: Center(
+                      child: Lottie.asset(
+                        'assets/waveloop.json',
+                        fit: BoxFit.fitHeight,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.palette_outlined,
+                          size: titleSize,
+                          color: ColorManager.orange.withValues(alpha: 0.3),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Center(
+                      child: Transform.translate(
+                        offset: Offset(0, 60),
+                        child: SelectableText(
+                          'Product Design & Development',
+                          style: GoogleFonts.albertSans(
+                            color: Colors.white,
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          SizedBox(height: he * 0.01),
-          Center(
-            child: SelectableText(
-              'End-to-end product design from research to cross-platform delivery',
-              style: GoogleFonts.albertSans(
-                color: ColorManager.orange,
-                fontSize: bodySize,
-                fontWeight: FontWeight.w500,
-              ),
+          Transform.translate(
+            offset: Offset(0, -he * 0.25),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: SelectableText(
+                    'End-to-end product design from research to cross-platform delivery',
+                    style: GoogleFonts.albertSans(
+                      color: ColorManager.orange,
+                      fontSize: bodySize,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                SizedBox(height: he * 0.03),
+                Transform.translate(
+                  offset: Offset(0, 0),
+                  child: _DesignSystemHighlight(
+                    designSystemTitleSize: designSystemTitleSize,
+                    designSystemSubSize: designSystemSubSize,
+                    bodySize: bodySize,
+                    isMobile: isMobile,
+                    onTapLink: () => _launchUrl(_designSystemUrl),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DesignSystemHighlight extends StatelessWidget {
+  final double designSystemTitleSize;
+  final double designSystemSubSize;
+  final double bodySize;
+  final bool isMobile;
+  final VoidCallback onTapLink;
+
+  const _DesignSystemHighlight({
+    required this.designSystemTitleSize,
+    required this.designSystemSubSize,
+    required this.bodySize,
+    required this.isMobile,
+    required this.onTapLink,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTapLink,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 20 : 28,
+              vertical: isMobile ? 20 : 24,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  ColorManager.orange.withValues(alpha: 0.12),
+                  ColorManager.orange.withValues(alpha: 0.06),
+                  Colors.white.withValues(alpha: 0.04),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: ColorManager.orange.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: ColorManager.orange.withValues(alpha: 0.15),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (!isMobile) ...[
+                  Icon(
+                    Icons.palette_outlined,
+                    size: 48,
+                    color: ColorManager.orange.withValues(alpha: 0.9),
+                  ),
+                  SizedBox(width: 24),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SelectableText(
+                        'My Own Design System',
+                        style: GoogleFonts.playfairDisplay(
+                          color: Colors.white,
+                          fontSize: designSystemTitleSize,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                          height: 1.2,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      SelectableText(
+                        'developed by: John Colani',
+                        style: GoogleFonts.cormorantGaramond(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: designSystemSubSize + 2,
+                          fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.italic,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      SelectableText(
+                        'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
+                        style: GoogleFonts.albertSans(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: bodySize - 1,
+                          height: 1.4,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.open_in_new,
+                            size: 18,
+                            color: ColorManager.orange,
+                          ),
+                          SizedBox(width: 8),
+                          SelectableText(
+                            'Open Design System →',
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.orange,
+                              fontSize: bodySize,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (isMobile) ...[
+                  SizedBox(width: 12),
+                  Icon(
+                    Icons.palette_outlined,
+                    size: 36,
+                    color: ColorManager.orange.withValues(alpha: 0.9),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

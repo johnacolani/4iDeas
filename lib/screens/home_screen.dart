@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
                                           style: TextStyle(
-                                            fontSize: wi < 400 ? 8 : 9,
+                                            fontSize: wi < 400 ? 11 : 12,
                                             color:
                                                 Colors.white.withValues(alpha: 0.9),
                                             decoration: TextDecoration.underline,
@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             text: 'Based in: Richmond, VA',
                                             style: TextStyle(
                                               fontSize:
-                                                  wi < 400 ? 8 * 1.3 : 9 * 1.3,
+                                                  wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,
                                               color: ColorManager.orange,
                                             ),
@@ -345,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'Login',
                                           style: TextStyle(
                                             fontSize:
-                                                wi < 400 ? 8 * 1.3 : 9 * 1.3,
+                                                wi < 400 ? 11 : 12,
                                             color: ColorManager.blue,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ' / ',
                                         style: TextStyle(
                                           fontSize:
-                                              wi < 400 ? 8 * 1.3 : 9 * 1.3,
+                                              wi < 400 ? 11 : 12,
                                           color: const Color(0xFFD81B60),
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'Sign Up',
                                           style: TextStyle(
                                             fontSize:
-                                                wi < 400 ? 8 * 1.3 : 9 * 1.3,
+                                                wi < 400 ? 11 : 12,
                                             color: ColorManager.orange,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -409,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             text: 'Based in: Richmond, VA',
                                             style: TextStyle(
                                               fontSize:
-                                                  wi < 400 ? 8 * 1.3 : 9 * 1.3,
+                                                  wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,
                                               color: ColorManager.orange,
                                             ),

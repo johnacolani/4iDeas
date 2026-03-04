@@ -19,6 +19,7 @@ class ServicesScreen extends StatefulWidget {
 class _ServicesScreenState extends State<ServicesScreen> {
   final ServicesContentService _servicesService = ServicesContentService();
   List<ServiceItem>? _servicesFromFirestore;
+  bool _isLoadingServices = true;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Future<void> _loadServices() async {
+    setState(() => _isLoadingServices = true);
     try {
       final hasAny = await _servicesService.hasServices();
       if (hasAny) {
@@ -34,6 +36,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         if (mounted) setState(() => _servicesFromFirestore = list);
       }
     } catch (_) {}
+    if (mounted) setState(() => _isLoadingServices = false);
   }
 
   List<ServiceItem> get _displayServices =>
@@ -160,6 +163,13 @@ class _ServicesScreenState extends State<ServicesScreen> {
               thumbVisibility: true,
               child: CustomScrollView(
                 slivers: [
+                if (_isLoadingServices)
+                  SliverToBoxAdapter(
+                    child: LinearProgressIndicator(
+                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                      valueColor: AlwaysStoppedAnimation<Color>(ColorManager.orange),
+                    ),
+                  ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(

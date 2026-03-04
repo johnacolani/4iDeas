@@ -372,18 +372,21 @@ class _SlidingMenuState extends State<SlidingMenu>
           curve: Curves.easeInOut,
           left: isSlideOpen ? drawerWidth + 3 : 0,
           top: (he / 2) - 55,
-          child: InkWell(
-            onTap: () {
-              setState(() {
-                isSlideOpen = !isSlideOpen;
-                if (isSlideOpen) {
-                  _animationController.forward();
-                } else {
-                  _animationController.reverse();
-                }
-              });
-            },
-            child: Align(
+          child: Semantics(
+            label: isSlideOpen ? 'Close menu' : 'Open menu',
+            button: true,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  isSlideOpen = !isSlideOpen;
+                  if (isSlideOpen) {
+                    _animationController.forward();
+                  } else {
+                    _animationController.reverse();
+                  }
+                });
+              },
+              child: Align(
               alignment: const Alignment(0, -0.5),
               child: ClipPath(
                 clipper: CustomMenuClipper(),
@@ -393,13 +396,14 @@ class _SlidingMenuState extends State<SlidingMenu>
                   color: const Color(0xFF4B556E),
                   alignment: Alignment.center,
                   child: AnimatedIcon(
-                    color: const Color(0xFFD81B60), // Dark pink/red color
+                    color: ColorManager.orange,
                     size: 25,
                     icon: AnimatedIcons.menu_close,
                     progress: _animationController.view,
                   ),
                 ),
               ),
+            ),
             ),
           ),
         ),

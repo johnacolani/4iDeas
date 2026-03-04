@@ -66,10 +66,10 @@ class MyApp extends StatelessWidget {
             return MaterialApp.router(
               routerConfig: router,
               debugShowCheckedModeBanner: false,
-              title: 'My Web Page',
+              title: '4iDeas – Product Design & Development',
               theme: ThemeData(
                 primarySwatch: Colors.blue,
-                useMaterial3: false,
+                useMaterial3: true,
                 fontFamily: GoogleFonts.albertSans().fontFamily,
                 scrollbarTheme: ScrollbarThemeData(
                   thumbVisibility: WidgetStateProperty.resolveWith((_) => true),
@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
       debugPrint('Critical error: $e');
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'My Web Page',
+        title: '4iDeas',
         home: Scaffold(
           body: Center(
             child: Padding(
