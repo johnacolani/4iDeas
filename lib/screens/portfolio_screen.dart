@@ -116,6 +116,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ? _caseStudiesFromFirestore!
           : PortfolioData.caseStudies;
 
+  static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
+
+  PortfolioApp get _designSystemApp => PortfolioApp(
+        id: 'design_system',
+        name: 'My Own Design System',
+        description: 'A living design system built in Flutter—components, patterns, and UI primitives. Developed by John Colani.',
+        imagePath: 'assets/images/design_system/design-system.png',
+        webUrl: _designSystemUrl,
+      );
+
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
@@ -565,16 +575,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 crossAxisSpacing: spacing,
                                 mainAxisSpacing: spacing,
                               ),
-                              itemCount: _displayApps.length,
+                              itemCount: _displayApps.length + 1,
                               itemBuilder: (context, index) {
-                                final app = _displayApps[index];
+                                final app = index < _displayApps.length
+                                    ? _displayApps[index]
+                                    : _designSystemApp;
                                 return PortfolioAppCard(
                                   app: app,
                                   isMobile: isMobile,
                                   isTablet: isTablet,
-                                  showAdminActions: isAdmin && appsFromFirestore,
-                                  onEdit: isAdmin && appsFromFirestore ? () => _navigateToEditApp(app) : null,
-                                  onDelete: isAdmin && appsFromFirestore ? () => _deleteApp(app) : null,
+                                  showAdminActions: index < _displayApps.length && isAdmin && appsFromFirestore,
+                                  onEdit: index < _displayApps.length && isAdmin && appsFromFirestore ? () => _navigateToEditApp(app) : null,
+                                  onDelete: index < _displayApps.length && isAdmin && appsFromFirestore ? () => _deleteApp(app) : null,
                                 );
                               },
                             );
@@ -708,8 +720,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
     );
   }
-
-  static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
 
   Widget _buildHero({
     required double he,
