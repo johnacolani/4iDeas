@@ -366,6 +366,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final double sectionTitleSize = isMobile ? 20 : (isTablet ? 22 : 24);
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
+    // ---------- CONTROLLABLE GAPS (adjust these to control distance between sections) ----------
+    final double gapAfterHero = he * 0.004;
+    final double gapAfterSubtitle = he * 0.012;
+    final double gapAfterDesignSystemCard = he * 0.012;
+    final double gapAfterDesignPhilosophy = he * 0.012;
+    final double gapAfterFeaturedTitle = 8.0;
+    final double gapBetweenCaseStudyCards = 24.0;
+    final double gapAfterCaseStudies = he * 0.04;
+    final double gapAfterAppShowcaseTitle = 16.0;
+    final double gapAfterAppShowcase = he * 0.04;
+    final double gapAfterPublicationsTitle = 12.0;
+    final double gapAfterPublications = he * 0.04;
+    final double gapAfterOpenSourceTitle = 16.0;
+    // ---------- END GAPS ----------
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.amber[100]),
@@ -414,7 +429,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Hero
+                        // 1. Hero (animation + title only)
                         _buildHero(
                           he: he,
                           wi: wi,
@@ -423,28 +438,51 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           isMobile: isMobile,
                           sectionTitleSize: sectionTitleSize,
                         ),
-                        SizedBox(height: he * 0.0015),
+                        SizedBox(height: gapAfterHero),
 
-                        // Design Philosophy
+                        // Content below hero: moved up 200px to reduce gap
                         Transform.translate(
-                          offset: Offset(0, -160),
-                          child: _DesignPhilosophyCard(
-                            bodySize: bodySize,
-                            isMobile: isMobile,
+                          offset: const Offset(0, -200),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                        // 2. End-to-end product design from research to cross-platform delivery
+                        Center(
+                          child: SelectableText(
+                            'End-to-end product design from research to cross-platform delivery',
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.orange,
+                              fontSize: bodySize,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                        SizedBox(height: he * 0.012),
+                        SizedBox(height: gapAfterSubtitle),
 
-                        // Featured Case Studies
-                        Transform.translate(
-                          offset: Offset(0, -20),
-                          child: _SectionTitle(
-                            title: 'Featured Case Studies',
-                            sectionTitleSize: sectionTitleSize,
-                          ),
+                        // 3. My Own Design System card
+                        _DesignSystemHighlight(
+                          designSystemTitleSize: isMobile ? 22 : (sectionTitleSize + 4),
+                          designSystemSubSize: isMobile ? 14 : (bodySize - 1),
+                          bodySize: bodySize,
+                          isMobile: isMobile,
+                          onTapLink: () => _launchUrl(_designSystemUrl),
+                        ),
+                        SizedBox(height: gapAfterDesignSystemCard),
+
+                        // 4. Design Philosophy & Principles card
+                        _DesignPhilosophyCard(
+                          bodySize: bodySize,
+                          isMobile: isMobile,
+                        ),
+                        SizedBox(height: gapAfterDesignPhilosophy),
+
+                        // 5. Featured Case Studies
+                        _SectionTitle(
+                          title: 'Featured Case Studies',
+                          sectionTitleSize: sectionTitleSize,
                         ),
                         if (AdminService.isAdmin()) ...[
-                          SizedBox(height: 4),
+                          SizedBox(height: gapAfterFeaturedTitle),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddCaseStudy,
                             icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
@@ -457,10 +495,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ],
-                        SizedBox(height: 0),
+                        SizedBox(height: gapAfterFeaturedTitle),
                         ..._displayCaseStudies.map(
                           (cs) => Padding(
-                            padding: EdgeInsets.only(bottom: 36),
+                            padding: EdgeInsets.only(bottom: gapBetweenCaseStudyCards),
                             child: CaseStudyCard(
                               caseStudy: cs,
                               isMobile: isMobile,
@@ -471,15 +509,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: he * 0.04),
+                        SizedBox(height: gapAfterCaseStudies),
 
-                        // App Showcase
-                        Transform.translate(
-                          offset: Offset(0, 0),
-                          child: _SectionTitle(
-                            title: 'App Showcase',
-                            sectionTitleSize: sectionTitleSize,
-                          ),
+                        // 6. App Showcase (2 columns or responsive grid)
+                        _SectionTitle(
+                          title: 'App Showcase',
+                          sectionTitleSize: sectionTitleSize,
                         ),
                         if (AdminService.isAdmin()) ...[
                           Padding(
@@ -498,7 +533,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ],
-                        SizedBox(height: 16),
+                        SizedBox(height: gapAfterAppShowcaseTitle),
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final double availableWidth = constraints.maxWidth;
@@ -545,18 +580,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             );
                           },
                         ),
-                        SizedBox(height: he * 0.04),
+                        SizedBox(height: gapAfterAppShowcase),
 
-                        // Publications
-                        Transform.translate(
-                          offset: Offset(0, 0),
-                          child: _SectionTitle(
-                            title: 'Publications',
-                            sectionTitleSize: sectionTitleSize,
-                          ),
+                        // 7. Publications
+                        _SectionTitle(
+                          title: 'Publications',
+                          sectionTitleSize: sectionTitleSize,
                         ),
                         if (AdminService.isAdmin()) ...[
-                          SizedBox(height: 8),
+                          SizedBox(height: gapAfterPublicationsTitle),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddPublication,
                             icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
@@ -569,7 +601,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ],
-                        SizedBox(height: 12),
+                        SizedBox(height: gapAfterPublicationsTitle),
                         ..._displayPublications.map(
                           (p) => Padding(
                             padding: EdgeInsets.only(bottom: 10),
@@ -587,8 +619,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton.icon(
-                            onPressed: () =>
-                                _launchUrl(PortfolioData.mediumProfile),
+                            onPressed: () => _launchUrl(PortfolioData.mediumProfile),
                             icon: Icon(
                               Icons.open_in_new,
                               size: 16,
@@ -604,18 +635,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: he * 0.04),
+                        SizedBox(height: gapAfterPublications),
 
-                        // Open Source & Package
-                        Transform.translate(
-                          offset: Offset(0, 0),
-                          child: _SectionTitle(
-                            title: 'Open Source & Package',
-                            sectionTitleSize: sectionTitleSize,
-                          ),
+                        // 8. Open Source & Package
+                        _SectionTitle(
+                          title: 'Open Source & Package',
+                          sectionTitleSize: sectionTitleSize,
                         ),
                         if (AdminService.isAdmin()) ...[
-                          SizedBox(height: 8),
+                          SizedBox(height: gapAfterOpenSourceTitle),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddOpenSource,
                             icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
@@ -628,7 +656,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             ),
                           ),
                         ],
-                        SizedBox(height: 16),
+                        SizedBox(height: gapAfterOpenSourceTitle),
                         ..._displayOpenSourceItems.asMap().entries.map((e) {
                           final item = e.value;
                           return Padding(
@@ -665,6 +693,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                         ),
                         SizedBox(height: he * 0.03),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -688,86 +719,50 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     required bool isMobile,
     required double sectionTitleSize,
   }) {
-    final double designSystemTitleSize = isMobile ? 22 : (sectionTitleSize + 4);
-    final double designSystemSubSize = isMobile ? 14 : (bodySize - 1);
-
-    // Lottie behind title — 9× the title line size (3× larger again), shifted up
+    // Lottie behind title — animation + title only (layout kept as-is)
     final double lottieHeight = titleSize * 1.3 * 9;
     final double lottieWidth = titleSize * 12 * 9;
 
     return Center(
-      child: Column(
-        children: [
-          Transform.translate(
-            offset: Offset(0, -he * 0.20),
-            child: Center(
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  SizedBox(
-                    width: lottieWidth*0.3,
-                    height: lottieHeight,
-                    child: Center(
-                      child: Lottie.asset(
-                        'assets/waveloop.json',
-                        fit: BoxFit.fitHeight,
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.palette_outlined,
-                          size: titleSize,
-                          color: ColorManager.orange.withValues(alpha: 0.3),
-                        ),
-                      ),
+      child: Transform.translate(
+        offset: Offset(0, -he * 0.20),
+        child: Center(
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              SizedBox(
+                width: lottieWidth * 0.3,
+                height: lottieHeight,
+                child: Center(
+                  child: Lottie.asset(
+                    'assets/waveloop.json',
+                    fit: BoxFit.fitHeight,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.palette_outlined,
+                      size: titleSize,
+                      color: ColorManager.orange.withValues(alpha: 0.3),
                     ),
                   ),
-                  Positioned.fill(
-                    child: Center(
-                      child: Transform.translate(
-                        offset: Offset(0, 60),
-                        child: SelectableText(
-                          'Product Design & Development',
-                          style: GoogleFonts.albertSans(
-                            color: Colors.white,
-                            fontSize: titleSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          Transform.translate(
-            offset: Offset(0, -he * 0.25),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: SelectableText(
-                    'End-to-end product design from research to cross-platform delivery',
-                    style: GoogleFonts.albertSans(
-                      color: ColorManager.orange,
-                      fontSize: bodySize,
-                      fontWeight: FontWeight.w500,
+              Positioned.fill(
+                child: Center(
+                  child: Transform.translate(
+                    offset: Offset(0, 60),
+                    child: SelectableText(
+                      'Product Design & Development',
+                      style: GoogleFonts.albertSans(
+                        color: Colors.white,
+                        fontSize: titleSize,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(height: he * 0.03),
-                Transform.translate(
-                  offset: Offset(0, 0),
-                  child: _DesignSystemHighlight(
-                    designSystemTitleSize: designSystemTitleSize,
-                    designSystemSubSize: designSystemSubSize,
-                    bodySize: bodySize,
-                    isMobile: isMobile,
-                    onTapLink: () => _launchUrl(_designSystemUrl),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
