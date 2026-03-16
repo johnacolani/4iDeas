@@ -40,6 +40,24 @@ class CaseStudyContentService {
     return ref.id;
   }
 
+  /// Set a case study with a specific document id (e.g. 'asd'). Use when editing
+  /// a case study that was from static data so it can be updated in Firestore.
+  Future<void> setCaseStudyWithId(String docId, PortfolioCaseStudy cs) async {
+    final col = _firestore.collection(_collection);
+    final doc = col.doc(docId);
+    final snapshot = await doc.get();
+    final data = cs.toMap();
+    if (!snapshot.exists) {
+      final orderSnapshot = await col.orderBy('order', descending: true).limit(1).get();
+      data['order'] = orderSnapshot.docs.isEmpty
+          ? 0
+          : (orderSnapshot.docs.first.data()['order'] as num? ?? 0).toInt() + 1;
+    } else {
+      data['order'] = snapshot.data()?['order'] ?? 0;
+    }
+    await doc.set(data);
+  }
+
   Future<void> updateCaseStudy(String docId, PortfolioCaseStudy cs) async {
     await _firestore.collection(_collection).doc(docId).update(cs.toMap());
   }

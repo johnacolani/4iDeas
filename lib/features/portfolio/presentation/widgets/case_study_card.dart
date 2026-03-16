@@ -11,6 +11,8 @@ class CaseStudyCard extends StatelessWidget {
   final bool showAdminActions;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  /// When set (e.g. for ASD), shows an "Adaptive" button to edit only the Adaptive Platform section.
+  final VoidCallback? onEditAdaptiveSection;
 
   const CaseStudyCard({
     super.key,
@@ -20,6 +22,7 @@ class CaseStudyCard extends StatelessWidget {
     this.showAdminActions = false,
     this.onEdit,
     this.onDelete,
+    this.onEditAdaptiveSection,
   });
 
   @override
@@ -118,7 +121,7 @@ class CaseStudyCard extends StatelessWidget {
       ),
     );
 
-    if (showAdminActions && (onEdit != null || onDelete != null)) {
+    if (showAdminActions && (onEdit != null || onDelete != null || onEditAdaptiveSection != null)) {
       return Stack(
         clipBehavior: Clip.none,
         children: [
@@ -129,6 +132,14 @@ class CaseStudyCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (onEditAdaptiveSection != null)
+                  IconButton(
+                    icon: Icon(Icons.image, size: 22, color: ColorManager.blue),
+                    onPressed: onEditAdaptiveSection,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 36, minHeight: 36),
+                    tooltip: 'Edit Adaptive section images',
+                  ),
                 if (onEdit != null)
                   IconButton(
                     icon: Icon(Icons.edit, size: 22, color: ColorManager.orange),

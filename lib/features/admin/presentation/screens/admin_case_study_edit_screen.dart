@@ -111,19 +111,27 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
     });
     try {
       final cs = _buildCaseStudy();
-      if (widget.docId == null) {
-        await _service.addCaseStudy(cs);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Case study added'), backgroundColor: Colors.green),
-          );
-          Navigator.of(context).pop(true);
-        }
-      } else {
+      if (widget.docId != null) {
         await _service.updateCaseStudy(widget.docId!, cs);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Case study updated'), backgroundColor: Colors.green),
+          );
+          Navigator.of(context).pop(true);
+        }
+      } else if (widget.initialCaseStudy != null) {
+        await _service.setCaseStudyWithId(widget.initialCaseStudy!.id, cs);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Case study saved to cloud'), backgroundColor: Colors.green),
+          );
+          Navigator.of(context).pop(true);
+        }
+      } else {
+        await _service.addCaseStudy(cs);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Case study added'), backgroundColor: Colors.green),
           );
           Navigator.of(context).pop(true);
         }
@@ -284,9 +292,9 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                   ),
                                   _buildField(
                                     controller: s.imagePaths,
-                                    label: 'Image paths (one per line, optional)',
-                                    hint: 'assets/images/...',
-                                    maxLines: 2,
+                                    label: 'Image paths (one per line; add as many as you need for e.g. Adaptive Platform)',
+                                    hint: 'assets/images/asd_app_adaptive/asd-app-0001.jpg',
+                                    maxLines: 12,
                                   ),
                                 ],
                               ),

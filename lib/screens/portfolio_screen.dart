@@ -111,10 +111,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     } catch (_) {}
   }
 
-  List<PortfolioCaseStudy> get _displayCaseStudies =>
-      (_caseStudiesFromFirestore != null && _caseStudiesFromFirestore!.isNotEmpty)
-          ? _caseStudiesFromFirestore!
-          : PortfolioData.caseStudies;
+  List<PortfolioCaseStudy> get _displayCaseStudies {
+    final fromFirestore = _caseStudiesFromFirestore;
+    if (fromFirestore == null || fromFirestore.isEmpty) return PortfolioData.caseStudies;
+    final firestoreIds = fromFirestore.map((e) => e.id).toSet();
+    final staticOnly = PortfolioData.caseStudies.where((s) => !firestoreIds.contains(s.id)).toList();
+    return [...fromFirestore, ...staticOnly];
+  }
+
+  bool get _hasAnyCaseStudiesFromFirestore =>
+      _caseStudiesFromFirestore != null && _caseStudiesFromFirestore!.isNotEmpty;
 
   static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
 
@@ -317,12 +323,109 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Future<void> _navigateToEditCaseStudy(PortfolioCaseStudy cs) async {
+    final isFromFirestore = _caseStudiesFromFirestore?.any((f) => f.id == cs.id) ?? false;
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminCaseStudyEditScreen(docId: cs.id, initialCaseStudy: cs),
+        builder: (context) => AdminCaseStudyEditScreen(
+          docId: isFromFirestore ? cs.id : null,
+          initialCaseStudy: cs,
+        ),
       ),
     );
-    if (result == true) _loadCaseStudies();
+    if (result == true) await _loadCaseStudies();
+  }
+
+  Future<void> _openEditAdaptiveSection(PortfolioCaseStudy cs) async {
+    const String adaptiveTitle = 'Adaptive Platform';
+    final adaptiveList = cs.sections.where((s) => s.title == adaptiveTitle).toList();
+    final adaptiveSection = adaptiveList.isEmpty ? null : adaptiveList.first;
+    final initialPaths = adaptiveSection != null
+        ? (adaptiveSection.imagePaths ?? adaptiveSection.displayImages.map((i) => i.path).toList()).join('\n')
+        : '';
+
+    final controller = TextEditingController(text: initialPaths);
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xff1a1a2e),
+        title: Text('Edit Adaptive Platform images', style: GoogleFonts.albertSans(color: Colors.white)),
+        content: SingleChildScrollView(
+          child: SizedBox(
+            width: MediaQuery.of(ctx).size.width * 0.8,
+            child: TextField(
+              controller: controller,
+              maxLines: 14,
+              style: GoogleFonts.albertSans(color: Colors.white, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'One asset path per line\nassets/images/asd_app_adaptive/asd-app-0001.jpg',
+                hintStyle: GoogleFonts.albertSans(color: Colors.white38),
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: ColorManager.orange),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Save', style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (saved != true || !mounted) return;
+
+    final pathLines = controller.text.trim().split(RegExp(r'\n')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final newSections = cs.sections.map((s) {
+      if (s.title == adaptiveTitle) {
+        return CaseStudySection(
+          title: s.title,
+          content: s.content,
+          imagePaths: pathLines.isEmpty ? null : pathLines,
+          images: null,
+        );
+      }
+      return s;
+    }).toList();
+
+    final updated = PortfolioCaseStudy(
+      id: cs.id,
+      title: cs.title,
+      subtitle: cs.subtitle,
+      overview: cs.overview,
+      designApproach: cs.designApproach,
+      sections: newSections,
+      order: cs.order,
+    );
+
+    try {
+      await _caseStudyService.setCaseStudyWithId('asd', updated);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Adaptive Platform images updated'), backgroundColor: Colors.green),
+        );
+        await _loadCaseStudies();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   Future<void> _deleteCaseStudy(PortfolioCaseStudy cs) async {
@@ -513,9 +616,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               caseStudy: cs,
                               isMobile: isMobile,
                               isTablet: isTablet,
-                              showAdminActions: AdminService.isAdmin() && _caseStudiesFromFirestore != null,
-                              onEdit: AdminService.isAdmin() && _caseStudiesFromFirestore != null ? () => _navigateToEditCaseStudy(cs) : null,
-                              onDelete: AdminService.isAdmin() && _caseStudiesFromFirestore != null ? () => _deleteCaseStudy(cs) : null,
+                              showAdminActions: AdminService.isAdmin(),
+                              onEdit: AdminService.isAdmin() ? () => _navigateToEditCaseStudy(cs) : null,
+                              onDelete: AdminService.isAdmin() && (_caseStudiesFromFirestore?.any((f) => f.id == cs.id) ?? false)
+                                  ? () => _deleteCaseStudy(cs)
+                                  : null,
+                              onEditAdaptiveSection: (AdminService.isAdmin() && cs.id == 'asd')
+                                  ? () => _openEditAdaptiveSection(cs)
+                                  : null,
                             ),
                           ),
                         ),
