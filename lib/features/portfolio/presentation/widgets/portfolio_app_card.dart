@@ -71,7 +71,9 @@ class PortfolioAppCard extends StatelessWidget {
                     _buildButtons(),
                     SizedBox(height: 8),
                     Expanded(
-                      child: _buildTextContent(titleSize, bodySize),
+                      child: SingleChildScrollView(
+                        child: _buildTextContent(titleSize, bodySize),
+                      ),
                     ),
                   ],
                 )
@@ -84,7 +86,9 @@ class PortfolioAppCard extends StatelessWidget {
                         children: [
                           Expanded(
                             flex: 5,
-                            child: _buildTextContent(titleSize, bodySize),
+                            child: SingleChildScrollView(
+                              child: _buildTextContent(titleSize, bodySize),
+                            ),
                           ),
                           SizedBox(width: 12),
                           Expanded(
@@ -155,13 +159,15 @@ class PortfolioAppCard extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
-        SelectableText(
+        Text(
           app.description,
           style: GoogleFonts.albertSans(
             color: Colors.white,
             fontSize: bodySize,
             height: 1.3,
           ),
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );

@@ -589,6 +589,16 @@ class _SectionBlock extends StatelessWidget {
                       imageWidth = isMobile 
                           ? availableWidth 
                           : (availableWidth - (crossAxisCount - 1) * 12) / crossAxisCount;
+                    } else if (title == 'Adaptive Platform') {
+                      // 3840 x 2160 = 16:9 aspect ratio
+                      const double aspectRatio = 3840 / 2160;
+                      crossAxisCount = 1;
+                      imageWidth = availableWidth;
+                      imageHeight = imageWidth / aspectRatio;
+                      if (imageHeight > (isMobile ? 320 : 420)) {
+                        imageHeight = isMobile ? 320 : 420;
+                        imageWidth = imageHeight * aspectRatio;
+                      }
                     } else if (isSolutionSection) {
                       crossAxisCount = isMobile ? 2 : (availableWidth > 900 ? 4 : (availableWidth > 600 ? 3 : 2));
                       final double spacing = 12;

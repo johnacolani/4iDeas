@@ -750,6 +750,24 @@ class PortfolioData {
                   'This approach reduced maintenance overhead while ensuring consistent experiences across devices.',
             ),
             CaseStudySection(
+              title: 'Adaptive Platform',
+              content:
+                  'The same codebase adapts to each platform with role-appropriate layouts and interactions.\n\n'
+                  '• **iOS & Android**: Native-feel navigation, touch-optimized targets, and platform-specific patterns where they add value.\n'
+                  '• **Web**: Responsive layouts, keyboard support, and desktop-friendly dashboards for admin and sales.\n'
+                  '• **Shared**: Design tokens, components, and data layer are shared; only layout and platform affordances vary.\n\n'
+                  'Screens below show how key flows (e.g. dashboard, scheduling, installer job) adapt across devices while keeping one source of truth.',
+              imagePaths: [
+                'assets/images/asd_app_adaptive/asd-app-0001.jpg',
+                'assets/images/asd_app_adaptive/asd-app-0002.jpg',
+                'assets/images/asd_app_adaptive/asd-app-0003.jpg',
+                'assets/images/asd_app_adaptive/asd-app-0004.jpg',
+                'assets/images/asd_app_adaptive/asd-app-0005.jpg',
+                'assets/images/asd_app_adaptive/asd-app-0006.jpg',
+                'assets/images/asd_app_adaptive/asd-app-0007.jpg',
+              ],
+            ),
+            CaseStudySection(
               title: 'Outcomes & Learnings',
               content:
                   '• Unified operations under one platform.\n'

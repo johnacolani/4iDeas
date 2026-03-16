@@ -80,6 +80,14 @@ flutter:
     - assets/images/vision_exercise.png
     - assets/images/app_store/
     - assets/images/design_system/
+    - assets/images/asd_app_adaptive/
+    - assets/images/asd_app_adaptive/asd-app-0001.jpg
+    - assets/images/asd_app_adaptive/asd-app-0002.jpg
+    - assets/images/asd_app_adaptive/asd-app-0003.jpg
+    - assets/images/asd_app_adaptive/asd-app-0004.jpg
+    - assets/images/asd_app_adaptive/asd-app-0005.jpg
+    - assets/images/asd_app_adaptive/asd-app-0006.jpg
+    - assets/images/asd_app_adaptive/asd-app-0007.jpg
     - assets/images/admin/
     - assets/images/sales_rep/
     - assets/images/installer/
