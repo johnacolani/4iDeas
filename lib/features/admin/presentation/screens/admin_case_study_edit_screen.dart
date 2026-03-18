@@ -293,7 +293,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                   _buildField(
                                     controller: s.imagePaths,
                                     label: 'Image paths (one per line; add as many as you need for e.g. Adaptive Platform)',
-                                    hint: 'assets/images/asd_app_adaptive/asd-app-0001.jpg',
+                                    hint: 'assets/images/asd_app_adaptive/asd-001.jpg',
                                     maxLines: 12,
                                   ),
                                 ],

@@ -116,7 +116,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     if (fromFirestore == null || fromFirestore.isEmpty) return PortfolioData.caseStudies;
     final firestoreIds = fromFirestore.map((e) => e.id).toSet();
     final staticOnly = PortfolioData.caseStudies.where((s) => !firestoreIds.contains(s.id)).toList();
-    return [...fromFirestore, ...staticOnly];
+    final mergedFirestore = fromFirestore.map((cs) {
+      if (cs.id == 'asd') return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
+      return cs;
+    }).toList();
+    return [...mergedFirestore, ...staticOnly];
   }
 
   bool get _hasAnyCaseStudiesFromFirestore =>
@@ -336,9 +340,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Future<void> _openEditAdaptiveSection(PortfolioCaseStudy cs) async {
-    const String adaptiveTitle = 'Adaptive Platform';
-    final adaptiveList = cs.sections.where((s) => s.title == adaptiveTitle).toList();
-    final adaptiveSection = adaptiveList.isEmpty ? null : adaptiveList.first;
+    final adaptiveCandidates = cs.sections.where((s) => s.isAsdAdaptivePlatformSection).toList();
+    final adaptiveSection = adaptiveCandidates.isEmpty ? null : adaptiveCandidates.first;
     final initialPaths = adaptiveSection != null
         ? (adaptiveSection.imagePaths ?? adaptiveSection.displayImages.map((i) => i.path).toList()).join('\n')
         : '';
@@ -348,7 +351,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Edit Adaptive Platform images', style: GoogleFonts.albertSans(color: Colors.white)),
+        title: Text('Edit adaptive & responsive images', style: GoogleFonts.albertSans(color: Colors.white)),
         content: SingleChildScrollView(
           child: SizedBox(
             width: MediaQuery.of(ctx).size.width * 0.8,
@@ -357,7 +360,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               maxLines: 14,
               style: GoogleFonts.albertSans(color: Colors.white, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'One asset path per line\nassets/images/asd_app_adaptive/asd-app-0001.jpg',
+                hintText: 'One asset path per line\ne.g. assets/images/asd_app_adaptive/asd-001.jpg',
                 hintStyle: GoogleFonts.albertSans(color: Colors.white38),
                 alignLabelWithHint: true,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -390,7 +393,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
     final pathLines = controller.text.trim().split(RegExp(r'\n')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
     final newSections = cs.sections.map((s) {
-      if (s.title == adaptiveTitle) {
+      if (s.isAsdAdaptivePlatformSection) {
         return CaseStudySection(
           title: s.title,
           content: s.content,
@@ -415,7 +418,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       await _caseStudyService.setCaseStudyWithId('asd', updated);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Adaptive Platform images updated'), backgroundColor: Colors.green),
+          const SnackBar(content: Text('Adaptive & responsive images updated'), backgroundColor: Colors.green),
         );
         await _loadCaseStudies();
       }

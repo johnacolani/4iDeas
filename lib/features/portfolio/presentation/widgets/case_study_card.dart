@@ -37,7 +37,9 @@ class CaseStudyCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CaseStudyDetailScreen(caseStudy: caseStudy),
+              builder: (context) => CaseStudyDetailScreen(
+                  caseStudy: caseStudy.withAdaptiveBeforeDesignSystem(),
+                ),
             ),
           );
         },

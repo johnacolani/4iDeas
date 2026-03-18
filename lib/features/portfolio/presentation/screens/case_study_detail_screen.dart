@@ -8,6 +8,12 @@ import 'package:four_ideas/helper/app_background.dart';
 /// Corner radius (in logical pixels) used for all case study images in this screen.
 const double kCaseStudyImageCornerRadius = 30;
 
+/// Adaptive Platform screenshots (landscape). Matches asset aspect so layout isn’t mistaken for phone portrait.
+const double kAdaptivePlatformImageWidth = 2720;
+const double kAdaptivePlatformImageHeight = 1504;
+double get kAdaptivePlatformAspectRatio =>
+    kAdaptivePlatformImageWidth / kAdaptivePlatformImageHeight;
+
 /// Onboarding flow order: English (1st), Persian (2nd), Turkish (3rd), then rest by trailing number.
 const List<String> _onboardingFlowFirstPaths = [
   'assets/images/on_boarding_image/on_boarding_en_1.png',  // 1st: English
@@ -26,14 +32,21 @@ List<CaseStudyImage> _sortImagesByTrailingNumber(List<CaseStudyImage> images) {
       if (n == null) break;
       numerics.insert(0, n);
     }
-    if (numerics.isEmpty) return 999.0;
-    double order = 0.0;
-    double divisor = 1.0;
-    for (final n in numerics) {
-      order += n / divisor;
-      divisor *= 10;
+    if (numerics.isNotEmpty) {
+      double order = 0.0;
+      double divisor = 1.0;
+      for (final n in numerics) {
+        order += n / divisor;
+        divisor *= 10;
+      }
+      return order;
     }
-    return order;
+    // e.g. asd-001.jpg → order by last number run in basename
+    final digitRuns = RegExp(r'\d+').allMatches(name).map((m) => int.tryParse(m.group(0)!)).whereType<int>().toList();
+    if (digitRuns.isNotEmpty) {
+      return digitRuns.last.toDouble();
+    }
+    return 999.0;
   }
   final pathToImage = {for (final img in images) img.path: img};
   final result = <CaseStudyImage>[];
@@ -261,15 +274,95 @@ class _ClickableImage extends StatelessWidget {
   final double imageHeight;
   final VoidCallback onTap;
 
+  final BoxFit fit;
+
+  /// When true (Adaptive section), image is scaled to fit entirely inside the box (no overflow).
+  final bool fitInsideContainer;
+
   const _ClickableImage({
     required this.imagePath,
     required this.imageWidth,
     required this.imageHeight,
     required this.onTap,
+    this.fit = BoxFit.cover,
+    this.fitInsideContainer = false,
   });
+
+  static Widget _errorPlaceholder(double w, double h) {
+    return Container(
+      width: w,
+      height: h,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.image_not_supported,
+            color: Colors.white.withValues(alpha: 0.5),
+            size: 40,
+          ),
+          SizedBox(height: 8),
+          SelectableText(
+            'Image not found',
+            style: GoogleFonts.albertSans(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final decoration = BoxDecoration(
+      color: Colors.white.withValues(alpha: 0.05),
+      borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
+      border: Border.all(
+        color: Colors.white.withValues(alpha: 0.1),
+        width: 1,
+      ),
+    );
+
+    final Widget inner = fitInsideContainer
+        ? FittedBox(
+            fit: BoxFit.contain,
+            clipBehavior: Clip.hardEdge,
+            alignment: Alignment.center,
+            child: Image.asset(
+              imagePath,
+              errorBuilder: (context, error, stackTrace) {
+                debugPrint('Failed to load image: $imagePath');
+                debugPrint('Error: $error');
+                return SizedBox(
+                  width: imageWidth,
+                  height: imageHeight,
+                  child: _errorPlaceholder(imageWidth, imageHeight),
+                );
+              },
+            ),
+          )
+        : Image.asset(
+            imagePath,
+            width: imageWidth,
+            height: imageHeight,
+            fit: fit,
+            errorBuilder: (context, error, stackTrace) {
+              debugPrint('Failed to load image: $imagePath');
+              debugPrint('Error: $error');
+              return _errorPlaceholder(imageWidth, imageHeight);
+            },
+          );
+
     return GestureDetector(
       onTap: onTap,
       child: Hero(
@@ -279,59 +372,15 @@ class _ClickableImage extends StatelessWidget {
           height: imageHeight,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
-            child: Container(
-              width: imageWidth,
-              height: imageHeight,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  width: 1,
-                ),
-              ),
-              child: Image.asset(
-                imagePath,
-                width: imageWidth,
-                height: imageHeight,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  debugPrint('Failed to load image: $imagePath');
-                  debugPrint('Error: $error');
-                  return Container(
-                    width: imageWidth,
-                    height: imageHeight,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                      ),
+            child: DecoratedBox(
+              decoration: decoration,
+              child: fitInsideContainer
+                  ? inner
+                  : SizedBox(
+                      width: imageWidth,
+                      height: imageHeight,
+                      child: inner,
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image_not_supported,
-                            color: Colors.white.withValues(alpha: 0.5),
-                            size: 40,
-                          ),
-                          SizedBox(height: 8),
-                          SelectableText(
-                            'Image not found',
-                            style: GoogleFonts.albertSans(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
             ),
           ),
         ),
@@ -348,6 +397,8 @@ class _ImageWithCaption extends StatelessWidget {
   final double imageHeight;
   final double bodySize;
   final VoidCallback onTap;
+  final BoxFit imageFit;
+  final bool imageFitInsideContainer;
 
   const _ImageWithCaption({
     required this.imagePath,
@@ -356,6 +407,8 @@ class _ImageWithCaption extends StatelessWidget {
     required this.imageHeight,
     required this.bodySize,
     required this.onTap,
+    this.imageFit = BoxFit.cover,
+    this.imageFitInsideContainer = false,
   });
 
   /// Display name from path: filename without extension, underscores to spaces, title case.
@@ -376,6 +429,8 @@ class _ImageWithCaption extends StatelessWidget {
           imageWidth: imageWidth,
           imageHeight: imageHeight,
           onTap: onTap,
+          fit: imageFit,
+          fitInsideContainer: imageFitInsideContainer,
         ),
         SizedBox(height: 8),
         Padding(
@@ -575,29 +630,40 @@ class _SectionBlock extends StatelessWidget {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final List<CaseStudyImage> sortedImages = _sortImagesByTrailingNumber(displayImages);
-                    final double availableWidth = constraints.maxWidth;
+                    final double availableWidth = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+                        ? constraints.maxWidth
+                        : wi;
                     final bool isDesignSystem = title == 'Design System (v3.0.11)';
                     final bool isSolutionSection = title == 'The Solution';
-                    
+                    // Firestore title typos still get correct layout if paths are under asd_app_adaptive.
+                    final bool isAdaptivePlatformSection =
+                        CaseStudySection.matchesAdaptivePlatformSection(
+                      title,
+                      displayImages.map((i) => i.path),
+                    );
+
                     double imageWidth;
                     double imageHeight;
                     int crossAxisCount;
-                    
+
                     if (isDesignSystem) {
                       imageHeight = isMobile ? 240 : 320;
                       crossAxisCount = isMobile ? 1 : (availableWidth > 900 ? 3 : 2);
-                      imageWidth = isMobile 
-                          ? availableWidth 
+                      imageWidth = isMobile
+                          ? availableWidth
                           : (availableWidth - (crossAxisCount - 1) * 12) / crossAxisCount;
-                    } else if (title == 'Adaptive Platform') {
-                      // 3840 x 2160 = 16:9 aspect ratio
-                      const double aspectRatio = 3840 / 2160;
+                    } else if (isAdaptivePlatformSection) {
+                      // Landscape assets 2720×1504 — full width on phone; capped height on wider layouts.
+                      final double aspect = kAdaptivePlatformAspectRatio;
                       crossAxisCount = 1;
                       imageWidth = availableWidth;
-                      imageHeight = imageWidth / aspectRatio;
-                      if (imageHeight > (isMobile ? 320 : 420)) {
-                        imageHeight = isMobile ? 320 : 420;
-                        imageWidth = imageHeight * aspectRatio;
+                      imageHeight = imageWidth / aspect;
+                      if (!isMobile) {
+                        final double maxH = availableWidth > 960 ? 520 : 440;
+                        if (imageHeight > maxH) {
+                          imageHeight = maxH;
+                          imageWidth = imageHeight * aspect;
+                        }
                       }
                     } else if (isSolutionSection) {
                       crossAxisCount = isMobile ? 2 : (availableWidth > 900 ? 4 : (availableWidth > 600 ? 3 : 2));
@@ -617,10 +683,15 @@ class _SectionBlock extends StatelessWidget {
                     }
                     
                     final double spacing = 12;
-                    final bool showOneByOneCentered = isMobile && !isDesignSystem && !isSolutionSection;
+                    final bool showOneByOneCentered =
+                        isMobile && !isDesignSystem && !isSolutionSection && !isAdaptivePlatformSection;
                     final bool hasDescriptions = sortedImages.any((img) => img.description != null && img.description!.isNotEmpty);
 
-                    Widget buildImageItem(CaseStudyImage item) {
+                    Widget buildImageItem(
+                      CaseStudyImage item, {
+                      BoxFit fit = BoxFit.cover,
+                      bool fitInside = false,
+                    }) {
                       return _ImageWithCaption(
                         imagePath: item.path,
                         description: item.description,
@@ -628,6 +699,28 @@ class _SectionBlock extends StatelessWidget {
                         imageHeight: imageHeight,
                         bodySize: bodySize,
                         onTap: () => onImageTap(item.path),
+                        imageFit: fit,
+                        imageFitInsideContainer: fitInside,
+                      );
+                    }
+
+                    if (isAdaptivePlatformSection) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: List.generate(sortedImages.length, (index) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: index < sortedImages.length - 1 ? spacing : 0,
+                            ),
+                            child: Center(
+                              child: buildImageItem(
+                                sortedImages[index],
+                                fit: BoxFit.contain,
+                                fitInside: true,
+                              ),
+                            ),
+                          );
+                        }),
                       );
                     }
 

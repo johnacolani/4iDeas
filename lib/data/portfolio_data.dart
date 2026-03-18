@@ -163,6 +163,28 @@ class PortfolioCaseStudy {
       order: (map['order'] as num?)?.toInt() ?? 0,
     );
   }
+
+  /// ASD only: place **Adaptive Platform** immediately before **Design System** (static + Firestore order).
+  PortfolioCaseStudy withAdaptiveBeforeDesignSystem() {
+    if (id != 'asd') return this;
+    final list = List<CaseStudySection>.from(sections);
+    final adaptiveI = list.indexWhere((s) => s.isAsdAdaptivePlatformSection);
+    final designI = list.indexWhere((s) => s.title.trim().startsWith('Design System'));
+    if (adaptiveI < 0 || designI < 0) return this;
+    if (adaptiveI == designI - 1) return this;
+    final adaptive = list.removeAt(adaptiveI);
+    final insertAt = adaptiveI > designI ? designI : designI - 1;
+    list.insert(insertAt, adaptive);
+    return PortfolioCaseStudy(
+      id: id,
+      title: title,
+      subtitle: subtitle,
+      overview: overview,
+      designApproach: designApproach,
+      sections: list,
+      order: order,
+    );
+  }
 }
 
 /// A case study image with optional caption.
@@ -228,6 +250,30 @@ class CaseStudySection {
       imagePaths: imagePaths?.map((e) => e.toString()).toList(),
       images: imagesList?.map((e) => CaseStudyImage.fromMap(Map<String, dynamic>.from(e as Map))).toList(),
     );
+  }
+
+  /// ASD adaptive gallery section (title variants or `asd_app_adaptive` paths).
+  bool get isAsdAdaptivePlatformSection {
+    final t = title.trim();
+    if (t == 'Adaptive Platform' ||
+        t == 'Adaptive & Responsive Platform' ||
+        t == 'Adaptive Platform for Fully Responsive Screens') return true;
+    if (t.startsWith('Adaptive') && t.contains('Responsive')) return true;
+    for (final p in imagePaths ?? const <String>[]) {
+      if (p.toLowerCase().contains('asd_app_adaptive')) return true;
+    }
+    for (final i in images ?? const <CaseStudyImage>[]) {
+      if (i.path.toLowerCase().contains('asd_app_adaptive')) return true;
+    }
+    return false;
+  }
+
+  static bool matchesAdaptivePlatformSection(String title, Iterable<String> imagePaths) {
+    return CaseStudySection(
+      title: title,
+      content: '',
+      imagePaths: imagePaths.toList(),
+    ).isAsdAdaptivePlatformSection;
   }
 }
 
@@ -538,6 +584,30 @@ class PortfolioData {
                   '• Cross-platform parity achieved (iOS, Android, Web)',
             ),
             CaseStudySection(
+              title: 'Adaptive Platform for Fully Responsive Screens',
+              content:
+                  'I treated **platform** and **viewport** as two lenses on the same product: one codebase, many surfaces. Adaptive work answers *where the app runs*; responsive work answers *how much room we have*—and both inform hierarchy, density, and interaction model.\n\n'
+                  '• **Responsive**: Breakpoints aren’t decorative—they reorder information so the same task stays coherent on a narrow phone, a tablet in the field, or a wide admin desktop. Primary actions stay thumb-reachable on small screens; data-heavy views breathe on large ones. Typography and spacing scale with tokens so nothing feels “shrunk” or “stretched”—just appropriate for the context.\n\n'
+                  '• **iOS & Android**: Native-feel navigation, touch-first targets, and platform idioms only where they reduce friction—not novelty for its own sake.\n\n'
+                  '• **Web**: Keyboard paths, hover affordances where useful, and dashboards tuned for sustained desktop use (admin, sales) without abandoning mobile web where clients check status.\n\n'
+                  '• **Shared foundation**: One design system and data layer; layout and affordances shift. No duplicate flows—just deliberate adaptation.\n\n'
+                  'The screens below show the same journeys across form factors: one source of truth, intentionally responsive and platform-aware.',
+              imagePaths: [
+                'assets/images/asd_app_adaptive/asd-001.jpg',
+                'assets/images/asd_app_adaptive/asd-002.jpg',
+                'assets/images/asd_app_adaptive/asd-003.jpg',
+                'assets/images/asd_app_adaptive/asd-004.jpg',
+                'assets/images/asd_app_adaptive/asd-005.jpg',
+                'assets/images/asd_app_adaptive/asd-006.jpg',
+                'assets/images/asd_app_adaptive/asd-007.jpg',
+                'assets/images/asd_app_adaptive/asd-008.jpg',
+                'assets/images/asd_app_adaptive/asd-009.jpg',
+                'assets/images/asd_app_adaptive/asd-010.jpg',
+                'assets/images/asd_app_adaptive/asd-011.jpg',
+                'assets/images/asd_app_adaptive/asd-012.jpg',
+              ],
+            ),
+            CaseStudySection(
               title: 'Design System (v3.0.11)',
               content:
                   'I designed and implemented a token-based design system shared across mobile and web.\n\n'
@@ -750,24 +820,6 @@ class PortfolioData {
                   'This approach reduced maintenance overhead while ensuring consistent experiences across devices.',
             ),
             CaseStudySection(
-              title: 'Adaptive Platform',
-              content:
-                  'The same codebase adapts to each platform with role-appropriate layouts and interactions.\n\n'
-                  '• **iOS & Android**: Native-feel navigation, touch-optimized targets, and platform-specific patterns where they add value.\n'
-                  '• **Web**: Responsive layouts, keyboard support, and desktop-friendly dashboards for admin and sales.\n'
-                  '• **Shared**: Design tokens, components, and data layer are shared; only layout and platform affordances vary.\n\n'
-                  'Screens below show how key flows (e.g. dashboard, scheduling, installer job) adapt across devices while keeping one source of truth.',
-              imagePaths: [
-                'assets/images/asd_app_adaptive/asd-app-0001.jpg',
-                'assets/images/asd_app_adaptive/asd-app-0002.jpg',
-                'assets/images/asd_app_adaptive/asd-app-0003.jpg',
-                'assets/images/asd_app_adaptive/asd-app-0004.jpg',
-                'assets/images/asd_app_adaptive/asd-app-0005.jpg',
-                'assets/images/asd_app_adaptive/asd-app-0006.jpg',
-                'assets/images/asd_app_adaptive/asd-app-0007.jpg',
-              ],
-            ),
-            CaseStudySection(
               title: 'Outcomes & Learnings',
               content:
                   '• Unified operations under one platform.\n'
@@ -867,4 +919,73 @@ class PortfolioData {
           ],
         ),
       ];
+
+  /// Renamed assets: `asd-app-0001.jpg` → `asd-001.jpg` (Firestore may still list old names).
+  static String migrateAsdAdaptiveAssetPath(String path) {
+    final m = RegExp(r'asd-app-(\d+)\.(jpg|jpeg|png)', caseSensitive: false).firstMatch(path);
+    if (m == null) return path;
+    final dirEnd = path.lastIndexOf('/') + 1;
+    if (dirEnd <= 0) return path;
+    final n = int.parse(m.group(1)!);
+    final ext = m.group(2)!.toLowerCase();
+    return '${path.substring(0, dirEnd)}asd-${n.toString().padLeft(3, '0')}.$ext';
+  }
+
+  /// Firestore ASD often stores an older adaptive section title/body; keep copy in sync with [caseStudies].
+  static PortfolioCaseStudy mergeFirestoreAsdAdaptiveCopyFromStatic(PortfolioCaseStudy firestoreAsd) {
+    if (firestoreAsd.id != 'asd') return firestoreAsd;
+    PortfolioCaseStudy? staticAsd;
+    for (final c in caseStudies) {
+      if (c.id == 'asd') {
+        staticAsd = c;
+        break;
+      }
+    }
+    if (staticAsd == null) return firestoreAsd;
+    final staticAdaptiveList = staticAsd.sections.where((s) => s.isAsdAdaptivePlatformSection).toList();
+    if (staticAdaptiveList.isEmpty) return firestoreAsd;
+    final staticAdaptive = staticAdaptiveList.first;
+
+    final staticPaths = staticAdaptive.imagePaths ?? const <String>[];
+
+    final newSections = firestoreAsd.sections.map((s) {
+      if (!s.isAsdAdaptivePlatformSection) return s;
+
+      // Firestore often still has 7 old paths; static repo lists all current assets (e.g. 12).
+      List<String> fromFirestore = const [];
+      if (s.images != null && s.images!.isNotEmpty) {
+        fromFirestore = s.images!.map((i) => migrateAsdAdaptiveAssetPath(i.path)).toList();
+      } else if (s.imagePaths != null && s.imagePaths!.isNotEmpty) {
+        fromFirestore = s.imagePaths!.map(migrateAsdAdaptiveAssetPath).toList();
+      }
+
+      final List<String> paths;
+      if (fromFirestore.length >= staticPaths.length && fromFirestore.isNotEmpty) {
+        // Admin extended list in Firestore — trust it.
+        paths = fromFirestore;
+      } else if (staticPaths.isNotEmpty) {
+        // Repo has more (or fresher) assets than Firestore — show all bundled images.
+        paths = staticPaths;
+      } else {
+        paths = fromFirestore;
+      }
+
+      return CaseStudySection(
+        title: staticAdaptive.title,
+        content: staticAdaptive.content,
+        imagePaths: paths.isEmpty ? null : paths,
+        images: null,
+      );
+    }).toList();
+
+    return PortfolioCaseStudy(
+      id: firestoreAsd.id,
+      title: firestoreAsd.title,
+      subtitle: firestoreAsd.subtitle,
+      overview: firestoreAsd.overview,
+      designApproach: firestoreAsd.designApproach,
+      sections: newSections,
+      order: firestoreAsd.order,
+    );
+  }
 }
