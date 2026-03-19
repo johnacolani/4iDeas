@@ -477,116 +477,49 @@ class PortfolioData {
           title: 'Absolute Stone Design (ASD)',
           subtitle: 'Multi‑Role Operations Platform',
           overview:
-              'Absolute Stone Design (ASD) is a production‑ready, multi‑role operations platform built for a real stone fabrication and installation business. The product replaces fragmented workflows such as phone calls, text messages, spreadsheets, and disconnected tools with a single, unified system supporting Admins, Sales Representatives, Schedulers, Installers, and Clients. I owned the product end‑to‑end: strategy, UX/UI, design system, AI governance, data architecture, and cross‑platform delivery on iOS, Android, and Web.\n\n'
-              '**Senior-Level Highlights:** Complex multi-role workflows, systems thinking with unified data models, AI governance with human oversight, ecosystem integration, cross-functional alignment, and regulated flows with audit trails.',
+              'One system replaced phone, text, and spreadsheets: visible state, less coordination, scalable onboarding, human-governed AI. '
+              'Operations platform for stone fabrication and installation. End-to-end ownership: product strategy, UX/UI, design system, AI governance, data architecture, cross-platform (iOS, Android, Web). '
+              'Single data model, role-based permissions, visible workflows—config and integrations co-specified with engineering for scale.',
           designApproach:
-              'Design principles applied — Circle Method (Comprehend → Identify Users → Report Needs → Cut & Prioritize → List Solutions → Evaluate Trade-offs → Recommend). '
-              'User types considered: Typical users (intuitive nav, clear labels), Frequent users (shortcuts, analytics), First-time users (onboarding, progressive disclosure). '
-              'STAR framing: Situation (fragmented workflows), Task (unified platform), Action (role-based dashboards, AI governance, design system), Result (70% less coordination overhead, 60% inquiries handled by AI). '
-              'WCAG 2.2 AA target: perceivable (contrast, typography), operable (keyboard, focus, touch targets), understandable (consistent nav, error messages), robust (semantic widgets, cross-platform). '
-              'Problem-first thinking, collaboration with PM/eng, iteration over perfection.',
+              'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
+              'Design strategy: systems thinking, role-based IA, explicit governance (audit, human-in-the-loop AI). Partnership with engineering on data model, workflow logic, and config-driven behavior. WCAG 2.2 AA for core flows.',
           sections: [
             CaseStudySection(
-              title: 'Problem Statement',
+              title: 'Problem',
               content:
-                  'Operational workflows were fragmented and inefficient:\n\n'
-                  '• Clients lacked visibility into job status and timelines\n'
-                  '• Installers relied on informal communication and manual updates\n'
-                  '• Sales and scheduling were disconnected from execution\n'
-                  '• Admins lacked centralized control and system governance\n\n'
-                  'This resulted in high coordination overhead, inconsistent client experience, and limited scalability.\n\n'
-                  'Goal: Design and ship a single, scalable platform that:\n'
-                  '• Unifies operations across all roles\n'
-                  '• Reduces manual coordination and cognitive load\n'
-                  '• Improves transparency and client trust\n'
-                  '• Enables AI adoption with clear human oversight',
+                  'Handoffs, not a system. Phone, text, spreadsheets, ad-hoc tools. Status in people\'s heads; clients blind; installers manual; sales and scheduling decoupled from field; admins without central control.\n\n'
+                  '**What was broken:** No single place for "where is my job?" or ownership. Coordination consumed hours; duplicate data, version conflicts. Adding users or changing content = manual, opaque steps; scaling added process, not capability. No structured data or governance for AI.\n\n'
+                  '**Goal:** One system—unified operations, visible handoffs and state, AI with human oversight—without new process or IT overhead.',
             ),
             CaseStudySection(
-              title: 'Users & Roles',
+              title: 'Context',
               content:
-                  'Admin: Full system governance, role promotion, content control, and AI oversight.\n\n'
-                  'Sales Representative: Lead management, contracts, and client communication.\n\n'
-                  'Scheduler: Job scheduling and coordination across teams.\n\n'
-                  'Installer: Field execution, live location tracking, and job lifecycle.\n\n'
-                  'Client: Discovery, order tracking, communication, and transparency.',
+                  '**Domain:** Stone fabrication and installation—measure → fabricate → install → maintain. Work flows through stages and roles; the system models that pipeline, not just screens.\n\n'
+                  '**Five roles, five surfaces:** Admin, Sales, Scheduler, Installer, Client. Different permissions, data needs, devices (desktop → mobile, often offline). Same entities serve all five; UI and backend enforce what each role sees and can do.\n\n'
+                  '**Pre-system:** No source of truth. "Where is my job?" landed on people. Scope: front-end, operational logic, ownership of config and integrations.',
             ),
             CaseStudySection(
-              title: 'Product Strategy & Systems Thinking',
+              title: 'System Complexity',
               content:
-                  '**Architecture Decision: Unified Platform vs. Separate Apps**\n\n'
-                  'Trade-off Analysis:\n'
-                  '• Option A: Separate apps per role (simpler, faster to build)\n'
-                  '• Option B: Single unified platform (complex, but enables cross-role workflows)\n'
-                  '• **Decision**: Unified platform to enable:\n'
-                  '  - Cross-role visibility (Sales sees Installer progress)\n'
-                  '  - Shared data models (one source of truth)\n'
-                  '  - Reduced maintenance overhead\n'
-                  '  - Future extensibility\n\n'
-                  '**Key Architectural Decisions:**\n'
-                  '• Single authentication flow for all users (reduces friction, enables role switching)\n'
-                  '• Dynamic role‑based routing after login (progressive disclosure, reduces cognitive overload)\n'
-                  '• Admin positioned as a central control layer, not a bottleneck (enables self-service governance)\n'
-                  '• AI designed as a governed assistant, not an autonomous system (human-in-the-loop for safety)\n\n'
-                  '**Constraints Addressed:**\n'
-                  '• Field workers with limited connectivity → Offline-first data sync\n'
-                  '• Multi-generational workforce → Simple, clear UI patterns\n'
-                  '• Real-time coordination needs → Event-driven architecture\n'
-                  '• Compliance requirements → Audit trails and role-based access control',
+                  '**One platform, one data model, many surfaces.**\n\n'
+                  'Flow: Sales creates project → Scheduler assigns Installer → Installer updates status → Client sees it live → Admin has full audit trail. Front-end maps to backend rules (read/write, notification triggers, state propagation). Flows and permission boundaries defined first; UI exposes the right slice per role.\n\n'
+                  '**Shared entities:** Users, Projects, Events, Materials, Contracts, AI conversations. Permissions govern visibility and actions. Stateful workflows—status changes trigger notifications and audit. Governance (roles, content, AI) Admin-controlled, no code deploys.\n\n'
+                  '**Integrations & backend:** Payments, email, GPS, hardware, offline sync. Design respected what each integration provides and where logic lives. Partnership with engineering kept workflow logic feasible and scalable.\n\n'
+                  '**Cross-platform:** One codebase (iOS, Android, Web). Layout adapts by device and viewport; front-end matches backend capabilities.',
             ),
             CaseStudySection(
-              title: 'Data Model & Ecosystem Architecture',
+              title: 'Solution',
               content:
-                  '**Unified Data Model Design**\n\n'
-                  'Designed a single data model that serves all roles while maintaining role-specific views:\n\n'
-                  '**Core Entities:**\n'
-                  '• Users (with role assignments and permissions)\n'
-                  '• Projects (shared across Sales, Scheduler, Installer, Client)\n'
-                  '• Events (scheduling, job assignments, status changes)\n'
-                  '• Materials (catalog, pricing, availability)\n'
-                  '• Contracts & Invoices (financial workflows)\n'
-                  '• AI Conversations (governed knowledge base)\n\n'
-                  '**Cross-Functional Data Flow:**\n'
-                  '1. Sales creates project → triggers Scheduler notification\n'
-                  '2. Scheduler assigns Installer → Installer receives job details\n'
-                  '3. Installer updates status → Client receives real-time notification\n'
-                  '4. All updates logged → Admin has full audit trail\n\n'
-                  '**Ecosystem Integration:**\n'
-                  '• External hardware integration (backup cameras for Phillips Rear-Vu)\n'
-                  '• Payment processing (Stripe integration for invoices)\n'
-                  '• Email notifications (Firebase Cloud Functions)\n'
-                  '• GPS tracking (real-time location services)\n\n'
-                  '**Regulated Flows:**\n'
-                  '• Role promotion requires Admin approval\n'
-                  '• Contract changes trigger approval workflows\n'
-                  '• AI responses logged for review and correction\n'
-                  '• Financial transactions require dual verification',
-            ),
-            CaseStudySection(
-              title: 'Before & After Impact',
-              content:
-                  '**Before (Fragmented Workflows):**\n\n'
-                  '• **Coordination Overhead**: 2-3 hours/day per admin managing phone calls, texts, spreadsheets\n'
-                  '• **Client Visibility**: Zero real-time updates, frequent "where is my job?" calls\n'
-                  '• **Data Accuracy**: Manual entry errors, version conflicts across spreadsheets\n'
-                  '• **Scalability**: Adding new users required manual setup, no self-service\n'
-                  '• **AI Adoption**: Not possible due to lack of structured data\n\n'
-                  '**After (Unified Platform):**\n\n'
-                  '• **Coordination Overhead**: Reduced by 70% through automated workflows\n'
-                  '• **Client Visibility**: Real-time status updates, 80% reduction in status inquiry calls\n'
-                  '• **Data Accuracy**: Single source of truth, automated validation, 95% error reduction\n'
-                  '• **Scalability**: Self-service role promotion, onboarding time reduced from days to minutes\n'
-                  '• **AI Adoption**: Structured knowledge base enabled Amy AI, handling 60% of client inquiries\n\n'
-                  '**Quantifiable Outcomes:**\n'
-                  '• 40% reduction in operational support requests\n'
-                  '• 3x faster user onboarding\n'
-                  '• 60% of client questions answered by AI (with human oversight)\n'
-                  '• 95% reduction in data entry errors\n'
-                  '• Cross-platform parity achieved (iOS, Android, Web)',
+                  '**One product, one source of truth.** Single product, not separate apps—cross-role visibility, permissions, and workflows consistent. Trade-off: more upfront design for long-term clarity and scale.\n\n'
+                  '**How it works:** Post-login, role-based routing and permission checks define what each user sees and can do. Backend enforces read/write; UI reflects it. Config is central: Admin promotes users, manages content and materials, configures Amy, reviews and corrects answers—no code deploys. Partnership with engineering: config-driven vs. fixed in code so the product scales without dev dependency.\n\n'
+                  '**AI:** Governed assistant—first-line for common questions, escalation and human fallback. Knowledge base and responses admin-owned, versioned, auditable.\n\n'
+                  '**Workflow logic:** Status → notifications and audit. Config → propagation to all surfaces. Offline sync → same data model. Built for feasibility and maintainability.\n\n'
+                  '**By role:** Sales—leads, contracts, invoices, tracking. Scheduler—calendar, events, allocation. Installer—one-tap start/status, auto notifications, live GPS; mobile-first, offline-capable. Client—status, materials, appointments, invoices, Amy. Shared design system; same journeys from phone to desktop.',
             ),
             CaseStudySection(
               title: 'Adaptive Platform for Fully Responsive Screens',
               content:
-                  'I treated **platform** and **viewport** as two lenses on the same product: one codebase, many surfaces. Adaptive work answers *where the app runs*; responsive work answers *how much room we have*—and both inform hierarchy, density, and interaction model.\n\n'
+                  '**Platform and viewport as two lenses.** One codebase, many surfaces. Adaptive = where the app runs. Responsive = how much room we have. Both shape hierarchy, density, and interaction.\n\n'
                   '• **Responsive**: Breakpoints aren’t decorative—they reorder information so the same task stays coherent on a narrow phone, a tablet in the field, or a wide admin desktop. Primary actions stay thumb-reachable on small screens; data-heavy views breathe on large ones. Typography and spacing scale with tokens so nothing feels “shrunk” or “stretched”—just appropriate for the context.\n\n'
                   '• **iOS & Android**: Native-feel navigation, touch-first targets, and platform idioms only where they reduce friction—not novelty for its own sake.\n\n'
                   '• **Web**: Keyboard paths, hover affordances where useful, and dashboards tuned for sustained desktop use (admin, sales) without abandoning mobile web where clients check status.\n\n'
@@ -610,16 +543,8 @@ class PortfolioData {
             CaseStudySection(
               title: 'Design System (v3.0.11)',
               content:
-                  'I designed and implemented a token-based design system shared across mobile and web.\n\n'
-                  '• Dark-first UI optimized for dashboards and field conditions\n'
-                  '• Semantic color system with role-specific palettes\n'
-                  '• Scalable typography, spacing, grid, and component library\n'
-                  '• Consistent interaction patterns across platforms\n\n'
-                  'Impact:\n'
-                  '• Faster feature delivery\n'
-                  '• Reduced UI inconsistencies\n'
-                  '• Lower engineering rework\n'
-                  '• Easier cross-platform parity',
+                  '**Token-based design system** across mobile and web: dark-first UI, semantic color (role-specific palettes), typography and spacing, grid, component library. Consistent patterns across platforms.\n\n'
+                  '**Impact:** Faster delivery, fewer inconsistencies, less rework, single source for UI.',
               imagePaths: [
                 'assets/images/design_system/design_system_colors.png',
                 'assets/images/design_system/design_system_typography.png',
@@ -631,15 +556,9 @@ class PortfolioData {
             CaseStudySection(
               title: 'Admin Dashboard',
               content:
-                  'The Admin dashboard functions as the heart of the platform.\n\n'
-                  'Admins can:\n'
-                  '• Promote users into any role without re-registration\n'
-                  '• Control home screen content, materials, chatrooms, and AI behavior\n'
-                  '• Configure the system without developer involvement\n\n'
-                  'Outcomes:\n'
-                  '• Faster user onboarding\n'
-                  '• Reduced operational support requests\n'
-                  '• Safe scaling without configuration chaos',
+                  '**Control layer for config and governance.**\n\n'
+                  'Admins promote users, control home content and materials, configure chat and AI—no dev involvement. Config flows surfaced and guarded: what takes effect where, dependencies, failure modes. Engineering: config stored and propagated, permissions enforced.\n\n'
+                  '**Outcome:** Faster onboarding, fewer support requests, safe scaling.',
               imagePaths: [
                 'assets/images/admin/admin_dashboard.jpeg',
                 'assets/images/admin/admin_home_screen.jpeg',
@@ -651,10 +570,8 @@ class PortfolioData {
             CaseStudySection(
               title: 'Role‑Specific Dashboards',
               content:
-                  'Each role receives a dedicated dashboard tailored to their responsibilities.\n\n'
-                  '• Sales Reps focus on leads and contracts.\n'
-                  '• Installers focus on job execution and live tracking.\n'
-                  '• Schedulers focus on coordination and planning.',
+                  '**One role, one dashboard.** Responsibilities and permissions drive what each sees.\n\n'
+                  'Sales — Leads, contracts. Scheduler — Coordination, planning. Installer — Job execution, live tracking.',
               imagePaths: [
                 'assets/images/sales_rep/salesRep_dashboard.png',
                 'assets/images/sales_rep/salesRep_home.png',
@@ -667,13 +584,7 @@ class PortfolioData {
             CaseStudySection(
               title: 'Sales Representative Experience',
               content:
-                  'Sales Representatives manage leads, contracts, and client relationships through dedicated dashboards.\n\n'
-                  'Key features:\n'
-                  '• Lead management and client communication\n'
-                  '• Contract creation and management\n'
-                  '• Invoice generation and payment tracking\n'
-                  '• Project tracking and performance analytics\n\n'
-                  'The dashboard provides quick access to all sales activities and client information.',
+                  '**Leads, contracts, client relationships** in one place. Lead management, contracts, invoices, payment tracking, project and performance analytics.',
               imagePaths: [
                 'assets/images/sales_rep/salesRep_dashboard.png',
                 'assets/images/sales_rep/salesRep_home.png',
@@ -686,13 +597,7 @@ class PortfolioData {
             CaseStudySection(
               title: 'Scheduler Experience',
               content:
-                  'Schedulers coordinate jobs and manage team schedules across the platform.\n\n'
-                  'Key features:\n'
-                  '• Calendar-based scheduling interface\n'
-                  '• Event creation and management\n'
-                  '• Team coordination and resource allocation\n'
-                  '• Date and time picker tools for precise scheduling\n\n'
-                  'The scheduler dashboard provides a comprehensive view of all scheduled activities.',
+                  '**Jobs and team schedules** in one view. Calendar scheduling, event creation, team and resource allocation, date and time pickers.',
               imagePaths: [
                 'assets/images/scheduler/Scheduler dashboard.png',
                 'assets/images/scheduler/Scheduler dashboard 01.png',
@@ -704,15 +609,7 @@ class PortfolioData {
             CaseStudySection(
               title: 'Client Experience',
               content:
-                  'Clients have full visibility into their projects, orders, and communication with the team.\n\n'
-                  'Key features:\n'
-                  '• Project tracking and status updates\n'
-                  '• Material browsing and selection\n'
-                  '• Appointment scheduling\n'
-                  '• Direct communication with sales representatives\n'
-                  '• Invoice viewing and payment\n'
-                  '• AI assistant (Amy) for quick questions\n\n'
-                  'The client interface prioritizes transparency and ease of use.',
+                  '**Full visibility** into projects, orders, and communication. Project tracking, materials, appointments, invoices, payment, direct contact with sales, Amy for quick questions.',
               // imagePaths: [
               //   'assets/images/Clients/Home/Bottom Nav/Home03.png',
               //   'assets/images/Clients/Home/Bottom Nav/Home04.png',
@@ -724,18 +621,10 @@ class PortfolioData {
               // ],
             ),
             CaseStudySection(
-              title: 'Installer Experience (Field-First Design)',
+              title: 'Installer Experience',
               content:
-                  'Installers operate in variable environments, often with limited attention and connectivity.\n\n'
-                  'Key features:\n'
-                  '• One-tap job start and status updates\n'
-                  '• Automatic client notifications triggered by job state changes\n'
-                  '• Live GPS tracking for transparency\n'
-                  '• Mobile-first flows optimized for speed and clarity\n\n'
-                  'Impact:\n'
-                  '• Reduced inbound "where is my installer" calls\n'
-                  '• Improved job status accuracy\n'
-                  '• Higher installer task completion reliability',
+                  '**Field-first:** Variable environments, limited attention and connectivity. One-tap start/status, auto client notifications, live GPS. Mobile-first flows for speed and clarity.\n\n'
+                  '**Result:** Fewer "where is my installer?" calls; accurate status; higher task completion.',
               imagePaths: [
                 'assets/images/installer/installer dashboard.png',
                 'assets/images/installer/installer home screen.png',
@@ -745,43 +634,13 @@ class PortfolioData {
               ],
             ),
             CaseStudySection(
-              title: 'AI Workflow Reasoning & Governance',
+              title: 'AI Workflow & Governance',
               content:
-                  '**AI Integration Strategy: Governed Assistant, Not Autonomous Agent**\n\n'
-                  '**Decision Framework:**\n'
-                  '• Problem: Client questions overloaded sales team (40+ daily inquiries)\n'
-                  '• Constraint: AI cannot make business decisions or provide incorrect information\n'
-                  '• Solution: AI as first-line responder with human oversight layer\n\n'
-                  '**AI Workflow Architecture:**\n\n'
-                  '1. **Knowledge Base Governance**\n'
-                  '   • Admin-controlled content repository\n'
-                  '   • Versioned knowledge entries\n'
-                  '   • Testing mode before production deployment\n'
-                  '   • Structured Q&A pairs with confidence scoring\n\n'
-                  '2. **Conversation Flow Design**\n'
-                  '   • AI handles common questions (materials, services, pricing)\n'
-                  '   • Escalation triggers for complex queries\n'
-                  '   • Fallback to human sales rep when confidence < threshold\n'
-                  '   • Context preservation across conversation turns\n\n'
-                  '3. **Audit & Correction Loop**\n'
-                  '   • All conversations logged and reviewable\n'
-                  '   • Admin can flag incorrect responses\n'
-                  '   • Knowledge base updated based on corrections\n'
-                  '   • Continuous improvement through feedback\n\n'
-                  '**Cross-Functional AI Collaboration:**\n'
-                  '• Sales team provides domain knowledge → Admin structures it → AI learns\n'
-                  '• Client questions reveal knowledge gaps → Admin fills gaps → AI improves\n'
-                  '• Installer feedback on job status → AI can answer related client questions\n\n'
-                  '**Governance Model:**\n'
-                  '• Admin controls what AI can say (knowledge base management)\n'
-                  '• Admin controls when AI responds (testing vs. production mode)\n'
-                  '• Admin reviews AI performance (conversation logs)\n'
-                  '• Admin corrects AI mistakes (knowledge base updates)\n\n'
-                  '**Impact Metrics:**\n'
-                  '• 60% of client inquiries handled by AI\n'
-                  '• 80% reduction in repetitive sales team questions\n'
-                  '• 95% accuracy rate (with human oversight)\n'
-                  '• Zero business-critical errors (governance prevents autonomous decisions)',
+                  '**Governed assistant, not autonomous agent.** First-line responder with human oversight.\n\n'
+                  '**Why:** Client questions overloaded sales. Constraint: AI cannot decide or misinform. Solution: AI handles common questions; complex or sensitive escalates.\n\n'
+                  '**Architecture:** Knowledge base—Admin-controlled, versioned, test before prod, structured Q&A, confidence scoring. Conversation flow—common questions (materials, services, pricing), escalation triggers, human fallback when confidence low. Audit & correction—all logged, Admin flags errors, knowledge base updated.\n\n'
+                  '**Governance:** Admin controls what AI says, when it responds (test vs. prod), and corrects. Zero autonomous business-critical decisions.\n\n'
+                  '**Outcome:** Routine inquiries deflected to AI; repetitive sales questions down; oversight keeps the system correctable and improvable.',
               imagePaths: [
                 'assets/images/admin/admin_amy_manager.jpeg',
                 'assets/images/admin/admin_chat_with_amy.jpeg',
@@ -791,9 +650,7 @@ class PortfolioData {
             CaseStudySection(
               title: 'Content & Material Management',
               content:
-                  'Admins manage trending, new, and recommended materials.\n\n'
-                  'Home content updates do not require app redeployment.\n\n'
-                  'This keeps the experience fresh and business‑driven.',
+                  '**Config, not code.** Admins manage trending, new, and recommended materials. Content flows from Admin to all clients—no redeploy. Storage and delivery designed so content refreshes without releases.',
               imagePaths: [
                 'assets/images/admin/admin_trending_material.jpeg',
                 'assets/images/admin/admin_new_material.jpeg',
@@ -804,36 +661,41 @@ class PortfolioData {
             CaseStudySection(
               title: 'Accessibility & Usability',
               content:
-                  'Core user flows were designed to meet WCAG 2.2 AA accessibility standards, including:\n\n'
-                  '• Sufficient color contrast\n'
-                  '• Clear focus states\n'
-                  '• Readable typography\n'
-                  '• Predictable navigation and error handling\n\n'
-                  'Accessibility decisions improved usability for all users, especially in field and low-attention contexts.',
+                  '**WCAG 2.2 AA** for core flows: contrast, focus states, typography, predictable navigation and errors. Critical for field and low-attention contexts.',
             ),
             CaseStudySection(
               title: 'Shipping & Platforms',
               content:
-                  '• Single Flutter codebase shipped to iOS, Android, and Web\n'
-                  '• Shared design system across all platforms\n'
-                  '• QR-based distribution enabled fast onboarding\n\n'
-                  'This approach reduced maintenance overhead while ensuring consistent experiences across devices.',
+                  '**One codebase** — iOS, Android, Web. Shared design system. QR distribution for fast onboarding. Single data layer so new features and config don\'t fragment the product. Lower maintenance; consistent behavior across roles and devices.',
             ),
             CaseStudySection(
-              title: 'Outcomes & Learnings',
+              title: 'Constraints & Trade-offs',
               content:
-                  '• Unified operations under one platform.\n'
-                  '• Improved transparency for clients.\n'
-                  '• Reduced operational friction for internal teams.\n'
-                  '• Human‑governed AI adoption with real business value.',
+                  '• **Unified vs. separate apps** — One platform, consistent data and permissions. Higher upfront complexity for long-term clarity.\n'
+                  '• **AI** — Routine only; complex or sensitive escalates. Governance explicit; audit and permissions block autonomous decisions.\n'
+                  '• **Offline & field** — Data model and sync support offline; UI and backend agree on offline behavior and reconciliation.\n'
+                  '• **Accessibility** — WCAG 2.2 AA for field and office.\n'
+                  '• **Single codebase** — One design system and data layer; layout adapts by platform. One source of truth for behavior and styling.',
+            ),
+            CaseStudySection(
+              title: 'Outcome & Impact',
+              content:
+                  '**Before → After**\n\n'
+                  '**Visibility** — Was: status in heads and spreadsheets, clients blind. Now: one source of truth, real-time job state, "where is my job?" in the product.\n'
+                  '**Coordination** — Was: hours on phone and text. Now: workflows visible and automated, handoffs and permissions consistent.\n'
+                  '**Scalability** — Was: manual, opaque steps. Now: self-service role promotion, config-driven content, onboarding from days to minutes.\n'
+                  '**Trust** — Was: no record. Now: actions and AI conversations logged and reviewable.\n'
+                  '**AI** — Was: no structured data or governance. Now: Amy handles routine with oversight; conversations correctable.\n\n'
+                  '**Shipped:** iOS, Android, Web. One design system and data layer. QR onboarding. Integrations (payments, notifications, GPS, offline) with specified behavior and failure modes. Front-end, backend, and config co-specified from the start—single source of truth, fewer handoff failures, scalable without proportional process growth.\n\n'
+                  '**Next:** Deeper analytics, installer workflows (QA, signatures, checklists), stronger scheduling automation—same system.',
             ),
             CaseStudySection(
               title: 'Next Steps',
               content:
-                  '• Advanced analytics dashboards.\n'
-                  '• Expanded installer workflows (QA, signatures, checklists).\n'
-                  '• AI feedback loops tied to real performance metrics.\n'
-                  '• Further automation in scheduling and operations.',
+                  '• Advanced analytics dashboards\n'
+                  '• Expanded installer workflows (QA, signatures, checklists)\n'
+                  '• AI feedback loops tied to performance metrics\n'
+                  '• Further automation in scheduling and operations',
             ),
           ],
         ),
@@ -842,25 +704,39 @@ class PortfolioData {
           title: 'Twin Scriptures',
           subtitle: 'Consumer Spiritual App',
           overview:
-              'Scripture reading experience that feels personal, emotionally resonant, and culturally respectful. Supports Persian–English and Turkish–English with visual preference selection instead of text forms. '
-              'We added the onboarding theme so users can design their own UI — themes, fonts, seasons, and emotions — making the app feel personal. "Show, Don\'t Ask" design philosophy.',
+              'Scripture reading that feels personal and culturally respectful. Replaced long forms with visual preference selection—themes, fonts, seasons, emotions—so users shape the UI. '
+              'Persian–English and Turkish–English, RTL support, multi-platform. "Show, Don\'t Ask" design strategy; high onboarding completion and strong user feedback on personalization.',
           designApproach:
-              'Design philosophy applied — Empathy as foundation: respect users, avoid long forms, prefer visual choice over surveys. '
-              'Progressive personalization: invite users to personalize via short onboarding; adaptation feels like understanding, not surveillance. '
-              'Why we added the onboarding theme: so users can design their UI (themes, fonts, seasons, emotions); this puts design in their hands and drives 85–90% completion. '
-              'Context-aware design: seasonal and emotional themes (time of year, state of mind) build trust and comfort. '
-              '"Show, Don\'t Ask": image-based preference selection (seasons, emotions, holidays, fonts) instead of text forms; 85–90% onboarding completion vs. ~40% industry average. '
-              'Principles: problem-first thinking, safety and privacy by design, collaboration over ego, ethics over trends.',
+              'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
+              'Design strategy: empathy-led (respect users, avoid long forms, visual choice over surveys); personalization as a system—onboarding choices drive themes, typography, and content globally. Preference model aligned with implementation. Privacy and ethics by design.',
           sections: [
             CaseStudySection(
-              title: 'The Problem',
+              title: 'Problem',
               content:
-                  'Traditional spiritual apps use long text-based forms and surveys for personalization, leading to high onboarding abandonment (~60% industry average). Generic experiences, no emotional connection, limited cultural adaptation.',
+                  'Spiritual apps often rely on long text forms and surveys for personalization. Result: high abandonment (industry ~60%), generic experience, little emotional or cultural connection. '
+                  'Users drop off before the product feels theirs; one-size-fits-all undermines trust and engagement.\n\n'
+                  '**Goal:** A reading experience that feels personal and culturally respectful—without forms that users abandon.',
             ),
             CaseStudySection(
-              title: 'The Solution',
+              title: 'Context',
               content:
-                  '"Show, Don\'t Ask" — Users select preferences through beautiful visual choices (seasons, emotions, holidays, fonts) instead of forms. Estimated 85–90% onboarding completion vs. 40% for text forms. Visual personalization creates ownership.',
+                  '**Domain:** Scripture reading—personal, emotional, culturally sensitive. Persian–English and Turkish–English; RTL and multi-script. Users span languages, seasons, and emotional states; a single default UI would miss them.\n\n'
+                  '**Pre-product:** Generic spiritual apps with text-heavy onboarding. No model for "user-designed" UI or visual preference as the driver of experience.\n\n'
+                  '**Scope:** Onboarding that captures preference without friction; those preferences must drive themes, fonts, imagery, and content across the app.',
+            ),
+            CaseStudySection(
+              title: 'System Complexity',
+              content:
+                  '**Personalization as a system.** User choices (seasons, emotions, holidays, fonts, colors) aren\'t decorative—they drive theme, typography, and content. One data model: what the user selected; the app reflects it everywhere.\n\n'
+                  '**Multi-language and RTL.** Persian (Farsi) and Turkish with English; RTL layout and script. Visual preference selection had to work across languages without relying on long copy.\n\n'
+                  '**Cross-platform.** iOS, Android, Web, desktop—same personalization logic, consistent expression across surfaces.',
+            ),
+            CaseStudySection(
+              title: 'Solution',
+              content:
+                  '**"Show, Don\'t Ask."** Replace forms with visual preference selection. Users choose seasons, emotions, holidays, and fonts through image-based flows—no long surveys. Onboarding puts the UI in the user\'s hands: they define how the app looks and feels.\n\n'
+                  '**Architecture:** Short onboarding → structured choices (seasonal, emotional, cultural) → themes and typography applied globally. Single preference model; UI and content respond consistently. Design and implementation aligned on the preference schema so theming and content stay in sync.\n\n'
+                  'Screens below show the onboarding flows and resulting experience.',
               images: [
                 CaseStudyImage(path: 'assets/images/on_boarding_image/access_camera_10_1.png', description: 'Permission to access device camera for importing personal images.'),
                 CaseStudyImage(path: 'assets/images/on_boarding_image/book_mark_home_17.png', description: 'Bookmarks and home screen with quick access to saved verses.'),
@@ -888,33 +764,20 @@ class PortfolioData {
               ],
             ),
             CaseStudySection(
-              title: 'Why We Added the Onboarding Theme',
+              title: 'Constraints & Trade-offs',
               content:
-                  'We added the onboarding theme so that users can design their own UI. '
-                  'Instead of a one-size-fits-all experience, each person chooses themes, fonts, seasons, and emotions that reflect their taste and context. '
-                  'This puts design in the user\'s hands: they shape the app to feel personal, which drives engagement and the high completion rates we see. '
-                  'Letting users design their UI is a core reason we achieved 85–90% onboarding completion (vs. ~40% industry average) and why users report a "personal feel."',
+                  '• **Forms vs. visual choice** — Long forms drive abandonment. Trade-off: invest in visual preference design so onboarding is short and completable.\n'
+                  '• **Personalization vs. privacy** — Preferences drive the experience without surveillance; no long surveys, no sensitive data.\n'
+                  '• **Cultural breadth** — Seasons, emotions, holidays (e.g. Nowruz, Christmas) and multi-language (Persian, Turkish, English) with RTL. One system, many expressions.\n'
+                  '• **Multi-platform** — Same preference model and theming logic across iOS, Android, Web, Linux, macOS, Windows.',
             ),
             CaseStudySection(
-              title: 'Research & Insights',
+              title: 'Outcome & Impact',
               content:
-                  'Users engage 3x longer with image-based choices vs. text forms. Seasonal themes create stronger return patterns. Cultural imagery (Nowruz, Christmas) drives emotional connection. Font choice significantly impacts reading comfort.',
-            ),
-            CaseStudySection(
-              title: 'Features',
-              content:
-                  'Visual Preference Selection — Image grids for seasons, emotions, holidays, fonts.\n'
-                  'Seasonal Theming — Spring, Summer, Fall, Winter with adaptive imagery.\n'
-                  'Multi-Language & RTL — Persian, Turkish, English with proper RTL layout.\n'
-                  'Emotional Themes — Peaceful, joyful, reflective, seeking, grateful.',
-            ),
-            CaseStudySection(
-              title: 'Outcomes',
-              content:
-                  '• 85–90% onboarding completion (vs. 40% industry average).\n'
-                  '• Multi-platform reach: iOS, Android, Web, Linux, macOS, Windows.\n'
-                  '• Free, no ads, no in-app purchases — spiritual content accessible to all.\n'
-                  '• Users report "beautiful themes" and "personal feel."',
+                  '**Before → After**\n\n'
+                  '**Onboarding** — Was: text forms, high abandonment. Now: visual preference selection; completion far above industry (~40% baseline); users report a personal, owned experience and strong engagement with themes.\n\n'
+                  '**Experience** — Was: generic. Now: themes, fonts, seasons, and emotions chosen by the user; the app reflects their choices everywhere. Personalization as a system—one preference model, consistent expression.\n\n'
+                  '**Reach** — Multi-platform (iOS, Android, Web, Linux, macOS, Windows). Free, no ads, no in-app purchases—spiritual content accessible to all.',
             ),
           ],
         ),
