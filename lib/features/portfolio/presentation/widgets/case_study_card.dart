@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
-import 'package:four_ideas/features/portfolio/presentation/screens/case_study_detail_screen.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 
 class CaseStudyCard extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
@@ -33,16 +34,7 @@ class CaseStudyCard extends StatelessWidget {
     Widget cardContent = Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CaseStudyDetailScreen(
-                  caseStudy: caseStudy.withAdaptiveBeforeDesignSystem(),
-                ),
-            ),
-          );
-        },
+        onTap: () => context.push(AppRoutes.portfolioCaseStudyPath(caseStudy.id)),
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(

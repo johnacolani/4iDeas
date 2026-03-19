@@ -3,12 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
+import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import 'email_verification_screen.dart';
-import 'forgot_password_screen.dart';
-import 'signup_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -56,16 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
           BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is EmailNotVerified) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EmailVerificationScreen(
-                      userEmail: state.user.email ?? _emailController.text.trim(),
-                    ),
-                  ),
+                context.pushReplacement(
+                  AppRoutes.emailVerification,
+                  extra: state.user.email ?? _emailController.text.trim(),
                 );
               } else if (state is Authenticated) {
-                Navigator.of(context).pop();
+                context.pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Welcome back, ${state.user.email ?? "User"}!'),
@@ -191,14 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const ForgotPasswordScreen(),
-                                          ),
-                                        );
-                                      },
+                                      onPressed: () => context.push(AppRoutes.forgotPassword),
                                       child: Text(
                                         'Forgot Password?',
                                         style: TextStyle(
@@ -346,14 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const SignUpScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.pushReplacement(AppRoutes.signUp),
                                         child: Text(
                                           'Sign Up',
                                           style: TextStyle(

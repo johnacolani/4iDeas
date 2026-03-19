@@ -7,10 +7,6 @@ import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/helper/menu_item.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
-import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
-import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
-import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
-import 'package:four_ideas/features/admin/presentation/screens/admin_orders_screen.dart';
 import 'package:four_ideas/services/admin_service.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:sizer/sizer.dart';
@@ -41,14 +37,6 @@ class _SlidingMenuState extends State<SlidingMenu>
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-
-  void _closeDrawerAndNavigate(Widget screen) {
-    setState(() {
-      isSlideOpen = false;
-      _animationController.reverse();
-    });
-    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 
   void _closeDrawerAndGo(String path) {
@@ -317,7 +305,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         icon: Icons.person,
                                         title: 'Profile',
                                         onPressed: () {
-                                          _closeDrawerAndNavigate(const ProfileScreen());
+                                          _closeDrawerAndGo(AppRoutes.profile);
                                         },
                                       ),
                                       // Admin menu items (only visible to admins)
@@ -326,7 +314,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           icon: Icons.admin_panel_settings,
                                           title: 'Admin - Orders',
                                           onPressed: () {
-                                            _closeDrawerAndNavigate(const AdminOrdersScreen());
+                                            _closeDrawerAndGo(AppRoutes.adminOrders);
                                           },
                                         ),
                                       ],
@@ -467,12 +455,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                     TextButton(
                       onPressed: () {
                         Navigator.of(dialogContext).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                        context.push(AppRoutes.login);
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(
@@ -498,12 +481,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(dialogContext).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpScreen(),
-                            ),
-                          );
+                          context.push(AppRoutes.signUp);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ColorManager.orange,

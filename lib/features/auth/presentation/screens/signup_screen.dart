@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
+import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import 'email_verification_screen.dart';
-import 'login_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -58,25 +58,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is EmailVerificationSent) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EmailVerificationScreen(
-                      userEmail: _emailController.text.trim(),
-                    ),
-                  ),
+                context.pushReplacement(
+                  AppRoutes.emailVerification,
+                  extra: _emailController.text.trim(),
                 );
               } else if (state is EmailNotVerified) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EmailVerificationScreen(
-                      userEmail: state.user.email ?? _emailController.text.trim(),
-                    ),
-                  ),
+                context.pushReplacement(
+                  AppRoutes.emailVerification,
+                  extra: state.user.email ?? _emailController.text.trim(),
                 );
               } else if (state is Authenticated) {
-                Navigator.of(context).pop();
+                context.pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Account created successfully! Welcome, ${state.user.email ?? "User"}!'),
@@ -285,14 +277,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const LoginScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.pushReplacement(AppRoutes.login),
                                         child: Text(
                                           'Login',
                                           style: TextStyle(

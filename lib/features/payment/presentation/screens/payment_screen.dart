@@ -3,13 +3,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
+import 'package:go_router/go_router.dart';
 
 class PaymentScreen extends StatefulWidget {
   final Map<String, dynamic> order;
+  final VoidCallback? onPaymentSuccess;
 
   const PaymentScreen({
     super.key,
     required this.order,
+    this.onPaymentSuccess,
   });
 
   @override
@@ -85,7 +88,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
 
       if (mounted) {
-        Navigator.of(context).pop(true); // Return true to indicate success
+        widget.onPaymentSuccess?.call();
+        context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Payment of \$${amount.toStringAsFixed(2)} processed successfully'),

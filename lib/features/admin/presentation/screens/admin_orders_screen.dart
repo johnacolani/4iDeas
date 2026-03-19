@@ -4,7 +4,8 @@ import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/admin_service.dart';
 import '../../../../services/order_service.dart';
-import 'admin_order_detail_screen.dart';
+import '../../../../app_router.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminOrdersScreen extends StatefulWidget {
   const AdminOrdersScreen({super.key});
@@ -25,7 +26,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     if (!AdminService.isAdmin()) {
       // Redirect if not admin
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pop();
+        context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Access denied. Admin only.'),
@@ -201,19 +202,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         ),
       ),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AdminOrderDetailScreen(
-                order: order,
-                onResponseAdded: () {
-                  _loadOrders(); // Refresh list after response
-                },
-              ),
-            ),
-          );
-        },
+        onTap: () => context.push(
+          AppRoutes.adminOrderDetail,
+          extra: {'order': order, 'onResponseAdded': _loadOrders},
+        ),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: EdgeInsets.all(isMobile ? 16 : 20),

@@ -6,6 +6,7 @@ import '../../../../helper/app_background.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import 'package:go_router/go_router.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String userEmail;
@@ -46,7 +47,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is Authenticated) {
-                Navigator.of(context).pop();
+                context.pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Email verified successfully!'),

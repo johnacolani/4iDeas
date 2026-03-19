@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminOrderDetailScreen extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -67,7 +68,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
           ),
         );
         widget.onResponseAdded();
-        Navigator.of(context).pop();
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
@@ -753,7 +754,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
           ),
         );
         widget.onResponseAdded(); // Refresh the order list
-        Navigator.of(context).pop();
+        context.pop();
       }
     } catch (e) {
       if (mounted) {

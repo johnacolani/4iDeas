@@ -7,8 +7,6 @@ import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
-import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
-import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
 import 'package:four_ideas/services/order_service.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
@@ -1735,12 +1733,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(dialogContext).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                        context.push(AppRoutes.login);
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(
@@ -1767,12 +1760,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(dialogContext).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignUpScreen(),
-                            ),
-                          );
+                          context.push(AppRoutes.signUp);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ColorManager.orange,

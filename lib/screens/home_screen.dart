@@ -6,10 +6,9 @@ import 'package:four_ideas/helper/sliding_menu.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
-import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
-import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
-import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
+import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/screens/web_screen.dart';
+import 'package:go_router/go_router.dart';
 
 import '../helper/app_background.dart';
 
@@ -150,15 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ProfileScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.push(AppRoutes.profile),
                                         style: TextButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
                                             horizontal: wi < 400 ? 2 : 4,
@@ -237,15 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ProfileScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.push(AppRoutes.profile),
                                         style: TextButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
                                             horizontal: 8,
@@ -323,15 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.push(AppRoutes.login),
                                         style: TextButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
                                             horizontal: wi < 400 ? 4 : 6,
@@ -361,15 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SignUpScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.push(AppRoutes.signUp),
                                         style: TextButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
                                             horizontal: wi < 400 ? 4 : 6,
@@ -430,15 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.push(AppRoutes.login),
                                         style: TextButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
                                             horizontal: 13,
@@ -463,15 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SignUpScreen(),
-                                            ),
-                                          );
-                                        },
+                                        onPressed: () => context.push(AppRoutes.signUp),
                                         style: TextButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
                                             horizontal: 13,

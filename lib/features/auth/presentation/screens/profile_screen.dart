@@ -4,11 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
-import '../../../payment/presentation/screens/payment_screen.dart';
-import '../../../contract/presentation/screens/contract_view_screen.dart';
+import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -89,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is Unauthenticated) {
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                context.go(AppRoutes.home);
               } else if (state is AuthError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -251,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () => context.pop(),
                         child: Text(
                           'Cancel',
                           style: TextStyle(color: ColorManager.blue),
@@ -262,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context
                               .read<AuthBloc>()
                               .add(const AuthLogoutRequested());
-                          Navigator.of(context).pop();
+                          context.pop();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ColorManager.orange,
@@ -697,15 +697,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ContractViewScreen(order: order),
-                            ),
-                          );
-                        },
+                        onPressed: () => context.push(
+                          AppRoutes.contractView,
+                          extra: order,
+                        ),
                         icon: Icon(Icons.description, size: 18),
                         label: Text('View Full Contract'),
                         style: OutlinedButton.styleFrom(
@@ -858,18 +853,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          PaymentScreen(order: order),
-                                    ),
-                                  );
-                                  if (result == true) {
-                                    _loadOrders(); // Refresh orders after payment
-                                  }
-                                },
+                                onPressed: () => context.push(
+                                  AppRoutes.payment,
+                                  extra: {'order': order, 'onSuccess': _loadOrders},
+                                ),
                                 icon: Icon(Icons.payment, size: 18),
                                 label: Text('Make Down Payment'),
                                 style: ElevatedButton.styleFrom(
@@ -969,7 +956,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: isSubmitting
                       ? null
                       : () {
-                          Navigator.of(context).pop();
+                          context.pop();
                         },
                   child: Text(
                     'Cancel',
@@ -1002,7 +989,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
 
                             if (context.mounted) {
-                              Navigator.of(context).pop();
+                              context.pop();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('Response sent successfully'),
@@ -1108,7 +1095,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: isSigning
                       ? null
                       : () {
-                          Navigator.of(context).pop();
+                          context.pop();
                         },
                   child: Text(
                     'Cancel',
@@ -1129,7 +1116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 orderId: orderId);
 
                             if (context.mounted) {
-                              Navigator.of(context).pop();
+                              context.pop();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Contract signed successfully'),

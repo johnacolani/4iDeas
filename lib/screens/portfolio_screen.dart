@@ -1043,13 +1043,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => const DesignPhilosophyScreen(),
-            ),
-          );
-        },
+        onTap: () => context.push(AppRoutes.designPhilosophy),
         borderRadius: BorderRadius.circular(16),
         child: Container(
           width: double.infinity,

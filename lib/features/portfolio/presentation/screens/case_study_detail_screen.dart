@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
+import 'package:go_router/go_router.dart';
 
 /// Corner radius (in logical pixels) used for all case study images in this screen.
 const double kCaseStudyImageCornerRadius = 30;
@@ -469,7 +470,7 @@ class _FullScreenImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pop(),
+      onTap: () => context.pop(),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -523,7 +524,7 @@ class _FullScreenImage extends StatelessWidget {
                   color: Colors.white,
                   size: 32,
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.pop(),
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.black.withValues(alpha: 0.6),
                   shape: CircleBorder(),
