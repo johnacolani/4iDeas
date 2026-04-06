@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Conditional import for Platform detection
@@ -34,12 +36,24 @@ class PortfolioAppCard extends StatelessWidget {
 
     final String? primaryUrl = app.webUrl ?? app.appStoreUrl ?? app.playStoreUrl;
 
+    void onCardTap(BuildContext context) {
+      if (app.caseStudyId != null) {
+        context.push(AppRoutes.portfolioCaseStudyPath(app.caseStudyId!));
+        return;
+      }
+      if (primaryUrl != null) {
+        _launch(primaryUrl);
+      }
+    }
+
     final Widget cardContent = ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: primaryUrl != null ? () => _launch(primaryUrl) : null,
+          onTap: (app.caseStudyId != null || primaryUrl != null)
+              ? () => onCardTap(context)
+              : null,
           borderRadius: BorderRadius.circular(12),
           child: Container(
             width: double.infinity,

@@ -71,6 +71,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
       appStoreUrl: _appStoreUrlController.text.trim().isEmpty ? null : _appStoreUrlController.text.trim(),
       playStoreUrl: _playStoreUrlController.text.trim().isEmpty ? null : _playStoreUrlController.text.trim(),
       webUrl: _webUrlController.text.trim().isEmpty ? null : _webUrlController.text.trim(),
+      caseStudyId: widget.initialApp?.caseStudyId,
     );
   }
 

@@ -51,30 +51,29 @@ GoRouter createAppRouter() {
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
       ),
+      // Portfolio sub-routes are top-level so hash / path URL updates reliably on web.
+      GoRoute(
+        path: AppRoutes.designPhilosophy,
+        builder: (context, state) => const DesignPhilosophyScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.portfolioCaseStudy}/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final found = PortfolioData.caseStudies.where((c) => c.id == id).toList();
+          if (found.isEmpty) {
+            return Scaffold(
+              body: Center(
+                child: Text('Case study not found'),
+              ),
+            );
+          }
+          return CaseStudyDetailScreen(caseStudy: found.first.withAdaptiveBeforeDesignSystem());
+        },
+      ),
       GoRoute(
         path: AppRoutes.portfolio,
         builder: (context, state) => const PortfolioScreen(),
-        routes: <RouteBase>[
-          GoRoute(
-            path: 'design-philosophy',
-            builder: (context, state) => const DesignPhilosophyScreen(),
-          ),
-          GoRoute(
-            path: 'case-study/:id',
-            builder: (context, state) {
-              final id = state.pathParameters['id'] ?? '';
-              final found = PortfolioData.caseStudies.where((c) => c.id == id).toList();
-              if (found.isEmpty) {
-                return Scaffold(
-                  body: Center(
-                    child: Text('Case study not found'),
-                  ),
-                );
-              }
-              return CaseStudyDetailScreen(caseStudy: found.first.withAdaptiveBeforeDesignSystem());
-            },
-          ),
-        ],
       ),
       GoRoute(
         path: AppRoutes.services,

@@ -12,6 +12,9 @@ class PortfolioApp {
   final String? appStoreUrl;
   final String? playStoreUrl;
   final String? webUrl;
+  /// When set, tapping the app card navigates to this case study (go_router) instead of opening [webUrl].
+  /// Use when the product also has a full case study on this site (e.g. ASD USA → case study `asd`).
+  final String? caseStudyId;
 
   const PortfolioApp({
     required this.id,
@@ -23,6 +26,7 @@ class PortfolioApp {
     this.appStoreUrl,
     this.playStoreUrl,
     this.webUrl,
+    this.caseStudyId,
   });
 
   Map<String, dynamic> toMap() => {
@@ -35,6 +39,7 @@ class PortfolioApp {
         'appStoreUrl': appStoreUrl,
         'playStoreUrl': playStoreUrl,
         'webUrl': webUrl,
+        'caseStudyId': caseStudyId,
       };
 
   static PortfolioApp fromMap(String docId, Map<String, dynamic> map) {
@@ -48,6 +53,7 @@ class PortfolioApp {
       appStoreUrl: map['appStoreUrl'] as String?,
       playStoreUrl: map['playStoreUrl'] as String?,
       webUrl: map['webUrl'] as String?,
+      caseStudyId: map['caseStudyId'] as String?,
     );
   }
 }
@@ -313,6 +319,7 @@ class PortfolioData {
           playStoreUrl:
               'https://play.google.com/store/apps/details?id=com.JohnColani.asdapp',
           webUrl: 'https://absolute-stone-design-app.web.app/',
+          caseStudyId: 'asd',
         ),
         PortfolioApp(
           id: 'solomon-prayers',
@@ -368,6 +375,7 @@ class PortfolioData {
               'https://apps.apple.com/app/twin-scriptures/id6740755381',
           playStoreUrl:
               'https://play.google.com/store/apps/details?id=com.johncolani.twin.scripture',
+          caseStudyId: 'twin-scriptures',
         ),
         PortfolioApp(
           id: 'twin-scripture-en-tr',
