@@ -422,6 +422,63 @@ class PortfolioData {
         ),
       ];
 
+  /// Firestore app docs often omit [PortfolioApp.caseStudyId]. Copy from static [apps] when [id] matches
+  /// so App Showcase still navigates to `/portfolio/case-study/:id` instead of opening [webUrl].
+  ///
+  /// Firestore document ids are often auto-generated (not `asdusa`), so [id] may not match the static catalog.
+  /// In that case we infer the case study from [name] for known products.
+  static PortfolioApp mergePortfolioAppCaseStudyFromCatalog(PortfolioApp app) {
+    if (app.caseStudyId != null) return app;
+    for (final a in apps) {
+      if (a.id == app.id && a.caseStudyId != null) {
+        return PortfolioApp(
+          id: app.id,
+          name: app.name,
+          description: app.description,
+          imagePath: app.imagePath,
+          useComingSoonPlaceholder: app.useComingSoonPlaceholder,
+          showComingSoonOverlay: app.showComingSoonOverlay,
+          appStoreUrl: app.appStoreUrl,
+          playStoreUrl: app.playStoreUrl,
+          webUrl: app.webUrl,
+          caseStudyId: a.caseStudyId,
+        );
+      }
+    }
+    final inferred = caseStudyIdForPortfolioAppName(app.name);
+    if (inferred != null) {
+      return PortfolioApp(
+        id: app.id,
+        name: app.name,
+        description: app.description,
+        imagePath: app.imagePath,
+        useComingSoonPlaceholder: app.useComingSoonPlaceholder,
+        showComingSoonOverlay: app.showComingSoonOverlay,
+        appStoreUrl: app.appStoreUrl,
+        playStoreUrl: app.playStoreUrl,
+        webUrl: app.webUrl,
+        caseStudyId: inferred,
+      );
+    }
+    return app;
+  }
+
+  /// Maps showcase app title to [PortfolioCaseStudy.id] when Firestore id does not match static data.
+  static String? caseStudyIdForPortfolioAppName(String name) {
+    final n = name.toLowerCase().trim();
+    // Twin Scripture EN‑TR (separate app; no dedicated case study in this repo)
+    if (n.contains('twin') && (n.contains('en-tr') || n.contains('en‑tr'))) {
+      return null;
+    }
+    if (n.contains('twin scripture')) {
+      return 'twin-scriptures';
+    }
+    if (n.contains('absolute stone') || n.contains('asd usa')) {
+      return 'asd';
+    }
+    return null;
+  }
+
   static List<PortfolioPublication> get publications => [
         PortfolioPublication(
           id: 'static-0',

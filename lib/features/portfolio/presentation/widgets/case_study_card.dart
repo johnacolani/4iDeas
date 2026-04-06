@@ -34,7 +34,8 @@ class CaseStudyCard extends StatelessWidget {
     Widget cardContent = Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => context.push(AppRoutes.portfolioCaseStudyPath(caseStudy.id)),
+        // Use go (not push) so the browser URL updates on web; push can leave the bar at /portfolio.
+        onTap: () => context.go(AppRoutes.portfolioCaseStudyPath(caseStudy.id)),
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(

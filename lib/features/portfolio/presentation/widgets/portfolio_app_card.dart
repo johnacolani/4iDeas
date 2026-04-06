@@ -38,7 +38,8 @@ class PortfolioAppCard extends StatelessWidget {
 
     void onCardTap(BuildContext context) {
       if (app.caseStudyId != null) {
-        context.push(AppRoutes.portfolioCaseStudyPath(app.caseStudyId!));
+        // go (not push) so browser URL shows /portfolio/case-study/:id on web.
+        context.go(AppRoutes.portfolioCaseStudyPath(app.caseStudyId!));
         return;
       }
       if (primaryUrl != null) {

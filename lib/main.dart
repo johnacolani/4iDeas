@@ -7,13 +7,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/injection/injection_container.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
-import 'package:four_ideas/screens/home_screen.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 
+import 'url_strategy_stub.dart' if (dart.library.html) 'url_strategy_web.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  configureWebUrlStrategy();
   
   // Lock orientation to portrait only for mobile devices
   await SystemChrome.setPreferredOrientations([

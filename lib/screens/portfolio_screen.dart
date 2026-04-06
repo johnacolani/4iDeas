@@ -66,10 +66,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     } catch (_) {}
   }
 
-  List<PortfolioApp> get _displayApps =>
-      (_appsFromFirestore != null && _appsFromFirestore!.isNotEmpty)
-          ? _appsFromFirestore!
-          : PortfolioData.apps;
+  List<PortfolioApp> get _displayApps {
+    if (_appsFromFirestore != null && _appsFromFirestore!.isNotEmpty) {
+      return _appsFromFirestore!
+          .map(PortfolioData.mergePortfolioAppCaseStudyFromCatalog)
+          .toList();
+    }
+    return PortfolioData.apps;
+  }
 
   Future<void> _loadPublications() async {
     try {

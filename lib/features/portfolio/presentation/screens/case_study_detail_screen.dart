@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
+import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 
 /// Corner radius (in logical pixels) used for all case study images in this screen.
@@ -111,6 +112,18 @@ class CaseStudyDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.amber[100]),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.portfolio);
+            }
+          },
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        ),
         iconTheme: IconThemeData(color: Colors.amber[100]),
         centerTitle: true,
         backgroundColor: const Color(0xff020923),
