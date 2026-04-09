@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>4iDeas Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #1A1917;
+      --bg-soft: #23211F;
+      --surface: #2B2825;
+      --surface-soft: #34312D;
+      --text: #F5F2EB;
+      --text-secondary: #D0CCC5;
+      --text-muted: #A49E95;
+
+      --teal: #6FA8A1;
+      --teal-pressed: #5A8F88;
+      --coral: #D98C7A;
+      --coral-pressed: #C47A68;
+      --purple: #7B6F9D;
+      --gold: #C9A96E;
+      --stroke: rgba(255, 255, 255, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Albert Sans", system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--bg) 0%, #1e1c23 45%, #1f221f 100%);
+      color: var(--text);
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 72px; }
+    .hero {
+      border: 1px solid var(--stroke);
+      border-radius: 20px;
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(10px);
+      margin-bottom: 20px;
+    }
+    .hero h1 { margin: 0 0 10px; font-size: clamp(30px, 5vw, 44px); }
+    .hero p { margin: 0; color: var(--text-secondary); line-height: 1.55; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+    .swatch {
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .chip { height: 70px; }
+    .label { padding: 10px 12px; font-size: 13px; color: var(--text-secondary); }
+    .section {
+      margin-top: 16px;
+      border: 1px solid var(--stroke);
+      border-radius: 20px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .section h2 { margin: 0 0 8px; font-size: 22px; }
+    .section p { margin: 0; color: var(--text-secondary); line-height: 1.55; }
+    .tokens { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; }
+    .tokens th, .tokens td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--stroke); }
+    .tokens th { color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 18px;
+      color: white; font-weight: 700; font-family: inherit;
+    }
+    .btn.teal { background: var(--teal); }
+    .btn.coral { background: var(--coral); }
+    .btn.purple { background: var(--purple); }
+    .badge {
+      display: inline-block; margin-top: 10px; padding: 6px 10px;
+      border-radius: 999px; border: 1px solid var(--stroke); color: var(--text-secondary); font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>4iDeas Design System</h1>
+      <p>
+        Dark-first product system for the 4iDeas site and app. Palette strategy is
+        <strong>tetradic</strong>: Teal ↔ Coral and Purple ↔ Gold, on top of warm charcoal surfaces.
+      </p>
+      <span class="badge">Version 1.0 · App-level foundation</span>
+    </section>
+
+    <section class="section">
+      <h2>Color System</h2>
+      <p>These are the core brand tokens used in Flutter theme and shared components.</p>
+      <div class="grid">
+        <article class="swatch"><div class="chip" style="background:#6FA8A1"></div><div class="label">Primary Teal · #6FA8A1</div></article>
+        <article class="swatch"><div class="chip" style="background:#D98C7A"></div><div class="label">CTA Coral · #D98C7A</div></article>
+        <article class="swatch"><div class="chip" style="background:#7B6F9D"></div><div class="label">Secondary Purple · #7B6F9D</div></article>
+        <article class="swatch"><div class="chip" style="background:#C9A96E"></div><div class="label">Accent Gold · #C9A96E</div></article>
+        <article class="swatch"><div class="chip" style="background:#1A1917"></div><div class="label">Background Dark · #1A1917</div></article>
+        <article class="swatch"><div class="chip" style="background:#2B2825"></div><div class="label">Surface Dark · #2B2825</div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Token Mapping (Flutter)</h2>
+      <table class="tokens">
+        <thead><tr><th>Token</th><th>Hex</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td>backgroundDark</td><td>#1A1917</td><td>Scaffold and base backgrounds</td></tr>
+          <tr><td>surfaceDark</td><td>#2B2825</td><td>Cards, elevated panels</td></tr>
+          <tr><td>primaryTeal</td><td>#6FA8A1</td><td>Interactive emphasis, links, focus</td></tr>
+          <tr><td>accentCoral</td><td>#D98C7A</td><td>Primary CTA buttons</td></tr>
+          <tr><td>secondaryPurple</td><td>#7B6F9D</td><td>Secondary emphasis and gradients</td></tr>
+          <tr><td>accentGold</td><td>#C9A96E</td><td>Decorative accent, badge highlights</td></tr>
+        </tbody>
+      </table>
+      <div class="btns">
+        <button class="btn teal" type="button">Teal Action</button>
+        <button class="btn coral" type="button">Primary CTA</button>
+        <button class="btn purple" type="button">Secondary CTA</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

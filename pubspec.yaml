@@ -90,6 +90,8 @@ flutter:
     - assets/images/Clients/
     - assets/images/on_boarding_image/
     - assets/icons/
+    - assets/docs/serviceflow-design-system.html
+    - assets/docs/4ideas-design-system.html
     - assets/waveloop.json
   # assets:
   #   - images/a_dot_burr.jpeg

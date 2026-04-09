@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:four_ideas/firebase_options.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/injection/injection_container.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/app_router.dart';
+import 'package:four_ideas/core/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 
@@ -69,16 +69,9 @@ class MyApp extends StatelessWidget {
               routerConfig: router,
               debugShowCheckedModeBanner: false,
               title: '4iDeas – Product Design & Development',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-                useMaterial3: true,
-                fontFamily: GoogleFonts.albertSans().fontFamily,
-                scrollbarTheme: ScrollbarThemeData(
-                  thumbVisibility: WidgetStateProperty.resolveWith((_) => true),
-                  thumbColor: WidgetStateProperty.all(Colors.white.withValues(alpha: 0.5)),
-                  trackColor: WidgetStateProperty.all(Colors.white.withValues(alpha: 0.12)),
-                ),
-              ),
+              themeMode: ThemeMode.dark,
+              darkTheme: AppTheme.dark,
+              theme: AppTheme.dark,
             );
           },
         ),

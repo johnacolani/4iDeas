@@ -17,6 +17,7 @@ import 'package:four_ideas/features/admin/presentation/screens/admin_order_detai
 import 'package:four_ideas/features/payment/presentation/screens/payment_screen.dart';
 import 'package:four_ideas/features/contract/presentation/screens/contract_view_screen.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/design_philosophy_screen.dart';
+import 'package:four_ideas/features/portfolio/presentation/screens/case_study_design_system_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -25,6 +26,10 @@ abstract class AppRoutes {
   static const String portfolio = '/portfolio';
   static const String portfolioCaseStudy = '/portfolio/case-study';
   static String portfolioCaseStudyPath(String id) => '$portfolioCaseStudy/$id';
+  static String portfolioCaseStudyDesignSystemPath(String id) =>
+      '$portfolioCaseStudy/$id/design-system';
+  static String portfolioDesignSystemPath(String id) =>
+      '$portfolio/design-system/$id';
   static const String designPhilosophy = '/portfolio/design-philosophy';
 
   static const String services = '/services';
@@ -55,6 +60,34 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.designPhilosophy,
         builder: (context, state) => const DesignPhilosophyScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.portfolio}/design-system/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          if (!PortfolioData.caseStudyHasDesignSystemDoc(id)) {
+            return Scaffold(
+              body: Center(
+                child: Text('Design system not found'),
+              ),
+            );
+          }
+          return CaseStudyDesignSystemScreen(designSystemId: id);
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.portfolioCaseStudy}/:id/design-system',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          if (!PortfolioData.caseStudyHasDesignSystemDoc(id)) {
+            return Scaffold(
+              body: Center(
+                child: Text('Design system not found'),
+              ),
+            );
+          }
+          return CaseStudyDesignSystemScreen(designSystemId: id);
+        },
       ),
       GoRoute(
         path: '${AppRoutes.portfolioCaseStudy}/:id',

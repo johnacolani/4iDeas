@@ -116,8 +116,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      const Color(0xFF2D3748),
-                      const Color(0xFF1A202C),
+                      ColorManager.accentGold,
+                      ColorManager.accentGold.withValues(alpha: 0.45),
                     ],
                   ),
                 ),
@@ -139,15 +139,22 @@ class _SlidingMenuState extends State<SlidingMenu>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          const Color(0xFF4B556E).withValues(alpha: 0.2),
-                          const Color(0xFF2D3748).withValues(alpha: 0.25),
+                          ColorManager.backgroundDark.withValues(alpha: 0.94),
+                          ColorManager.backgroundDarkElevated.withValues(alpha: 0.96),
+                          ColorManager.secondaryPurple.withValues(alpha: 0.14),
                         ],
+                      ),
+                      border: Border(
+                        right: BorderSide(
+                          color: ColorManager.accentGold.withValues(alpha: 0.28),
+                          width: 1,
+                        ),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 20,
-                          offset: const Offset(5, 0),
+                          color: Colors.black.withValues(alpha: 0.28),
+                          blurRadius: 24,
+                          offset: const Offset(6, 0),
                         ),
                       ],
                     ),
@@ -162,17 +169,17 @@ class _SlidingMenuState extends State<SlidingMenu>
                       Container(
                         padding: EdgeInsets.all(isMobile ? 14 : 16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.08),
+                          color: ColorManager.onDarkPrimary.withValues(alpha: 0.06),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: ColorManager.accentGold.withValues(alpha: 0.28),
                             width: 1.5,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
+                              color: ColorManager.accentGold.withValues(alpha: 0.08),
+                              blurRadius: 14,
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
@@ -183,7 +190,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: ColorManager.orange.withValues(alpha: 0.5),
+                                  color: ColorManager.accentGold.withValues(alpha: 0.55),
                                   width: 2,
                                 ),
                               ),
@@ -199,7 +206,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                               style: TextStyle(
                                 fontSize: isMobile ? 22 : (isTablet ? 20 : 18),
                                 fontWeight: FontWeight.bold,
-                                color: ColorManager.orange,
+                                color: ColorManager.accentGold,
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -212,13 +219,13 @@ class _SlidingMenuState extends State<SlidingMenu>
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    ColorManager.blue.withValues(alpha: 0.15),
-                                    ColorManager.orange.withValues(alpha: 0.1),
+                                    ColorManager.primaryTeal.withValues(alpha: 0.18),
+                                    ColorManager.accentGold.withValues(alpha: 0.12),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.15),
+                                  color: ColorManager.accentGold.withValues(alpha: 0.25),
                                   width: 1,
                                 ),
                               ),
@@ -228,7 +235,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                     "Let's Talk! 🇺🇸",
                                     style: TextStyle(
                                       fontSize: isMobile ? 14 : (isTablet ? 13 : 12),
-                                      color: ColorManager.white,
+                                      color: ColorManager.onDarkSecondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -237,7 +244,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                     "804-774-9008",
                                     style: TextStyle(
                                       fontSize: isMobile ? 18 : (isTablet ? 17 : 16),
-                                      color: ColorManager.white,
+                                      color: ColorManager.onDarkPrimary,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
@@ -376,15 +383,28 @@ class _SlidingMenuState extends State<SlidingMenu>
               },
               child: Align(
               alignment: const Alignment(0, -0.5),
-              child: ClipPath(
+                child: ClipPath(
                 clipper: CustomMenuClipper(),
                 child: Container(
                   width: 35,
                   height: 110,
-                  color: const Color(0xFF4B556E),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        ColorManager.backgroundDarkElevated,
+                        ColorManager.surfaceDark,
+                      ],
+                    ),
+                    border: Border.all(
+                      color: ColorManager.accentGold.withValues(alpha: 0.4),
+                      width: 1,
+                    ),
+                  ),
                   alignment: Alignment.center,
                   child: AnimatedIcon(
-                    color: ColorManager.orange,
+                    color: ColorManager.accentGold,
                     size: 25,
                     icon: AnimatedIcons.menu_close,
                     progress: _animationController.view,
@@ -412,13 +432,13 @@ class _SlidingMenuState extends State<SlidingMenu>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF4B556E).withValues(alpha: 0.95),
-                  const Color(0xFF2D3748).withValues(alpha: 0.98),
+                  ColorManager.backgroundDarkElevated.withValues(alpha: 0.98),
+                  ColorManager.backgroundDark.withValues(alpha: 0.99),
                 ],
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: ColorManager.accentGold.withValues(alpha: 0.35),
                 width: 1.5,
               ),
             ),
@@ -434,7 +454,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                 SelectableText(
                   'Sign Up Required',
                   style: GoogleFonts.albertSans(
-                    color: Colors.white,
+                    color: ColorManager.onDarkPrimary,
                     fontSize: isMobile ? 24 : 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -443,7 +463,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                 SelectableText(
                   'You need to sign up first to place an order. Please create an account to continue.',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: ColorManager.onDarkSecondary,
                     fontSize: isMobile ? 15 : 16,
                   ),
                   textAlign: TextAlign.center,
@@ -462,15 +482,18 @@ class _SlidingMenuState extends State<SlidingMenu>
                           horizontal: isMobile ? 20 : 24,
                           vertical: isMobile ? 12 : 14,
                         ),
-                        backgroundColor: ColorManager.blue.withValues(alpha: 0.2),
+                        backgroundColor: ColorManager.primaryTeal.withValues(alpha: 0.22),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: ColorManager.primaryTeal.withValues(alpha: 0.45),
+                          ),
                         ),
                       ),
                       child: Text(
                         'Login',
                         style: TextStyle(
-                          color: ColorManager.blue,
+                          color: ColorManager.primaryTeal,
                           fontSize: isMobile ? 15 : 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -484,8 +507,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                           context.push(AppRoutes.signUp);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorManager.orange,
-                          foregroundColor: Colors.white,
+                          backgroundColor: ColorManager.accentGold,
+                          foregroundColor: ColorManager.backgroundDark,
                           padding: EdgeInsets.symmetric(
                             vertical: isMobile ? 12 : 14,
                           ),
@@ -512,7 +535,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                   child: Text(
                     'Cancel',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: ColorManager.onDarkSecondary.withValues(alpha: 0.85),
                       fontSize: isMobile ? 14 : 15,
                     ),
                   ),

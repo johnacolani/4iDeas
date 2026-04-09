@@ -223,12 +223,15 @@ class CaseStudySection {
   final List<String>? imagePaths;
   /// When set, used instead of [imagePaths]; allows a description per image.
   final List<CaseStudyImage>? images;
+  /// When true, show a control to open the full HTML design-system doc for this case study (see [PortfolioData.caseStudyHasDesignSystemDoc]).
+  final bool opensDesignSystemDoc;
 
   const CaseStudySection({
     required this.title,
     required this.content,
     this.imagePaths,
     this.images,
+    this.opensDesignSystemDoc = false,
   });
 
   /// Images to display: [images] if set, otherwise [imagePaths] as [CaseStudyImage] with no description.
@@ -245,6 +248,7 @@ class CaseStudySection {
         'content': content,
         'imagePaths': imagePaths,
         'images': images?.map((i) => i.toMap()).toList(),
+        if (opensDesignSystemDoc) 'opensDesignSystemDoc': true,
       };
 
   static CaseStudySection fromMap(Map<String, dynamic> map) {
@@ -255,6 +259,7 @@ class CaseStudySection {
       content: map['content'] as String? ?? '',
       imagePaths: imagePaths?.map((e) => e.toString()).toList(),
       images: imagesList?.map((e) => CaseStudyImage.fromMap(Map<String, dynamic>.from(e as Map))).toList(),
+      opensDesignSystemDoc: map['opensDesignSystemDoc'] as bool? ?? false,
     );
   }
 
@@ -263,7 +268,9 @@ class CaseStudySection {
     final t = title.trim();
     if (t == 'Adaptive Platform' ||
         t == 'Adaptive & Responsive Platform' ||
-        t == 'Adaptive Platform for Fully Responsive Screens') return true;
+        t == 'Adaptive Platform for Fully Responsive Screens') {
+      return true;
+    }
     if (t.startsWith('Adaptive') && t.contains('Responsive')) return true;
     for (final p in imagePaths ?? const <String>[]) {
       if (p.toLowerCase().contains('asd_app_adaptive')) return true;
@@ -283,8 +290,38 @@ class CaseStudySection {
   }
 }
 
+/// Paths for embedded HTML design-system documents (web + Flutter asset).
+class CaseStudyDesignSystemDocPaths {
+  final String webRelativePath;
+  final String flutterAssetPath;
+
+  const CaseStudyDesignSystemDocPaths({
+    required this.webRelativePath,
+    required this.flutterAssetPath,
+  });
+}
+
 class PortfolioData {
   PortfolioData._();
+
+  /// Design-system HTML docs keyed by id.
+  /// Includes case-study docs (e.g. `service-flow`) and app-level docs (e.g. `4ideas`).
+  static const Map<String, CaseStudyDesignSystemDocPaths> designSystemDocsByCaseStudyId = {
+    'service-flow': CaseStudyDesignSystemDocPaths(
+      webRelativePath: 'docs/serviceflow-design-system.html',
+      flutterAssetPath: 'assets/docs/serviceflow-design-system.html',
+    ),
+    '4ideas': CaseStudyDesignSystemDocPaths(
+      webRelativePath: 'docs/4ideas-design-system.html',
+      flutterAssetPath: 'assets/docs/4ideas-design-system.html',
+    ),
+  };
+
+  static bool caseStudyHasDesignSystemDoc(String id) =>
+      designSystemDocsByCaseStudyId.containsKey(id);
+
+  static CaseStudyDesignSystemDocPaths? designSystemDocPathsForCaseStudy(String id) =>
+      designSystemDocsByCaseStudyId[id];
 
   static const String portfolioVideoUrl =
       'https://github.com/johnhcolani/John-Colani-interactive-Portfolio-/blob/master/Portfolio-2024%20JohnColani.mp4';
@@ -297,7 +334,16 @@ class PortfolioData {
       'https://sites.google.com/view/senior-interaction-product-d/home';
   static const String githubProfile = 'https://github.com/johnhcolani';
 
+  /// App grid order matches list order (first item appears first). New showcase app: insert at the top.
   static List<PortfolioApp> get apps => [
+        PortfolioApp(
+          id: 'service-flow',
+          name: 'Service Flow',
+          description:
+              'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
+          useComingSoonPlaceholder: true,
+          caseStudyId: 'service-flow',
+        ),
         PortfolioApp(
           id: 'great-t2s',
           name: 'Great T2S',
@@ -476,6 +522,9 @@ class PortfolioData {
     if (n.contains('absolute stone') || n.contains('asd usa')) {
       return 'asd';
     }
+    if (n.contains('service flow')) {
+      return 'service-flow';
+    }
     return null;
   }
 
@@ -536,7 +585,62 @@ class PortfolioData {
         ),
       ];
 
+  /// Featured case studies are sorted by [PortfolioCaseStudy.order] ascending on the portfolio screen (lower = higher on the page).
+  /// New featured study: add near the top here and give it the lowest `order` (e.g. 0); increase `order` on older studies if needed.
   static List<PortfolioCaseStudy> get caseStudies => [
+        PortfolioCaseStudy(
+          id: 'service-flow',
+          title: 'Service Flow',
+          subtitle: 'Multi-tenant SaaS for field service workflows',
+          overview:
+              'Service Flow is a Multi-tenant SaaS case study for structuring complex operational work across field teams and office teams. '
+              'The focus is clarity under pressure: predictable navigation, legible hierarchy, tenant-safe data boundaries, and a design system that keeps product and engineering aligned. '
+              'Below is a concise narrative; the full **ServiceFlow design system** document (tokens, components, patterns) opens as an interactive HTML spec.',
+          designApproach:
+              'Systems-first IA, Multi-tenant SaaS constraints (isolation, configuration, role policy), and a single source of truth for UI tokens and components. '
+              'The design system is maintained as a living document so specs stay shippable alongside the product.',
+          sections: [
+            CaseStudySection(
+              title: 'Problem',
+              content:
+                  'Field and dispatch workflows often scatter status, actions, and context across screens and ad-hoc tools. '
+                  'Technicians lose time finding “what’s next”; coordinators re-enter the same data; stakeholders lack a shared vocabulary for UI and states.\n\n'
+                  '**Goal:** One coherent service experience—clear jobs, obvious next steps, and a design system that scales without one-off screens.',
+            ),
+            CaseStudySection(
+              title: 'Context',
+              content:
+                  '**Users:** Field technicians, dispatchers, and account stakeholders—different devices, attention budgets, and connectivity.\n\n'
+                  '**Product lens:** Mobile-first execution with desktop-friendly oversight. The same entities (jobs, visits, assets) surface differently per role without forking the mental model.',
+            ),
+            CaseStudySection(
+              title: 'Multi-tenant SaaS model',
+              content:
+                  'Service Flow is designed as a **Multi-tenant SaaS**: one shared product serves many companies (tenants), while each tenant keeps isolated operational data, users, and configuration.\n\n'
+                  '**How it works:**\n'
+                  '• **Tenant isolation:** Data reads/writes are scoped to tenant context so one company cannot access another company\'s records.\n'
+                  '• **Shared platform, configurable behavior:** Core workflows are shared, but tenant-specific policies, labels, and feature toggles adapt the experience without forking code.\n'
+                  '• **Role + tenant policy:** Permissions are enforced by both role (technician/dispatcher/admin) and tenant membership.\n'
+                  '• **Scalable operations:** New tenants onboard through configuration and templates rather than custom builds.\n\n'
+                  'This model keeps delivery fast and maintainable while preserving security, compliance posture, and per-tenant autonomy.',
+            ),
+            CaseStudySection(
+              title: 'Solution direction',
+              content:
+                  '**Information architecture** built around jobs and timelines—not feature silos. **Progressive disclosure** so critical actions stay visible while secondary detail stays one tap away.\n\n'
+                  '**Design system** as the contract between design and engineering: semantic color, type scale, spacing, radii, and component states documented in one place.\n\n'
+                  'The next section links to the full ServiceFlow design spec (HTML).',
+            ),
+            CaseStudySection(
+              title: 'Design system',
+              content:
+                  'The ServiceFlow design system captures foundations (color, typography, spacing, elevation), components, and pattern guidance in a single scrollable document—ideal for handoff and long-term maintenance.\n\n'
+                  'Use the button to open the full HTML document in-app (web: same-origin; mobile: bundled asset).',
+              opensDesignSystemDoc: true,
+            ),
+          ],
+          order: 0,
+        ),
         PortfolioCaseStudy(
           id: 'asd',
           title: 'Absolute Stone Design (ASD)',
@@ -548,6 +652,7 @@ class PortfolioData {
           designApproach:
               'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
               'Design strategy: systems thinking, role-based IA, explicit governance (audit, human-in-the-loop AI). Partnership with engineering on data model, workflow logic, and config-driven behavior. WCAG 2.2 AA for core flows.',
+          order: 10,
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -774,6 +879,7 @@ class PortfolioData {
           designApproach:
               'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
               'Design strategy: empathy-led (respect users, avoid long forms, visual choice over surveys); personalization as a system—onboarding choices drive themes, typography, and content globally. Preference model aligned with implementation. Privacy and ethics by design.',
+          order: 20,
           sections: [
             CaseStudySection(
               title: 'Problem',

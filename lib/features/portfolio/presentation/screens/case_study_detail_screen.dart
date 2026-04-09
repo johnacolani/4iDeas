@@ -114,7 +114,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.amber[100]),
+          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -124,13 +124,13 @@ class CaseStudyDetailScreen extends StatelessWidget {
           },
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
-        iconTheme: IconThemeData(color: Colors.amber[100]),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        backgroundColor: ColorManager.accentGold,
         title: SelectableText(
           caseStudy.title,
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
           ),
@@ -169,7 +169,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                           SelectableText(
                             caseStudy.overview,
                             style: GoogleFonts.albertSans(
-                              color: Colors.white,
+                              color: ColorManager.textSecondary,
                               fontSize: bodySize,
                               height: 1.6,
                             ),
@@ -186,9 +186,11 @@ class CaseStudyDetailScreen extends StatelessWidget {
                           ...caseStudy.sections.expand((s) => [
                             SizedBox(height: he * 0.025),
                             _SectionBlock(
+                              caseStudyId: caseStudy.id,
                               title: s.title,
                               content: s.content,
                               displayImages: s.displayImages,
+                              opensDesignSystemDoc: s.opensDesignSystemDoc,
                               bodySize: bodySize,
                               he: he,
                               isMobile: isMobile,
@@ -552,9 +554,11 @@ class _FullScreenImage extends StatelessWidget {
 }
 
 class _SectionBlock extends StatelessWidget {
+  final String caseStudyId;
   final String title;
   final String content;
   final List<CaseStudyImage> displayImages;
+  final bool opensDesignSystemDoc;
   final double bodySize;
   final double he;
   final bool isMobile;
@@ -562,9 +566,11 @@ class _SectionBlock extends StatelessWidget {
   final Function(String) onImageTap;
 
   const _SectionBlock({
+    required this.caseStudyId,
     required this.title,
     required this.content,
     required this.displayImages,
+    required this.opensDesignSystemDoc,
     required this.bodySize,
     required this.he,
     required this.isMobile,
@@ -639,6 +645,31 @@ class _SectionBlock extends StatelessWidget {
                   height: 1.6,
                 ),
               ),
+              if (opensDesignSystemDoc &&
+                  PortfolioData.caseStudyHasDesignSystemDoc(caseStudyId)) ...[
+                SizedBox(height: he * 0.02),
+                FilledButton.icon(
+                  onPressed: () => context.push(
+                    AppRoutes.portfolioCaseStudyDesignSystemPath(caseStudyId),
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: ColorManager.orange,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 16 : 20,
+                      vertical: 14,
+                    ),
+                  ),
+                  icon: const Icon(Icons.auto_stories_outlined),
+                  label: Text(
+                    'Open design system (full document)',
+                    style: GoogleFonts.albertSans(
+                      fontWeight: FontWeight.w600,
+                      fontSize: bodySize,
+                    ),
+                  ),
+                ),
+              ],
               if (displayImages.isNotEmpty) ...[
                 SizedBox(height: he * 0.02),
                 LayoutBuilder(

@@ -40,8 +40,8 @@ class _MenuItemState extends State<MenuItem> {
           gradient: _isHovered
               ? LinearGradient(
                   colors: [
-                    ColorManager.blue.withValues(alpha: 0.2),
-                    ColorManager.orange.withValues(alpha: 0.15),
+                    ColorManager.primaryTeal.withValues(alpha: 0.18),
+                    ColorManager.accentGold.withValues(alpha: 0.12),
                   ],
                 )
               : null,
@@ -49,15 +49,15 @@ class _MenuItemState extends State<MenuItem> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _isHovered
-                ? ColorManager.orange.withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.05),
+                ? ColorManager.accentGold.withValues(alpha: 0.45)
+                : ColorManager.onDarkPrimary.withValues(alpha: 0.10),
             width: _isHovered ? 1.5 : 1,
           ),
           boxShadow: _isHovered
               ? [
                   BoxShadow(
-                    color: ColorManager.orange.withValues(alpha: 0.2),
-                    blurRadius: 8,
+                    color: ColorManager.accentGold.withValues(alpha: 0.15),
+                    blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
                 ]
@@ -84,16 +84,16 @@ class _MenuItemState extends State<MenuItem> {
                     padding: EdgeInsets.all(isMobile ? 7 : 6),
                     decoration: BoxDecoration(
                       color: _isHovered
-                          ? ColorManager.orange.withValues(alpha: 0.2)
-                          : Colors.white.withValues(alpha: 0.05),
+                          ? ColorManager.accentGold.withValues(alpha: 0.22)
+                          : ColorManager.onDarkPrimary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       widget.icon,
                       size: iconSize,
                       color: _isHovered
-                          ? ColorManager.orange
-                          : ColorManager.white,
+                          ? ColorManager.backgroundDark
+                          : ColorManager.onDarkPrimary,
                     ),
                   ),
                   SizedBox(width: isMobile ? 14 : (isTablet ? 12 : 10)),
@@ -102,7 +102,7 @@ class _MenuItemState extends State<MenuItem> {
                       widget.title,
                       style: TextStyle(
                         fontSize: fontSize,
-                        color: ColorManager.white,
+                        color: ColorManager.onDarkPrimary,
                         fontWeight: _isHovered
                             ? FontWeight.w600
                             : FontWeight.w400,
@@ -117,7 +117,7 @@ class _MenuItemState extends State<MenuItem> {
                       child: Icon(
                         Icons.arrow_forward_ios,
                         size: isMobile ? 16 : 14,
-                        color: ColorManager.orange,
+                        color: ColorManager.accentGold,
                       ),
                     ),
                 ],

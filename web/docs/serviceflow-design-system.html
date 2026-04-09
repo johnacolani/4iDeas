@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ServiceFlow Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Tetradic anchors: Teal ↔ Coral · Purple ↔ Gold */
+      --color-primary: #6FA8A1;
+      --color-primary-pressed: #5A8F88;
+      --color-primary-soft: #A5D4CC;
+      --color-coral: #D98C7A;
+      --color-coral-pressed: #C47A68;
+      --color-secondary: #7B6F9D;
+      --color-secondary-soft: #9A91B5;
+      --color-gold: #C9A96E;
+      --color-gold-soft: #D9BC88;
+
+      --page-bg: #F5F2EB;
+      --page-fg: #1A1917;
+      --card: #FFFCF7;
+      --card-muted: #FAF7F2;
+      --card-border: rgba(26, 25, 23, 0.08);
+
+      --text-secondary: #5C5A56;
+      --text-tertiary: #6D6A65;
+      --text-on-light: #3D3C39;
+      --text-body-muted: #4A4844;
+      --text-teal-deep: #3D5C55;
+
+      --accent: var(--color-primary);
+      --link-accent: var(--color-primary);
+      --cta: var(--color-coral);
+
+      --divider: #E8E4DC;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--page-bg);
+      color: var(--page-fg);
+      line-height: 1.5;
+      font-size: 16px;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 20px 80px; }
+    header.hero {
+      padding: 48px 0 32px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 40px;
+    }
+    header.hero h1 {
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 8px;
+    }
+    header.hero .meta {
+      color: var(--text-secondary);
+      font-size: 14px;
+      max-width: 640px;
+    }
+    header.hero code { font-family: var(--mono); font-size: 13px; background: rgba(111, 168, 161, 0.22); padding: 2px 6px; border-radius: 4px; }
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    nav.toc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(111, 168, 161, 0.18);
+      border: 1px solid rgba(111, 168, 161, 0.32);
+    }
+    nav.toc a:hover { background: rgba(111, 168, 161, 0.3); }
+    section {
+      margin-bottom: 48px;
+    }
+    section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--color-primary);
+    }
+    section p.lead { color: var(--text-body-muted); margin: 0 0 20px; max-width: 720px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(26, 25, 23, 0.06);
+    }
+    .grid-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .swatch {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .swatch:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .swatch .chip { height: 72px; }
+    .swatch .lbl {
+      padding: 10px 12px;
+      background: #fff;
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+    .swatch .lbl strong { display: block; font-size: 11px; color: #666; font-weight: 600; margin-bottom: 2px; font-family: Roboto, sans-serif; }
+    .row-grad {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .grad-preview {
+      border-radius: 16px;
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .grad-preview .lbl {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 10px 14px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.65));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .type-scale { display: flex; flex-direction: column; gap: 16px; }
+    .type-row { border-bottom: 1px solid var(--divider); padding-bottom: 12px; }
+    .type-row .name { font-size: 12px; font-weight: 600; color: var(--color-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+    table.token-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    table.token-table th, table.token-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--divider); }
+    table.token-table th { font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    table.token-table code { font-family: var(--mono); font-size: 13px; }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--page-fg);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), opacity 0.3s;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .principles { display: grid; gap: 12px; }
+    .principles li { margin-left: 1.2em; }
+    .role-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .role-tabs button {
+      border: 1px solid rgba(26,25,23,0.15);
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .role-tabs button.active {
+      background: var(--page-fg);
+      color: #fff;
+      border-color: var(--page-fg);
+    }
+    .dashboard-mock {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.12);
+      max-width: 400px;
+    }
+    .dashboard-mock .bar {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .dashboard-mock .body {
+      height: 140px;
+      position: relative;
+    }
+    .dashboard-mock .body::after {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .cmp-h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 28px 0 10px;
+      color: var(--text-on-light);
+    }
+    .cmp-h3:first-child { margin-top: 0; }
+    .cmp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 12px;
+    }
+    .cmp-frame {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      background: var(--card-muted);
+    }
+    .cmp-frame.dark {
+      background: linear-gradient(145deg, #1e2426 0%, #1A1917 45%, #1f1c24 100%);
+      color: #fff;
+    }
+    .cmp-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-secondary);
+      margin-bottom: 12px;
+    }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn-sf-primary {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      background: var(--color-coral);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(217, 140, 122, 0.35);
+    }
+    .btn-sf-primary:hover { background: var(--color-coral-pressed); }
+    .btn-sf-secondary {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-teal-deep);
+      border: 1px solid var(--color-primary);
+      cursor: pointer;
+    }
+    .btn-sf-ghost {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-teal-deep);
+      border: none;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .btn-legacy {
+      font-family: inherit;
+      font-size: 15px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 2px solid #fff;
+      background: var(--color-secondary);
+      color: #fff;
+      text-decoration: underline;
+      cursor: default;
+    }
+    .inp-sf {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid rgba(26, 25, 23, 0.12);
+      border-radius: 12px;
+      padding: 12px 16px;
+      max-width: 320px;
+    }
+    .inp-sf input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-family: inherit;
+      font-size: 16px;
+    }
+    .banner-demo {
+      font-size: 13px;
+      padding: 10px 16px;
+      text-align: center;
+      color: #fff;
+      margin: 6px 0;
+      border-radius: 8px;
+    }
+    .nav-demo-bar {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 14px 8px;
+      background: rgba(0, 0, 0, 0.28);
+      border-radius: 0 0 12px 12px;
+    }
+    .nav-demo-bar span {
+      font-size: 22px;
+      opacity: 0.45;
+      filter: grayscale(0.2);
+    }
+    .nav-demo-bar span.on { opacity: 1; }
+    .dlg-mock {
+      max-width: 300px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--card-border);
+    }
+    .dlg-mock h4 { margin: 0 0 8px; font-size: 18px; color: var(--page-fg); }
+    .dlg-mock p { margin: 0 0 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.45; }
+    .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .dlg-actions button {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    .glass-demo {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 16px;
+      padding: 16px;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    table.table-comp { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.table-comp th, table.table-comp td {
+      text-align: left;
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--divider);
+      vertical-align: top;
+    }
+    table.table-comp th {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    table.table-comp td:first-child { font-weight: 600; color: var(--page-fg); }
+    table.table-comp code { font-family: var(--mono); font-size: 11px; word-break: break-all; }
+    .comp-search { margin-bottom: 14px; }
+    .comp-search input {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(26, 25, 23, 0.15);
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .comp-search input:focus {
+      outline: 2px solid var(--color-primary-soft);
+      outline-offset: 0;
+    }
+    .picker-split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+    .picker-pane {
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 16px;
+      background: var(--card-muted);
+    }
+    .picker-result {
+      margin: 20px 0 0;
+      padding: 12px 16px;
+      background: rgba(111, 168, 161, 0.18);
+      border-radius: 12px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--page-fg);
+    }
+    /* Material date picker mock */
+    .mat-dlg {
+      background: #fff;
+      border-radius: 28px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .mat-dlg-h {
+      padding: 16px 20px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .mat-dlg-title {
+      padding: 0 20px 12px;
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--page-fg);
+    }
+    .mat-cal-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .mat-cal-nav button {
+      border: none;
+      background: transparent;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #5a5a5a;
+      border-radius: 999px;
+    }
+    .mat-cal-nav button:hover { background: #f0f0f0; }
+    .mat-cal-nav span { font-weight: 600; font-size: 14px; }
+    .mat-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      padding: 12px 16px 20px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .mat-cal-grid .dow { color: #888; font-weight: 600; padding: 4px 0; }
+    .mat-cal-grid .cell {
+      aspect-ratio: 1;
+      max-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #333;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      padding: 0;
+    }
+    .mat-cal-grid .cell:hover { background: rgba(111, 168, 161, 0.14); }
+    .mat-cal-grid .cell.out { color: #ccc; cursor: default; }
+    .mat-cal-grid .cell.out:hover { background: transparent; }
+    .mat-cal-grid .cell.today { border: 1px solid var(--color-primary); }
+    .mat-cal-grid .cell.sel { background: var(--color-primary); color: #fff; font-weight: 600; }
+    .mat-cal-grid .cell.sel:hover { background: var(--color-primary-pressed); }
+    /* Cupertino sheet mock */
+    .cup-sheet {
+      background: rgba(245, 245, 247, 0.95);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+      max-width: 340px;
+      margin: 0 auto;
+    }
+    .cup-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      font-size: 17px;
+    }
+    .cup-toolbar button {
+      border: none;
+      background: none;
+      font-size: 17px;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 8px;
+    }
+    .cup-toolbar .cancel { color: var(--color-primary); }
+    .cup-toolbar .done { font-weight: 600; color: var(--color-primary); }
+    .cup-toolbar .title { font-weight: 600; color: #000; font-size: 15px; }
+    .cup-wheels {
+      display: flex;
+      height: 180px;
+      position: relative;
+      background: linear-gradient(
+        180deg,
+        rgba(245, 245, 247, 1) 0%,
+        rgba(230, 230, 232, 0.4) 45%,
+        rgba(230, 230, 232, 0.4) 55%,
+        rgba(245, 245, 247, 1) 100%
+      );
+    }
+    .cup-wheels::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 44px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .cup-col {
+      flex: 1;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .cup-col::-webkit-scrollbar { display: none; }
+    .cup-item {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: center;
+      font-size: 20px;
+      color: #000;
+      font-weight: 400;
+    }
+    /* Alert dialog mocks — Material vs Cupertino */
+    .dlg-preview-stage {
+      min-height: 210px;
+      background: linear-gradient(180deg, var(--page-bg), rgba(111, 168, 161, 0.12));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .mat-alert-card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 20px 20px 12px;
+      max-width: 300px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+    }
+    .mat-alert-card h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--page-fg);
+      line-height: 1.25;
+    }
+    .mat-alert-card p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .mat-alert-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .mat-alert-actions button {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+    }
+    .mat-alert-actions .btn-m-text {
+      background: transparent;
+      color: var(--color-primary);
+    }
+    .mat-alert-actions .btn-m-text:hover { background: rgba(111, 168, 161, 0.12); }
+    .mat-alert-actions .btn-m-filled {
+      background: var(--color-coral);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+    .mat-alert-actions .btn-m-dest {
+      background: transparent;
+      color: #c62828;
+    }
+    .cup-alert-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 14px;
+      overflow: hidden;
+      max-width: 280px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+    .cup-alert-inner { padding: 20px 16px 14px; }
+    .cup-alert-card h3 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+    }
+    .cup-alert-card p {
+      margin: 0;
+      font-size: 13px;
+      color: #000;
+      opacity: 0.88;
+      line-height: 1.35;
+    }
+    .cup-alert-actions { border-top: 0.5px solid rgba(60, 60, 67, 0.29); }
+    .cup-alert-actions button {
+      width: 100%;
+      border: none;
+      background: rgba(255, 255, 255, 0.01);
+      padding: 14px 16px;
+      font-size: 17px;
+      cursor: pointer;
+      font-family: inherit;
+      border-bottom: 0.5px solid rgba(60, 60, 67, 0.29);
+      color: var(--color-primary);
+    }
+    .cup-alert-actions button:last-child { border-bottom: none; }
+    .cup-alert-actions button.cup-default { font-weight: 600; }
+    .cup-alert-actions button.cup-dest { color: #ff3b30; font-weight: 400; }
+    .alert-dual { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+    footer.note {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--card-border);
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>ServiceFlow Design System</h1>
+      <p class="meta">
+        Version <strong>1.0.0</strong> — source of truth in Flutter:
+        <code>lib/core/theme/service_tokens.dart</code> and
+        <code>lib/core/theme/serviceflow_dashboard_theme.dart</code>.
+        Colors below are computed in JavaScript with the same HSL rules as Dart (<code>ServiceFlowColors</code>).
+        The <a href="#components">components</a> section catalogs reusable Flutter widgets under <code>lib/core/widgets</code>.
+      </p>
+      <nav class="toc" aria-label="Sections">
+        <a href="#principles">Principles</a>
+        <a href="#color">Color</a>
+        <a href="#typography">Typography</a>
+        <a href="#layout">Layout</a>
+        <a href="#radius">Radius</a>
+        <a href="#elevation">Elevation</a>
+        <a href="#motion">Motion</a>
+        <a href="#gradients">Gradients</a>
+        <a href="#roles">Role dashboards</a>
+        <a href="#components">Components</a>
+        <a href="#pickers">Pickers</a>
+        <a href="#alert-dialogs">Alerts</a>
+      </nav>
+    </header>
+
+    <section id="principles">
+      <h2>Principles</h2>
+      <p class="lead">Decisions locked for ServiceFlow multi-tenant SaaS UI.</p>
+      <div class="card">
+        <ul class="principles">
+          <li><strong>Tetradic anchors</strong> — <strong>Primary (teal)</strong> <code>#6FA8A1</code> · <strong>Coral (CTA / highlights)</strong> <code>#D98C7A</code> (complement to teal). <strong>Secondary (purple)</strong> <code>#7B6F9D</code> · <strong>Gold (soft accent)</strong> <code>#C9A96E</code> (complement to purple). Ramps use HSL lightness steps (±0.04 per step) from each anchor.</li>
+          <li><strong>Pairing</strong> — Teal ↔ coral for action vs. brand structure; purple ↔ gold for secondary surfaces and premium hints. Use coral for primary filled buttons; teal for links, focus rings, and selection states.</li>
+          <li><strong>Surfaces</strong> — Light app background <code>#F5F2EB</code>. Dark scaffold <code>#1A1917</code> (warm charcoal).</li>
+          <li><strong>Staff dashboards</strong> — Deep teal–purple gradient headers and body washes; each role gets a distinct mix of the same tetrad via <code>ServiceFlowDashboardTheme</code>.</li>
+          <li><strong>Type</strong> — Roboto with system-ui fallbacks; scale uses px sizes documented in <code>ServiceFlowTypography</code>.</li>
+          <li><strong>Grid</strong> — 12 columns, 16px gutter (<code>ServiceFlowSpacing</code>).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="color">
+      <h2>Color</h2>
+      <p class="lead">Click any swatch to copy HEX to the clipboard.</p>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Core & surfaces</h3>
+        <div class="grid-swatches" id="swatches-core"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Primary (teal) ramp — <code>primary_dark1…10</code> / <code>primary_light1…10</code></h3>
+        <div class="grid-swatches" id="swatches-primary"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Coral — teal complement (CTA / highlights)</h3>
+        <div class="grid-swatches" id="swatches-t1"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Purple — secondary</h3>
+        <div class="grid-swatches" id="swatches-t2"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Gold — purple complement (soft accent)</h3>
+        <div class="grid-swatches" id="swatches-t4"></div>
+      </div>
+    </section>
+
+    <section id="typography">
+      <h2>Typography</h2>
+      <p class="lead"><code>ServiceFlowTypography</code> — Roboto, sizes in logical px.</p>
+      <div class="card type-scale" id="type-scale"></div>
+    </section>
+
+    <section id="layout">
+      <h2>Layout & spacing</h2>
+      <p class="lead"><code>ServiceFlowSpacing</code> — 12-column grid, 16px gutter.</p>
+      <div class="card">
+        <table class="token-table" id="table-spacing"></table>
+      </div>
+    </section>
+
+    <section id="radius">
+      <h2>Border radius</h2>
+      <div class="card">
+        <table class="token-table" id="table-radius"></table>
+      </div>
+    </section>
+
+    <section id="elevation">
+      <h2>Icons & elevation</h2>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Icon sizes</h3>
+        <table class="token-table" id="table-icons"></table>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:16px;">Shadow presets (alpha on shadow color)</h3>
+        <p style="font-size:14px;color:var(--text-secondary);margin-top:0;">sm: blur 4, offset (0,1), α 0.08 · md: blur 8, (0,2), α 0.12 · lg: blur 16, (0,4), α 0.16</p>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;">
+          <div style="width:100px;height:100px;background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;font-size:12px;">sm</div>
+          <div style="width:100px;height:100px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center;font-size:12px;">md</div>
+          <div style="width:100px;height:100px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.16);display:flex;align-items:center;justify-content:center;font-size:12px;">lg</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="motion">
+      <h2>Motion</h2>
+      <p class="lead"><code>ServiceFlowMotion</code> — Material-style curves where noted.</p>
+      <div class="card">
+        <table class="token-table" id="table-motion"></table>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:0;">Custom cubics: easeIn <code>cubic-bezier(0.4, 0, 1, 1)</code>, easeOut <code>cubic-bezier(0, 0, 0.2, 1)</code>, easeInOut <code>cubic-bezier(0.4, 0, 0.2, 1)</code></p>
+      </div>
+    </section>
+
+    <section id="gradients">
+      <h2>Product gradients</h2>
+      <p class="lead"><code>ServiceFlowGradients</code> in Flutter — reproduced here for reference.</p>
+      <div class="card row-grad" id="gradients-product"></div>
+    </section>
+
+    <section id="roles">
+      <h2>Role dashboard chrome</h2>
+      <p class="lead"><code>ServiceFlowDashboardTheme.appBarGradient(role)</code> and <code>bodyGradient(role)</code>. Tap a role to preview.</p>
+      <div class="card">
+        <div class="role-tabs" id="role-tabs"></div>
+        <div class="dashboard-mock" id="role-mock">
+          <div class="bar" id="role-mock-bar">Admin</div>
+          <div class="body" id="role-mock-body"></div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:16px;margin-bottom:0;">App bar foreground: white. Muted secondary text on headers: white at 75% opacity.</p>
+      </div>
+    </section>
+
+    <section id="components">
+      <h2>Components</h2>
+      <p class="lead">
+        These are the <strong>implemented</strong> building blocks in the Flutter app (not Figma-only). Prefer
+        <code>PlatformScaffold</code>, <code>PlatformButton</code>, and <code>showPlatformDialog</code> for new work so Android/web and iOS stay native.
+        Pair them with <code>ServiceFlowColors</code> / <code>Theme.of(context)</code> instead of legacy purple/navy hex values.
+      </p>
+
+      <div class="card">
+        <h3 class="cmp-h3" style="margin-top:0;">Recommended patterns (HTML preview — implement in Flutter)</h3>
+        <div class="cmp-grid">
+          <div class="cmp-frame">
+            <div class="cmp-label">Actions · prefer PlatformButton</div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Filled / outlined / text. On iOS: Cupertino; on Android/web: Material 3. Theme with tetradic tokens: teal structure, coral CTAs.</p>
+            <div class="btn-row">
+              <button type="button" class="btn-sf-primary">Primary</button>
+              <button type="button" class="btn-sf-secondary">Outlined</button>
+              <button type="button" class="btn-sf-ghost">Text</button>
+            </div>
+          </div>
+          <div class="cmp-frame">
+            <div class="cmp-label">Forms · RoundedTextField</div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;"><code>borderRadius: 12</code> (see <code>ServiceFlowRadius.base</code>), leading icon, optional password toggle.</p>
+            <div class="inp-sf">
+              <span style="opacity:0.5;font-size:18px;">✉</span>
+              <input type="text" placeholder="Email" aria-label="Demo field" />
+            </div>
+          </div>
+          <div class="cmp-frame dark">
+            <div class="cmp-label" style="color:rgba(255,255,255,0.75);">Shell · CustomBottomNavigationBar</div>
+            <p style="font-size:13px;opacity:0.85;margin:0 0 12px;">Transparent bar; selected white, unselected grey — designed to sit on gradient backgrounds (home / dashboards).</p>
+            <div class="nav-demo-bar">
+              <span class="on" title="Home">⌂</span>
+              <span title="Location">◎</span>
+              <span title="Camera">▣</span>
+              <span title="Phone">☎</span>
+              <span title="Account">◉</span>
+            </div>
+          </div>
+          <div class="cmp-frame">
+            <div class="cmp-label">Feedback · showPlatformDialog</div>
+            <div class="dlg-mock" style="margin:0;">
+              <h4>Title</h4>
+              <p>Short message body. iOS uses light Cupertino chrome when wrapped with <code>wrapDialogForIOSLight</code>.</p>
+              <div class="dlg-actions">
+                <button type="button" style="background:transparent;color:var(--text-teal-deep);">Cancel</button>
+                <button type="button" style="background:var(--color-coral);color:#fff;">OK</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmp-frame dark">
+            <div class="cmp-label" style="color:rgba(255,255,255,0.75);">Surfaces · glass / frosted (installer-style cards)</div>
+            <div class="glass-demo">Semi-transparent layer + border for content on dark gradient bodies.</div>
+          </div>
+          <div class="cmp-frame">
+            <div class="cmp-label">Legacy CTAs · RectangularButton / RoundedButton</div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Wide, underlined labels — keep for existing flows; new screens should migrate to <code>PlatformButton</code> + tokens.</p>
+            <button type="button" class="btn-legacy">Underlined CTA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="cmp-h3" style="margin-top:0;">TenantStatusBanner</h3>
+        <p style="font-size:14px;color:var(--text-secondary);margin:0 0 8px;">Driven by <code>TenantContextCubit</code>; hidden when status is <code>active</code>.</p>
+        <div class="banner-demo" style="background:#ff8f00;">past_due — Payment issue…</div>
+        <div class="banner-demo" style="background:#c62828;">suspended / canceled — Subscription inactive…</div>
+        <div class="banner-demo" style="background:#1565c0;">trial — You are on a trial plan.</div>
+      </div>
+
+      <div class="card">
+        <h3 class="cmp-h3" style="margin-top:0;">Widget inventory (<code>lib/core/widgets</code>)</h3>
+        <div class="comp-search">
+          <label for="comp-filter" class="visually-hidden">Filter components</label>
+          <input type="search" id="comp-filter" placeholder="Filter by name or path…" autocomplete="off" />
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="table-comp">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Path</th>
+                <th>Use</th>
+              </tr>
+            </thead>
+            <tbody id="component-tbody">
+              <tr><td>PlatformScaffold</td><td><code>platform_scaffold.dart</code></td><td>Adaptive shell: Material Scaffold vs CupertinoPageScaffold.</td></tr>
+              <tr><td>PlatformAppBar</td><td><code>platform_app_bar.dart</code></td><td>Adaptive top bar; <code>PlatformAppBar.material</code> for Android <code>AppBar</code> slot.</td></tr>
+              <tr><td>PlatformButton</td><td><code>platform_button.dart</code></td><td><code>filled</code> | <code>text</code> | <code>outlined</code>; primary control for actions.</td></tr>
+              <tr><td>showPlatformDialog</td><td><code>platform_dialog.dart</code></td><td>Adaptive alerts; <code>wrapDialogForIOSLight</code> for readable iOS dialogs on dark app theme.</td></tr>
+              <tr><td>RectangularButton</td><td><code>rectangular_button.dart</code></td><td>Full-width bordered CTA, underlined title (legacy).</td></tr>
+              <tr><td>RoundedButton</td><td><code>rounded_button.dart</code></td><td>White rounded CTA, underlined text (legacy).</td></tr>
+              <tr><td>RoundedButtonC</td><td><code>rounded_button_c.dart</code></td><td>Colored row button with leading widget + Cupertino (legacy lists).</td></tr>
+              <tr><td>RoundedTextField</td><td><code>rounded_text_field.dart</code></td><td>Icon-led form field, password toggle, validator hook.</td></tr>
+              <tr><td>CustomBottomNavigationBar</td><td><code>custom_bottom_navigation_bar.dart</code></td><td>Five tabs, transparent; white/grey icons on gradient.</td></tr>
+              <tr><td>HomeAppBar</td><td><code>home_appbar.dart</code></td><td>Home header composition, logo, actions (reference for brand chrome).</td></tr>
+              <tr><td>RemoteAssetImage</td><td><code>remote_asset_image.dart</code></td><td>Firebase Storage URLs; <code>fromAssetPath</code> factory.</td></tr>
+              <tr><td>BundledAppLogo</td><td><code>remote_asset_image.dart</code></td><td>App logo widget (bundled / remote resolution).</td></tr>
+              <tr><td>SafeCircleAvatar</td><td><code>remote_asset_image.dart</code></td><td>Avatar with network URL + safe fallback.</td></tr>
+              <tr><td>TenantStatusBanner</td><td><code>tenant_status_banner.dart</code></td><td>Billing / subscription strip for non-active tenant states.</td></tr>
+              <tr><td>AuthRequiredDialog</td><td><code>auth_required_dialog.dart</code></td><td>Prompt when auth is required.</td></tr>
+              <tr><td>AppUpdateDialog</td><td><code>app_update_dialog.dart</code></td><td>Update available messaging.</td></tr>
+              <tr><td>AuditLogsDialog</td><td><code>audit_logs_dialog.dart</code></td><td>Audit log presentation.</td></tr>
+              <tr><td>AdaptiveIconButton</td><td><code>adaptive_icon_button.dart</code></td><td>Consistent hit targets for icon actions.</td></tr>
+              <tr><td>AppBackground</td><td><code>app_background.dart</code></td><td>App-wide background layer.</td></tr>
+              <tr><td>HomeBackground</td><td><code>home_background.dart</code></td><td>Home screen background treatment.</td></tr>
+              <tr><td>NewAppBackground</td><td><code>new_app_background.dart</code></td><td>Alternate app background variant.</td></tr>
+              <tr><td>ProfileBackground</td><td><code>profile_background.dart</code></td><td>Profile flows background.</td></tr>
+              <tr><td>AmyFaceImage</td><td><code>amy_face_image.dart</code></td><td>Amy assistant face asset display.</td></tr>
+              <tr><td>AmyVirtualAssistant</td><td><code>amy_virtual_assistant.dart</code></td><td>Amy assistant UI composition.</td></tr>
+              <tr><td>AnimatedChatBackground</td><td><code>animated_chat_background.dart</code></td><td>Animated chat atmosphere.</td></tr>
+              <tr><td>ChatBackground</td><td><code>chat_background.dart</code></td><td>Chat screen background.</td></tr>
+              <tr><td>SimpleChatBackground</td><td><code>simple_chat_background.dart</code></td><td>Lightweight chat background.</td></tr>
+              <tr><td>ConstructionScreen</td><td><code>construction_screen.dart</code></td><td>Full-screen “under construction” placeholder.</td></tr>
+              <tr><td>ScreenshotRowWidget</td><td><code>screenshot_row_widget.dart</code></td><td>Horizontal screenshot / promo row.</td></tr>
+              <tr><td>MaterialDetailScreen</td><td><code>material_detail_screen.dart</code></td><td>Material detail presentation shell.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:13px;color:var(--text-tertiary);margin:14px 0 0;">
+          <strong>Also:</strong> <code>lib/core/utils/platform_icons.dart</code> — <code>PlatformIcons.back(context)</code>, <code>.share</code>, <code>.close</code>, <code>.send</code>, etc.
+          Staff dashboards use <code>ServiceFlowDashboardTheme</code> for app bar / body gradients (see <a href="#roles">Role dashboards</a>).
+        </p>
+      </div>
+    </section>
+
+    <section id="pickers">
+      <h2>Date &amp; time pickers</h2>
+      <p class="lead">
+        These mocks are <strong>HTML/CSS/JS only</strong> for the design system page. In Flutter, ServiceFlow uses
+        <code>showDatePicker</code> / <code>showTimePicker</code> on <strong>Android &amp; web</strong>, and
+        <code>showCupertinoModalPopup</code> with <code>CupertinoDatePicker</code> on <strong>iOS</strong>
+        (see <code>create_invoice_screen.dart</code>, <code>create_estimate_screen.dart</code>,
+        <code>contract_form_screen.dart</code>, <code>event_form_dialog.dart</code>).
+      </p>
+      <div class="card">
+        <div class="picker-split">
+          <div class="picker-pane">
+            <div class="cmp-label" style="margin-top:0;">Material · calendar dialog</div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Tap a day. Teal primary for selection echoes <code>ServiceFlowColors</code> (not default Material purple).</p>
+            <div class="mat-dlg">
+              <div class="mat-dlg-h">Select date</div>
+              <div class="mat-dlg-title" id="mat-dlg-title">—</div>
+              <div class="mat-cal-nav">
+                <button type="button" id="mat-cal-prev" aria-label="Previous month">‹</button>
+                <span id="mat-cal-label"></span>
+                <button type="button" id="mat-cal-next" aria-label="Next month">›</button>
+              </div>
+              <div class="mat-cal-grid" id="mat-cal-grid" role="grid"></div>
+            </div>
+          </div>
+          <div class="picker-pane">
+            <div class="cmp-label" style="margin-top:0;">Cupertino · wheel sheet</div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Scroll each column; tap <strong>Done</strong>. Real iOS uses native blur and haptics.</p>
+            <div class="cup-sheet">
+              <div class="cup-toolbar">
+                <button type="button" class="cancel" id="cup-cancel-demo">Cancel</button>
+                <span class="title">Pick date</span>
+                <button type="button" class="done" id="cup-done-demo">Done</button>
+              </div>
+              <div class="cup-wheels">
+                <div class="cup-col" id="cup-col-month" aria-label="Month"></div>
+                <div class="cup-col" id="cup-col-day" aria-label="Day"></div>
+                <div class="cup-col" id="cup-col-year" aria-label="Year"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="picker-result" id="picker-demo-result">
+          <strong>Demo output:</strong> interact with either picker above.
+        </p>
+        <p style="font-size:13px;color:var(--text-tertiary);margin:0;">
+          Dark app theme: wrap Cupertino pickers in <code>CupertinoThemeData(brightness: Brightness.light)</code> so the sheet stays readable (same pattern as <code>wrapDialogForIOSLight</code> for alerts).
+        </p>
+      </div>
+    </section>
+
+    <section id="alert-dialogs">
+      <h2>Alert dialogs (Android / web vs iOS)</h2>
+      <p class="lead">
+        In Flutter, <code>showPlatformDialog</code> in
+        <code>lib/core/widgets/platform_dialog.dart</code> uses <strong><code>AlertDialog</code></strong> (Material) on Android and web, and
+        <strong><code>CupertinoAlertDialog</code></strong> inside <code>showCupertinoDialog</code> on iOS.
+        Destructive actions map to red text on both; default iOS action is bold.
+        iOS dialogs are wrapped in <code>CupertinoThemeData(brightness: Brightness.light)</code> so they stay readable when the app uses a dark scaffold.
+      </p>
+      <div class="card">
+        <div class="picker-split">
+          <div class="picker-pane">
+            <div class="cmp-label" style="margin-top:0;">Material · <code>showDialog</code> + <code>AlertDialog</code></div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">
+              Actions in code: non-destructive → <code>ElevatedButton</code>, destructive → <code>TextButton</code> with red label (map Material primary to teal / coral tokens if desired).
+            </p>
+            <div class="alert-dual">
+              <div class="dlg-preview-stage">
+                <div class="mat-alert-card" role="dialog" aria-labelledby="mat-al1-t">
+                  <h3 id="mat-al1-t">Save changes?</h3>
+                  <p>Your edits will be stored for this project.</p>
+                  <div class="mat-alert-actions">
+                    <button type="button" class="btn-m-text" data-alert-demo="mat" data-action="Cancel">Cancel</button>
+                    <button type="button" class="btn-m-filled" data-alert-demo="mat" data-action="Save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <div class="dlg-preview-stage">
+                <div class="mat-alert-card" role="dialog" aria-labelledby="mat-al2-t">
+                  <h3 id="mat-al2-t">Delete item?</h3>
+                  <p>This cannot be undone.</p>
+                  <div class="mat-alert-actions">
+                    <button type="button" class="btn-m-text" data-alert-demo="mat" data-action="Cancel">Cancel</button>
+                    <button type="button" class="btn-m-dest" data-alert-demo="mat" data-action="Delete">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="picker-pane">
+            <div class="cmp-label" style="margin-top:0;">Cupertino · <code>showCupertinoDialog</code> + <code>CupertinoAlertDialog</code></div>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">
+              Full-width stacked actions; map default blue to <code>--color-primary</code> (teal) for brand alignment. Destructive stays red. Pattern follows Human Interface Guidelines.
+            </p>
+            <div class="alert-dual">
+              <div class="dlg-preview-stage">
+                <div class="cup-alert-card" role="dialog" aria-labelledby="cup-al1-t">
+                  <div class="cup-alert-inner">
+                    <h3 id="cup-al1-t">Save changes?</h3>
+                    <p>Your edits will be stored for this project.</p>
+                  </div>
+                  <div class="cup-alert-actions">
+                    <button type="button" data-alert-demo="cup" data-action="Cancel">Cancel</button>
+                    <button type="button" class="cup-default" data-alert-demo="cup" data-action="Save">Save</button>
+                  </div>
+                </div>
+              </div>
+              <div class="dlg-preview-stage">
+                <div class="cup-alert-card" role="dialog" aria-labelledby="cup-al2-t">
+                  <div class="cup-alert-inner">
+                    <h3 id="cup-al2-t">Delete item?</h3>
+                    <p>This cannot be undone.</p>
+                  </div>
+                  <div class="cup-alert-actions">
+                    <button type="button" data-alert-demo="cup" data-action="Cancel">Cancel</button>
+                    <button type="button" class="cup-dest" data-alert-demo="cup" data-action="Delete">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="picker-result" id="alert-demo-result" style="margin-top:20px;">
+          <strong>Demo:</strong> tap a button above — mimics <code>Navigator.pop</code> with a result (documentation only).
+        </p>
+        <p style="font-size:13px;color:var(--text-tertiary);margin:0;">
+          Also used: <code>AlertDialog.adaptive</code> in some feature screens (chat, log-in, profile). Prefer <code>showPlatformDialog</code> / <code>showPlatformConfirmDialog</code> for new code so behavior stays aligned with <code>PlatformDialogAction</code> (<code>isDestructive</code>, <code>isDefaultAction</code>).
+        </p>
+      </div>
+    </section>
+
+    <footer class="note">
+      This page is static HTML/JS for stakeholder review. For implementation, keep tokens in Dart and treat this file as documentation only.
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status">Copied</div>
+
+  <script>
+(function () {
+  'use strict';
+
+  // --- Color math (matches service_tokens.dart intent: HSL lightness / hue) ---
+  function hexToRgb(hex) {
+    const h = hex.replace('#', '');
+    const n = parseInt(h, 16);
+    return { r: (n >> 16) / 255, g: ((n >> 8) & 255) / 255, b: (n & 255) / 255 };
+  }
+  function rgbToHex(r, g, b) {
+    const c = (x) => Math.max(0, Math.min(255, Math.round(x * 255))).toString(16).padStart(2, '0');
+    return ('#' + c(r) + c(g) + c(b)).toUpperCase();
+  }
+  function rgbToHsl(r, g, b) {
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        default: h = ((r - g) / d + 4) / 6;
+      }
+    }
+    return { h: h * 360, s, l };
+  }
+  function hslToRgb(h, s, l) {
+    h = (h % 360 + 360) % 360 / 360;
+    let r, g, b;
+    if (s === 0) r = g = b = l;
+    else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+    return { r, g, b };
+  }
+  function adjustLightness(hex, delta) {
+    const { r, g, b } = hexToRgb(hex);
+    let { h, s, l } = rgbToHsl(r, g, b);
+    l = Math.max(0, Math.min(1, l + delta));
+    const rgb = hslToRgb(h, s, l);
+    return rgbToHex(rgb.r, rgb.g, rgb.b);
+  }
+  function rotateHue(hex, degrees) {
+    const { r, g, b } = hexToRgb(hex);
+    let { h, s, l } = rgbToHsl(r, g, b);
+    h = (h + degrees) % 360;
+    if (h < 0) h += 360;
+    const rgb = hslToRgb(h, s, l);
+    return rgbToHex(rgb.r, rgb.g, rgb.b);
+  }
+  function lerpColor(hexA, hexB, t) {
+    const a = hexToRgb(hexA), b = hexToRgb(hexB);
+    return rgbToHex(
+      a.r + (b.r - a.r) * t,
+      a.g + (b.g - a.g) * t,
+      a.b + (b.b - a.b) * t
+    );
+  }
+
+  const PRIMARY = '#6FA8A1';
+  const CORAL = '#D98C7A';
+  const PURPLE = '#7B6F9D';
+  const GOLD = '#C9A96E';
+  const APP_BG = '#F5F2EB';
+  const APP_BG_DARK = '#1A1917';
+
+  function primaryRamp() {
+    const dark = [];
+    const light = [];
+    for (let i = 1; i <= 10; i++) {
+      dark.push({ name: 'primary_dark' + i, hex: adjustLightness(PRIMARY, -0.04 * i) });
+      light.push({ name: 'primary_light' + i, hex: adjustLightness(PRIMARY, 0.04 * i) });
+    }
+    return { dark, light };
+  }
+
+  function tetradicRamp(seedHex) {
+    const dark = [];
+    const light = [];
+    for (let i = 1; i <= 10; i++) {
+      dark.push(adjustLightness(seedHex, -0.04 * i));
+      light.push(adjustLightness(seedHex, 0.04 * i));
+    }
+    return { dark, light };
+  }
+
+  const t1seed = CORAL;
+  const t2seed = PURPLE;
+  const t4seed = GOLD;
+
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1600);
+  }
+
+  function swatchEl(name, hex) {
+    const div = document.createElement('div');
+    div.className = 'swatch';
+    div.innerHTML = '<div class="chip" style="background:' + hex + '"></div><div class="lbl"><strong>' + name + '</strong>' + hex + '</div>';
+    div.addEventListener('click', () => {
+      navigator.clipboard.writeText(hex).then(() => toast('Copied ' + hex));
+    });
+    return div;
+  }
+
+  function fillSwatchContainer(id, items) {
+    const el = document.getElementById(id);
+    items.forEach(({ name, hex }) => el.appendChild(swatchEl(name, hex)));
+  }
+
+  const ramp = primaryRamp();
+  fillSwatchContainer('swatches-core', [
+    { name: 'primary (teal)', hex: PRIMARY },
+    { name: 'coral (CTA)', hex: CORAL },
+    { name: 'secondary (purple)', hex: PURPLE },
+    { name: 'gold (accent)', hex: GOLD },
+    { name: 'appBackground', hex: APP_BG },
+    { name: 'appBackgroundDark', hex: APP_BG_DARK },
+    { name: 'coral_muted (tetradic_1_dark4)', hex: tetradicRamp(t1seed).dark[3] },
+  ]);
+
+  const primarySwatches = [...ramp.dark.reverse(), { name: 'primary', hex: PRIMARY }, ...ramp.light];
+  fillSwatchContainer('swatches-primary', primarySwatches);
+
+  const t1 = tetradicRamp(t1seed);
+  const t2 = tetradicRamp(t2seed);
+  const t4 = tetradicRamp(t4seed);
+
+  function appendRamp(containerId, prefix, seed, rampObj) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    for (let i = 10; i >= 1; i--) el.appendChild(swatchEl(prefix + '_dark' + i, rampObj.dark[i - 1]));
+    el.appendChild(swatchEl(prefix, seed));
+    for (let i = 1; i <= 10; i++) el.appendChild(swatchEl(prefix + '_light' + i, rampObj.light[i - 1]));
+  }
+  document.getElementById('swatches-t1').innerHTML = '';
+  document.getElementById('swatches-t2').innerHTML = '';
+  document.getElementById('swatches-t4').innerHTML = '';
+  appendRamp('swatches-t1', 'tetradic_1', t1seed, t1);
+  appendRamp('swatches-t2', 'tetradic_2', t2seed, t2);
+  appendRamp('swatches-t4', 'tetradic_4', t4seed, t4);
+
+  // Typography
+  const typo = [
+    ['display', 48, 1.2],
+    ['heading', 32, 1.25],
+    ['title', 24, 1.3],
+    ['subtitle', 20, 1.35],
+    ['body', 16, 1.5],
+    ['caption', 14, 1.4],
+    ['label', 12, 1.25],
+  ];
+  const typeScale = document.getElementById('type-scale');
+  typo.forEach(([name, px, lh]) => {
+    const row = document.createElement('div');
+    row.className = 'type-row';
+    row.innerHTML = '<div class="name">' + name + ' · ' + px + 'px / lh ' + lh + '</div><div style="font-size:' + px + 'px;line-height:' + lh + ';font-weight:400;">The quick brown fox jumps over the lazy dog.</div>';
+    typeScale.appendChild(row);
+  });
+
+  // Spacing
+  const spacing = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24];
+  const ts = document.getElementById('table-spacing');
+  ts.innerHTML = '<thead><tr><th>Token</th><th>Value</th></tr></thead><tbody>' +
+    spacing.map((v) => '<tr><td><code>s' + v + '</code></td><td>' + v + 'px</td></tr>').join('') +
+    '<tr><td><code>gridColumns</code></td><td>12</td></tr><tr><td><code>gutter</code></td><td>16px</td></tr></tbody>';
+
+  document.getElementById('table-radius').innerHTML = '<thead><tr><th>Token</th><th>Value</th></tr></thead><tbody>' +
+    [['none', 0], ['sm', 8], ['base', 12], ['md', 16], ['lg', 24], ['xl', 30], ['full', 9999]]
+      .map(([k, v]) => '<tr><td><code>' + k + '</code></td><td>' + (v === 9999 ? 'pill (9999)' : v + 'px') + '</td></tr>').join('') + '</tbody>';
+
+  document.getElementById('table-icons').innerHTML = '<thead><tr><th>Token</th><th>dp</th></tr></thead><tbody>' +
+    [['xs', 16], ['sm', 20], ['md', 24], ['lg', 28], ['xl', 32], ['xxl', 40]]
+      .map(([k, v]) => '<tr><td><code>' + k + '</code></td><td>' + v + '</td></tr>').join('') + '</tbody>';
+
+  document.getElementById('table-motion').innerHTML = '<thead><tr><th>Token</th><th>Value</th></tr></thead><tbody>' +
+    '<tr><td><code>fast</code></td><td>150ms</td></tr>' +
+    '<tr><td><code>medium</code></td><td>300ms</td></tr>' +
+    '<tr><td><code>slow</code></td><td>500ms</td></tr></tbody>';
+
+  const p = PRIMARY;
+  const pd2 = adjustLightness(p, -0.08);
+  const pl2 = adjustLightness(p, 0.08);
+  const pd5 = adjustLightness(p, -0.20);
+  const authG = 'linear-gradient(to bottom right, ' + pd5 + ', ' + pd2 + ', ' + pl2 + ')';
+  const appBarG = 'linear-gradient(to bottom right, ' + pl2 + ', ' + pd2 + ')';
+
+  const searchTop = lerpColor(APP_BG, PRIMARY, 0.14);
+  const searchMidStop = lerpColor(APP_BG, PRIMARY, 0.07);
+  const searchG =
+    'linear-gradient(to bottom, ' +
+    searchTop +
+    ' 0%, ' +
+    searchMidStop +
+    ' 45%, ' +
+    APP_BG +
+    ' 100%)';
+
+  const gp = document.getElementById('gradients-product');
+  [
+    ['appBarPrimary', appBarG],
+    ['authFullScreen', authG],
+    ['searchPageBackground (light)', searchG],
+  ].forEach(([label, grad]) => {
+    const d = document.createElement('div');
+    d.className = 'grad-preview';
+    d.style.background = grad;
+    d.innerHTML = '<div class="lbl">' + label + '</div>';
+    gp.appendChild(d);
+  });
+
+  // Dashboard gradients (mirror serviceflow_dashboard_theme.dart)
+  const pd8 = adjustLightness(PRIMARY, -0.32);
+  const pd7 = adjustLightness(PRIMARY, -0.28);
+  const pd4 = adjustLightness(PRIMARY, -0.16);
+  const pd3 = adjustLightness(PRIMARY, -0.12);
+  const pd9 = adjustLightness(PRIMARY, -0.36);
+  // pd5 already defined above for auth gradient
+
+  const t1d4 = t1.dark[3];
+  const t2d5 = t2.dark[4];
+  const t2d7 = t2.dark[6];
+  const t4d4 = t4.dark[3];
+  const t1d8 = t1.dark[7];
+  const t2d8 = t2.dark[7];
+  const t4d8 = t4.dark[7];
+
+  function appBarGradientAdmin() {
+    return 'linear-gradient(to bottom right, ' + pd8 + ' 0%, ' + pd5 + ' 55%, ' + lerpColor(pd4, t2d7, 0.45) + ' 100%)';
+  }
+  function appBarGradientSales() {
+    return 'linear-gradient(to bottom right, ' + pd8 + ' 0%, ' + lerpColor(pd5, t1d4, 0.5) + ' 50%, ' + pd3 + ' 100%)';
+  }
+  function appBarGradientSched() {
+    return 'linear-gradient(to bottom right, ' + pd8 + ' 0%, ' + lerpColor(pd5, t4d4, 0.45) + ' 55%, ' + pd4 + ' 100%)';
+  }
+  function appBarGradientInst() {
+    return 'linear-gradient(to bottom right, ' + pd8 + ' 0%, ' + pd5 + ' 60%, ' + lerpColor(pd4, t2d5, 0.35) + ' 100%)';
+  }
+
+  function bodyGradient(accentDark) {
+    const c0 = lerpColor('#0A0F0D', pd9, 0.35);
+    const c1 = lerpColor('#0D1210', pd8, 0.28);
+    const c2 = lerpColor('#101816', accentDark, 0.22);
+    const c3 = lerpColor('#121A18', pd7, 0.2);
+    return 'linear-gradient(to bottom right, ' + c0 + ' 0%, ' + c1 + ' 35%, ' + c2 + ' 72%, ' + c3 + ' 100%)';
+  }
+
+  const roles = [
+    { id: 'admin', label: 'Admin', appBar: appBarGradientAdmin, body: () => bodyGradient(t2d8) },
+    { id: 'sales', label: 'Sales Rep', appBar: appBarGradientSales, body: () => bodyGradient(t1d8) },
+    { id: 'sched', label: 'Scheduler', appBar: appBarGradientSched, body: () => bodyGradient(t4d8) },
+    { id: 'inst', label: 'Installer', appBar: appBarGradientInst, body: () => bodyGradient(t2d7) },
+  ];
+
+  const tabs = document.getElementById('role-tabs');
+  const bar = document.getElementById('role-mock-bar');
+  const mockBody = document.getElementById('role-mock-body');
+
+  roles.forEach((r, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = r.label;
+    if (i === 0) b.classList.add('active');
+    b.addEventListener('click', () => {
+      tabs.querySelectorAll('button').forEach((x, j) => x.classList.toggle('active', j === i));
+      bar.textContent = r.label + ' Dashboard';
+      bar.style.background = r.appBar();
+      mockBody.style.background = r.body();
+    });
+    tabs.appendChild(b);
+  });
+  bar.style.background = roles[0].appBar();
+  mockBody.style.background = roles[0].body();
+
+  const compFilter = document.getElementById('comp-filter');
+  const compTbody = document.getElementById('component-tbody');
+  if (compFilter && compTbody) {
+    compFilter.addEventListener('input', function () {
+      const q = this.value.toLowerCase().trim();
+      compTbody.querySelectorAll('tr').forEach(function (tr) {
+        tr.style.display = !q || tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  }
+
+  // --- Date picker demos (Material + Cupertino mocks) ---
+  const pickerOut = document.getElementById('picker-demo-result');
+  const matGrid = document.getElementById('mat-cal-grid');
+  const matLabel = document.getElementById('mat-cal-label');
+  const matTitle = document.getElementById('mat-dlg-title');
+  const matPrev = document.getElementById('mat-cal-prev');
+  const matNext = document.getElementById('mat-cal-next');
+
+  function setPickerMsg(html) {
+    if (pickerOut) pickerOut.innerHTML = '<strong>Demo output:</strong> ' + html;
+  }
+
+  if (matGrid && matLabel && matTitle && matPrev && matNext) {
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const dow = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    let viewYear = new Date().getFullYear();
+    let viewMonth = new Date().getMonth();
+    let selY = viewYear;
+    let selM = viewMonth;
+    let selD = new Date().getDate();
+
+    function daysInMonth(y, m) {
+      return new Date(y, m + 1, 0).getDate();
+    }
+
+    function renderMatCal() {
+      matLabel.textContent = monthNames[viewMonth] + ' ' + viewYear;
+      matTitle.textContent =
+        monthNames[selM].slice(0, 3) + ' ' + selD + ', ' + selY;
+      matGrid.innerHTML = '';
+      dow.forEach(function (d) {
+        const el = document.createElement('div');
+        el.className = 'dow';
+        el.textContent = d;
+        matGrid.appendChild(el);
+      });
+      const first = new Date(viewYear, viewMonth, 1).getDay();
+      const dim = daysInMonth(viewYear, viewMonth);
+      const today = new Date();
+      for (let i = 0; i < first; i++) {
+        const e = document.createElement('div');
+        e.className = 'cell out';
+        matGrid.appendChild(e);
+      }
+      for (let d = 1; d <= dim; d++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cell';
+        btn.textContent = String(d);
+        if (viewYear === today.getFullYear() && viewMonth === today.getMonth() && d === today.getDate()) {
+          btn.classList.add('today');
+        }
+        if (selY === viewYear && selM === viewMonth && selD === d) {
+          btn.classList.add('sel');
+        }
+        btn.addEventListener('click', function () {
+          selY = viewYear;
+          selM = viewMonth;
+          selD = d;
+          renderMatCal();
+          setPickerMsg(
+            'Material <code>showDatePicker</code> → <code>' +
+              selY +
+              '-' +
+              String(selM + 1).padStart(2, '0') +
+              '-' +
+              String(selD).padStart(2, '0') +
+              '</code>'
+          );
+        });
+        matGrid.appendChild(btn);
+      }
+    }
+
+    matPrev.addEventListener('click', function () {
+      viewMonth--;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear--;
+      }
+      renderMatCal();
+    });
+    matNext.addEventListener('click', function () {
+      viewMonth++;
+      if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear++;
+      }
+      renderMatCal();
+    });
+    renderMatCal();
+  }
+
+  const cupMonth = document.getElementById('cup-col-month');
+  const cupDay = document.getElementById('cup-col-day');
+  const cupYear = document.getElementById('cup-col-year');
+  const cupDone = document.getElementById('cup-done-demo');
+  const cupCancel = document.getElementById('cup-cancel-demo');
+
+  function fillWheelColumn(col, labels, initialIndex) {
+    if (!col) return;
+    col.innerHTML = '';
+    const pad = function (h) {
+      const d = document.createElement('div');
+      d.style.height = h + 'px';
+      d.style.flexShrink = '0';
+      col.appendChild(d);
+    };
+    pad(68);
+    labels.forEach(function (t) {
+      const d = document.createElement('div');
+      d.className = 'cup-item';
+      d.textContent = t;
+      col.appendChild(d);
+    });
+    pad(68);
+    const i = Math.max(0, Math.min(initialIndex, labels.length - 1));
+    col.scrollTop = i * 44;
+  }
+
+  function readWheelIndex(col) {
+    if (!col) return 0;
+    const i = Math.round(col.scrollTop / 44);
+    const max = col.querySelectorAll('.cup-item').length - 1;
+    return Math.max(0, Math.min(i, max));
+  }
+
+  if (cupMonth && cupDay && cupYear && cupDone) {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const years = [];
+    for (let y = 2024; y <= 2035; y++) years.push(String(y));
+    const now = new Date();
+    fillWheelColumn(cupMonth, months, now.getMonth());
+    const days = [];
+    for (let d = 1; d <= 31; d++) days.push(String(d));
+    fillWheelColumn(cupDay, days, now.getDate() - 1);
+    fillWheelColumn(cupYear, years, now.getFullYear() - 2024);
+
+    cupDone.addEventListener('click', function () {
+      const mi = readWheelIndex(cupMonth);
+      const di = readWheelIndex(cupDay);
+      const yi = readWheelIndex(cupYear);
+      const mName = months[mi];
+      const day = di + 1;
+      const year = parseInt(years[yi], 10);
+      setPickerMsg(
+        'Cupertino <code>CupertinoDatePicker</code> → <code>' +
+          year +
+          '-' +
+          String(mi + 1).padStart(2, '0') +
+          '-' +
+          String(day).padStart(2, '0') +
+          '</code> &nbsp;(' +
+          mName +
+          ' ' +
+          day +
+          ', ' +
+          year +
+          ')'
+      );
+    });
+    if (cupCancel) {
+      cupCancel.addEventListener('click', function () {
+        setPickerMsg('Cupertino Cancel (would dismiss <code>showCupertinoModalPopup</code>).');
+      });
+    }
+  }
+
+  const alertDemoOut = document.getElementById('alert-demo-result');
+  document.querySelectorAll('[data-alert-demo]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const plat = btn.getAttribute('data-alert-demo');
+      const act = btn.getAttribute('data-action');
+      const name = plat === 'mat' ? 'Material AlertDialog' : 'CupertinoAlertDialog';
+      if (alertDemoOut) {
+        alertDemoOut.innerHTML =
+          '<strong>Demo:</strong> <code>' +
+          name +
+          '</code> → <code>' +
+          act +
+          '</code> (would call <code>Navigator.pop</code> with this result).';
+      }
+      toast((plat === 'mat' ? 'Material' : 'Cupertino') + ': ' + act);
+    });
+  });
+})();
+  </script>
+</body>
+</html>

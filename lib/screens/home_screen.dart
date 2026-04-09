@@ -79,13 +79,21 @@ class _HomeScreenState extends State<HomeScreen> {
             vertical: isMobile ? 12.0 : (isTablet ? 24.0 : 28.0),
           ),
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            // Keep frosted glass, add a subtle gold tint layer.
+            color: ColorManager.accentGold.withValues(alpha: 0.14),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.3),
-                width: 1.5,
+                color: ColorManager.accentGold.withValues(alpha: 0.28),
+                width: 1.0,
               ),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: ColorManager.accentGold.withValues(alpha: 0.08),
+                blurRadius: 22,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -124,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: isMobile
                               ? (wi < 400 ? 14 : 16)
                               : (isTablet ? 18 : 22),
-                          color: Colors.white,
+                          color: ColorManager.backgroundDark,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -165,8 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           maxLines: 1,
                                           style: TextStyle(
                                             fontSize: wi < 400 ? 11 : 12,
-                                            color:
-                                                Colors.white.withValues(alpha: 0.9),
+                                            color: ColorManager.backgroundDark,
                                             decoration: TextDecoration.underline,
                                           ),
                                         ),
@@ -209,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize:
                                                   wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.orange,
+                                              color: ColorManager.backgroundDark,
                                             ),
                                           ),
                                         ),
@@ -241,8 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           maxLines: 1,
                                           style: TextStyle(
                                             fontSize: isTablet ? 14 : 16,
-                                            color:
-                                                Colors.white.withValues(alpha: 0.9),
+                                            color: ColorManager.backgroundDark,
                                             decoration: TextDecoration.underline,
                                           ),
                                         ),
@@ -285,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: TextStyle(
                                               fontSize: isTablet ? 12 : 14,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.orange,
+                                              color: ColorManager.backgroundDark,
                                             ),
                                           ),
                                         ),
@@ -351,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: TextStyle(
                                             fontSize:
                                                 wi < 400 ? 11 : 12,
-                                            color: ColorManager.orange,
+                                            color: ColorManager.accentCoral,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -378,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize:
                                                   wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.orange,
+                                              color: ColorManager.backgroundDark,
                                             ),
                                           ),
                                         ),
@@ -433,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'Sign Up',
                                           style: TextStyle(
                                             fontSize: isTablet ? 16 : 18,
-                                            color: ColorManager.orange,
+                                            color: ColorManager.accentCoral,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -460,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: TextStyle(
                                               fontSize: isTablet ? 12 : 14,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.orange,
+                                              color: ColorManager.backgroundDark,
                                             ),
                                           ),
                                         ),

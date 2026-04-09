@@ -274,12 +274,12 @@ class GlassOutlinedText extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white.withOpacity(0.20),
+                  color: Colors.white.withValues(alpha: 0.20),
                 ),
               ),
             ),
 
-            // 💎 Thin glass edge (white border)
+            // Gold edge only (keep frosted white text)
             SelectableText(
               text,
               style: GoogleFonts.albertSans(
@@ -288,7 +288,7 @@ class GlassOutlinedText extends StatelessWidget {
                 foreground: Paint()
                   ..style = PaintingStyle.stroke
                   ..strokeWidth = 0.8
-                  ..color = Colors.white.withValues(alpha: 0.70),
+                  ..color = ColorManager.accentGold.withValues(alpha: 0.90),
               ),
             ),
 
@@ -298,7 +298,7 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                color: Colors.white.withOpacity(0.26),
+                color: Colors.white.withValues(alpha: 0.26),
               ),
             ),
           ],

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
-import 'package:four_ideas/features/portfolio/presentation/screens/design_philosophy_screen.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/case_study_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
@@ -116,19 +115,32 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   List<PortfolioCaseStudy> get _displayCaseStudies {
+    final List<PortfolioCaseStudy> list;
     final fromFirestore = _caseStudiesFromFirestore;
-    if (fromFirestore == null || fromFirestore.isEmpty) return PortfolioData.caseStudies;
-    final firestoreIds = fromFirestore.map((e) => e.id).toSet();
-    final staticOnly = PortfolioData.caseStudies.where((s) => !firestoreIds.contains(s.id)).toList();
-    final mergedFirestore = fromFirestore.map((cs) {
-      if (cs.id == 'asd') return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
-      return cs;
-    }).toList();
-    return [...mergedFirestore, ...staticOnly];
+    if (fromFirestore == null || fromFirestore.isEmpty) {
+      list = List<PortfolioCaseStudy>.from(PortfolioData.caseStudies);
+    } else {
+      final firestoreIds = fromFirestore.map((e) => e.id).toSet();
+      final staticOnly = PortfolioData.caseStudies.where((s) => !firestoreIds.contains(s.id)).toList();
+      final mergedFirestore = fromFirestore.map((cs) {
+        if (cs.id == 'asd') return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
+        return cs;
+      }).toList();
+      list = [...mergedFirestore, ...staticOnly];
+    }
+    list.sort((a, b) {
+      final byOrder = a.order.compareTo(b.order);
+      if (byOrder != 0) return byOrder;
+      // When order matches (e.g. legacy Firestore defaults), prefer featured static ids first.
+      const tieBreak = {'service-flow': 0, 'asd': 1, 'twin-scriptures': 2};
+      final ta = tieBreak[a.id] ?? 99;
+      final tb = tieBreak[b.id] ?? 99;
+      final byTie = ta.compareTo(tb);
+      if (byTie != 0) return byTie;
+      return a.id.compareTo(b.id);
+    });
+    return list;
   }
-
-  bool get _hasAnyCaseStudiesFromFirestore =>
-      _caseStudiesFromFirestore != null && _caseStudiesFromFirestore!.isNotEmpty;
 
   static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
 
@@ -640,6 +652,26 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         _SectionTitle(
                           title: 'App Showcase',
                           sectionTitleSize: sectionTitleSize,
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 8, bottom: 10),
+                            child: OutlinedButton.icon(
+                              onPressed: () => context.push(AppRoutes.portfolioDesignSystemPath('4ideas')),
+                              icon: Icon(Icons.design_services_outlined, size: 18, color: ColorManager.orange),
+                              label: Text(
+                                'Open 4iDeas Design System',
+                                style: GoogleFonts.albertSans(
+                                  color: ColorManager.orange,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: ColorManager.orange),
+                              ),
+                            ),
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           Padding(
