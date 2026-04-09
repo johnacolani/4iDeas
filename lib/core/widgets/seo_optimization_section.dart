@@ -122,7 +122,7 @@ class SEOOptimizationSection extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: isMobile ? (wi < 400 ? 24.sp * 1.3 * 0.7 * 0.7 : 28.sp * 1.3 * 0.7 * 0.7) : wi * 0.028,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: ColorManager.textPrimary,
                 ),
               ),
             ],
@@ -132,7 +132,7 @@ class SEOOptimizationSection extends StatelessWidget {
             'Step-by-Step Guide to High Rankings',
             style: GoogleFonts.albertSans(
               fontSize: isMobile ? (wi < 400 ? 16.sp * 1.3 * 0.7 * 0.7 : 18.sp * 1.3 * 0.7 * 0.7) : wi * 0.018,
-              color: ColorManager.blue,
+              color: ColorManager.textSecondary,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -170,7 +170,7 @@ class SEOOptimizationSection extends StatelessWidget {
                         style: GoogleFonts.albertSans(
                           fontSize: isMobile ? 18.sp * 1.3 * 0.7 * 0.7 : wi * 0.017,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: ColorManager.accentGoldDark,
                         ),
                       ),
                     ),
@@ -185,7 +185,7 @@ class SEOOptimizationSection extends StatelessWidget {
                           children: [
                             Icon(
                               step['icon'],
-                              color: ColorManager.orange,
+                              color: ColorManager.accentCoralPressed,
                               size: isMobile ? 28 : wi * 0.028,
                             ),
                             SizedBox(width: 8),
@@ -195,7 +195,7 @@ class SEOOptimizationSection extends StatelessWidget {
                                 style: GoogleFonts.albertSans(
                                   fontSize: isMobile ? 16.sp * 1.3 * 0.7 * 0.7 : wi * 0.015,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: ColorManager.textPrimary,
                                 ),
                               ),
                             ),
@@ -206,7 +206,7 @@ class SEOOptimizationSection extends StatelessWidget {
                           step['description'],
                           style: GoogleFonts.albertSans(
                             fontSize: isMobile ? 13.sp * 1.3 * 0.7 * 0.7 : wi * 0.012,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: ColorManager.textSecondary,
                           ),
                         ),
                       ],

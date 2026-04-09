@@ -43,7 +43,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         title: SelectableText(
           'About Us',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.accentGoldDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -78,7 +78,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   Text(
                                     'John A. Colani',
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.accentGoldDark,
                                       fontSize: titleFontSize,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -98,7 +98,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   Text(
                                     'Richmond, VA',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
+                                      color: ColorManager.accentGoldDark.withValues(alpha: 0.8),
                                       fontSize: subtitleFontSize,
                                     ),
                                     textAlign: TextAlign.center,
@@ -177,7 +177,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                     SelectableText(
                                       'Let\'s Connect',
                                       style: GoogleFonts.albertSans(
-                                        color: Colors.white,
+                                        color: ColorManager.accentGoldDark,
                                         fontSize: sectionTitleSize,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -214,7 +214,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                       icon: Icons.public,
                                       label: 'Portfolio',
                                       value: 'View Portfolio',
-                                      onTap: () => _launchURL('https://sites.google.com/view/senior-interaction-product-d/home'),
+                                      onTap: () => _launchURL('https://4ideasapp.com/portfolio'),
                                       isMobile: isMobile,
                                       bodyFontSize: bodyFontSize,
                                     ),
@@ -280,7 +280,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           SelectableText(
             content,
             style: TextStyle(
-              color: Colors.white,
+              color: ColorManager.accentGoldDark,
               fontSize: fontSize,
               height: 1.6,
             ),
@@ -393,7 +393,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             SelectableText(
                               exp['company'] as String,
                               style: GoogleFonts.albertSans(
-                                color: Colors.white,
+                                color: ColorManager.accentGoldDark,
                                 fontSize: bodyFontSize + 2,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -413,7 +413,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                       SelectableText(
                         exp['period'] as String,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: ColorManager.accentGoldDark.withValues(alpha: 0.7),
                           fontSize: bodyFontSize - 1,
                         ),
                       ),
@@ -437,7 +437,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                               child: SelectableText(
                                 highlight,
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
+                                  color: ColorManager.accentGoldDark.withValues(alpha: 0.9),
                                   fontSize: bodyFontSize - 1,
                                   height: 1.5,
                                 ),
@@ -498,7 +498,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   SelectableText(
                     label,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: ColorManager.accentGoldDark.withValues(alpha: 0.7),
                       fontSize: bodyFontSize - 2,
                     ),
                   ),
@@ -506,7 +506,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   SelectableText(
                     value,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: ColorManager.accentGoldDark,
                       fontSize: bodyFontSize,
                       fontWeight: FontWeight.w500,
                     ),

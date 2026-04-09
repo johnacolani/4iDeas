@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: isMobile
                               ? (wi < 400 ? 14 : 16)
                               : (isTablet ? 18 : 22),
-                          color: ColorManager.backgroundDark,
+                          color: ColorManager.textPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           maxLines: 1,
                                           style: TextStyle(
                                             fontSize: wi < 400 ? 11 : 12,
-                                            color: ColorManager.backgroundDark,
+                                            color: ColorManager.textPrimary,
                                             decoration: TextDecoration.underline,
                                           ),
                                         ),
@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         icon: Icon(
                                           Icons.logout,
                                           size: wi < 400 ? 12 : 14,
-                                          color: ColorManager.orange,
+                                          color: ColorManager.accentCoral,
                                         ),
                                         padding: EdgeInsets.zero,
                                         constraints: BoxConstraints(),
@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: ColorManager.blue,
+                                        color: ColorManager.primaryTeal,
                                         size: wi < 400 ? wi * 0.025 : wi * 0.03,
                                       ),
                                       SizedBox(width: wi < 400 ? 3 : 6),
@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize:
                                                   wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.backgroundDark,
+                                              color: ColorManager.textPrimary,
                                             ),
                                           ),
                                         ),
@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           maxLines: 1,
                                           style: TextStyle(
                                             fontSize: isTablet ? 14 : 16,
-                                            color: ColorManager.backgroundDark,
+                                            color: ColorManager.textPrimary,
                                             decoration: TextDecoration.underline,
                                           ),
                                         ),
@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         icon: Icon(
                                           Icons.logout,
                                           size: isTablet ? 18 : 20,
-                                          color: ColorManager.orange,
+                                          color: ColorManager.accentCoral,
                                         ),
                                         padding: EdgeInsets.all(4),
                                         constraints: BoxConstraints(),
@@ -277,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: ColorManager.blue,
+                                        color: ColorManager.primaryTeal,
                                         size:
                                             isTablet ? wi * 0.018 : wi * 0.018,
                                       ),
@@ -291,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: TextStyle(
                                               fontSize: isTablet ? 12 : 14,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.backgroundDark,
+                                              color: ColorManager.textPrimary,
                                             ),
                                           ),
                                         ),
@@ -327,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: TextStyle(
                                             fontSize:
                                                 wi < 400 ? 11 : 12,
-                                            color: ColorManager.blue,
+                                            color: ColorManager.primaryTeal,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -337,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: TextStyle(
                                           fontSize:
                                               wi < 400 ? 11 : 12,
-                                          color: const Color(0xFFD81B60),
+                                          color: ColorManager.secondaryPurple,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -370,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: ColorManager.blue,
+                                        color: ColorManager.primaryTeal,
                                         size: wi < 400 ? wi * 0.025 : wi * 0.03,
                                       ),
                                       SizedBox(width: wi < 400 ? 3 : 6),
@@ -384,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize:
                                                   wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.backgroundDark,
+                                              color: ColorManager.textPrimary,
                                             ),
                                           ),
                                         ),
@@ -414,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'Login',
                                           style: TextStyle(
                                             fontSize: isTablet ? 16 : 18,
-                                            color: ColorManager.blue,
+                                            color: ColorManager.primaryTeal,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -423,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ' / ',
                                         style: TextStyle(
                                           fontSize: isTablet ? 16 : 18,
-                                          color: const Color(0xFFD81B60),
+                                          color: ColorManager.secondaryPurple,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -452,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: ColorManager.blue,
+                                        color: ColorManager.primaryTeal,
                                         size:
                                             isTablet ? wi * 0.018 : wi * 0.018,
                                       ),
@@ -466,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: TextStyle(
                                               fontSize: isTablet ? 12 : 14,
                                               fontWeight: FontWeight.bold,
-                                              color: ColorManager.backgroundDark,
+                                              color: ColorManager.textPrimary,
                                             ),
                                           ),
                                         ),

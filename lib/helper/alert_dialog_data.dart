@@ -146,10 +146,10 @@ class _AlertDialogDataState extends State<AlertDialogData> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${entry.label}"?', style: TextStyle(color: Colors.white)),
+        title: Text('Delete "${entry.label}"?', style: TextStyle(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove this contact entry.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
@@ -273,7 +273,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                         'Senior Product Designer',
                         style: TextStyle(
                           fontSize: isMobile ? 14 : 15,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: ColorManager.accentGoldDark.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -406,7 +406,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                   Text(
                     entry.label,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: ColorManager.accentGoldDark.withValues(alpha: 0.7),
                       fontSize: isMobile ? 13 : 14,
                     ),
                   ),
@@ -414,7 +414,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                   Text(
                     entry.value,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: ColorManager.accentGoldDark,
                       fontSize: isMobile ? 16 : 17,
                       fontWeight: FontWeight.w600,
                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import '../ColorManager.dart';
 
 class AWSBackendSection extends StatelessWidget {
   final double wi;
@@ -68,18 +69,18 @@ class AWSBackendSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.teal.withValues(alpha: 0.15),
-            Colors.teal.withValues(alpha: 0.2),
+            ColorManager.primaryTeal.withValues(alpha: 0.14),
+            ColorManager.secondaryPurple.withValues(alpha: 0.16),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.teal.withValues(alpha: 0.3),
+          color: ColorManager.primaryTeal.withValues(alpha: 0.35),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.teal.withValues(alpha: 0.2),
+            color: ColorManager.primaryTeal.withValues(alpha: 0.22),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -122,7 +123,7 @@ class AWSBackendSection extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: isMobile ? (wi < 400 ? 24.sp * 1.3 : 28.sp * 1.3) : wi * 0.028,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: ColorManager.textPrimary,
                 ),
               ),
             ],
@@ -132,7 +133,7 @@ class AWSBackendSection extends StatelessWidget {
             'Enterprise Cloud Infrastructure',
             style: GoogleFonts.albertSans(
               fontSize: isMobile ? (wi < 400 ? 16.sp * 1.3 * 0.7 * 0.7 * 0.8 : 18.sp * 1.3 * 0.7 * 0.7 * 0.8) : wi * 0.018,
-              color: Colors.teal,
+              color: ColorManager.textSecondary,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -202,7 +203,7 @@ class AWSBackendSection extends StatelessWidget {
                               service['name']!,
                               style: GoogleFonts.albertSans(
                                 fontSize: isMobile ? (wi < 400 ? 14.sp * 1.3 * 0.7 * 0.7 : 16.sp * 1.3 * 0.7 * 0.7) : wi * 0.018,
-                                color: Colors.white,
+                                color: ColorManager.textPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -211,7 +212,7 @@ class AWSBackendSection extends StatelessWidget {
                               service['description'] ?? '',
                               style: GoogleFonts.albertSans(
                                 fontSize: isMobile ? (wi < 400 ? 12.sp * 1.3 * 0.7 : 14.sp * 1.3 * 0.7) : (wi < 1024 ? 11 : 13),
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: ColorManager.textSecondary,
                                 fontWeight: FontWeight.w400,
                                 height: 1.5,
                               ),

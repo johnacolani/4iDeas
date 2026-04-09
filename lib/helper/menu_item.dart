@@ -4,19 +4,26 @@ import '../core/ColorManager.dart';
 
 class MenuItem extends StatefulWidget {
   final String title;
-  final  IconData icon;
+  final IconData icon;
   final VoidCallback onPressed;
+  final Color? cardColor;
+  final Color? accentColor;
 
 
-  const MenuItem({super.key, required this.icon, required this.title, required this.onPressed});
+  const MenuItem({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.onPressed,
+    this.cardColor,
+    this.accentColor,
+  });
 
   @override
   State<MenuItem> createState() => _MenuItemState();
 }
 
 class _MenuItemState extends State<MenuItem> {
-  bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     double wi = MediaQuery.of(context).size.width;
@@ -29,39 +36,20 @@ class _MenuItemState extends State<MenuItem> {
     final double iconSize = isMobile ? 22 : (isTablet ? 20 : 18);
     final double fontSize = isMobile ? 16 : (isTablet ? 15 : 14);
     final double horizontalPadding = isMobile ? 12.0 : (isTablet ? 14.0 : 16.0);
+    final Color accent = widget.accentColor ?? ColorManager.primaryTeal;
+    final Color iconColor = ColorManager.textPrimary;
+    final Color titleColor = ColorManager.textPrimary;
     
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+    return AnimatedContainer(
+        duration: const Duration(milliseconds: 0),
         margin: EdgeInsets.symmetric(vertical: isMobile ? 4.0 : 3.0),
         decoration: BoxDecoration(
-          gradient: _isHovered
-              ? LinearGradient(
-                  colors: [
-                    ColorManager.primaryTeal.withValues(alpha: 0.18),
-                    ColorManager.accentGold.withValues(alpha: 0.12),
-                  ],
-                )
-              : null,
-          color: _isHovered ? null : Colors.transparent,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isHovered
-                ? ColorManager.accentGold.withValues(alpha: 0.45)
-                : ColorManager.onDarkPrimary.withValues(alpha: 0.10),
-            width: _isHovered ? 1.5 : 1,
+            color: accent.withValues(alpha: 0.55),
+            width: 1.2,
           ),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: ColorManager.accentGold.withValues(alpha: 0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
         ),
         child: Material(
           color: Colors.transparent,
@@ -70,7 +58,7 @@ class _MenuItemState extends State<MenuItem> {
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: EdgeInsets.only(
-                left: 0,
+                left: 16,
                 right: horizontalPadding,
                 top: isMobile ? 12.0 : 10.0,
                 bottom: isMobile ? 12.0 : 10.0,
@@ -80,21 +68,10 @@ class _MenuItemState extends State<MenuItem> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 textDirection: TextDirection.ltr,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(isMobile ? 7 : 6),
-                    decoration: BoxDecoration(
-                      color: _isHovered
-                          ? ColorManager.accentGold.withValues(alpha: 0.22)
-                          : ColorManager.onDarkPrimary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      size: iconSize,
-                      color: _isHovered
-                          ? ColorManager.backgroundDark
-                          : ColorManager.onDarkPrimary,
-                    ),
+                  Icon(
+                    widget.icon,
+                    size: iconSize,
+                    color: iconColor,
                   ),
                   SizedBox(width: isMobile ? 14 : (isTablet ? 12 : 10)),
                   Expanded(
@@ -102,30 +79,18 @@ class _MenuItemState extends State<MenuItem> {
                       widget.title,
                       style: TextStyle(
                         fontSize: fontSize,
-                        color: ColorManager.onDarkPrimary,
-                        fontWeight: _isHovered
-                            ? FontWeight.w600
-                            : FontWeight.w400,
+                        color: titleColor,
+                        fontWeight: FontWeight.w500,
                         letterSpacing: 0.2,
                       ),
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  if (_isHovered)
-                    Padding(
-                      padding: EdgeInsets.only(left: isMobile ? 8 : 6),
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: isMobile ? 16 : 14,
-                        color: ColorManager.accentGold,
-                      ),
-                    ),
                 ],
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

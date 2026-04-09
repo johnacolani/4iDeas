@@ -53,7 +53,7 @@ class PortfolioPublicationCard extends StatelessWidget {
                 child: SelectableText(
                   publication.title,
                   style: GoogleFonts.albertSans(
-                    color: Colors.white,
+                    color: ColorManager.textSecondary,
                     fontSize: titleSize,
                     fontWeight: FontWeight.w500,
                   ),

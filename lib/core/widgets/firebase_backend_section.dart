@@ -69,18 +69,18 @@ class FirebaseBackendSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFF57C00).withValues(alpha: 0.15),
-            const Color(0xFFFBC02D).withValues(alpha: 0.1),
+            ColorManager.accentCoral.withValues(alpha: 0.18),
+            ColorManager.accentGold.withValues(alpha: 0.12),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFF57C00).withValues(alpha: 0.3),
+          color: ColorManager.accentCoral.withValues(alpha: 0.36),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFF57C00).withValues(alpha: 0.2),
+            color: ColorManager.accentCoral.withValues(alpha: 0.20),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -116,7 +116,7 @@ class FirebaseBackendSection extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: isMobile ? (wi < 400 ? 24 : 28) : wi * 0.028,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: ColorManager.textPrimary,
                 ),
               ),
             ],
@@ -126,7 +126,7 @@ class FirebaseBackendSection extends StatelessWidget {
             'Complete Backend Solutions',
             style: GoogleFonts.albertSans(
               fontSize: isMobile ? (wi < 400 ? 14 : 16) : wi * 0.018,
-              color: ColorManager.orange,
+              color: ColorManager.textSecondary,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
@@ -196,7 +196,7 @@ class FirebaseBackendSection extends StatelessWidget {
                               service['name']!,
                               style: GoogleFonts.albertSans(
                                 fontSize: isMobile ? (wi < 400 ? 14 : 16) : wi * 0.018,
-                                color: Colors.white,
+                                color: ColorManager.textPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -205,7 +205,7 @@ class FirebaseBackendSection extends StatelessWidget {
                               service['description'] ?? '',
                               style: GoogleFonts.albertSans(
                                 fontSize: isMobile ? (wi < 400 ? 12 : 14) : (wi < 1024 ? 11 : 13),
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: ColorManager.textSecondary,
                                 fontWeight: FontWeight.w400,
                                 height: 1.5,
                               ),

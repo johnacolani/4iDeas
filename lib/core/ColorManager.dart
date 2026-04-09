@@ -14,6 +14,7 @@ class ColorManager {
   static const accentCoralPressed = Color(0xFFC47A68);
   static const secondaryPurple = Color(0xFF7B6F9D);
   static const accentGold = Color(0xFFC9A96E);
+  static const accentGoldDark = Color(0xFF8A6A2F);
 
   static const textPrimary = Color(0xFF1F1D1A);
   static const textSecondary = Color(0xFF4A4640);

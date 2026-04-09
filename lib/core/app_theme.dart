@@ -23,10 +23,20 @@ class AppTheme {
         bodyColor: ColorManager.textPrimary,
         displayColor: ColorManager.textPrimary,
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xB3C9A96E),
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xB3C9A96E),
         surfaceTintColor: ColorManager.accentGold,
-        foregroundColor: ColorManager.backgroundDark,
+        foregroundColor: const Color(0xFF484744), // ~20% lighter than backgroundDark
+        titleTextStyle: GoogleFonts.albertSans(
+          color: const Color(0xFF484744), // app bar title text
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        toolbarTextStyle: GoogleFonts.albertSans(
+          color: const Color(0xFF484744),
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
         elevation: 1,
         scrolledUnderElevation: 2,
       ),
