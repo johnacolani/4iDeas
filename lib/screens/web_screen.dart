@@ -39,7 +39,7 @@ class _WebScreenState extends State<WebScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: wi < 600 ? 170 : (wi < 1024 ? 190 : 210),
+                    height: wi < 600 ? 90 : (wi < 1024 ? 105 : 130),
                   ),
                   GlassOutlinedText(
                     text: 'We design and build',
@@ -61,7 +61,14 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.bold,
-                                    color: ColorManager.blue,
+                                      color: const Color(0xFF0A84FF),
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0xCCFFFFFF),
+                                          blurRadius: 6,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
                                   ),
                                 ),
                                 SelectableText(
@@ -69,7 +76,14 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.bold,
-                                    color: ColorManager.blue,
+                                      color: const Color(0xFF3DDC84),
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0xCCFFFFFF),
+                                          blurRadius: 6,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
                                   ),
                                 ),
                                 SelectableText(
@@ -77,7 +91,14 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.bold,
-                                    color: ColorManager.blue,
+                                      color: const Color(0xFFA2AAAD),
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0xCCFFFFFF),
+                                          blurRadius: 6,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
                                   ),
                                 ),
                                 SelectableText(
@@ -85,7 +106,14 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.bold,
-                                    color: ColorManager.blue,
+                                      color: const Color(0xFF4285F4),
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0xCCFFFFFF),
+                                          blurRadius: 6,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
                                   ),
                                 ),
                               ],
@@ -109,7 +137,14 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.bold,
-                                        color: ColorManager.blue,
+                                        color: const Color(0xFF0A84FF),
+                                        shadows: const [
+                                          Shadow(
+                                            color: Color(0xCCFFFFFF),
+                                            blurRadius: 6,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     SelectableText(
@@ -117,7 +152,14 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.bold,
-                                        color: ColorManager.blue,
+                                        color: const Color(0xFF3DDC84),
+                                        shadows: const [
+                                          Shadow(
+                                            color: Color(0xCCFFFFFF),
+                                            blurRadius: 6,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     SelectableText(
@@ -125,7 +167,14 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.bold,
-                                        color: ColorManager.blue,
+                                        color: const Color(0xFFA2AAAD),
+                                        shadows: const [
+                                          Shadow(
+                                            color: Color(0xCCFFFFFF),
+                                            blurRadius: 6,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     SelectableText(
@@ -133,7 +182,14 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.bold,
-                                        color: ColorManager.blue,
+                                        color: const Color(0xFF4285F4),
+                                        shadows: const [
+                                          Shadow(
+                                            color: Color(0xCCFFFFFF),
+                                            blurRadius: 6,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -147,18 +203,18 @@ class _WebScreenState extends State<WebScreen> {
                     style: GoogleFonts.albertSans(
                       fontSize: isMobile ? (wi < 400 ? 16 : 18) : (isTablet ? 22 : 26),
                       fontWeight: FontWeight.bold,
-                      color: ColorManager.orange,
+                      color: ColorManager.accentGold,
                     ),
                   ),
                   SizedBox(
-                    height: he * 0.01,
+                    height: wi < 600 ? 8 : (wi < 1024 ? 10 : 12),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile
                           ? wi * 0.05
                           : (isTablet ? wi * 0.08 : wi * 0.1),
-                      vertical: isMobile ? he * 0.025 : (isTablet ? he * 0.05 : he * 0.05),
+                      vertical: isMobile ? 16 : (isTablet ? 20 : 12),
                     ),
                     child: SelectableText(
                       'that give you and your customers the best experience possible',
@@ -166,32 +222,29 @@ class _WebScreenState extends State<WebScreen> {
                       style: GoogleFonts.albertSans(
                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 16 : 20),
                         fontWeight: FontWeight.bold,
-                        color: ColorManager.white,
+                        color: ColorManager.primaryTealPressed,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: isMobile ? he * 0.01 : he * 0.015),
-                    child: SizedBox(
-                      width: isMobile
-                          ? wi * 0.9
-                          : (isTablet ? wi * 0.5 : wi * 0.3),
-                      child: const AutoScrollImage(),
-                    ),
-                  ),
                   SizedBox(
-                    height: he * 0.025,
+                    width: isMobile
+                        ? wi * 0.9
+                        : (isTablet ? wi * 0.5 : wi * 0.3),
+                    child: const AutoScrollImage(),
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 8.0 : 16.0),
-                    child: Container(
-                      width: double.infinity,
-                      height: wi < 600 ? wi * 0.5 : (wi < 1024 ? wi * 0.45 : wi * 0.4),
-                      decoration: const BoxDecoration(
-                          image: DecorationImage(
-                              image:
-                                  AssetImage('assets/images/top-web-apps.png'),
-                              fit: BoxFit.contain)),
+                  Transform.translate(
+                    offset: Offset(0, -60),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8.0 : 16.0),
+                      child: Container(
+                        width: double.infinity,
+                        height: wi < 600 ? wi * 0.5 : (wi < 1024 ? wi * 0.45 : wi * 0.4),
+                        decoration: const BoxDecoration(
+                            image: DecorationImage(
+                                image:
+                                    AssetImage('assets/images/top-web-apps.png'),
+                                fit: BoxFit.contain)),
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -208,7 +261,7 @@ class _WebScreenState extends State<WebScreen> {
                       style: GoogleFonts.albertSans(
                         fontSize: isMobile ? (wi < 400 ? 18 : 20) : (isTablet ? wi * 0.028 : wi * 0.032),
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: ColorManager.accentGold,
                       ),
                     ),
                   ),
@@ -218,7 +271,11 @@ class _WebScreenState extends State<WebScreen> {
                       vertical: isMobile ? 12 : 16,
                     ),
                     child: Divider(
-                      color: Colors.white.withValues(alpha: 0.35),
+                      color: Color.lerp(
+                        ColorManager.accentGold,
+                        ColorManager.backgroundDark,
+                        0.40,
+                      )!.withValues(alpha: 0.85),
                       thickness: 1.5,
                     ),
                   ),
@@ -274,7 +331,7 @@ class GlassOutlinedText extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white.withValues(alpha: 0.20),
+                  color: ColorManager.accentCoral.withValues(alpha: 0.20),
                 ),
               ),
             ),
@@ -285,10 +342,29 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                foreground: Paint()
+                foreground: (Paint()
                   ..style = PaintingStyle.stroke
-                  ..strokeWidth = 0.8
-                  ..color = ColorManager.accentGold.withValues(alpha: 0.90),
+                  ..strokeWidth = 0.95
+                  ..shader = LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorManager.accentGold.withValues(alpha: 0.95),
+                      Color.lerp(
+                            ColorManager.accentGold,
+                            ColorManager.backgroundDark,
+                            0.45,
+                          )!
+                          .withValues(alpha: 0.95),
+                    ],
+                  ).createShader(
+                    Rect.fromLTWH(
+                      0,
+                      0,
+                      (text.length * fontSize * 0.62).clamp(fontSize * 3, fontSize * 26),
+                      fontSize * 1.6,
+                    ),
+                  )),
               ),
             ),
 
@@ -298,7 +374,7 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                color: Colors.white.withValues(alpha: 0.26),
+                color: ColorManager.orange.withValues(alpha: 0.26),
               ),
             ),
           ],

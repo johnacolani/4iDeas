@@ -697,49 +697,61 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
     int maxLines = 1,
     bool isMobile = false,
   }) {
+    final double fieldFontSize = isMobile ? 15 : 16;
+    final Color fieldBackground = const Color(0xFF124E57).withValues(alpha: 0.82);
+    final Color enabledBorderColor =
+        ColorManager.accentGoldDark.withValues(alpha: 0.55);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 0.4.h : 0.5.h),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1F35).withValues(alpha: 0.55),
+          color: fieldBackground,
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextFormField(
           controller: controller,
           maxLines: maxLines,
+          cursorColor: ColorManager.accentGold,
           style: GoogleFonts.albertSans(
-            color: ColorManager.white,
-            fontSize: isMobile ? 10.sp : 5.sp,
+            color: ColorManager.onDarkPrimary,
+            fontSize: fieldFontSize,
           ),
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
             labelStyle: GoogleFonts.albertSans(
-              color: ColorManager.white.withValues(alpha: 0.8),
-              fontSize: isMobile ? 9.sp : 4.5.sp,
+              color: ColorManager.onDarkPrimary.withValues(alpha: 0.9),
+              fontSize: fieldFontSize - 1,
+            ),
+            floatingLabelStyle: GoogleFonts.albertSans(
+              color: ColorManager.accentGold,
+              fontSize: fieldFontSize - 1,
+              fontWeight: FontWeight.w600,
             ),
             hintStyle: GoogleFonts.albertSans(
-              color: ColorManager.white.withValues(alpha: 0.5),
-              fontSize: isMobile ? 9.sp : 4.5.sp,
+              color: ColorManager.onDarkPrimary.withValues(alpha: 0.65),
+              fontSize: fieldFontSize - 1,
             ),
-            fillColor: const Color(0xFF0F1F35).withValues(alpha: 0.55),
+            fillColor: fieldBackground,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: ColorManager.blue.withValues(alpha: 0.3),
+                color: enabledBorderColor,
+                width: 1.2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: ColorManager.blue.withValues(alpha: 0.3),
+                color: enabledBorderColor,
+                width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: ColorManager.blue,
+                color: ColorManager.accentGold,
                 width: 2,
               ),
             ),
@@ -765,6 +777,10 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
     bool isRequired = true,
     bool isMobile = false,
   }) {
+    final double fieldFontSize = isMobile ? 15 : 16;
+    final Color fieldBackground = const Color(0xFF124E57).withValues(alpha: 0.84);
+    final Color enabledBorderColor =
+        ColorManager.accentGoldDark.withValues(alpha: 0.55);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 0.4.h : 0.5.h),
       child: Container(
@@ -773,8 +789,8 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF0F1F35).withValues(alpha: 0.6),
-              const Color(0xFF1A2F4A).withValues(alpha: 0.5),
+              const Color(0xFF124E57).withValues(alpha: 0.86),
+              const Color(0xFF0F3F47).withValues(alpha: 0.80),
             ],
           ),
           borderRadius: BorderRadius.circular(10),
@@ -795,35 +811,44 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: GoogleFonts.albertSans(
-              color: ColorManager.white.withValues(alpha: 0.8),
-              fontSize: isMobile ? 9.sp : 4.5.sp,
+              color: ColorManager.onDarkPrimary.withValues(alpha: 0.9),
+              fontSize: fieldFontSize - 1,
             ),
-            fillColor: const Color(0xFF0F1F35).withValues(alpha: 0.55),
+            floatingLabelStyle: GoogleFonts.albertSans(
+              color: ColorManager.accentGold,
+              fontSize: fieldFontSize - 1,
+              fontWeight: FontWeight.w600,
+            ),
+            fillColor: fieldBackground,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: ColorManager.blue.withValues(alpha: 0.3),
+                color: enabledBorderColor,
+                width: 1.2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: ColorManager.blue.withValues(alpha: 0.3),
+                color: enabledBorderColor,
+                width: 1.2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: ColorManager.blue,
+                color: ColorManager.accentGold,
                 width: 2,
               ),
             ),
           ),
-          dropdownColor: const Color(0xFF0F1F35),
+          iconEnabledColor: ColorManager.accentGold,
+          iconDisabledColor: ColorManager.onDarkSecondary,
+          dropdownColor: const Color(0xFF4A3A24),
           style: GoogleFonts.albertSans(
-            color: ColorManager.white,
-            fontSize: isMobile ? 10.sp : 5.sp,
+            color: ColorManager.onDarkPrimary,
+            fontSize: fieldFontSize,
           ),
           items: items.map((String item) {
             return DropdownMenuItem<String>(
@@ -831,7 +856,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
               child: Text(
                 item,
                 style: GoogleFonts.albertSans(
-                  color: ColorManager.white,
+                  color: ColorManager.onDarkPrimary,
                 ),
               ),
             );
@@ -864,43 +889,29 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF0F1F35).withValues(alpha: 0.7),
-            const Color(0xFF1A2F4A).withValues(alpha: 0.6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF0F3F47).withValues(alpha: 0.52),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ColorManager.blue.withValues(alpha: 0.3),
-          width: 1.5,
+          color: ColorManager.accentGoldDark.withValues(alpha: 0.45),
+          width: 1.2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: ColorManager.blue.withValues(alpha: 0.15),
-            blurRadius: 12,
-            spreadRadius: 2,
-          ),
-        ],
       ),
-      padding: EdgeInsets.all(isMobile ? 1.h : 0.6.h),
+      padding: EdgeInsets.all(isMobile ? 1.1.h : 0.9.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Target Platforms *',
             style: GoogleFonts.albertSans(
-              color: ColorManager.white,
-              fontSize: isMobile ? 9.sp : 4.sp,
+              color: const Color(0xFFE3C998),
+              fontSize: isMobile ? 10.sp : 5.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: isMobile ? 0.8.h : 0.4.h),
+          SizedBox(height: isMobile ? 0.9.h : 0.7.h),
           Wrap(
-            spacing: isMobile ? 1.w : 0.6.w,
-            runSpacing: isMobile ? 0.6.h : 0.3.h,
+            spacing: isMobile ? 1.4.w : 0.8.w,
+            runSpacing: isMobile ? 0.8.h : 0.5.h,
             children: platforms.map((platform) {
               final isSelected = _selectedPlatforms.contains(platform['name']);
               return FilterChip(
@@ -909,15 +920,19 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                   children: [
                     Icon(
                       platform['icon'] as IconData,
-                      size: isMobile ? 14.sp : 9.sp,
-                      color: isSelected ? Colors.white : ColorManager.white,
+                      size: isMobile ? 12.sp : 10.sp,
+                      color: isSelected
+                          ? const Color(0xFF2E2415)
+                          : ColorManager.onDarkPrimary,
                     ),
                     SizedBox(width: isMobile ? 0.4.w : 0.25.w),
                     Text(
                       platform['name'] as String,
                       style: GoogleFonts.albertSans(
-                        color: isSelected ? Colors.white : ColorManager.white,
-                        fontSize: isMobile ? 9.sp : 4.sp,
+                        color: isSelected
+                            ? const Color(0xFF2E2415)
+                            : ColorManager.onDarkPrimary,
+                        fontSize: isMobile ? 9.sp : 4.6.sp,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -933,18 +948,28 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                     }
                   });
                 },
-                backgroundColor: const Color(0xFF0F1F35).withValues(alpha: 0.6),
-                selectedColor: ColorManager.blue.withValues(alpha: 0.7),
-                checkmarkColor: Colors.white,
+                backgroundColor: const Color(0xFF124E57).withValues(alpha: 0.88),
+                selectedColor: const Color(0xFFE3C998),
+                checkmarkColor: const Color(0xFF2E2415),
                 side: BorderSide(
                   color: isSelected
-                      ? ColorManager.blue
-                      : ColorManager.blue.withValues(alpha: 0.5),
-                  width: isMobile ? 1.5 : 0.8,
+                      ? const Color(0xFFE3C998)
+                      : ColorManager.accentGoldDark.withValues(alpha: 0.55),
+                  width: isMobile ? 1.2 : 1.0,
+                ),
+                elevation: 0,
+                pressElevation: 0,
+                shape: StadiumBorder(
+                  side: BorderSide(
+                    color: isSelected
+                        ? const Color(0xFFE3C998)
+                        : ColorManager.accentGoldDark.withValues(alpha: 0.55),
+                    width: isMobile ? 1.2 : 1.0,
+                  ),
                 ),
                 labelPadding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 1.w : 0.5.w,
-                  vertical: isMobile ? 0.4.h : 0.2.h,
+                  horizontal: isMobile ? 1.4.w : 0.9.w,
+                  vertical: isMobile ? 0.45.h : 0.32.h,
                 ),
               );
             }).toList(),
@@ -968,22 +993,10 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           Row(
             children: [
               if (icon != null) ...[
-                Container(
-                  padding: EdgeInsets.all(isMobile ? 0.6.h : 0.5.h),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        ColorManager.orange.withValues(alpha: 0.3),
-                        ColorManager.orange.withValues(alpha: 0.2),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: ColorManager.orange,
-                    size: isMobile ? 14.sp : 12.sp,
-                  ),
+                Icon(
+                  icon,
+                  color: ColorManager.orange,
+                  size: isMobile ? 14.sp : 12.sp,
                 ),
                 SizedBox(width: 1.w),
               ],
@@ -1042,17 +1055,10 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           children: [
             Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(isMobile ? 0.8.h : 1.h),
-                  decoration: BoxDecoration(
-                    color: ColorManager.orange.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.palette,
-                    color: ColorManager.orange,
-                    size: isMobile ? 16.sp : 14.sp,
-                  ),
+                Icon(
+                  Icons.palette,
+                  color: ColorManager.orange,
+                  size: isMobile ? 16.sp : 14.sp,
                 ),
                 SizedBox(width: 1.5.w),
                 Text(
@@ -1091,7 +1097,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Text(
                         'Design Style Preference',
                         style: GoogleFonts.albertSans(
-                          color: ColorManager.white,
+                          color: const Color(0xFFE3C998),
                           fontSize: isMobile ? 10.sp : 5.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1162,7 +1168,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Text(
                         'Design Complexity Level',
                         style: GoogleFonts.albertSans(
-                          color: ColorManager.white,
+                          color: const Color(0xFFE3C998),
                           fontSize: isMobile ? 10.sp : 5.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1232,7 +1238,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Text(
                         'Color Scheme / Brand Colors',
                         style: GoogleFonts.albertSans(
-                          color: ColorManager.white,
+                          color: const Color(0xFFE3C998),
                           fontSize: isMobile ? 10.sp : 5.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1294,7 +1300,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Text(
                         'Design Inspiration / References',
                         style: GoogleFonts.albertSans(
-                          color: ColorManager.white,
+                          color: const Color(0xFFE3C998),
                           fontSize: isMobile ? 10.sp : 5.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1356,7 +1362,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Text(
                         'Brand Guidelines / Assets',
                         style: GoogleFonts.albertSans(
-                          color: ColorManager.white,
+                          color: const Color(0xFFE3C998),
                           fontSize: isMobile ? 10.sp : 5.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1401,7 +1407,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         title: Text(
           'Order Here',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.accentGoldDark,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1411,16 +1417,16 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           const AppBackground(),
           Form(
             key: _formKey,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 4.w : 8.w,
-                vertical: isMobile ? 1.h : 1.2.h,
-              ),
-              child: Scrollbar(
-                thumbVisibility: true,
-                child: CustomScrollView(
-                  slivers: [
-                  SliverToBoxAdapter(
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 4.w : 8.w,
+                      vertical: isMobile ? 1.h : 1.2.h,
+                    ),
+                    sliver: SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1623,7 +1629,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                         Text(
                                           'Submitting...',
                                           style: GoogleFonts.albertSans(
-                                            color: Colors.white,
+                                            color: ColorManager.accentGoldDark,
                                             fontSize: isMobile ? 14.sp : 7.sp,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1642,7 +1648,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                         Text(
                                           'Submit Order',
                                           style: GoogleFonts.albertSans(
-                                            color: Colors.white,
+                                            color: ColorManager.accentGoldDark,
                                             fontSize: isMobile ? 14.sp : 7.sp,
                                             fontWeight: FontWeight.bold,
                                             shadows: [
@@ -1664,9 +1670,9 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       ],
                     ),
                   ),
+                  ),
                 ],
               ),
-            ),
             ),
           ),
         ],
@@ -1712,7 +1718,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 Text(
                   'Sign Up Required',
                   style: GoogleFonts.albertSans(
-                    color: Colors.white,
+                    color: ColorManager.accentGoldDark,
                     fontSize: isMobile ? 24 : 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1721,7 +1727,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 Text(
                   'You need to sign up first to place an order. Please create an account to continue.',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: ColorManager.accentGoldDark.withValues(alpha: 0.8),
                     fontSize: isMobile ? 15 : 16,
                   ),
                   textAlign: TextAlign.center,
@@ -1791,7 +1797,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                   child: Text(
                     'Cancel',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: ColorManager.accentGoldDark.withValues(alpha: 0.7),
                       fontSize: isMobile ? 14 : 15,
                     ),
                   ),

@@ -86,10 +86,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${item.title}"?', style: GoogleFonts.albertSans(color: Colors.white)),
+        title: Text('Delete "${item.title}"?', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the service from the list.',
-          style: GoogleFonts.albertSans(color: Colors.white70),
+          style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
@@ -149,7 +149,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         title: SelectableText(
           'Services',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.accentGoldDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -191,7 +191,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                   SelectableText(
                                     'Our Services',
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.accentGoldDark,
                                       fontSize: titleFontSize,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -266,7 +266,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                     SelectableText(
                                       'Ready to start your project?',
                                       style: GoogleFonts.albertSans(
-                                        color: Colors.white,
+                                        color: ColorManager.accentGoldDark,
                                         fontSize: sectionTitleSize,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -324,8 +324,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 0,
+            spreadRadius: 0,
+            offset: const Offset(6, 6),
           ),
         ],
       ),
@@ -363,7 +364,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     SelectableText(
                       item.subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: ColorManager.accentGoldDark.withValues(alpha: 0.70),
                         fontSize: bodyFontSize - 2,
                         fontWeight: FontWeight.w500,
                       ),
@@ -377,7 +378,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           SelectableText(
             item.description,
             style: TextStyle(
-              color: Colors.white,
+              color: ColorManager.accentGoldDark,
               fontSize: bodyFontSize,
               height: 1.6,
             ),
@@ -400,7 +401,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       child: SelectableText(
                         detail,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: ColorManager.accentGoldDark.withValues(alpha: 0.90),
                           fontSize: bodyFontSize - 1,
                           height: 1.5,
                         ),

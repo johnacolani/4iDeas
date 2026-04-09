@@ -24,6 +24,13 @@ class SlidingMenu extends StatefulWidget {
 
 class _SlidingMenuState extends State<SlidingMenu>
     with SingleTickerProviderStateMixin {
+  static const List<Color> _drawerMenuAccents = <Color>[
+    ColorManager.primaryTeal,
+    ColorManager.secondaryPurple,
+    ColorManager.accentCoral,
+    ColorManager.accentGold,
+  ];
+
   bool isSlideOpen = false;
   late AnimationController _animationController;
   @override
@@ -45,6 +52,23 @@ class _SlidingMenuState extends State<SlidingMenu>
       _animationController.reverse();
     });
     context.go(path);
+  }
+
+  Color _menuAccentAt(int index) => _drawerMenuAccents[index % _drawerMenuAccents.length];
+
+  MenuItem _buildMenuItem({
+    required int index,
+    required IconData icon,
+    required String title,
+    required VoidCallback onPressed,
+  }) {
+    return MenuItem(
+      icon: icon,
+      title: title,
+      onPressed: onPressed,
+      accentColor: _menuAccentAt(index),
+      cardColor: ColorManager.primaryTealPressed.withValues(alpha: 0.72),
+    );
   }
 
   @override
@@ -76,17 +100,17 @@ class _SlidingMenuState extends State<SlidingMenu>
         AnimatedBuilder(
           animation: _animationController,
           builder: (context, child) {
-            final isFullyOpen = _animationController.value == 1.0;
+            final progress = _animationController.value;
             return Positioned(
               left: drawerWidth,
               top: 0,
               right: 0,
               bottom: 0,
               child: IgnorePointer(
-                ignoring: !isFullyOpen,
+                ignoring: progress <= 0,
                 child: GestureDetector(
                   onTap: () {
-                    if (isFullyOpen) {
+                    if (progress > 0) {
                       setState(() {
                         isSlideOpen = false;
                         _animationController.reverse();
@@ -94,9 +118,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                     }
                   },
                   child: Container(
-                    color: isFullyOpen 
-                        ? Colors.black.withValues(alpha: 0.3)
-                        : Colors.transparent,
+                    color: ColorManager.primaryTeal.withValues(alpha: 0.10 * progress),
                   ),
                 ),
               ),
@@ -126,8 +148,8 @@ class _SlidingMenuState extends State<SlidingMenu>
               ),
               ClipRRect(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(isMobile ? 20 : 24),
-                  bottomLeft: Radius.circular(isMobile ? 20 : 24),
+                  topLeft: Radius.zero,
+                  bottomLeft: Radius.zero,
                 ),
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -135,225 +157,244 @@ class _SlidingMenuState extends State<SlidingMenu>
                     height: he,
                     width: drawerWidth,
                     decoration: BoxDecoration(
+                      // Light-gold frosted glossy background
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          ColorManager.backgroundDark.withValues(alpha: 0.94),
-                          ColorManager.backgroundDarkElevated.withValues(alpha: 0.96),
-                          ColorManager.secondaryPurple.withValues(alpha: 0.14),
+                          Colors.white.withValues(alpha: 0.28),
+                          const Color(0xFFF3E7CF).withValues(alpha: 0.82),
+                          const Color(0xFFE0C695).withValues(alpha: 0.78),
                         ],
                       ),
                       border: Border(
                         right: BorderSide(
-                          color: ColorManager.accentGold.withValues(alpha: 0.28),
+                          color: const Color(0xFF8A6A2F).withValues(alpha: 0.30),
                           width: 1,
                         ),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.28),
-                          blurRadius: 24,
+                          color: Colors.white.withValues(alpha: 0.22),
+                          blurRadius: 14,
+                          offset: const Offset(-1, -1),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 14,
                           offset: const Offset(6, 0),
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(isMobile ? 14.0 : 16.0),
-                      child: Column(
-                        children: [
-                      SizedBox(
-                        height: isMobile ? 2.h : 3.h,
-                      ),
-                      // Header Section with better styling
-                      Container(
-                        padding: EdgeInsets.all(isMobile ? 14 : 16),
-                        decoration: BoxDecoration(
-                          color: ColorManager.onDarkPrimary.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: ColorManager.accentGold.withValues(alpha: 0.28),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: ColorManager.accentGold.withValues(alpha: 0.08),
-                              blurRadius: 14,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: ColorManager.accentGold.withValues(alpha: 0.55),
-                                  width: 2,
-                                ),
-                              ),
-                              child: CircleAvatar(
-                                radius: isMobile ? 35 : 38,
-                                backgroundImage:
-                                    const AssetImage('assets/images/logo.png'),
-                              ),
-                            ),
-                            SizedBox(height: isMobile ? 12 : 14),
-                            SelectableText(
-                              '4iDeas',
-                              style: TextStyle(
-                                fontSize: isMobile ? 22 : (isTablet ? 20 : 18),
-                                fontWeight: FontWeight.bold,
-                                color: ColorManager.accentGold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            SizedBox(height: isMobile ? 12 : 14),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isMobile ? 12 : 14,
-                                vertical: isMobile ? 10 : 12,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    ColorManager.primaryTeal.withValues(alpha: 0.18),
-                                    ColorManager.accentGold.withValues(alpha: 0.12),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: ColorManager.accentGold.withValues(alpha: 0.25),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  SelectableText(
-                                    "Let's Talk! 🇺🇸",
-                                    style: TextStyle(
-                                      fontSize: isMobile ? 14 : (isTablet ? 13 : 12),
-                                      color: ColorManager.onDarkSecondary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  SelectableText(
-                                    "804-774-9008",
-                                    style: TextStyle(
-                                      fontSize: isMobile ? 18 : (isTablet ? 17 : 16),
-                                      color: ColorManager.onDarkPrimary,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: -20,
+                          left: -30,
+                          right: -20,
+                          child: Container(
+                            height: 130,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.24),
+                                  Colors.transparent,
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: isMobile ? 20 : 24),
-                      Expanded(
-                        child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isMobile ? 4.0 : 8.0,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                            MenuItem(
-                              icon: Icons.design_services,
-                              title: 'Services',
-                              onPressed: () {
-                                _closeDrawerAndGo(AppRoutes.services);
-                              },
-                            ),
-                            MenuItem(
-                              icon: Icons.people,
-                              title: 'About Us',
-                              onPressed: () {
-                                _closeDrawerAndGo(AppRoutes.about);
-                              },
-                            ),
-                            MenuItem(
-                              icon: Icons.note,
-                              title: 'Portfolio',
-                              onPressed: () {
-                                _closeDrawerAndGo(AppRoutes.portfolio);
-                              },
-                            ),
-                            MenuItem(
-                              icon: Icons.contrast,
-                              title: 'Order Here',
-                              onPressed: () {
-                                final authState = context.read<AuthBloc>().state;
-                                if (authState is Authenticated) {
-                                  _closeDrawerAndGo(AppRoutes.orderHere);
-                                } else {
-                                  setState(() {
-                                    isSlideOpen = false;
-                                    _animationController.reverse();
-                                  });
-                                  _showSignUpRequiredDialog(context, isMobile);
-                                }
-                              },
-                            ),
-                            BlocBuilder<AuthBloc, AuthState>(
-                              builder: (context, authState) {
-                                if (authState is Authenticated || authState is EmailNotVerified) {
-                                  return Column(
-                                    children: [
-                                      MenuItem(
-                                        icon: Icons.person,
-                                        title: 'Profile',
-                                        onPressed: () {
-                                          _closeDrawerAndGo(AppRoutes.profile);
-                                        },
+                        Padding(
+                          padding: EdgeInsets.all(isMobile ? 14.0 : 16.0),
+                          child: Column(
+                            children: [
+                              SizedBox(height: isMobile ? 2.h : 3.h),
+                              Container(
+                                padding: EdgeInsets.all(isMobile ? 14 : 16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFAF7F2).withValues(alpha: 0.92),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: ColorManager.primaryTeal.withValues(alpha: 0.28),
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: ColorManager.primaryTeal.withValues(alpha: 0.10),
+                                      blurRadius: 14,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: ColorManager.accentCoral.withValues(alpha: 0.68),
+                                          width: 2,
+                                        ),
                                       ),
-                                      // Admin menu items (only visible to admins)
-                                      if (AdminService.isAdmin()) ...[
-                                        MenuItem(
-                                          icon: Icons.admin_panel_settings,
-                                          title: 'Admin - Orders',
+                                      child: CircleAvatar(
+                                        radius: isMobile ? 35 : 38,
+                                        backgroundImage: const AssetImage('assets/images/logo.png'),
+                                      ),
+                                    ),
+                                    SizedBox(height: isMobile ? 12 : 14),
+                                    SelectableText(
+                                      '4iDeas',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 22 : (isTablet ? 20 : 18),
+                                        fontWeight: FontWeight.bold,
+                                        color: ColorManager.textPrimary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                    SizedBox(height: isMobile ? 12 : 14),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 12 : 14,
+                                        vertical: isMobile ? 10 : 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            ColorManager.primaryTeal.withValues(alpha: 0.14),
+                                            ColorManager.secondaryPurple.withValues(alpha: 0.10),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: ColorManager.primaryTeal.withValues(alpha: 0.35),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          SelectableText(
+                                            "Let's Talk! 🇺🇸",
+                                            style: TextStyle(
+                                              fontSize: isMobile ? 14 : (isTablet ? 13 : 12),
+                                              color: ColorManager.textSecondary,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          SelectableText(
+                                            "804-774-9008",
+                                            style: TextStyle(
+                                              fontSize: isMobile ? 18 : (isTablet ? 17 : 16),
+                                              color: ColorManager.textPrimary,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: isMobile ? 20 : 24),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  physics: const BouncingScrollPhysics(),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isMobile ? 4.0 : 8.0,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _buildMenuItem(
+                                          index: 0,
+                                          icon: Icons.design_services,
+                                          title: 'Services',
+                                          onPressed: () => _closeDrawerAndGo(AppRoutes.services),
+                                        ),
+                                        _buildMenuItem(
+                                          index: 1,
+                                          icon: Icons.people,
+                                          title: 'About Us',
+                                          onPressed: () => _closeDrawerAndGo(AppRoutes.about),
+                                        ),
+                                        _buildMenuItem(
+                                          index: 2,
+                                          icon: Icons.note,
+                                          title: 'Portfolio',
+                                          onPressed: () => _closeDrawerAndGo(AppRoutes.portfolio),
+                                        ),
+                                        _buildMenuItem(
+                                          index: 3,
+                                          icon: Icons.contrast,
+                                          title: 'Order Here',
                                           onPressed: () {
-                                            _closeDrawerAndGo(AppRoutes.adminOrders);
+                                            final authState = context.read<AuthBloc>().state;
+                                            if (authState is Authenticated) {
+                                              _closeDrawerAndGo(AppRoutes.orderHere);
+                                            } else {
+                                              setState(() {
+                                                isSlideOpen = false;
+                                                _animationController.reverse();
+                                              });
+                                              _showSignUpRequiredDialog(context, isMobile);
+                                            }
+                                          },
+                                        ),
+                                        BlocBuilder<AuthBloc, AuthState>(
+                                          builder: (context, authState) {
+                                            if (authState is Authenticated || authState is EmailNotVerified) {
+                                              return Column(
+                                                children: [
+                                                  _buildMenuItem(
+                                                    index: 4,
+                                                    icon: Icons.person,
+                                                    title: 'Profile',
+                                                    onPressed: () => _closeDrawerAndGo(AppRoutes.profile),
+                                                  ),
+                                                  if (AdminService.isAdmin())
+                                                    _buildMenuItem(
+                                                      index: 5,
+                                                      icon: Icons.admin_panel_settings,
+                                                      title: 'Admin - Orders',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.adminOrders),
+                                                    ),
+                                                ],
+                                              );
+                                            }
+                                            return const SizedBox.shrink();
+                                          },
+                                        ),
+                                        _buildMenuItem(
+                                          index: 6,
+                                          icon: Icons.connect_without_contact,
+                                          title: 'Contact Us',
+                                          onPressed: () {
+                                            setState(() {
+                                              isSlideOpen = false;
+                                              _animationController.reverse();
+                                            });
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialogData(wi: wi, he: he);
+                                              },
+                                            );
                                           },
                                         ),
                                       ],
-                                    ],
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            MenuItem(
-                              icon: Icons.connect_without_contact,
-                              title: 'Contact Us',
-                              onPressed: () {
-                                setState(() {
-                                  isSlideOpen = false;
-                                  _animationController.reverse();
-                                });
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialogData(wi: wi , he: he,);
-                                  },
-                                );
-                              },
-                            ),
-                              ],
-                            ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
@@ -390,21 +431,22 @@ class _SlidingMenuState extends State<SlidingMenu>
                   height: 110,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                       colors: [
-                        ColorManager.backgroundDarkElevated,
-                        ColorManager.surfaceDark,
+                        Colors.white.withValues(alpha: 0.28),
+                        const Color(0xFFF3E7CF).withValues(alpha: 0.82),
+                        const Color(0xFFE0C695).withValues(alpha: 0.78),
                       ],
                     ),
                     border: Border.all(
-                      color: ColorManager.accentGold.withValues(alpha: 0.4),
+                      color: const Color(0xFF8A6A2F).withValues(alpha: 0.30),
                       width: 1,
                     ),
                   ),
                   alignment: Alignment.center,
                   child: AnimatedIcon(
-                    color: ColorManager.accentGold,
+                    color: ColorManager.textPrimary,
                     size: 25,
                     icon: AnimatedIcons.menu_close,
                     progress: _animationController.view,
@@ -548,7 +590,6 @@ class _SlidingMenuState extends State<SlidingMenu>
     );
   }
 }
-
 
 
 class CustomMenuClipper extends CustomClipper<Path> {

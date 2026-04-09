@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 // Conditional import for Platform detection
 import 'dart:io' show Platform if (dart.library.html) 'package:four_ideas/core/platform_stub.dart';
 
-class PortfolioAppCard extends StatelessWidget {
+class PortfolioAppCard extends StatefulWidget {
   final PortfolioApp app;
   final bool isMobile;
   final bool isTablet;
@@ -29,12 +29,37 @@ class PortfolioAppCard extends StatelessWidget {
   });
 
   @override
+  State<PortfolioAppCard> createState() => _PortfolioAppCardState();
+}
+
+class _PortfolioAppCardState extends State<PortfolioAppCard> {
+  bool _isHovered = false;
+
+  PortfolioApp get app => widget.app;
+  bool get isMobile => widget.isMobile;
+  bool get isTablet => widget.isTablet;
+  bool get showAdminActions => widget.showAdminActions;
+  VoidCallback? get onEdit => widget.onEdit;
+  VoidCallback? get onDelete => widget.onDelete;
+
+  @override
   Widget build(BuildContext context) {
     final double cardPadding = isMobile ? 10.0 : 12.0;
     final double titleSize = isMobile ? 15 : (isTablet ? 17 : 18);
     final double bodySize = isMobile ? 12 : (isTablet ? 13 : 14);
 
     final String? primaryUrl = app.webUrl ?? app.appStoreUrl ?? app.playStoreUrl;
+    final Color cardGradientStart =
+        ColorManager.backgroundDark.withValues(alpha: 0.68);
+    final Color cardGradientEnd = ColorManager.blue.withValues(alpha: 0.22);
+    final Color accentGold = _goldForBackground(
+      _estimateGradientBackground(
+        context,
+        start: cardGradientStart,
+        end: cardGradientEnd,
+      ),
+    );
+    final bool isDarkCardSurface = accentGold == const Color(0xFFE3C998);
 
     void onCardTap(BuildContext context) {
       if (app.caseStudyId != null) {
@@ -51,28 +76,42 @@ class PortfolioAppCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          onTap: (app.caseStudyId != null || primaryUrl != null)
-              ? () => onCardTap(context)
-              : null,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          child: InkWell(
+            onTap: (app.caseStudyId != null || primaryUrl != null)
+                ? () => onCardTap(context)
+                : null,
+            borderRadius: BorderRadius.circular(12),
+            child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
             width: double.infinity,
             padding: EdgeInsets.all(cardPadding),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  cardGradientStart,
+                  cardGradientEnd,
+                ],
+              ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: accentGold.withValues(alpha: 0.38),
                 width: 1.5,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.24),
+                        blurRadius: 14,
+                        offset: const Offset(0, 10),
+                      ),
+                    ]
+                  : const [],
             ),
             child: isMobile
               ? Column(
@@ -80,14 +119,20 @@ class PortfolioAppCard extends StatelessWidget {
                   children: [
                     SizedBox(
                       height: 180,
-                      child: _buildImageBlock(mobileVertical: true),
+                      child: _buildImageBlock(
+                        mobileVertical: true,
+                        accentGold: accentGold,
+                      ),
                     ),
                     SizedBox(height: 8),
-                    _buildButtons(),
+                    _buildButtons(
+                      isDarkSurface: isDarkCardSurface,
+                      accentGold: accentGold,
+                    ),
                     SizedBox(height: 8),
                     Expanded(
                       child: SingleChildScrollView(
-                        child: _buildTextContent(titleSize, bodySize),
+                        child: _buildTextContent(titleSize, bodySize, accentGold),
                       ),
                     ),
                   ],
@@ -102,22 +147,29 @@ class PortfolioAppCard extends StatelessWidget {
                           Expanded(
                             flex: 5,
                             child: SingleChildScrollView(
-                              child: _buildTextContent(titleSize, bodySize),
+                              child: _buildTextContent(titleSize, bodySize, accentGold),
                             ),
                           ),
                           SizedBox(width: 12),
                           Expanded(
                             flex: 4,
-                            child: _buildImageBlock(mobileVertical: false),
+                            child: _buildImageBlock(
+                              mobileVertical: false,
+                              accentGold: accentGold,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     SizedBox(height: 8),
-                    _buildButtons(),
+                    _buildButtons(
+                      isDarkSurface: isDarkCardSurface,
+                      accentGold: accentGold,
+                    ),
                   ],
                 ),
           ),
+        ),
         ),
       ),
     );
@@ -160,7 +212,7 @@ class PortfolioAppCard extends StatelessWidget {
     return cardContent;
   }
 
-  Widget _buildTextContent(double titleSize, double bodySize) {
+  Widget _buildTextContent(double titleSize, double bodySize, Color accentGold) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -168,7 +220,7 @@ class PortfolioAppCard extends StatelessWidget {
         SelectableText(
           app.name,
           style: GoogleFonts.albertSans(
-            color: ColorManager.orange,
+            color: accentGold,
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
           ),
@@ -188,7 +240,30 @@ class PortfolioAppCard extends StatelessWidget {
     );
   }
 
-  Widget _buildButtons() {
+  Color _estimateGradientBackground(
+    BuildContext context, {
+    required Color start,
+    required Color end,
+  }) {
+    // App showcase cards are translucent over mostly light content areas.
+    // Estimate contrast against a light canvas to better match visual output.
+    final Color canvas = Colors.white;
+    final Color blendedStart = Color.alphaBlend(start, canvas);
+    final Color blendedEnd = Color.alphaBlend(end, canvas);
+    return Color.lerp(blendedStart, blendedEnd, 0.5) ?? blendedStart;
+  }
+
+  Color _goldForBackground(Color background) {
+    const Color darkGold = Color(0xFF8A6A2F);
+    const Color lightGold = Color(0xFFE3C998);
+    final brightness = ThemeData.estimateBrightnessForColor(background);
+    return brightness == Brightness.light ? darkGold : lightGold;
+  }
+
+  Widget _buildButtons({
+    required bool isDarkSurface,
+    required Color accentGold,
+  }) {
     return Center(
       child: Scrollbar(
         thumbVisibility: true,
@@ -207,13 +282,21 @@ class PortfolioAppCard extends StatelessWidget {
                   icon: Icons.language,
                   onTap: () => _launch(app.webUrl!),
                   isMobile: isMobile,
+                  isDarkSurface: isDarkSurface,
+                  accentGold: accentGold,
                 ),
               ),
             // Show platform-specific store buttons after web app button
             if (!kIsWeb)
-              ..._buildPlatformStoreButtonsWithSpacing()
+              ..._buildPlatformStoreButtonsWithSpacing(
+                isDarkSurface: isDarkSurface,
+                accentGold: accentGold,
+              )
             else
-              ..._buildAllStoreButtonsWithSpacing(),
+              ..._buildAllStoreButtonsWithSpacing(
+                isDarkSurface: isDarkSurface,
+                accentGold: accentGold,
+              ),
           ],
         ),
         ),
@@ -221,7 +304,10 @@ class PortfolioAppCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImageBlock({bool mobileVertical = false}) {
+  Widget _buildImageBlock({
+    bool mobileVertical = false,
+    required Color accentGold,
+  }) {
     final Widget content = app.useComingSoonPlaceholder
         ? Container(
             color: ColorManager.blue.withValues(alpha: 0.2),
@@ -229,7 +315,7 @@ class PortfolioAppCard extends StatelessWidget {
             child: SelectableText(
               'Coming Soon',
               style: GoogleFonts.albertSans(
-                color: ColorManager.orange,
+                color: accentGold,
                 fontSize: isMobile ? 14 : 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -260,7 +346,7 @@ class PortfolioAppCard extends StatelessWidget {
                             horizontal: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: ColorManager.orange.withValues(alpha: 0.9),
+                            color: accentGold.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.vertical(
                               bottom: Radius.circular(8),
                             ),
@@ -305,7 +391,10 @@ class PortfolioAppCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildPlatformStoreButtons() {
+  List<Widget> _buildPlatformStoreButtons({
+    required bool isDarkSurface,
+    required Color accentGold,
+  }) {
     final List<Widget> buttons = [];
     
     try {
@@ -317,6 +406,8 @@ class PortfolioAppCard extends StatelessWidget {
             icon: Icons.apple,
             onTap: () => _launch(app.appStoreUrl!),
             isMobile: isMobile,
+            isDarkSurface: isDarkSurface,
+            accentGold: accentGold,
           ),
         );
         // Also show Play Store if available
@@ -327,6 +418,8 @@ class PortfolioAppCard extends StatelessWidget {
               icon: Icons.android,
               onTap: () => _launch(app.playStoreUrl!),
               isMobile: isMobile,
+              isDarkSurface: isDarkSurface,
+              accentGold: accentGold,
             ),
           );
         }
@@ -339,6 +432,8 @@ class PortfolioAppCard extends StatelessWidget {
             icon: Icons.android,
             onTap: () => _launch(app.playStoreUrl!),
             isMobile: isMobile,
+            isDarkSurface: isDarkSurface,
+            accentGold: accentGold,
           ),
         );
         // Also show App Store if available
@@ -349,6 +444,8 @@ class PortfolioAppCard extends StatelessWidget {
               icon: Icons.apple,
               onTap: () => _launch(app.appStoreUrl!),
               isMobile: isMobile,
+              isDarkSurface: isDarkSurface,
+              accentGold: accentGold,
             ),
           );
         }
@@ -362,6 +459,8 @@ class PortfolioAppCard extends StatelessWidget {
               icon: Icons.apple,
               onTap: () => _launch(app.appStoreUrl!),
               isMobile: isMobile,
+              isDarkSurface: isDarkSurface,
+              accentGold: accentGold,
             ),
           );
         }
@@ -372,19 +471,27 @@ class PortfolioAppCard extends StatelessWidget {
               icon: Icons.android,
               onTap: () => _launch(app.playStoreUrl!),
               isMobile: isMobile,
+              isDarkSurface: isDarkSurface,
+              accentGold: accentGold,
             ),
           );
         }
       }
     } catch (e) {
       // Fallback to showing all buttons if Platform is not available
-      return _buildAllStoreButtons();
+      return _buildAllStoreButtons(
+        isDarkSurface: isDarkSurface,
+        accentGold: accentGold,
+      );
     }
     
     return buttons;
   }
 
-  List<Widget> _buildAllStoreButtons() {
+  List<Widget> _buildAllStoreButtons({
+    required bool isDarkSurface,
+    required Color accentGold,
+  }) {
     final List<Widget> buttons = [];
     if (app.appStoreUrl != null) {
       buttons.add(
@@ -393,6 +500,8 @@ class PortfolioAppCard extends StatelessWidget {
           icon: Icons.apple,
           onTap: () => _launch(app.appStoreUrl!),
           isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
         ),
       );
     }
@@ -403,14 +512,23 @@ class PortfolioAppCard extends StatelessWidget {
           icon: Icons.android,
           onTap: () => _launch(app.playStoreUrl!),
           isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
         ),
       );
     }
     return buttons;
   }
 
-  List<Widget> _buildPlatformStoreButtonsWithSpacing() {
-    final List<Widget> buttons = _buildPlatformStoreButtons();
+  List<Widget> _buildPlatformStoreButtonsWithSpacing({
+    required bool isDarkSurface,
+    required Color accentGold,
+  }) {
+    final List<Widget> buttons =
+        _buildPlatformStoreButtons(
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        );
     return buttons.asMap().entries.map((entry) {
       final index = entry.key;
       final button = entry.value;
@@ -424,8 +542,15 @@ class PortfolioAppCard extends StatelessWidget {
     }).toList();
   }
 
-  List<Widget> _buildAllStoreButtonsWithSpacing() {
-    final List<Widget> buttons = _buildAllStoreButtons();
+  List<Widget> _buildAllStoreButtonsWithSpacing({
+    required bool isDarkSurface,
+    required Color accentGold,
+  }) {
+    final List<Widget> buttons =
+        _buildAllStoreButtons(
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        );
     return buttons.asMap().entries.map((entry) {
       final index = entry.key;
       final button = entry.value;
@@ -452,17 +577,25 @@ class _LinkChip extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool isMobile;
+  final bool isDarkSurface;
+  final Color accentGold;
 
   const _LinkChip({
     required this.label,
     required this.icon,
     required this.onTap,
     required this.isMobile,
+    required this.isDarkSurface,
+    required this.accentGold,
   });
 
   @override
   Widget build(BuildContext context) {
     const double minTouchTarget = 48.0;
+    final Color chipBackground = accentGold.withValues(alpha: 0.2);
+    final Color buttonTitleColor = accentGold;
+    final Color buttonBorderColor = accentGold.withValues(alpha: 0.7);
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -483,19 +616,19 @@ class _LinkChip extends StatelessWidget {
                 vertical: isMobile ? 8 : 10,
               ),
               decoration: BoxDecoration(
-                color: ColorManager.orange.withValues(alpha: 0.2),
+                color: chipBackground,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: ColorManager.orange.withValues(alpha: 0.5)),
+                border: Border.all(color: buttonBorderColor),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: isMobile ? 12 : 14, color: ColorManager.orange),
+                  Icon(icon, size: isMobile ? 12 : 14, color: buttonTitleColor),
                   SizedBox(width: 4),
                   SelectableText(
                     label,
                     style: GoogleFonts.albertSans(
-                      color: ColorManager.orange,
+                      color: buttonTitleColor,
                       fontSize: isMobile ? 10 : 11,
                       fontWeight: FontWeight.w600,
                     ),

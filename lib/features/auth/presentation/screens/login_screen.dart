@@ -107,8 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
+                                    blurRadius: 0,
+                                    spreadRadius: 0,
+                                    offset: const Offset(6, 6),
                                   ),
                                 ],
                               ),
@@ -128,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Text(
                                     'Sign in to continue',
                                     style: TextStyle(
-                                      color: ColorManager.orange,
+                                      color: ColorManager.accentGoldDark,
                                       fontSize: isMobile ? 16 : 18,
                                     ),
                                     textAlign: TextAlign.center,
