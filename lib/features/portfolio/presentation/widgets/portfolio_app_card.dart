@@ -572,7 +572,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
   }
 }
 
-class _LinkChip extends StatelessWidget {
+class _LinkChip extends StatefulWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
@@ -590,54 +590,73 @@ class _LinkChip extends StatelessWidget {
   });
 
   @override
+  State<_LinkChip> createState() => _LinkChipState();
+}
+
+class _LinkChipState extends State<_LinkChip> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     const double minTouchTarget = 48.0;
-    final Color chipBackground = accentGold.withValues(alpha: 0.2);
-    final Color buttonTitleColor = accentGold;
-    final Color buttonBorderColor = accentGold.withValues(alpha: 0.7);
+    final Color baseTitleColor =
+        Color.lerp(widget.accentGold, Colors.black, 0.22) ?? widget.accentGold;
+    final Color baseBorderColor =
+        Color.lerp(widget.accentGold, Colors.black, 0.18) ?? widget.accentGold;
+    final Color hoverTitleColor =
+        Color.lerp(widget.accentGold, Colors.white, 0.65) ?? widget.accentGold;
+    final Color hoverBorderColor =
+        Color.lerp(widget.accentGold, Colors.white, 0.75) ?? widget.accentGold;
+    final Color buttonTitleColor = _isHovered ? hoverTitleColor : baseTitleColor;
+    final Color buttonBorderColor = _isHovered ? hoverBorderColor : baseBorderColor;
+    final Color chipBackground = _isHovered
+        ? widget.accentGold.withValues(alpha: 0.20)
+        : widget.accentGold.withValues(alpha: 0.14);
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
+          onTap: widget.onTap,
           borderRadius: BorderRadius.circular(8),
+          splashFactory: NoSplash.splashFactory,
+          overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
           child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: minTouchTarget,
-            minHeight: minTouchTarget,
-          ),
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 10 : 12,
-                vertical: isMobile ? 8 : 10,
-              ),
-              decoration: BoxDecoration(
-                color: chipBackground,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: buttonBorderColor),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: isMobile ? 12 : 14, color: buttonTitleColor),
-                  SizedBox(width: 4),
-                  SelectableText(
-                    label,
-                    style: GoogleFonts.albertSans(
-                      color: buttonTitleColor,
-                      fontSize: isMobile ? 10 : 11,
-                      fontWeight: FontWeight.w600,
+            constraints: const BoxConstraints(
+              minWidth: minTouchTarget,
+              minHeight: minTouchTarget,
+            ),
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: widget.isMobile ? 10 : 12,
+                  vertical: widget.isMobile ? 8 : 10,
+                ),
+                decoration: BoxDecoration(
+                  color: chipBackground,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: buttonBorderColor),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(widget.icon, size: widget.isMobile ? 12 : 14, color: buttonTitleColor),
+                    SizedBox(width: 4),
+                    SelectableText(
+                      widget.label,
+                      style: GoogleFonts.albertSans(
+                        color: buttonTitleColor,
+                        fontSize: widget.isMobile ? 10 : 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
         ),
       ),
     );
