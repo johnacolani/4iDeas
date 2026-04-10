@@ -118,7 +118,9 @@ class _SlidingMenuState extends State<SlidingMenu>
                     }
                   },
                   child: Container(
-                    color: ColorManager.primaryTeal.withValues(alpha: 0.10 * progress),
+                    color: isSlideOpen
+                        ? ColorManager.primaryTeal.withValues(alpha: 0.10 * progress)
+                        : Colors.transparent,
                   ),
                 ),
               ),

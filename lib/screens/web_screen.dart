@@ -25,6 +25,8 @@ class _WebScreenState extends State<WebScreen> {
     // Responsive breakpoints
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
+    // Keep hero text below the fixed top navigation in fullscreen desktop.
+    final double heroTopSpacing = isMobile ? 0 : (isTablet ? 88 : (he * 0.24).clamp(170.0, 240.0));
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -38,9 +40,7 @@ class _WebScreenState extends State<WebScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: wi < 600 ? 90 : (wi < 1024 ? 105 : 130),
-                  ),
+                  SizedBox(height: heroTopSpacing),
                   GlassOutlinedText(
                     text: 'We design and build',
                     fontSize: isMobile
@@ -216,13 +216,17 @@ class _WebScreenState extends State<WebScreen> {
                           : (isTablet ? wi * 0.08 : wi * 0.1),
                       vertical: isMobile ? 16 : (isTablet ? 20 : 12),
                     ),
-                    child: SelectableText(
-                      'that give you and your customers the best experience possible',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.albertSans(
-                        fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 16 : 20),
-                        fontWeight: FontWeight.bold,
-                        color: ColorManager.primaryTealPressed,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: SelectableText(
+                        'that give you and your customers the best experience possible',
+                        textAlign: TextAlign.center,
+                        textDirection: TextDirection.ltr,
+                        style: GoogleFonts.albertSans(
+                          fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 16 : 20),
+                          fontWeight: FontWeight.bold,
+                          color: ColorManager.primaryTealPressed,
+                        ),
                       ),
                     ),
                   ),
