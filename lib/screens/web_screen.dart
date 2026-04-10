@@ -246,7 +246,7 @@ class _WebScreenState extends State<WebScreen> {
                         decoration: const BoxDecoration(
                             image: DecorationImage(
                                 image:
-                                    AssetImage('assets/images/top-web-apps.png'),
+                                    AssetImage('assets/images/top-web-apps-01.png'),
                                 fit: BoxFit.contain)),
                       ),
                     ),

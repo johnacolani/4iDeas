@@ -252,7 +252,7 @@ class HomeWidget extends StatelessWidget {
                               // ],
                               image: DecorationImage(
                                   image: AssetImage(
-                                      'assets/images/top-web-apps.png'),
+                                      'assets/images/top-web-apps-01.png'),
                                   fit: BoxFit.contain)),
                         ),
                       ),
