@@ -515,21 +515,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.amber[100]),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        backgroundColor: ColorManager.accentGold,
         leading: Semantics(
           label: 'Back to home',
           button: true,
           child: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
             onPressed: () => context.go(AppRoutes.home),
           ),
         ),
         title: Text(
           'Portfolio',
           style: GoogleFonts.albertSans(
-            color: ColorManager.accentGoldDark,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.w600,
           ),
@@ -937,7 +937,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 }
 
-class _DesignSystemHighlight extends StatefulWidget {
+class _DesignSystemHighlight extends StatelessWidget {
   final double designSystemTitleSize;
   final double designSystemSubSize;
   final double bodySize;
@@ -953,69 +953,25 @@ class _DesignSystemHighlight extends StatefulWidget {
   });
 
   @override
-  State<_DesignSystemHighlight> createState() => _DesignSystemHighlightState();
-}
-
-class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: widget.isMobile ? 12 : 24),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
       child: Material(
         color: Colors.transparent,
-        child: MouseRegion(
-          onEnter: (_) => setState(() => _isHovered = true),
-          onExit: (_) => setState(() => _isHovered = false),
-          child: InkWell(
-            onTap: widget.onTapLink,
-            borderRadius: BorderRadius.circular(20),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOutCubic,
-              transform: Matrix4.translationValues(0, _isHovered ? -2 : 0, 0),
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: widget.isMobile ? 20 : 28,
-                vertical: widget.isMobile ? 20 : 24,
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    ColorManager.orange.withValues(alpha: 0.12),
-                    ColorManager.orange.withValues(alpha: 0.06),
-                    Colors.white.withValues(alpha: 0.04),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: ColorManager.orange.withValues(alpha: 0.5),
-                  width: 1.5,
-                ),
-                boxShadow: _isHovered
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.14),
-                          blurRadius: 20,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 10),
-                        ),
-                        BoxShadow(
-                          color: ColorManager.orange.withValues(alpha: 0.18),
-                          blurRadius: 18,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 6),
-                        ),
-                      ]
-                    : const [],
-              ),
-              child: Row(
+        child: InkWell(
+          onTap: onTapLink,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 20 : 28,
+              vertical: isMobile ? 20 : 24,
+            ),
+            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (!widget.isMobile) ...[
+                if (!isMobile) ...[
                   Icon(
                     Icons.palette_outlined,
                     size: 48,
@@ -1031,7 +987,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
                         'My Own Design System',
                         style: GoogleFonts.playfairDisplay(
                           color: ColorManager.accentGoldDark,
-                          fontSize: widget.designSystemTitleSize,
+                          fontSize: designSystemTitleSize,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
                           height: 1.2,
@@ -1042,7 +998,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
                         'developed by: John Colani',
                         style: GoogleFonts.cormorantGaramond(
                           color: ColorManager.accentGoldDark.withValues(alpha: 0.9),
-                          fontSize: widget.designSystemSubSize + 2,
+                          fontSize: designSystemSubSize + 2,
                           fontWeight: FontWeight.w600,
                           fontStyle: FontStyle.italic,
                           letterSpacing: 0.3,
@@ -1053,7 +1009,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
                         'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.accentGoldDark.withValues(alpha: 0.8),
-                          fontSize: widget.bodySize - 1,
+                          fontSize: bodySize - 1,
                           height: 1.4,
                           fontWeight: FontWeight.w400,
                         ),
@@ -1071,7 +1027,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
                             'Open Design System →',
                             style: GoogleFonts.albertSans(
                               color: ColorManager.orange,
-                              fontSize: widget.bodySize,
+                              fontSize: bodySize,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.2,
                             ),
@@ -1081,7 +1037,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
                     ],
                   ),
                 ),
-                if (widget.isMobile) ...[
+                if (isMobile) ...[
                   SizedBox(width: 12),
                   Icon(
                     Icons.palette_outlined,
@@ -1093,7 +1049,6 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight> {
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -1110,23 +1065,18 @@ class _DesignPhilosophyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => context.push(AppRoutes.designPhilosophy),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isMobile ? 18 : 22),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: ColorManager.orange.withValues(alpha: 0.4),
-              width: 1.5,
-            ),
-          ),
-          child: Row(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.designPhilosophy),
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(isMobile ? 18 : 22),
+            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+            child: Row(
             children: [
               Icon(
                 Icons.auto_awesome,
@@ -1166,6 +1116,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -1228,63 +1179,50 @@ class _OpenSourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = _iconFromName(item.iconName);
-    final Color cardBackground = Colors.white.withValues(alpha: 0.14);
-    final Color effectiveBackground = Color.alphaBlend(
-      cardBackground,
-      Theme.of(context).scaffoldBackgroundColor,
-    );
-    const Color darkGold = Color(0xFF8A6A2F);
-    const Color lightGold = Color(0xFFE3C998);
-    final Color titleGold =
-        ThemeData.estimateBrightnessForColor(effectiveBackground) ==
-                Brightness.light
-            ? darkGold
-            : lightGold;
 
-    Widget cardContent = InkWell(
-      onTap: () async {
-        final uri = Uri.parse(item.url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        }
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: EdgeInsets.all(isMobile ? 16 : 20),
-        decoration: BoxDecoration(
-          color: cardBackground,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: ColorManager.orange, size: 28),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SelectableText(
-                    item.title,
-                    style: GoogleFonts.albertSans(
-                      color: titleGold,
-                      fontSize: bodySize + 2,
-                      fontWeight: FontWeight.w600,
+    Widget cardContent = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          final uri = Uri.parse(item.url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: EdgeInsets.all(isMobile ? 16 : 20),
+          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+          child: Row(
+            children: [
+              Icon(icon, color: ColorManager.orange, size: 28),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectableText(
+                      item.title,
+                      style: GoogleFonts.albertSans(
+                        color: ColorManager.accentGoldDark,
+                        fontSize: bodySize + 2,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  SelectableText(
-                    item.subtitle,
-                    style: GoogleFonts.albertSans(
-                      color: titleGold.withValues(alpha: 0.84),
-                      fontSize: bodySize - 1,
+                    SizedBox(height: 4),
+                    SelectableText(
+                      item.subtitle,
+                      style: GoogleFonts.albertSans(
+                        color: ColorManager.textSecondary,
+                        fontSize: bodySize - 1,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Icon(Icons.open_in_new, color: ColorManager.blue, size: 20),
-          ],
+              Icon(Icons.open_in_new, color: ColorManager.blue, size: 20),
+            ],
+          ),
         ),
       ),
     );

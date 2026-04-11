@@ -1,8 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/helper/app_background.dart';
+import 'package:go_router/go_router.dart';
 
 Widget _principleItem(double bodySize, String text) {
   return Padding(
@@ -10,7 +11,7 @@ Widget _principleItem(double bodySize, String text) {
     child: SelectableText(
       '• $text',
       style: GoogleFonts.albertSans(
-        color: Colors.white,
+        color: ColorManager.textSecondary,
         fontSize: bodySize,
         height: 1.45,
       ),
@@ -22,21 +23,14 @@ Widget _frameworkItem(double bodySize, double he, String name, String descriptio
   return Container(
     width: double.infinity,
     padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: 0.05),
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(
-        color: ColorManager.orange.withValues(alpha: 0.4),
-        width: 1,
-      ),
-    ),
+    decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SelectableText(
           name,
           style: GoogleFonts.albertSans(
-            color: Colors.amber,
+            color: ColorManager.accentGoldDark,
             fontSize: bodySize + 1,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
@@ -49,7 +43,7 @@ Widget _frameworkItem(double bodySize, double he, String name, String descriptio
           SelectableText(
             description,
             style: GoogleFonts.albertSans(
-              color: Colors.white,
+              color: ColorManager.textSecondary,
               fontSize: bodySize,
               height: 1.5,
             ),
@@ -63,12 +57,12 @@ const double _circleMethodIndent = 32; // 2 tabs
 
 Widget _circleMethodDescription(double bodySize) {
   final baseStyle = GoogleFonts.albertSans(
-    color: Colors.white,
+    color: ColorManager.textSecondary,
     fontSize: bodySize,
     height: 1.5,
   );
   final boldStyle = GoogleFonts.albertSans(
-    color: Colors.white,
+    color: ColorManager.textPrimary,
     fontSize: bodySize,
     height: 1.5,
     fontWeight: FontWeight.bold,
@@ -109,8 +103,8 @@ Widget _circleMethodDescription(double bodySize) {
 }
 
 Widget _starDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize, height: 1.5);
-  final boldStyle = GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize, height: 1.5, fontWeight: FontWeight.bold);
+  final baseStyle = GoogleFonts.albertSans(color: ColorManager.textSecondary, fontSize: bodySize, height: 1.5);
+  final boldStyle = GoogleFonts.albertSans(color: ColorManager.textPrimary, fontSize: bodySize, height: 1.5, fontWeight: FontWeight.bold);
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -123,8 +117,8 @@ Widget _starDescription(double bodySize) {
 }
 
 Widget _userTypesDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize, height: 1.5);
-  final boldStyle = GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize, height: 1.5, fontWeight: FontWeight.bold);
+  final baseStyle = GoogleFonts.albertSans(color: ColorManager.textSecondary, fontSize: bodySize, height: 1.5);
+  final boldStyle = GoogleFonts.albertSans(color: ColorManager.textPrimary, fontSize: bodySize, height: 1.5, fontWeight: FontWeight.bold);
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -136,8 +130,8 @@ Widget _userTypesDescription(double bodySize) {
 }
 
 Widget _wcagDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize, height: 1.5);
-  final boldStyle = GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize, height: 1.5, fontWeight: FontWeight.bold);
+  final baseStyle = GoogleFonts.albertSans(color: ColorManager.textSecondary, fontSize: bodySize, height: 1.5);
+  final boldStyle = GoogleFonts.albertSans(color: ColorManager.textPrimary, fontSize: bodySize, height: 1.5, fontWeight: FontWeight.bold);
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -171,7 +165,7 @@ Widget _processStep(double bodySize, String number, String stageName, String des
       SelectableText.rich(
         TextSpan(
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.textSecondary,
             fontSize: bodySize,
             height: 1.55,
           ),
@@ -179,7 +173,7 @@ Widget _processStep(double bodySize, String number, String stageName, String des
             TextSpan(
               text: '$number. ',
               style: GoogleFonts.albertSans(
-                color: Colors.amber,
+                color: ColorManager.accentGoldDark,
                 fontSize: bodySize,
                 fontWeight: FontWeight.bold,
               ),
@@ -202,7 +196,7 @@ Widget _processStep(double bodySize, String number, String stageName, String des
           child: SelectableText(
             '• $b',
             style: GoogleFonts.albertSans(
-              color: Colors.white,
+              color: ColorManager.textSecondary,
               fontSize: bodySize - 1,
               height: 1.45,
             ),
@@ -228,13 +222,25 @@ class DesignPhilosophyScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.amber[100]),
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.portfolio);
+            }
+          },
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        ),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        backgroundColor: ColorManager.accentGold,
         title: SelectableText(
           'Design Philosophy & Principles',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 16 : 18,
             fontWeight: FontWeight.w600,
           ),
@@ -273,7 +279,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                           SelectableText(
                             'Understanding humans deeply and solving real problems with care, clarity, and intention.',
                             style: GoogleFonts.albertSans(
-                              color: Colors.white,
+                              color: ColorManager.textPrimary,
                               fontSize: bodySize,
                               height: 1.5,
                               fontWeight: FontWeight.bold,
@@ -291,7 +297,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'Design does not begin with screens or tools',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.amber,
+                                    color: ColorManager.accentGoldDark,
                                     fontSize: bodySize,
                                     height: 1.55,
                                     fontWeight: FontWeight.bold,
@@ -300,7 +306,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'It begins with understanding people.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -309,7 +315,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'In digital products:',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -318,7 +324,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'visual clutter is a cognitive sharp edge;',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -326,7 +332,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'poor hierarchy creates fatigue;',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -334,7 +340,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'ignoring privacy can harm users.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -343,7 +349,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText.rich(
                                   TextSpan(
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.textSecondary,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -361,7 +367,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                       TextSpan(
                                         text: 'overwhelm them',
                                         style: GoogleFonts.albertSans(
-                                          color: Colors.amber.shade200,
+                                          color: ColorManager.orange,
                                           fontSize: bodySize,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -385,7 +391,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText.rich(
                                   TextSpan(
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.textSecondary,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -393,7 +399,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                       TextSpan(
                                         text: 'Empathy is not a step in the process',
                                         style: GoogleFonts.albertSans(
-                                          color: Colors.amber,
+                                          color: ColorManager.accentGoldDark,
                                           fontSize: bodySize,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -405,7 +411,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'it is the foundation of every decision.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -414,7 +420,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'Users open up only when they feel respected.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -423,7 +429,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText.rich(
                                   TextSpan(
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.textSecondary,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -441,7 +447,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                       TextSpan(
                                         text: 'observation',
                                         style: GoogleFonts.albertSans(
-                                          color: Colors.amber.shade200,
+                                          color: ColorManager.orange,
                                           fontSize: bodySize,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -454,7 +460,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'I listen more than I ask.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -463,7 +469,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'Without empathy, design becomes decoration.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                     fontWeight: FontWeight.bold,
@@ -473,7 +479,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'AI can analyze patterns, but it cannot feel frustration, fear, or trust. That responsibility remains human.',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.white,
+                                    color: ColorManager.textSecondary,
                                     fontSize: bodySize,
                                     height: 1.55,
                                   ),
@@ -493,7 +499,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 SelectableText(
                                   'Structured thinking in eight stages:',
                                   style: GoogleFonts.albertSans(
-                                    color: Colors.amber,
+                                    color: ColorManager.accentGoldDark,
                                     fontSize: bodySize,
                                     height: 1.55,
                                     fontWeight: FontWeight.bold,
@@ -641,7 +647,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                               padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 10),
                               child: Icon(
                                 Icons.star_rounded,
-                                color: Colors.amber.withValues(alpha: 0.7 - i * 0.08),
+                                color: ColorManager.accentGold.withValues(alpha: 0.75 - i * 0.08),
                                 size: isMobile ? 28 : 36,
                               ),
                             )),
@@ -681,47 +687,34 @@ class _PhilosophyBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isMobile ? 16 : 20),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
-              width: 1,
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SelectableText(
+            title,
+            style: GoogleFonts.albertSans(
+              color: ColorManager.orange,
+              fontSize: bodySize + 2,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SelectableText(
-                title,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.orange,
-                  fontSize: bodySize + 2,
-                  fontWeight: FontWeight.bold,
-                ),
+          SizedBox(height: he * 0.012),
+          if (customChild != null)
+            customChild!
+          else
+            SelectableText(
+              content!,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.textSecondary,
+                fontSize: bodySize,
+                height: 1.55,
               ),
-              SizedBox(height: he * 0.012),
-              if (customChild != null)
-                customChild!
-              else
-                SelectableText(
-                  content!,
-                  style: GoogleFonts.albertSans(
-                    color: Colors.white,
-                    fontSize: bodySize,
-                    height: 1.55,
-                  ),
-                ),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }

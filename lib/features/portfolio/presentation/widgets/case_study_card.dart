@@ -5,7 +5,7 @@ import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 
-class CaseStudyCard extends StatefulWidget {
+class CaseStudyCard extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
   final bool isMobile;
   final bool isTablet;
@@ -27,116 +27,80 @@ class CaseStudyCard extends StatefulWidget {
   });
 
   @override
-  State<CaseStudyCard> createState() => _CaseStudyCardState();
-}
-
-class _CaseStudyCardState extends State<CaseStudyCard> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final double titleSize = widget.isMobile ? 20 : (widget.isTablet ? 22 : 24);
-    final double subtitleSize = widget.isMobile ? 14 : (widget.isTablet ? 15 : 16);
-    const Color darkGold = Color(0xFFB8934A);
-    const Color lightGold = Color(0xFFE3C998);
-    final Color accentGold = _isHovered ? lightGold : darkGold;
+    final double titleSize = isMobile ? 20 : (isTablet ? 22 : 24);
+    final double subtitleSize = isMobile ? 14 : (isTablet ? 15 : 16);
 
-    Widget cardContent = Material(
-      color: Colors.transparent,
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
+    Widget cardContent = Padding(
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           // Use go (not push) so the browser URL updates on web; push can leave the bar at /portfolio.
-          onTap: () => context.go(AppRoutes.portfolioCaseStudyPath(widget.caseStudy.id)),
-          borderRadius: BorderRadius.circular(16),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  ColorManager.backgroundDark.withValues(alpha: 0.68),
-                  ColorManager.blue.withValues(alpha: 0.40),
-                  ColorManager.orange.withValues(alpha: 0.26),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: ColorManager.orange.withValues(alpha: 0.4)),
-              boxShadow: _isHovered
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.22),
-                        blurRadius: 14,
-                        offset: const Offset(0, 10),
-                      ),
-                    ]
-                  : const [],
-            ),
-            child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(widget.isMobile ? 20 : 24),
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SelectableText(
-              widget.caseStudy.title,
-              style: GoogleFonts.albertSans(
-                color: Colors.white,
-                fontSize: titleSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 6),
-            SelectableText(
-              widget.caseStudy.subtitle,
-              style: GoogleFonts.albertSans(
-                color: accentGold,
-                fontSize: subtitleSize,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 12),
-            SelectableText(
-              widget.caseStudy.overview,
-              maxLines: 3,
-              style: GoogleFonts.albertSans(
-                color: Colors.white.withValues(alpha: 0.9),
-                fontSize: widget.isMobile ? 14 : 15,
-                height: 1.5,
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
+          onTap: () => context.go(AppRoutes.portfolioCaseStudyPath(caseStudy.id)),
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(isMobile ? 20 : 24),
+            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SelectableText(
-                  'View Case Study',
+                  caseStudy.title,
                   style: GoogleFonts.albertSans(
-                    color: accentGold,
-                    fontSize: widget.isMobile ? 14 : 15,
+                    color: ColorManager.accentGoldDark,
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 6),
+                SelectableText(
+                  caseStudy.subtitle,
+                  style: GoogleFonts.albertSans(
+                    color: ColorManager.orange,
+                    fontSize: subtitleSize,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward,
-                  color: accentGold,
-                  size: widget.isMobile ? 18 : 20,
+                SizedBox(height: 12),
+                SelectableText(
+                  caseStudy.overview,
+                  maxLines: 3,
+                  style: GoogleFonts.albertSans(
+                    color: ColorManager.textSecondary,
+                    fontSize: isMobile ? 14 : 15,
+                    height: 1.5,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    SelectableText(
+                      'View Case Study',
+                      style: GoogleFonts.albertSans(
+                        color: ColorManager.orange,
+                        fontSize: isMobile ? 14 : 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward,
+                      color: ColorManager.orange,
+                      size: isMobile ? 18 : 20,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
-        ),
-        ),
-      ),
       ),
     );
 
-    if (widget.showAdminActions &&
-        (widget.onEdit != null || widget.onDelete != null || widget.onEditAdaptiveSection != null)) {
+    if (showAdminActions &&
+        (onEdit != null || onDelete != null || onEditAdaptiveSection != null)) {
       return Stack(
         clipBehavior: Clip.none,
         children: [
@@ -147,25 +111,25 @@ class _CaseStudyCardState extends State<CaseStudyCard> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (widget.onEditAdaptiveSection != null)
+                if (onEditAdaptiveSection != null)
                   IconButton(
                     icon: Icon(Icons.image, size: 22, color: ColorManager.blue),
-                    onPressed: widget.onEditAdaptiveSection,
+                    onPressed: onEditAdaptiveSection,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 36, minHeight: 36),
                     tooltip: 'Edit Adaptive section images',
                   ),
-                if (widget.onEdit != null)
+                if (onEdit != null)
                   IconButton(
                     icon: Icon(Icons.edit, size: 22, color: ColorManager.orange),
-                    onPressed: widget.onEdit,
+                    onPressed: onEdit,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 36, minHeight: 36),
                   ),
-                if (widget.onDelete != null)
+                if (onDelete != null)
                   IconButton(
                     icon: Icon(Icons.delete_outline, size: 22, color: Colors.red),
-                    onPressed: widget.onDelete,
+                    onPressed: onDelete,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 36, minHeight: 36),
                   ),

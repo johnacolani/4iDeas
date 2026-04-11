@@ -20,6 +20,31 @@ class ColorManager {
   static const textSecondary = Color(0xFF4A4640);
   static const textMuted = Color(0xFF6E6860);
 
+  /// Light gray surfaces (cards, case study blocks on light backgrounds).
+  static const containerSurface = Color(0xFFE8E6E3);
+  static const containerSurfaceMuted = Color(0xFFDDDAD6);
+  static const containerBorder = Color(0xFFC4BFBA);
+
+  /// Portfolio cards (design system highlight, case studies, apps, etc.): light gold wash, gold border, flat (no shadow).
+  static BoxDecoration portfolioHighlightCardDecoration({double borderRadius = 20}) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          accentGold.withValues(alpha: 0.12),
+          accentGold.withValues(alpha: 0.06),
+          const Color(0xFFFFFFFF).withValues(alpha: 0.04),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: accentGold.withValues(alpha: 0.5),
+        width: 1.5,
+      ),
+    );
+  }
+
   /// Text on dark surfaces (drawer, overlays) — do not use [textPrimary] there.
   static const onDarkPrimary = Color(0xFFF5F2EB);
   static const onDarkSecondary = Color(0xFFC9C4BC);

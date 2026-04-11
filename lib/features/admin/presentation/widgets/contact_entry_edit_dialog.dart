@@ -83,7 +83,7 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
               ),
               const SizedBox(height: 6),
               DropdownButtonFormField<String>(
-                value: _type,
+                initialValue: _type,
                 dropdownColor: const Color(0xff2d3748),
                 style: GoogleFonts.albertSans(color: Colors.white),
                 decoration: InputDecoration(

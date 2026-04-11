@@ -30,17 +30,13 @@ class PortfolioPublicationCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () => _launch(publication.url),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 14 : 18,
             vertical: isMobile ? 12 : 16,
           ),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-          ),
+          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
           child: Row(
             children: [
               Icon(

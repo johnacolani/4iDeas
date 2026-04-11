@@ -249,10 +249,10 @@ class _DesignApproachBlock extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(isMobile ? 16 : 20),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: ColorManager.containerSurface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: ColorManager.orange.withValues(alpha: 0.35),
+              color: ColorManager.containerBorder,
               width: 1,
             ),
           ),
@@ -271,7 +271,7 @@ class _DesignApproachBlock extends StatelessWidget {
               SelectableText(
                 content,
                 style: GoogleFonts.albertSans(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: ColorManager.textSecondary,
                   fontSize: bodySize,
                   height: 1.55,
                 ),
@@ -310,10 +310,10 @@ class _ClickableImage extends StatelessWidget {
       height: h,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: ColorManager.containerSurfaceMuted,
         borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
+          color: ColorManager.containerBorder,
         ),
       ),
       child: Column(
@@ -322,14 +322,14 @@ class _ClickableImage extends StatelessWidget {
         children: [
           Icon(
             Icons.image_not_supported,
-            color: Colors.white.withValues(alpha: 0.5),
+            color: ColorManager.textMuted,
             size: 40,
           ),
           SizedBox(height: 8),
           SelectableText(
             'Image not found',
             style: GoogleFonts.albertSans(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: ColorManager.textMuted,
               fontSize: 12,
             ),
           ),
@@ -341,10 +341,10 @@ class _ClickableImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
-      color: Colors.white.withValues(alpha: 0.05),
+      color: ColorManager.containerSurface,
       borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
       border: Border.all(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: ColorManager.containerBorder,
         width: 1,
       ),
     );
@@ -458,7 +458,7 @@ class _ImageWithCaption extends StatelessWidget {
               SelectableText(
                 displayDescription,
                 style: GoogleFonts.albertSans(
-                  color: Colors.white,
+                  color: ColorManager.textSecondary,
                   fontSize: bodySize * 0.9,
                   height: 1.35,
                 ),
@@ -503,22 +503,25 @@ class _FullScreenImage extends StatelessWidget {
                       return Container(
                         padding: EdgeInsets.all(40),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: ColorManager.containerSurface,
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: ColorManager.containerBorder,
+                          ),
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.image_not_supported,
-                              color: Colors.white,
+                              color: ColorManager.textMuted,
                               size: 60,
                             ),
                             SizedBox(height: 16),
                             SelectableText(
                               'Image not found',
                               style: GoogleFonts.albertSans(
-                                color: Colors.white,
+                                color: ColorManager.textSecondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -536,12 +539,12 @@ class _FullScreenImage extends StatelessWidget {
               child: IconButton(
                 icon: Icon(
                   Icons.close,
-                  color: Colors.white,
+                  color: ColorManager.textPrimary,
                   size: 32,
                 ),
                 onPressed: () => context.pop(),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.black.withValues(alpha: 0.6),
+                  backgroundColor: ColorManager.containerSurface,
                   shape: CircleBorder(),
                 ),
               ),
@@ -593,37 +596,23 @@ class _SectionBlock extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: title == 'The Solution'
                   ? [
-                      const Color(0xFFD81B60).withValues(alpha: 0.08),
-                      const Color(0xFFB0154F).withValues(alpha: 0.05),
-                      const Color(0xFFD81B60).withValues(alpha: 0.06),
+                      ColorManager.containerSurface,
+                      ColorManager.containerSurfaceMuted,
+                      const Color(0xFFE8D5DC),
                     ]
                   : [
-                      Colors.white.withValues(alpha: 0.15),
-                      Colors.white.withValues(alpha: 0.08),
-                      Colors.white.withValues(alpha: 0.12),
+                      ColorManager.containerSurface,
+                      ColorManager.containerSurfaceMuted,
+                      ColorManager.containerSurface,
                     ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: title == 'The Solution'
-                  ? const Color(0xFFD81B60).withValues(alpha: 0.18)
-                  : Colors.white.withValues(alpha: 0.3),
+                  ? const Color(0xFFD81B60).withValues(alpha: 0.35)
+                  : ColorManager.containerBorder,
               width: 1.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                spreadRadius: 2,
-                offset: const Offset(0, 4),
-              ),
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.1),
-                blurRadius: 15,
-                spreadRadius: -5,
-                offset: const Offset(0, -2),
-              ),
-            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +629,7 @@ class _SectionBlock extends StatelessWidget {
               SelectableText(
                 content,
                 style: GoogleFonts.albertSans(
-                  color: Colors.white,
+                  color: ColorManager.textSecondary,
                   fontSize: bodySize,
                   height: 1.6,
                 ),
@@ -654,7 +643,7 @@ class _SectionBlock extends StatelessWidget {
                   ),
                   style: FilledButton.styleFrom(
                     backgroundColor: ColorManager.orange,
-                    foregroundColor: Colors.white,
+                    foregroundColor: ColorManager.backgroundDark,
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile ? 16 : 20,
                       vertical: 14,

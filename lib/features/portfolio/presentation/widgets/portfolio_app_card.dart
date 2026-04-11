@@ -33,8 +33,6 @@ class PortfolioAppCard extends StatefulWidget {
 }
 
 class _PortfolioAppCardState extends State<PortfolioAppCard> {
-  bool _isHovered = false;
-
   PortfolioApp get app => widget.app;
   bool get isMobile => widget.isMobile;
   bool get isTablet => widget.isTablet;
@@ -49,17 +47,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     final double bodySize = isMobile ? 12 : (isTablet ? 13 : 14);
 
     final String? primaryUrl = app.webUrl ?? app.appStoreUrl ?? app.playStoreUrl;
-    final Color cardGradientStart =
-        ColorManager.backgroundDark.withValues(alpha: 0.68);
-    final Color cardGradientEnd = ColorManager.blue.withValues(alpha: 0.22);
-    final Color accentGold = _goldForBackground(
-      _estimateGradientBackground(
-        context,
-        start: cardGradientStart,
-        end: cardGradientEnd,
-      ),
-    );
-    final bool isDarkCardSurface = accentGold == const Color(0xFFE3C998);
+    /// Light portfolio card surface — chips use dark gold on light wash.
+    final Color accentGold = ColorManager.accentGold;
+    const bool isDarkCardSurface = false;
 
     void onCardTap(BuildContext context) {
       if (app.caseStudyId != null) {
@@ -76,43 +66,15 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       borderRadius: BorderRadius.circular(12),
       child: Material(
         color: Colors.transparent,
-        child: MouseRegion(
-          onEnter: (_) => setState(() => _isHovered = true),
-          onExit: (_) => setState(() => _isHovered = false),
-          child: InkWell(
-            onTap: (app.caseStudyId != null || primaryUrl != null)
-                ? () => onCardTap(context)
-                : null,
-            borderRadius: BorderRadius.circular(12),
-            child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOutCubic,
+        child: InkWell(
+          onTap: (app.caseStudyId != null || primaryUrl != null)
+              ? () => onCardTap(context)
+              : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
             width: double.infinity,
             padding: EdgeInsets.all(cardPadding),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  cardGradientStart,
-                  cardGradientEnd,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: accentGold.withValues(alpha: 0.38),
-                width: 1.5,
-              ),
-              boxShadow: _isHovered
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.24),
-                        blurRadius: 14,
-                        offset: const Offset(0, 10),
-                      ),
-                    ]
-                  : const [],
-            ),
+            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
             child: isMobile
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -132,7 +94,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                     SizedBox(height: 8),
                     Expanded(
                       child: SingleChildScrollView(
-                        child: _buildTextContent(titleSize, bodySize, accentGold),
+                        child: _buildTextContent(titleSize, bodySize),
                       ),
                     ),
                   ],
@@ -147,7 +109,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                           Expanded(
                             flex: 5,
                             child: SingleChildScrollView(
-                              child: _buildTextContent(titleSize, bodySize, accentGold),
+                              child: _buildTextContent(titleSize, bodySize),
                             ),
                           ),
                           SizedBox(width: 12),
@@ -169,7 +131,6 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   ],
                 ),
           ),
-        ),
         ),
       ),
     );
@@ -212,7 +173,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     return cardContent;
   }
 
-  Widget _buildTextContent(double titleSize, double bodySize, Color accentGold) {
+  Widget _buildTextContent(double titleSize, double bodySize) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -220,7 +181,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         SelectableText(
           app.name,
           style: GoogleFonts.albertSans(
-            color: accentGold,
+            color: ColorManager.accentGoldDark,
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
           ),
@@ -229,7 +190,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         Text(
           app.description,
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.textSecondary,
             fontSize: bodySize,
             height: 1.3,
           ),
@@ -238,26 +199,6 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         ),
       ],
     );
-  }
-
-  Color _estimateGradientBackground(
-    BuildContext context, {
-    required Color start,
-    required Color end,
-  }) {
-    // App showcase cards are translucent over mostly light content areas.
-    // Estimate contrast against a light canvas to better match visual output.
-    final Color canvas = Colors.white;
-    final Color blendedStart = Color.alphaBlend(start, canvas);
-    final Color blendedEnd = Color.alphaBlend(end, canvas);
-    return Color.lerp(blendedStart, blendedEnd, 0.5) ?? blendedStart;
-  }
-
-  Color _goldForBackground(Color background) {
-    const Color darkGold = Color(0xFF8A6A2F);
-    const Color lightGold = Color(0xFFE3C998);
-    final brightness = ThemeData.estimateBrightnessForColor(background);
-    return brightness == Brightness.light ? darkGold : lightGold;
   }
 
   Widget _buildButtons({
@@ -355,7 +296,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                             child: Text(
                               'Coming Soon',
                               style: GoogleFonts.albertSans(
-                                color: Colors.white,
+                                color: ColorManager.backgroundDark,
                                 fontSize: isMobile ? 12 : 14,
                                 fontWeight: FontWeight.bold,
                               ),

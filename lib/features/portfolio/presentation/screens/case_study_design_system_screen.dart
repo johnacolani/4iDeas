@@ -23,12 +23,33 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: ColorManager.accentGold,
+          iconTheme: IconThemeData(color: ColorManager.backgroundDark),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
             onPressed: () => context.pop(),
           ),
+          title: Text(
+            'Design system',
+            style: GoogleFonts.albertSans(
+              color: ColorManager.backgroundDark,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
-        body: const Center(child: Text('Design system not found for this case study.')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'Design system not found for this case study.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.textSecondary,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
       );
     }
 
@@ -67,14 +88,18 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
           const AppBackground(),
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: ColoredBox(
-                  color: Colors.white,
-                  child: buildDesignSystemHtmlView(
-                    webRelativePath: paths.webRelativePath,
-                    flutterAssetPath: paths.flutterAssetPath,
+              padding: const EdgeInsets.all(12),
+              child: Container(
+                decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+                padding: const EdgeInsets.all(6),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: ColoredBox(
+                    color: Colors.white,
+                    child: buildDesignSystemHtmlView(
+                      webRelativePath: paths.webRelativePath,
+                      flutterAssetPath: paths.flutterAssetPath,
+                    ),
                   ),
                 ),
               ),
