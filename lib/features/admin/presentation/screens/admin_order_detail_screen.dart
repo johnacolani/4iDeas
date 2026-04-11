@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
+import '../../../../app_router.dart';
 import 'package:go_router/go_router.dart';
 
 class AdminOrderDetailScreen extends StatefulWidget {
@@ -93,7 +94,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
             child: Text(
               '$label:',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: ColorManager.textMuted,
                 fontSize: isMobile ? 14 : 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -103,7 +104,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
             child: Text(
               value,
               style: TextStyle(
-                color: Colors.white,
+                color: ColorManager.textPrimary,
                 fontSize: isMobile ? 14 : 15,
               ),
             ),
@@ -130,15 +131,31 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.amber),
-        backgroundColor: const Color(0xff020923),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        leadingWidth: 56,
+        backgroundColor: ColorManager.accentGold,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.home);
+            }
+          },
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        ),
         title: Text(
           'Order Details',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
       body: Stack(
@@ -154,21 +171,14 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 // Order Info Card
                 Container(
                   padding: EdgeInsets.all(isMobile ? 20 : 24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      width: 1.5,
-                    ),
-                  ),
+                  decoration: ColorManager.adminPanelCardDecoration(borderRadius: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         appName,
                         style: GoogleFonts.albertSans(
-                          color: Colors.white,
+                          color: ColorManager.textPrimary,
                           fontSize: isMobile ? 24 : 26,
                           fontWeight: FontWeight.bold,
                         ),
@@ -210,10 +220,10 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                   Container(
                     padding: EdgeInsets.all(isMobile ? 20 : 24),
                     decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: ColorManager.containerSurface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.green.withValues(alpha: 0.3),
+                        color: Colors.green.shade600.withValues(alpha: 0.45),
                         width: 1.5,
                       ),
                     ),
@@ -238,7 +248,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           existingResponse,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: ColorManager.textPrimary,
                             fontSize: isMobile ? 14 : 15,
                           ),
                         ),
@@ -253,10 +263,10 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                   Container(
                     padding: EdgeInsets.all(isMobile ? 20 : 24),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.1),
+                      color: ColorManager.containerSurface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.blue.withValues(alpha: 0.3),
+                        color: ColorManager.primaryTeal.withValues(alpha: 0.55),
                         width: 1.5,
                       ),
                     ),
@@ -265,12 +275,12 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.person, color: Colors.blue, size: 20),
+                            Icon(Icons.person, color: ColorManager.primaryTeal, size: 20),
                             const SizedBox(width: 8),
                             Text(
                               'Client Response',
                               style: TextStyle(
-                                color: Colors.blue,
+                                color: ColorManager.primaryTeal,
                                 fontSize: isMobile ? 16 : 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -281,7 +291,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           clientResponse,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: ColorManager.textPrimary,
                             fontSize: isMobile ? 14 : 15,
                           ),
                         ),
@@ -294,21 +304,14 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 // Response Form
                 Container(
                   padding: EdgeInsets.all(isMobile ? 20 : 24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      width: 1.5,
-                    ),
-                  ),
+                  decoration: ColorManager.orderFormCardDecoration(borderRadius: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         existingResponse.isEmpty ? 'Send Response to Client' : 'Update Response',
                         style: GoogleFonts.albertSans(
-                          color: Colors.white,
+                          color: ColorManager.textPrimary,
                           fontSize: isMobile ? 20 : 22,
                           fontWeight: FontWeight.bold,
                         ),
@@ -317,28 +320,28 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                       TextField(
                         controller: _responseController,
                         maxLines: 8,
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: ColorManager.textPrimary),
                         decoration: InputDecoration(
                           hintText: 'Type your response to the client...',
-                          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                          hintStyle: TextStyle(color: ColorManager.textMuted),
                           filled: true,
-                          fillColor: Colors.white.withValues(alpha: 0.05),
+                          fillColor: ColorManager.containerSurface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: ColorManager.containerBorder,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: ColorManager.containerBorder,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(
-                              color: ColorManager.blue,
+                              color: ColorManager.primaryTeal,
                               width: 2,
                             ),
                           ),
@@ -358,8 +361,8 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : _submitResponse,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: ColorManager.blue,
-                            foregroundColor: Colors.white,
+                            backgroundColor: ColorManager.primaryTeal,
+                            foregroundColor: ColorManager.backgroundDark,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -370,7 +373,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(ColorManager.backgroundDark),
                                   ),
                                 )
                               : Text(
@@ -390,16 +393,16 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 // Contract Section
                 Container(
                   padding: EdgeInsets.all(isMobile ? 20 : 24),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: contractSent 
-                          ? (contractSigned ? Colors.green : Colors.orange)
-                          : Colors.purple.withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
-                  ),
+                  decoration: contractSent
+                      ? BoxDecoration(
+                          color: ColorManager.containerSurface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: contractSigned ? Colors.green.shade600.withValues(alpha: 0.45) : ColorManager.accentCoral.withValues(alpha: 0.55),
+                            width: 1.5,
+                          ),
+                        )
+                      : ColorManager.signUpAuthCardDecoration(borderRadius: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -407,9 +410,9 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         children: [
                           Icon(
                             Icons.description,
-                            color: contractSent 
-                                ? (contractSigned ? Colors.green : Colors.orange)
-                                : Colors.purple,
+                            color: contractSent
+                                ? (contractSigned ? Colors.green.shade700 : ColorManager.accentCoral)
+                                : ColorManager.secondaryPurple,
                             size: 24,
                           ),
                           const SizedBox(width: 12),
@@ -417,7 +420,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                             child: Text(
                               'Contract',
                               style: GoogleFonts.albertSans(
-                                color: Colors.white,
+                                color: ColorManager.textPrimary,
                                 fontSize: isMobile ? 20 : 22,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -449,7 +452,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                           Text(
                             'Notes:',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: ColorManager.textSecondary,
                               fontSize: isMobile ? 14 : 15,
                               fontWeight: FontWeight.w500,
                             ),
@@ -458,7 +461,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                           Text(
                             contractNotes,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: ColorManager.textPrimary,
                               fontSize: isMobile ? 14 : 15,
                             ),
                           ),
@@ -492,7 +495,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           'Send contract to client after agreement',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: ColorManager.textSecondary,
                             fontSize: isMobile ? 14 : 15,
                           ),
                         ),
@@ -502,7 +505,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           'Final Price *',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: ColorManager.textSecondary,
                             fontSize: isMobile ? 14 : 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -511,25 +514,25 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         TextField(
                           controller: _finalPriceController,
                           keyboardType: TextInputType.numberWithOptions(decimal: true),
-                          style: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 18),
+                          style: TextStyle(color: ColorManager.textPrimary, fontSize: isMobile ? 16 : 18),
                           decoration: InputDecoration(
                             prefixText: '\$ ',
-                            prefixStyle: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 18),
+                            prefixStyle: TextStyle(color: ColorManager.textMuted, fontSize: isMobile ? 16 : 18),
                             hintText: '0.00',
-                            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                            hintStyle: TextStyle(color: ColorManager.textMuted),
                             filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.05),
+                            fillColor: ColorManager.containerSurface,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.purple, width: 2),
+                              borderSide: BorderSide(color: ColorManager.secondaryPurple, width: 2),
                             ),
                           ),
                         ),
@@ -539,7 +542,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           'Down Payment Amount *',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: ColorManager.textSecondary,
                             fontSize: isMobile ? 14 : 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -548,25 +551,25 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         TextField(
                           controller: _downPaymentController,
                           keyboardType: TextInputType.numberWithOptions(decimal: true),
-                          style: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 18),
+                          style: TextStyle(color: ColorManager.textPrimary, fontSize: isMobile ? 16 : 18),
                           decoration: InputDecoration(
                             prefixText: '\$ ',
-                            prefixStyle: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 18),
+                            prefixStyle: TextStyle(color: ColorManager.textMuted, fontSize: isMobile ? 16 : 18),
                             hintText: '0.00',
-                            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                            hintStyle: TextStyle(color: ColorManager.textMuted),
                             filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.05),
+                            fillColor: ColorManager.containerSurface,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.purple, width: 2),
+                              borderSide: BorderSide(color: ColorManager.secondaryPurple, width: 2),
                             ),
                           ),
                         ),
@@ -576,7 +579,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           'Weekly Payment Amount *',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: ColorManager.textSecondary,
                             fontSize: isMobile ? 14 : 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -585,27 +588,27 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         TextField(
                           controller: _weeklyPaymentController,
                           keyboardType: TextInputType.numberWithOptions(decimal: true),
-                          style: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 18),
+                          style: TextStyle(color: ColorManager.textPrimary, fontSize: isMobile ? 16 : 18),
                           decoration: InputDecoration(
                             prefixText: '\$ ',
-                            prefixStyle: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 18),
+                            prefixStyle: TextStyle(color: ColorManager.textMuted, fontSize: isMobile ? 16 : 18),
                             hintText: '0.00',
-                            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                            hintStyle: TextStyle(color: ColorManager.textMuted),
                             helperText: 'Payments triggered after weekly progress reports',
-                            helperStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                            helperStyle: TextStyle(color: ColorManager.textMuted, fontSize: 12),
                             filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.05),
+                            fillColor: ColorManager.containerSurface,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.purple, width: 2),
+                              borderSide: BorderSide(color: ColorManager.secondaryPurple, width: 2),
                             ),
                           ),
                         ),
@@ -615,7 +618,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Text(
                           'Contract Notes (Optional)',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: ColorManager.textSecondary,
                             fontSize: isMobile ? 14 : 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -624,23 +627,23 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         TextField(
                           controller: _contractNotesController,
                           maxLines: 4,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: ColorManager.textPrimary),
                           decoration: InputDecoration(
                             hintText: 'Additional notes or instructions...',
-                            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                            hintStyle: TextStyle(color: ColorManager.textMuted),
                             filled: true,
-                            fillColor: Colors.white.withValues(alpha: 0.05),
+                            fillColor: ColorManager.containerSurface,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                              borderSide: BorderSide(color: ColorManager.containerBorder),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.purple, width: 2),
+                              borderSide: BorderSide(color: ColorManager.secondaryPurple, width: 2),
                             ),
                           ),
                         ),
@@ -650,7 +653,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                           height: 50,
                           child: ElevatedButton.icon(
                             onPressed: _isSendingContract ? null : _sendContract,
-                            icon: Icon(Icons.send, color: Colors.white),
+                            icon: Icon(Icons.send, color: ColorManager.onDarkPrimary),
                             label: Text(
                               'Send Contract',
                               style: GoogleFonts.albertSans(
@@ -659,8 +662,8 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple,
-                              foregroundColor: Colors.white,
+                              backgroundColor: ColorManager.secondaryPurple,
+                              foregroundColor: ColorManager.onDarkPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),

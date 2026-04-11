@@ -22,11 +22,12 @@ class _WebScreenState extends State<WebScreen> {
     double he = MediaQuery.of(context).size.height;
     double wi = MediaQuery.of(context).size.width;
 
-    // Responsive breakpoints
+    // Responsive breakpoints (WebScreen is used at width >= 600 from HomeScreen.)
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Keep hero text below the fixed top navigation in fullscreen desktop.
-    final double heroTopSpacing = isMobile ? 0 : (isTablet ? 88 : (he * 0.24).clamp(170.0, 240.0));
+    // Keep hero text below the overlaid frosted top bar; tablet needs more than 88px when the bar wraps.
+    final double heroTopSpacing =
+        isMobile ? 0 : (isTablet ? 112 : (he * 0.22).clamp(180.0, 260.0));
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -41,11 +42,14 @@ class _WebScreenState extends State<WebScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: heroTopSpacing),
-                  GlassOutlinedText(
-                    text: 'We design and build',
-                    fontSize: isMobile
-                        ? (wi < 400 ? 28 : (wi < 500 ? 35 : 42))
-                        : (isTablet ? 56 : 84),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20),
+                    child: GlassOutlinedText(
+                      text: 'We design and build',
+                      fontSize: isMobile
+                          ? (wi < 400 ? 28 : (wi < 500 ? 35 : 42))
+                          : (isTablet ? 56 : 84),
+                    ),
                   ),
                   // On very small mobile screens, stack vertically; otherwise horizontal
                   isMobile && wi < 400
@@ -198,12 +202,20 @@ class _WebScreenState extends State<WebScreen> {
                             ],
                           ),
                         ),
-                  SelectableText(
-                    'Just with single Codebase',
-                    style: GoogleFonts.albertSans(
-                      fontSize: isMobile ? (wi < 400 ? 16 : 18) : (isTablet ? 22 : 26),
-                      fontWeight: FontWeight.bold,
-                      color: ColorManager.accentGold,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: SelectableText(
+                        'Just with single Codebase',
+                        textAlign: TextAlign.center,
+                        textDirection: TextDirection.ltr,
+                        style: GoogleFonts.albertSans(
+                          fontSize: isMobile ? (wi < 400 ? 16 : 18) : (isTablet ? 22 : 26),
+                          fontWeight: FontWeight.bold,
+                          color: ColorManager.accentGold,
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -324,7 +336,11 @@ class GlassOutlinedText extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Stack(
+        final w = constraints.maxWidth;
+        final shaderH = fontSize * 4.5;
+        return SizedBox(
+          width: w,
+          child: Stack(
           alignment: Alignment.center,
           children: [
             // 🌫️ Foggy interior (steam inside glass)
@@ -332,6 +348,8 @@ class GlassOutlinedText extends StatelessWidget {
               imageFilter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
               child: SelectableText(
                 text,
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.ltr,
                 style: GoogleFonts.albertSans(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
@@ -343,6 +361,8 @@ class GlassOutlinedText extends StatelessWidget {
             // Gold edge only (keep frosted white text)
             SelectableText(
               text,
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.ltr,
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
@@ -362,12 +382,7 @@ class GlassOutlinedText extends StatelessWidget {
                           .withValues(alpha: 0.95),
                     ],
                   ).createShader(
-                    Rect.fromLTWH(
-                      0,
-                      0,
-                      (text.length * fontSize * 0.62).clamp(fontSize * 3, fontSize * 26),
-                      fontSize * 1.6,
-                    ),
+                    Rect.fromLTWH(0, 0, w, shaderH),
                   )),
               ),
             ),
@@ -375,6 +390,8 @@ class GlassOutlinedText extends StatelessWidget {
             // 🌫️ Front diffusion (glass thickness)
             SelectableText(
               text,
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.ltr,
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
@@ -382,7 +399,8 @@ class GlassOutlinedText extends StatelessWidget {
               ),
             ),
           ],
-        );
+        ),
+      );
       },
     );
   }

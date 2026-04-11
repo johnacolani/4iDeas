@@ -137,22 +137,31 @@ class _ServicesScreenState extends State<ServicesScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.amber[100],
-        ),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        automaticallyImplyLeading: false,
+        leadingWidth: 56,
+        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.home);
+            }
+          },
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
-        title: SelectableText(
+        title: Text(
           'Services',
           style: GoogleFonts.albertSans(
-            color: ColorManager.accentGoldDark,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
       body: Stack(
@@ -248,19 +257,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                             Center(
                               child: Container(
                                 padding: EdgeInsets.all(isMobile ? 20 : 24),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      ColorManager.blue.withValues(alpha: 0.2),
-                                      ColorManager.orange.withValues(alpha: 0.15),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                    width: 1.5,
-                                  ),
-                                ),
+                                decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
                                 child: Column(
                                   children: [
                                     SelectableText(
@@ -275,8 +272,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                     SelectableText(
                                       'Let\'s discuss how we can bring your ideas to life',
                                       style: TextStyle(
-                                        color: ColorManager.orange,
+                                        color: ColorManager.primaryTeal,
                                         fontSize: bodyFontSize,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ],
@@ -314,22 +312,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
     Widget cardContent = Container(
       width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 0,
-            spreadRadius: 0,
-            offset: const Offset(6, 6),
-          ),
-        ],
-      ),
+      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -338,12 +321,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
               Container(
                 padding: EdgeInsets.all(isMobile ? 10 : 12),
                 decoration: BoxDecoration(
-                  color: ColorManager.orange.withValues(alpha: 0.2),
+                  color: ColorManager.primaryTeal.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: ColorManager.orange,
+                  color: ColorManager.primaryTeal,
                   size: isMobile ? 28 : 32,
                 ),
               ),
@@ -355,7 +338,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     SelectableText(
                       item.title,
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.orange,
+                        color: ColorManager.textPrimary,
                         fontSize: sectionTitleSize,
                         fontWeight: FontWeight.bold,
                       ),
@@ -364,7 +347,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     SelectableText(
                       item.subtitle,
                       style: TextStyle(
-                        color: ColorManager.accentGoldDark.withValues(alpha: 0.70),
+                        color: ColorManager.textSecondary,
                         fontSize: bodyFontSize - 2,
                         fontWeight: FontWeight.w500,
                       ),
@@ -378,7 +361,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           SelectableText(
             item.description,
             style: TextStyle(
-              color: ColorManager.accentGoldDark,
+              color: ColorManager.textPrimary,
               fontSize: bodyFontSize,
               height: 1.6,
             ),
@@ -393,7 +376,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       padding: EdgeInsets.only(top: 6, right: 8),
                       child: Icon(
                         Icons.check_circle,
-                        color: ColorManager.blue,
+                        color: ColorManager.primaryTeal,
                         size: 18,
                       ),
                     ),
@@ -401,7 +384,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       child: SelectableText(
                         detail,
                         style: TextStyle(
-                          color: ColorManager.accentGoldDark.withValues(alpha: 0.90),
+                          color: ColorManager.textSecondary,
                           fontSize: bodyFontSize - 1,
                           height: 1.5,
                         ),

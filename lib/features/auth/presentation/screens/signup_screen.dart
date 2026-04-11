@@ -40,13 +40,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.amber[100]),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        backgroundColor: ColorManager.accentGold,
         title: Text(
           'Sign Up',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -105,28 +105,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             Container(
                               padding: EdgeInsets.all(isMobile ? 20 : 24),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
+                              decoration: ColorManager.signUpAuthCardDecoration(borderRadius: 20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Text(
                                     'Create Account',
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.textPrimary,
                                       fontSize: isMobile ? 28 : 32,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -136,8 +122,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   Text(
                                     'Sign up to get started',
                                     style: TextStyle(
-                                      color: ColorManager.orange,
+                                      color: ColorManager.secondaryPurple,
                                       fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -148,6 +135,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     hint: 'Enter your email',
                                     keyboardType: TextInputType.emailAddress,
                                     prefixIcon: Icons.email_outlined,
+                                    accentColor: ColorManager.secondaryPurple,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your email';
@@ -166,12 +154,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     hint: 'Enter your password',
                                     obscureText: _obscurePassword,
                                     prefixIcon: Icons.lock_outline,
+                                    accentColor: ColorManager.secondaryPurple,
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscurePassword
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: Colors.white.withValues(alpha: 0.7),
+                                        color: ColorManager.textMuted,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -197,12 +186,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     hint: 'Confirm your password',
                                     obscureText: _obscureConfirmPassword,
                                     prefixIcon: Icons.lock_outline,
+                                    accentColor: ColorManager.secondaryPurple,
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscureConfirmPassword
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: Colors.white.withValues(alpha: 0.7),
+                                        color: ColorManager.textMuted,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -239,8 +229,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               }
                                             },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: ColorManager.orange,
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: ColorManager.accentGold,
+                                        foregroundColor: ColorManager.backgroundDark,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(12),
                                         ),
@@ -252,8 +242,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               width: 20,
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  ColorManager.backgroundDark,
+                                                ),
                                               ),
                                             )
                                           : Text(
@@ -272,7 +263,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       Text(
                                         "Already have an account? ",
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.7),
+                                          color: ColorManager.textSecondary,
                                           fontSize: isMobile ? 14 : 15,
                                         ),
                                       ),
@@ -281,7 +272,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         child: Text(
                                           'Login',
                                           style: TextStyle(
-                                            color: ColorManager.blue,
+                                            color: ColorManager.secondaryPurple,
                                             fontSize: isMobile ? 14 : 15,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -311,6 +302,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required TextEditingController controller,
     required String label,
     required String hint,
+    required Color accentColor,
     IconData? prefixIcon,
     Widget? suffixIcon,
     bool obscureText = false,
@@ -323,29 +315,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
-      style: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 17),
+      style: TextStyle(color: ColorManager.textPrimary, fontSize: isMobile ? 16 : 17),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-        labelStyle: TextStyle(color: ColorManager.orange),
-        prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: ColorManager.orange)
-            : null,
+        hintStyle: TextStyle(color: ColorManager.textMuted),
+        labelStyle: TextStyle(color: accentColor, fontWeight: FontWeight.w600),
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: accentColor) : null,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
+        fillColor: ColorManager.containerSurface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+          borderSide: BorderSide(color: ColorManager.containerBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+          borderSide: BorderSide(color: ColorManager.containerBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: ColorManager.orange, width: 2),
+          borderSide: BorderSide(color: accentColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

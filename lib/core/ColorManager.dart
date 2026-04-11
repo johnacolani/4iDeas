@@ -45,6 +45,90 @@ class ColorManager {
     );
   }
 
+  /// Login screen: gold + subtle **teal** wash; teal-leaning border (pairs with [primaryTeal] accents).
+  static BoxDecoration loginAuthCardDecoration({double borderRadius = 20}) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          accentGold.withValues(alpha: 0.11),
+          primaryTeal.withValues(alpha: 0.12),
+          accentGold.withValues(alpha: 0.05),
+          const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: primaryTeal.withValues(alpha: 0.48),
+        width: 1.5,
+      ),
+    );
+  }
+
+  /// Order Here form: gold + subtle **coral** wash; coral-leaning border (distinct from login/signup tints).
+  static BoxDecoration orderFormCardDecoration({double borderRadius = 20}) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          accentGold.withValues(alpha: 0.11),
+          accentCoral.withValues(alpha: 0.11),
+          accentGold.withValues(alpha: 0.05),
+          const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: accentCoral.withValues(alpha: 0.42),
+        width: 1.5,
+      ),
+    );
+  }
+
+  /// Sign-up screen: gold + subtle **purple** wash; purple-leaning border (pairs with [secondaryPurple] accents).
+  static BoxDecoration signUpAuthCardDecoration({double borderRadius = 20}) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          accentGold.withValues(alpha: 0.11),
+          secondaryPurple.withValues(alpha: 0.13),
+          accentGold.withValues(alpha: 0.05),
+          const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: secondaryPurple.withValues(alpha: 0.45),
+        width: 1.5,
+      ),
+    );
+  }
+
+  /// Admin panel (orders list/detail): gold + **purple** wash; distinct from auth/order forms.
+  static BoxDecoration adminPanelCardDecoration({double borderRadius = 20}) {
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          accentGold.withValues(alpha: 0.10),
+          secondaryPurple.withValues(alpha: 0.11),
+          accentGold.withValues(alpha: 0.06),
+          const Color(0xFFFFFFFF).withValues(alpha: 0.04),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: secondaryPurple.withValues(alpha: 0.42),
+        width: 1.5,
+      ),
+    );
+  }
+
   /// Text on dark surfaces (drawer, overlays) — do not use [textPrimary] there.
   static const onDarkPrimary = Color(0xFFF5F2EB);
   static const onDarkSecondary = Color(0xFFC9C4BC);

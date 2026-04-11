@@ -32,21 +32,32 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: Colors.amber[100],
+          color: ColorManager.backgroundDark,
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        automaticallyImplyLeading: false,
+        leadingWidth: 56,
+        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.home);
+            }
+          },
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
-        title: SelectableText(
+        title: Text(
           'About Us',
           style: GoogleFonts.albertSans(
-            color: ColorManager.accentGoldDark,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
       body: Stack(
@@ -88,7 +99,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   Text(
                                     'Senior Product Designer • UX/UI Designer • Design Systems',
                                     style: TextStyle(
-                                      color: ColorManager.orange,
+                                      color: ColorManager.primaryTeal,
                                       fontSize: bodyFontSize,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -159,19 +170,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             Center(
                               child: Container(
                                 padding: EdgeInsets.all(isMobile ? 20 : 24),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      ColorManager.blue.withValues(alpha: 0.2),
-                                      ColorManager.orange.withValues(alpha: 0.15),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.3),
-                                    width: 1.5,
-                                  ),
-                                ),
+                                decoration: ColorManager.loginAuthCardDecoration(borderRadius: 16),
                                 child: Column(
                                   children: [
                                     SelectableText(
@@ -250,28 +249,14 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SelectableText(
             title,
             style: GoogleFonts.albertSans(
-              color: ColorManager.orange,
+              color: ColorManager.accentGoldDark,
               fontSize: sectionTitleSize,
               fontWeight: FontWeight.bold,
             ),
@@ -280,7 +265,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           SelectableText(
             content,
             style: TextStyle(
-              color: ColorManager.accentGoldDark,
+              color: ColorManager.textSecondary,
               fontSize: fontSize,
               height: 1.6,
             ),
@@ -348,28 +333,14 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
             style: GoogleFonts.albertSans(
-              color: ColorManager.orange,
+              color: ColorManager.accentGoldDark,
               fontSize: sectionTitleSize,
               fontWeight: FontWeight.bold,
             ),
@@ -402,7 +373,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             SelectableText(
                               exp['role'] as String,
                               style: TextStyle(
-                                color: ColorManager.orange,
+                                color: ColorManager.primaryTeal,
                                 fontSize: bodyFontSize,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -429,7 +400,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                               padding: EdgeInsets.only(top: 6, right: 8),
                               child: Icon(
                                 Icons.arrow_right,
-                                color: ColorManager.blue,
+                                color: ColorManager.primaryTeal,
                                 size: 18,
                               ),
                             ),
@@ -437,7 +408,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                               child: SelectableText(
                                 highlight,
                                 style: TextStyle(
-                                  color: ColorManager.accentGoldDark.withValues(alpha: 0.9),
+                                  color: ColorManager.textSecondary,
                                   fontSize: bodyFontSize - 1,
                                   height: 1.5,
                                 ),
@@ -450,7 +421,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 16),
                       child: Divider(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: ColorManager.containerBorder,
                         thickness: 1,
                       ),
                     ),
@@ -477,17 +448,17 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: ColorManager.containerSurface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
+            color: ColorManager.containerBorder,
           ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: ColorManager.orange,
+              color: ColorManager.primaryTeal,
               size: 20,
             ),
             SizedBox(width: 12),
@@ -498,7 +469,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   SelectableText(
                     label,
                     style: TextStyle(
-                      color: ColorManager.accentGoldDark.withValues(alpha: 0.7),
+                      color: ColorManager.textMuted,
                       fontSize: bodyFontSize - 2,
                     ),
                   ),
@@ -506,7 +477,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   SelectableText(
                     value,
                     style: TextStyle(
-                      color: ColorManager.accentGoldDark,
+                      color: ColorManager.textPrimary,
                       fontSize: bodyFontSize,
                       fontWeight: FontWeight.w500,
                     ),
@@ -516,7 +487,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: ColorManager.textMuted,
               size: 16,
             ),
           ],

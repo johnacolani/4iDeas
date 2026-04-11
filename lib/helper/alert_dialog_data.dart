@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
@@ -195,28 +196,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
           maxWidth: isMobile ? widget.wi * 0.9 : (isTablet ? 400 : 450),
           maxHeight: widget.he * 0.85,
         ),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF4B556E).withValues(alpha: 0.95),
-              const Color(0xFF2D3748).withValues(alpha: 0.98),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.15),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
+        decoration: ColorManager.loginAuthCardDecoration(borderRadius: 24),
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.all(isMobile ? 20.0 : 24.0),
@@ -226,21 +206,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                 // Header Section
                 Container(
                   padding: EdgeInsets.all(isMobile ? 16 : 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                  decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
                   child: Column(
                     children: [
                       Container(
@@ -248,7 +214,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: ColorManager.orange.withValues(alpha: 0.5),
+                            color: ColorManager.accentGold.withValues(alpha: 0.55),
                             width: 2,
                           ),
                         ),
@@ -261,19 +227,19 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                       SizedBox(height: isMobile ? 12 : 16),
                       Text(
                         'John A. Colani',
-                        style: TextStyle(
+                        style: GoogleFonts.albertSans(
                           fontSize: isMobile ? 22 : 24,
                           fontWeight: FontWeight.bold,
-                          color: ColorManager.orange,
+                          color: ColorManager.accentGoldDark,
                           letterSpacing: 0.5,
                         ),
                       ),
                       SizedBox(height: 6),
                       Text(
                         'Senior Product Designer',
-                        style: TextStyle(
+                        style: GoogleFonts.albertSans(
                           fontSize: isMobile ? 14 : 15,
-                          color: ColorManager.accentGoldDark.withValues(alpha: 0.8),
+                          color: ColorManager.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -285,11 +251,11 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                 Container(
                   padding: EdgeInsets.all(isMobile ? 16 : 20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: ColorManager.containerSurface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      width: 1,
+                      color: ColorManager.containerBorder,
+                      width: 1.5,
                     ),
                   ),
                   child: Column(
@@ -327,7 +293,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                             if (!isLast) ...[
                               SizedBox(height: 12),
                               Divider(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: ColorManager.containerBorder,
                                 thickness: 1,
                               ),
                               SizedBox(height: 12),
@@ -345,21 +311,17 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorManager.orange.withValues(alpha: 0.2),
-                      foregroundColor: ColorManager.white,
+                      backgroundColor: ColorManager.accentGold,
+                      foregroundColor: ColorManager.backgroundDark,
                       padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: ColorManager.orange.withValues(alpha: 0.5),
-                          width: 1.5,
-                        ),
                       ),
                       elevation: 0,
                     ),
                     child: Text(
                       'Close',
-                      style: TextStyle(
+                      style: GoogleFonts.albertSans(
                         fontSize: isMobile ? 16 : 17,
                         fontWeight: FontWeight.bold,
                       ),
@@ -393,10 +355,10 @@ class _AlertDialogDataState extends State<AlertDialogData> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: ColorManager.orange.withValues(alpha: 0.2),
+                color: ColorManager.primaryTeal.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, color: ColorManager.orange, size: 20),
+              child: Icon(icon, color: ColorManager.primaryTeal, size: 20),
             ),
             SizedBox(width: 12),
             Expanded(
@@ -406,7 +368,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                   Text(
                     entry.label,
                     style: TextStyle(
-                      color: ColorManager.accentGoldDark.withValues(alpha: 0.7),
+                      color: ColorManager.textMuted,
                       fontSize: isMobile ? 13 : 14,
                     ),
                   ),
@@ -414,7 +376,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
                   Text(
                     entry.value,
                     style: TextStyle(
-                      color: ColorManager.accentGoldDark,
+                      color: ColorManager.textPrimary,
                       fontSize: isMobile ? 16 : 17,
                       fontWeight: FontWeight.w600,
                     ),
@@ -443,7 +405,7 @@ class _AlertDialogDataState extends State<AlertDialogData> {
             else
               Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.white.withValues(alpha: 0.5),
+                color: ColorManager.textMuted,
                 size: 16,
               ),
           ],

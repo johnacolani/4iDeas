@@ -33,13 +33,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.amber[100]),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        backgroundColor: ColorManager.accentGold,
         title: Text(
           'Forgot Password',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -88,34 +88,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           children: [
                             Container(
                               padding: EdgeInsets.all(isMobile ? 20 : 24),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
+                              decoration: ColorManager.loginAuthCardDecoration(borderRadius: 20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Icon(
                                     Icons.lock_reset,
                                     size: 64,
-                                    color: ColorManager.orange,
+                                    color: ColorManager.primaryTeal,
                                   ),
                                   SizedBox(height: he * 0.02),
                                   Text(
                                     'Reset Password',
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: ColorManager.textPrimary,
                                       fontSize: isMobile ? 28 : 32,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -125,7 +111,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   Text(
                                     'Enter your email address and we will send you a link to reset your password.',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
+                                      color: ColorManager.textSecondary,
                                       fontSize: isMobile ? 15 : 16,
                                     ),
                                     textAlign: TextAlign.center,
@@ -143,26 +129,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                       }
                                       return null;
                                     },
-                                    style: TextStyle(color: Colors.white, fontSize: isMobile ? 16 : 17),
+                                    style: TextStyle(color: ColorManager.textPrimary, fontSize: isMobile ? 16 : 17),
                                     decoration: InputDecoration(
                                       labelText: 'Email',
                                       hintText: 'Enter your email',
-                                      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-                                      labelStyle: TextStyle(color: ColorManager.orange),
-                                      prefixIcon: Icon(Icons.email_outlined, color: ColorManager.orange),
+                                      hintStyle: TextStyle(color: ColorManager.textMuted),
+                                      labelStyle: TextStyle(
+                                        color: ColorManager.primaryTeal,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      prefixIcon: Icon(Icons.email_outlined, color: ColorManager.primaryTeal),
                                       filled: true,
-                                      fillColor: Colors.white.withValues(alpha: 0.05),
+                                      fillColor: ColorManager.containerSurface,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                                        borderSide: BorderSide(color: ColorManager.containerBorder),
                                       ),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                                        borderSide: BorderSide(color: ColorManager.containerBorder),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(color: ColorManager.orange, width: 2),
+                                        borderSide: BorderSide(color: ColorManager.primaryTeal, width: 2),
                                       ),
                                       errorBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -191,8 +180,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                               }
                                             },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: ColorManager.orange,
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: ColorManager.accentGold,
+                                        foregroundColor: ColorManager.backgroundDark,
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(12),
                                         ),
@@ -204,8 +193,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                               width: 20,
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  ColorManager.backgroundDark,
+                                                ),
                                               ),
                                             )
                                           : Text(

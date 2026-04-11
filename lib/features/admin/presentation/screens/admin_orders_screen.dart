@@ -78,31 +78,72 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     if (!AdminService.isAdmin()) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Access Denied'),
-          backgroundColor: const Color(0xff020923),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          leadingWidth: 56,
+          title: Text(
+            'Access Denied',
+            style: GoogleFonts.albertSans(
+              color: ColorManager.backgroundDark,
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          backgroundColor: ColorManager.accentGold,
+          iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(AppRoutes.home);
+              }
+            },
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          ),
         ),
-        body: const Center(
-          child: Text('Admin access required'),
+        body: Center(
+          child: Text(
+            'Admin access required',
+            style: TextStyle(color: ColorManager.textSecondary),
+          ),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.amber),
+        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
+        automaticallyImplyLeading: false,
+        leadingWidth: 56,
+        backgroundColor: ColorManager.accentGold,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.home);
+            }
+          },
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        ),
         title: Text(
           'Admin - Client Orders',
           style: GoogleFonts.albertSans(
-            color: Colors.white,
+            color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, color: ColorManager.backgroundDark),
             onPressed: _isLoading ? null : _loadOrders,
             tooltip: 'Refresh',
           ),
@@ -127,7 +168,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   Text(
                     _error!,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: ColorManager.textSecondary,
                       fontSize: isMobile ? 16 : 18,
                     ),
                     textAlign: TextAlign.center,
@@ -138,8 +179,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorManager.blue,
-                      foregroundColor: Colors.white,
+                      backgroundColor: ColorManager.primaryTeal,
+                      foregroundColor: ColorManager.backgroundDark,
                     ),
                   ),
                 ],
@@ -153,13 +194,13 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   Icon(
                     Icons.inbox,
                     size: 60,
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: ColorManager.textMuted,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No orders yet',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: ColorManager.textSecondary,
                       fontSize: isMobile ? 18 : 20,
                     ),
                   ),
@@ -191,93 +232,88 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     final createdAt = order['createdAt']?.toString() ?? '';
     final hasResponse = order['adminResponse'] != null && order['adminResponse'].toString().isNotEmpty;
 
-    return Card(
+    return Container(
       margin: EdgeInsets.only(bottom: isMobile ? 12 : 16),
-      color: Colors.white.withValues(alpha: 0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: hasResponse ? Colors.green.withValues(alpha: 0.5) : ColorManager.blue.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-      ),
-      child: InkWell(
-        onTap: () => context.push(
-          AppRoutes.adminOrderDetail,
-          extra: {'order': order, 'onResponseAdded': _loadOrders},
-        ),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.all(isMobile ? 16 : 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      decoration: ColorManager.adminPanelCardDecoration(borderRadius: 16),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(
+            AppRoutes.adminOrderDetail,
+            extra: {'order': order, 'onResponseAdded': _loadOrders},
+          ),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: EdgeInsets.all(isMobile ? 16 : 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appName,
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.textPrimary,
+                              fontSize: isMobile ? 18 : 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Client: $clientName',
+                            style: TextStyle(
+                              color: ColorManager.textSecondary,
+                              fontSize: isMobile ? 14 : 16,
+                            ),
+                          ),
+                          Text(
+                            clientEmail,
+                            style: TextStyle(
+                              color: ColorManager.textMuted,
+                              fontSize: isMobile ? 12 : 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          appName,
-                          style: GoogleFonts.albertSans(
-                            color: Colors.white,
-                            fontSize: isMobile ? 18 : 20,
-                            fontWeight: FontWeight.bold,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: hasResponse
+                                ? Colors.green.withValues(alpha: 0.22)
+                                : ColorManager.accentGold.withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            hasResponse ? 'Responded' : status.toUpperCase(),
+                            style: TextStyle(
+                              color: hasResponse ? Colors.green.shade700 : ColorManager.accentGoldDark,
+                              fontSize: isMobile ? 11 : 12,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Client: $clientName',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: isMobile ? 14 : 16,
+                        if (createdAt.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            createdAt.length > 19 ? createdAt.substring(0, 19) : createdAt,
+                            style: TextStyle(
+                              color: ColorManager.textMuted,
+                              fontSize: isMobile ? 10 : 11,
+                            ),
                           ),
-                        ),
-                        Text(
-                          clientEmail,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
-                            fontSize: isMobile ? 12 : 14,
-                          ),
-                        ),
+                        ],
                       ],
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: hasResponse
-                              ? Colors.green.withValues(alpha: 0.3)
-                              : ColorManager.orange.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          hasResponse ? 'Responded' : status.toUpperCase(),
-                          style: TextStyle(
-                            color: hasResponse ? Colors.green : ColorManager.orange,
-                            fontSize: isMobile ? 11 : 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (createdAt.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          createdAt.length > 19 ? createdAt.substring(0, 19) : createdAt,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
-                            fontSize: isMobile ? 10 : 11,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
+                  ],
+                ),
               if (hasResponse) ...[
                 const SizedBox(height: 8),
                 Row(
@@ -285,13 +321,13 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     Icon(
                       Icons.check_circle,
                       size: 16,
-                      color: Colors.green,
+                      color: Colors.green.shade700,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Response sent',
                       style: TextStyle(
-                        color: Colors.green,
+                        color: Colors.green.shade700,
                         fontSize: isMobile ? 12 : 13,
                       ),
                     ),
@@ -301,6 +337,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
