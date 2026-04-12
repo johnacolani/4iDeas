@@ -4,8 +4,16 @@ import 'package:four_ideas/core/ColorManager.dart';
 class AppBackground extends StatelessWidget {
   const AppBackground({super.key});
 
+  /// On narrow layouts, nudge decorative circles (half their width via [FractionalTranslation]).
+  static Widget _shiftOnMobile(bool mobile, Offset translation, Widget child) {
+    if (!mobile) return child;
+    return FractionalTranslation(translation: translation, child: child);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isMobileHome = MediaQuery.sizeOf(context).width < 600;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -25,23 +33,31 @@ class AppBackground extends StatelessWidget {
           // Soft color blooms for a modern product feel.
           Align(
             alignment: const Alignment(-0.92, -0.96),
-            child: Container(
-              width: 360,
-              height: 360,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: ColorManager.primaryTeal.withValues(alpha: 0.14),
+            child: _shiftOnMobile(
+              isMobileHome,
+              const Offset(-0.5, 0),
+              Container(
+                width: 360,
+                height: 360,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorManager.primaryTeal.withValues(alpha: 0.14),
+                ),
               ),
             ),
           ),
           Align(
             alignment: const Alignment(1.0, 0.92),
-            child: Container(
-              width: 420,
-              height: 420,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: ColorManager.secondaryPurple.withValues(alpha: 0.12),
+            child: _shiftOnMobile(
+              isMobileHome,
+              const Offset(0.5, 0),
+              Container(
+                width: 420,
+                height: 420,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorManager.secondaryPurple.withValues(alpha: 0.12),
+                ),
               ),
             ),
           ),

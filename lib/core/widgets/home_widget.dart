@@ -23,12 +23,13 @@ class HomeWidget extends StatelessWidget {
     // Responsive breakpoints (HomeWidget is only used from MobileScreen, width under 600.)
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Reserve space for HomeScreen's overlaid frosted bar (taller when narrow / two-line header).
+    // Space below the overlaid frosted header only (SafeArea already clears the notch).
+    // ~90–124px matches one- to two-row bar height; wider buffers on very narrow widths.
     final double heroTopSpacing = () {
-      if (wi < 360) return 276.0;
-      if (wi < 400) return 256.0;
-      if (wi < 480) return 236.0;
-      if (wi < 600) return 220.0;
+      if (wi < 360) return 124.0;
+      if (wi < 400) return 116.0;
+      if (wi < 480) return 108.0;
+      if (wi < 600) return 100.0;
       if (wi < 1024) return 248.0;
       return 270.0;
     }();
@@ -69,7 +70,7 @@ class HomeWidget extends StatelessWidget {
                                     'Custom iOS apps',
                                     style: GoogleFonts.albertSans(
                                       fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w500,
                                       color: const Color(0xFF0A84FF),
                                       shadows: const [
                                         Shadow(
@@ -84,7 +85,7 @@ class HomeWidget extends StatelessWidget {
                                     'Custom Android apps',
                                     style: GoogleFonts.albertSans(
                                       fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w500,
                                       color: const Color(0xFF3DDC84),
                                       shadows: const [
                                         Shadow(
@@ -99,7 +100,7 @@ class HomeWidget extends StatelessWidget {
                                     'Custom macOS apps',
                                     style: GoogleFonts.albertSans(
                                       fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w500,
                                       color: const Color(0xFFA2AAAD),
                                       shadows: const [
                                         Shadow(
@@ -114,12 +115,28 @@ class HomeWidget extends StatelessWidget {
                                     'Custom web apps',
                                     style: GoogleFonts.albertSans(
                                       fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w500,
                                       color: const Color(0xFF4285F4),
                                       shadows: const [
                                         Shadow(
                                           color: Color(0xCCFFFFFF),
                                           blurRadius: 6,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SelectableText(
+                                    'Windows & Linux',
+                                    style: GoogleFonts.albertSans(
+                                      fontSize: wi < 400 ? 13 : 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF0F5C4A),
+                                      shadows: const [
+                                        Shadow(
+                                          color: Color(0xCCFFFFFF),
+                                          blurRadius: 4,
                                           offset: Offset(0, 1),
                                         ),
                                       ],
@@ -147,7 +164,7 @@ class HomeWidget extends StatelessWidget {
                                         'Custom iOS apps',
                                         style: GoogleFonts.albertSans(
                                           fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w500,
                                           color: const Color(0xFF0A84FF),
                                           shadows: const [
                                             Shadow(
@@ -162,7 +179,7 @@ class HomeWidget extends StatelessWidget {
                                         'Custom Android apps',
                                         style: GoogleFonts.albertSans(
                                           fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w500,
                                           color: const Color(0xFF3DDC84),
                                           shadows: const [
                                             Shadow(
@@ -177,7 +194,7 @@ class HomeWidget extends StatelessWidget {
                                         'Custom macOS apps',
                                         style: GoogleFonts.albertSans(
                                           fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w500,
                                           color: const Color(0xFFA2AAAD),
                                           shadows: const [
                                             Shadow(
@@ -192,12 +209,28 @@ class HomeWidget extends StatelessWidget {
                                         'Custom web apps',
                                         style: GoogleFonts.albertSans(
                                           fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w500,
                                           color: const Color(0xFF4285F4),
                                           shadows: const [
                                             Shadow(
                                               color: Color(0xCCFFFFFF),
                                               blurRadius: 6,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: isMobile ? 10 : 12),
+                                      SelectableText(
+                                        'Windows & Linux',
+                                        style: GoogleFonts.albertSans(
+                                          fontSize: isMobile ? (wi < 400 ? 13 : 15) : (isTablet ? 17 : 19),
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xFF0F5C4A),
+                                          shadows: const [
+                                            Shadow(
+                                              color: Color(0xCCFFFFFF),
+                                              blurRadius: 4,
                                               offset: Offset(0, 1),
                                             ),
                                           ],
@@ -259,22 +292,34 @@ class HomeWidget extends StatelessWidget {
                       offset: Offset(0, isMobile ? -12 : -18),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Container(
+                        child: SizedBox(
                           width: double.infinity,
                           height: wi < 600 ? wi * 0.5 : wi * 0.4,
-                          decoration: const BoxDecoration(
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: Colors.white,
-                              //     spreadRadius: 0,
-                              //     blurRadius: 5,
-                              //     offset: Offset(0,0),
-                              //   )
-                              // ],
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                      'assets/images/top-web-apps-01.png'),
-                                  fit: BoxFit.contain)),
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            alignment: Alignment.center,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF6C5428)
+                                        .withValues(alpha: 0.38),
+                                    offset: const Offset(12, 14),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.asset(
+                                  'assets/images/top-web-apps-01.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -342,7 +387,11 @@ class HomeWidget extends StatelessWidget {
   }
 }
 
+/// Hero headline "We design and build" — border #436E69 (2px), body #AFCECB.
 class GlassOutlinedText extends StatelessWidget {
+  static const Color _border = Color(0xFF436E69);
+  static const Color _body = Color(0xFFAFCECB);
+
   final String text;
   final double fontSize;
 
@@ -357,13 +406,12 @@ class GlassOutlinedText extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        final shaderH = fontSize * 4.5;
         return SizedBox(
           width: w,
           child: Stack(
           alignment: Alignment.center,
           children: [
-            // 🌫️ Foggy interior (steam inside glass)
+            // Soft body glow behind stroke
             ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
               child: SelectableText(
@@ -373,12 +421,12 @@ class GlassOutlinedText extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
-                  color: ColorManager.accentGoldDark.withValues(alpha: 0.20),
+                  color: _body.withValues(alpha: 0.45),
                 ),
               ),
             ),
 
-            // Gold edge only (keep frosted white text)
+            // Border (stroke)
             SelectableText(
               text,
               textAlign: TextAlign.center,
@@ -386,28 +434,14 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                foreground: (Paint()
+                foreground: Paint()
                   ..style = PaintingStyle.stroke
-                  ..strokeWidth = 0.95
-                  ..shader = LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorManager.accentGold.withValues(alpha: 0.95),
-                      Color.lerp(
-                            ColorManager.accentGold,
-                            ColorManager.backgroundDark,
-                            0.45,
-                          )!
-                          .withValues(alpha: 0.95),
-                    ],
-                  ).createShader(
-                    Rect.fromLTWH(0, 0, w, shaderH),
-                  )),
+                  ..strokeWidth = 2
+                  ..color = _border,
               ),
             ),
 
-            // 🌫️ Front diffusion (glass thickness)
+            // Body fill
             SelectableText(
               text,
               textAlign: TextAlign.center,
@@ -415,7 +449,7 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                color: ColorManager.accentGoldDark.withValues(alpha: 0.26),
+                color: _body,
               ),
             ),
           ],

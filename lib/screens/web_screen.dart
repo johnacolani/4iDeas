@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../core/ColorManager.dart';
-import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/aws_backend_section.dart';
+import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 
 class WebScreen extends StatefulWidget {
@@ -25,9 +25,13 @@ class _WebScreenState extends State<WebScreen> {
     // Responsive breakpoints (WebScreen is used at width >= 600 from HomeScreen.)
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Keep hero text below the overlaid frosted top bar; tablet needs more than 88px when the bar wraps.
-    final double heroTopSpacing =
-        isMobile ? 0 : (isTablet ? 112 : (he * 0.22).clamp(180.0, 260.0));
+    // Keep hero text below the overlaid frosted top bar (same bar as HomeScreen).
+    // Tablet needs extra clearance vs phone web; desktop scales with window height.
+    final double heroTopSpacing = isMobile
+        ? 0
+        : (isTablet
+            ? (he * 0.14).clamp(168.0, 220.0)
+            : (he * 0.22).clamp(180.0, 260.0));
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -64,7 +68,7 @@ class _WebScreenState extends State<WebScreen> {
                                   'Custom iOS apps',
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
                                       color: const Color(0xFF0A84FF),
                                       shadows: const [
                                         Shadow(
@@ -94,7 +98,7 @@ class _WebScreenState extends State<WebScreen> {
                                   'Custom macOS apps',
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
                                       color: const Color(0xFFA2AAAD),
                                       shadows: const [
                                         Shadow(
@@ -109,7 +113,7 @@ class _WebScreenState extends State<WebScreen> {
                                   'Custom web apps',
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
                                       color: const Color(0xFF4285F4),
                                       shadows: const [
                                         Shadow(
@@ -118,6 +122,22 @@ class _WebScreenState extends State<WebScreen> {
                                           offset: Offset(0, 1),
                                         ),
                                       ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                SelectableText(
+                                  'Windows & Linux',
+                                  style: GoogleFonts.albertSans(
+                                    fontSize: wi < 400 ? 13 : 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xFF0F5C4A),
+                                    shadows: const [
+                                      Shadow(
+                                        color: Color(0xCCFFFFFF),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -140,7 +160,7 @@ class _WebScreenState extends State<WebScreen> {
                                       'Custom iOS apps',
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w500,
                                         color: const Color(0xFF0A84FF),
                                         shadows: const [
                                           Shadow(
@@ -170,7 +190,7 @@ class _WebScreenState extends State<WebScreen> {
                                       'Custom macOS apps',
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w500,
                                         color: const Color(0xFFA2AAAD),
                                         shadows: const [
                                           Shadow(
@@ -185,12 +205,28 @@ class _WebScreenState extends State<WebScreen> {
                                       'Custom web apps',
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w500,
                                         color: const Color(0xFF4285F4),
                                         shadows: const [
                                           Shadow(
                                             color: Color(0xCCFFFFFF),
                                             blurRadius: 6,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: isMobile ? 10 : 12),
+                                    SelectableText(
+                                      'Windows & Linux',
+                                      style: GoogleFonts.albertSans(
+                                        fontSize: isMobile ? (wi < 400 ? 13 : 15) : (isTablet ? 17 : 19),
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xFF0F5C4A),
+                                        shadows: const [
+                                          Shadow(
+                                            color: Color(0xCCFFFFFF),
+                                            blurRadius: 4,
                                             offset: Offset(0, 1),
                                           ),
                                         ],
@@ -252,14 +288,34 @@ class _WebScreenState extends State<WebScreen> {
                     offset: Offset(0, -60),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: isMobile ? 8.0 : 16.0),
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         height: wi < 600 ? wi * 0.5 : (wi < 1024 ? wi * 0.45 : wi * 0.4),
-                        decoration: const BoxDecoration(
-                            image: DecorationImage(
-                                image:
-                                    AssetImage('assets/images/top-web-apps-01.png'),
-                                fit: BoxFit.contain)),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          alignment: Alignment.center,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF6C5428)
+                                      .withValues(alpha: 0.38),
+                                  offset: const Offset(12, 14),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.asset(
+                                'assets/images/top-web-apps-01.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -322,7 +378,11 @@ class _WebScreenState extends State<WebScreen> {
   }
 }
 
+/// Hero headline "We design and build" — border #436E69 (2px), body #AFCECB.
 class GlassOutlinedText extends StatelessWidget {
+  static const Color _border = Color(0xFF436E69);
+  static const Color _body = Color(0xFFAFCECB);
+
   final String text;
   final double fontSize;
 
@@ -337,13 +397,11 @@ class GlassOutlinedText extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        final shaderH = fontSize * 4.5;
         return SizedBox(
           width: w,
           child: Stack(
           alignment: Alignment.center,
           children: [
-            // 🌫️ Foggy interior (steam inside glass)
             ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
               child: SelectableText(
@@ -353,12 +411,11 @@ class GlassOutlinedText extends StatelessWidget {
                 style: GoogleFonts.albertSans(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
-                  color: ColorManager.accentCoral.withValues(alpha: 0.20),
+                  color: _body.withValues(alpha: 0.45),
                 ),
               ),
             ),
 
-            // Gold edge only (keep frosted white text)
             SelectableText(
               text,
               textAlign: TextAlign.center,
@@ -366,28 +423,13 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                foreground: (Paint()
+                foreground: Paint()
                   ..style = PaintingStyle.stroke
-                  ..strokeWidth = 0.95
-                  ..shader = LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorManager.accentGold.withValues(alpha: 0.95),
-                      Color.lerp(
-                            ColorManager.accentGold,
-                            ColorManager.backgroundDark,
-                            0.45,
-                          )!
-                          .withValues(alpha: 0.95),
-                    ],
-                  ).createShader(
-                    Rect.fromLTWH(0, 0, w, shaderH),
-                  )),
+                  ..strokeWidth = 2
+                  ..color = _border,
               ),
             ),
 
-            // 🌫️ Front diffusion (glass thickness)
             SelectableText(
               text,
               textAlign: TextAlign.center,
@@ -395,7 +437,7 @@ class GlassOutlinedText extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
-                color: ColorManager.orange.withValues(alpha: 0.26),
+                color: _body,
               ),
             ),
           ],
