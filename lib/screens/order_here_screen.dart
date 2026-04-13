@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
@@ -664,7 +665,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       'Your form data has been saved. You can try again without retyping.',
                       style: GoogleFonts.albertSans(
                         color: ColorManager.primaryTeal,
-                        fontSize: isMobile ? 9.sp : 4.sp,
+                        fontSize: isMobile ? 9.sp : 13,
                       ),
                     ),
                   ),
@@ -692,6 +693,19 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
   }
 
   static const Color _orderAccent = ColorManager.accentCoral;
+
+  /// Web/desktop: `Sizer.sp` scales too large on wide viewports — use fixed dp for headings/icons.
+  double _webSectionTitleFs(bool isMobile) => isMobile ? 14.sp : 18;
+  double _webSectionIconSize(bool isMobile) => isMobile ? 14.sp : 22;
+  double _webCardHeaderTitleFs(bool isMobile) => isMobile ? 14.sp : 17;
+  double _webCardHeaderIconSize(bool isMobile) => isMobile ? 16.sp : 22;
+  double _webSubsectionTitleFs(bool isMobile) => isMobile ? 10.sp : 14;
+  double _webSubsectionIconSize(bool isMobile) => isMobile ? 14.sp : 18;
+  double _webPlatformsHeadingFs(bool isMobile) => isMobile ? 10.sp : 14;
+  double _webChipIconSize(bool isMobile) => isMobile ? 12.sp : 18;
+  double _webChipLabelFs(bool isMobile) => isMobile ? 9.sp : 13;
+  double _webPrimaryButtonLabelFs(bool isMobile) => isMobile ? 14.sp : 16;
+  double _webPrimaryButtonIconSize(bool isMobile) => isMobile ? 16.sp : 20;
 
   Widget _buildTextField({
     required String label,
@@ -868,7 +882,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
             'Target Platforms *',
             style: GoogleFonts.albertSans(
               color: ColorManager.textPrimary,
-              fontSize: isMobile ? 10.sp : 5.sp,
+              fontSize: _webPlatformsHeadingFs(isMobile),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -884,7 +898,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                   children: [
                     Icon(
                       platform['icon'] as IconData,
-                      size: isMobile ? 12.sp : 10.sp,
+                      size: _webChipIconSize(isMobile),
                       color: isSelected
                           ? ColorManager.backgroundDark
                           : ColorManager.textSecondary,
@@ -896,7 +910,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                         color: isSelected
                             ? ColorManager.backgroundDark
                             : ColorManager.textPrimary,
-                        fontSize: isMobile ? 9.sp : 4.6.sp,
+                        fontSize: _webChipLabelFs(isMobile),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -960,7 +974,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 Icon(
                   icon,
                   color: _orderAccent,
-                  size: isMobile ? 14.sp : 12.sp,
+                  size: _webSectionIconSize(isMobile),
                 ),
                 SizedBox(width: 1.w),
               ],
@@ -968,7 +982,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 title,
                 style: GoogleFonts.albertSans(
                   color: _orderAccent,
-                  fontSize: isMobile ? 14.sp : 7.sp,
+                  fontSize: _webSectionTitleFs(isMobile),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -995,14 +1009,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 Icon(
                   Icons.palette,
                   color: _orderAccent,
-                  size: isMobile ? 16.sp : 14.sp,
+                  size: _webCardHeaderIconSize(isMobile),
                 ),
                 SizedBox(width: 1.5.w),
                 Text(
                   'Design Requirements',
                   style: GoogleFonts.albertSans(
                     color: ColorManager.textPrimary,
-                    fontSize: isMobile ? 14.sp : 6.sp,
+                    fontSize: _webCardHeaderTitleFs(isMobile),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1026,14 +1040,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Icon(
                         Icons.style,
                         color: _orderAccent,
-                        size: isMobile ? 14.sp : 8.sp,
+                        size: _webSubsectionIconSize(isMobile),
                       ),
                       SizedBox(width: 0.8.w),
                       Text(
                         'Design Style Preference',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.textPrimary,
-                          fontSize: isMobile ? 10.sp : 5.sp,
+                          fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1080,14 +1094,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Icon(
                         Icons.layers,
                         color: _orderAccent,
-                        size: isMobile ? 14.sp : 8.sp,
+                        size: _webSubsectionIconSize(isMobile),
                       ),
                       SizedBox(width: 0.8.w),
                       Text(
                         'Design Complexity Level',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.textPrimary,
-                          fontSize: isMobile ? 10.sp : 5.sp,
+                          fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1133,14 +1147,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Icon(
                         Icons.color_lens,
                         color: _orderAccent,
-                        size: isMobile ? 14.sp : 8.sp,
+                        size: _webSubsectionIconSize(isMobile),
                       ),
                       SizedBox(width: 0.8.w),
                       Text(
                         'Color Scheme / Brand Colors',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.textPrimary,
-                          fontSize: isMobile ? 10.sp : 5.sp,
+                          fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1178,14 +1192,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Icon(
                         Icons.lightbulb,
                         color: _orderAccent,
-                        size: isMobile ? 14.sp : 8.sp,
+                        size: _webSubsectionIconSize(isMobile),
                       ),
                       SizedBox(width: 0.8.w),
                       Text(
                         'Design Inspiration / References',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.textPrimary,
-                          fontSize: isMobile ? 10.sp : 5.sp,
+                          fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1223,14 +1237,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       Icon(
                         Icons.folder_special,
                         color: _orderAccent,
-                        size: isMobile ? 14.sp : 8.sp,
+                        size: _webSubsectionIconSize(isMobile),
                       ),
                       SizedBox(width: 0.8.w),
                       Text(
                         'Brand Guidelines / Assets',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.textPrimary,
-                          fontSize: isMobile ? 10.sp : 5.sp,
+                          fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1282,7 +1296,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           'Order Here',
           style: GoogleFonts.albertSans(
             color: ColorManager.backgroundDark,
-            fontSize: isMobile ? 20 : 22,
+            fontSize: isMobile ? 20 : 18,
             fontWeight: FontWeight.bold,
           ),
           maxLines: 1,
@@ -1307,6 +1321,88 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, authState) {
+                            if (authState is Authenticated) {
+                              return const SizedBox.shrink();
+                            }
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: isMobile ? 12 : 16),
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(isMobile ? 14 : 16),
+                                decoration: BoxDecoration(
+                                  color: ColorManager.accentGold.withValues(alpha: 0.22),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: ColorManager.accentGold.withValues(alpha: 0.45),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.lock_outline,
+                                          color: ColorManager.backgroundDark,
+                                          size: 22,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            'Sign in to submit your order. You can fill out the form first; submission requires an account.',
+                                            style: GoogleFonts.albertSans(
+                                              color: ColorManager.backgroundDark,
+                                              fontSize: isMobile ? 13 : 14,
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.35,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: isMobile ? 10 : 12),
+                                    Wrap(
+                                      spacing: 10,
+                                      runSpacing: 8,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              context.push(AppRoutes.login),
+                                          child: Text(
+                                            'Log in',
+                                            style: GoogleFonts.albertSans(
+                                              fontWeight: FontWeight.bold,
+                                              color: ColorManager.backgroundDark,
+                                            ),
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () =>
+                                              context.push(AppRoutes.signUp),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                ColorManager.backgroundDark,
+                                            foregroundColor:
+                                                ColorManager.accentGold,
+                                          ),
+                                          child: Text(
+                                            'Sign up',
+                                            style: GoogleFonts.albertSans(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         // Client Information
                         _buildSection(
                           title: 'Client Information',
@@ -1476,8 +1572,8 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       SizedBox(
-                                        width: isMobile ? 16.sp : 14.sp,
-                                        height: isMobile ? 16.sp : 14.sp,
+                                        width: _webPrimaryButtonIconSize(isMobile),
+                                        height: _webPrimaryButtonIconSize(isMobile),
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           valueColor: AlwaysStoppedAnimation<Color>(
@@ -1490,7 +1586,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                         'Submitting...',
                                         style: GoogleFonts.albertSans(
                                           color: ColorManager.backgroundDark,
-                                          fontSize: isMobile ? 14.sp : 7.sp,
+                                          fontSize: _webPrimaryButtonLabelFs(isMobile),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -1502,14 +1598,14 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                       Icon(
                                         Icons.send,
                                         color: ColorManager.backgroundDark,
-                                        size: isMobile ? 16.sp : 14.sp,
+                                        size: _webPrimaryButtonIconSize(isMobile),
                                       ),
                                       SizedBox(width: 1.w),
                                       Text(
                                         'Submit Order',
                                         style: GoogleFonts.albertSans(
                                           color: ColorManager.backgroundDark,
-                                          fontSize: isMobile ? 14.sp : 7.sp,
+                                          fontSize: _webPrimaryButtonLabelFs(isMobile),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -1533,117 +1629,213 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
   }
 
   void _showSignUpRequiredDialog() {
-    double wi = MediaQuery.of(context).size.width;
+    final wi = MediaQuery.sizeOf(context).width;
     final bool isMobile = wi < 600;
 
-    showDialog(
+    showDialog<void>(
       context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.35),
       builder: (BuildContext dialogContext) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.all(isMobile ? 20 : 24),
-            decoration: ColorManager.orderFormCardDecoration(borderRadius: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  size: 64,
-                  color: _orderAccent,
-                ),
-                SizedBox(height: isMobile ? 16 : 20),
-                Text(
-                  'Sign Up Required',
-                  style: GoogleFonts.albertSans(
-                    color: ColorManager.textPrimary,
-                    fontSize: isMobile ? 24 : 28,
-                    fontWeight: FontWeight.bold,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 40,
+            vertical: 24,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: isMobile ? wi - 32 : 400),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                decoration: BoxDecoration(
+                  // Opaque shell (signUpAuthCardDecoration alone uses faint alphas and reads transparent)
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      HomeWarmColors.shellTop,
+                      HomeWarmColors.shellBottom,
+                    ],
                   ),
-                ),
-                SizedBox(height: isMobile ? 12 : 16),
-                Text(
-                  'You need to sign up first to place an order. Please create an account to continue.',
-                  style: TextStyle(
-                    color: ColorManager.textSecondary,
-                    fontSize: isMobile ? 15 : 16,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: ColorManager.secondaryPurple.withValues(alpha: 0.42),
+                    width: 1.5,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: isMobile ? 24 : 28),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                        context.push(AppRoutes.login);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 20 : 24,
-                          vertical: isMobile ? 12 : 14,
-                        ),
-                        backgroundColor:
-                            ColorManager.primaryTeal.withValues(alpha: 0.18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: ColorManager.primaryTeal.withValues(alpha: 0.4),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: ColorManager.primaryTeal,
-                          fontSize: isMobile ? 15 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: isMobile ? 120 : 140,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          context.push(AppRoutes.signUp);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorManager.accentGold,
-                          foregroundColor: ColorManager.backgroundDark,
-                          padding: EdgeInsets.symmetric(
-                            vertical: isMobile ? 12 : 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Sign Up',
-                          style: GoogleFonts.albertSans(
-                            fontSize: isMobile ? 15 : 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 22,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                SizedBox(height: isMobile ? 12 : 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: ColorManager.textMuted,
-                      fontSize: isMobile ? 14 : 15,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(isMobile ? 18 : 22),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            vertical: isMobile ? 14 : 16,
+                            horizontal: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                HomeWarmColors.shellTop.withValues(alpha: 0.98),
+                                HomeWarmColors.shellBottom.withValues(alpha: 0.92),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: HomeWarmColors.appBarBorderBottom,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: ColorManager.accentGold
+                                        .withValues(alpha: 0.55),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: const CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage:
+                                      AssetImage('assets/images/logo.png'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: ColorManager.accentGold
+                                      .withValues(alpha: 0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.lock_outline_rounded,
+                                  size: isMobile ? 22 : 24,
+                                  color: ColorManager.backgroundDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: isMobile ? 16 : 18),
+                        Text(
+                          'Account required',
+                          style: GoogleFonts.albertSans(
+                            color: HomeWarmColors.textInk,
+                            fontSize: isMobile ? 20 : 22,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: isMobile ? 8 : 10),
+                        Text(
+                          'Sign in or create an account to submit your order.',
+                          style: GoogleFonts.albertSans(
+                            color: HomeWarmColors.bodyEmphasis,
+                            fontSize: isMobile ? 14 : 15,
+                            height: 1.45,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: isMobile ? 18 : 22),
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: HomeWarmColors.dividerLine,
+                        ),
+                        SizedBox(height: isMobile ? 16 : 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                  context.push(AppRoutes.login);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: HomeWarmColors.linkLogin,
+                                  side: BorderSide(
+                                    color: HomeWarmColors.linkLogin
+                                        .withValues(alpha: 0.85),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: isMobile ? 12 : 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Log in',
+                                  style: GoogleFonts.albertSans(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: isMobile ? 14 : 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: isMobile ? 10 : 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                  context.push(AppRoutes.signUp);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorManager.accentGold,
+                                  foregroundColor: ColorManager.backgroundDark,
+                                  elevation: 0,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: isMobile ? 12 : 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Sign up',
+                                  style: GoogleFonts.albertSans(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: isMobile ? 14 : 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: isMobile ? 8 : 10),
+                        TextButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          child: Text(
+                            'Not now',
+                            style: GoogleFonts.albertSans(
+                              color: HomeWarmColors.iconLocation,
+                              fontSize: isMobile ? 13 : 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         );

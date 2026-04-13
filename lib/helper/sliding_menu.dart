@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/helper/menu_item.dart';
@@ -10,9 +9,6 @@ import 'package:four_ideas/services/admin_service.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:sizer/sizer.dart';
 import 'package:go_router/go_router.dart';
-
-import 'alert_dialog_data.dart';
-
 
 class SlidingMenu extends StatefulWidget {
   const SlidingMenu({super.key});
@@ -307,18 +303,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           index: 3,
                                           icon: Icons.contrast,
                                           title: 'Order Here',
-                                          onPressed: () {
-                                            final authState = context.read<AuthBloc>().state;
-                                            if (authState is Authenticated) {
-                                              _closeDrawerAndGo(AppRoutes.orderHere);
-                                            } else {
-                                              setState(() {
-                                                isSlideOpen = false;
-                                                _animationController.reverse();
-                                              });
-                                              _showSignUpRequiredDialog(context, isMobile);
-                                            }
-                                          },
+                                          onPressed: () =>
+                                              _closeDrawerAndGo(AppRoutes.orderHere),
                                         ),
                                         BlocBuilder<AuthBloc, AuthState>(
                                           builder: (context, authState) {
@@ -348,18 +334,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           index: 6,
                                           icon: Icons.connect_without_contact,
                                           title: 'Contact Us',
-                                          onPressed: () {
-                                            setState(() {
-                                              isSlideOpen = false;
-                                              _animationController.reverse();
-                                            });
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialogData(wi: wi, he: he);
-                                              },
-                                            );
-                                          },
+                                          onPressed: () =>
+                                              _closeDrawerAndGo(AppRoutes.contact),
                                         ),
                                       ],
                                     ),
@@ -423,135 +399,6 @@ class _SlidingMenuState extends State<SlidingMenu>
           ),
         ),
       ],
-    );
-  }
-
-  void _showSignUpRequiredDialog(BuildContext context, bool isMobile) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.all(isMobile ? 20 : 24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  ColorManager.backgroundDarkElevated.withValues(alpha: 0.98),
-                  ColorManager.backgroundDark.withValues(alpha: 0.99),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: ColorManager.accentGold.withValues(alpha: 0.35),
-                width: 1.5,
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  size: 64,
-                  color: ColorManager.orange,
-                ),
-                SizedBox(height: isMobile ? 16 : 20),
-                SelectableText(
-                  'Sign Up Required',
-                  style: GoogleFonts.albertSans(
-                    color: ColorManager.onDarkPrimary,
-                    fontSize: isMobile ? 24 : 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: isMobile ? 12 : 16),
-                SelectableText(
-                  'You need to sign up first to place an order. Please create an account to continue.',
-                  style: TextStyle(
-                    color: ColorManager.onDarkSecondary,
-                    fontSize: isMobile ? 15 : 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: isMobile ? 24 : 28),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                        context.push(AppRoutes.login);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 20 : 24,
-                          vertical: isMobile ? 12 : 14,
-                        ),
-                        backgroundColor: ColorManager.primaryTeal.withValues(alpha: 0.22),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: ColorManager.primaryTeal.withValues(alpha: 0.45),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: ColorManager.primaryTeal,
-                          fontSize: isMobile ? 15 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: isMobile ? 120 : 140,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          context.push(AppRoutes.signUp);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorManager.accentGold,
-                          foregroundColor: ColorManager.backgroundDark,
-                          padding: EdgeInsets.symmetric(
-                            vertical: isMobile ? 12 : 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Sign Up',
-                          style: GoogleFonts.albertSans(
-                            fontSize: isMobile ? 15 : 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: isMobile ? 12 : 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: ColorManager.onDarkSecondary.withValues(alpha: 0.85),
-                      fontSize: isMobile ? 14 : 15,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:four_ideas/screens/portfolio_screen.dart';
 import 'package:four_ideas/screens/services_screen.dart';
 import 'package:four_ideas/screens/about_us_screen.dart';
 import 'package:four_ideas/screens/order_here_screen.dart';
+import 'package:four_ideas/screens/contact_us_screen.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/case_study_detail_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
@@ -35,6 +36,8 @@ abstract class AppRoutes {
   static const String services = '/services';
   static const String about = '/about';
   static const String orderHere = '/order-here';
+  /// Full-page contact (matches drawer + deep link); same content as the legacy modal.
+  static const String contact = '/contact';
 
   static const String login = '/login';
   static const String signUp = '/signup';
@@ -119,6 +122,10 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.orderHere,
         builder: (context, state) => const OrderHereScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.contact,
+        builder: (context, state) => const ContactUsScreen(),
       ),
       // Auth
       GoRoute(
