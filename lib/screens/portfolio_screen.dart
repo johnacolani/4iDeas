@@ -87,9 +87,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   List<PortfolioApp> get _displayApps {
     final List<PortfolioApp> list;
     if (_appsFromFirestore != null && _appsFromFirestore!.isNotEmpty) {
-      list = _appsFromFirestore!
+      // Merge with built-in catalog: editing one app in Firestore must not hide the rest
+      // of the showcase (same idea as case studies: cloud overrides by id, static fills gaps).
+      final fromCloud = _appsFromFirestore!
           .map(PortfolioData.mergePortfolioAppCaseStudyFromCatalog)
           .toList();
+      final idsFromCloud = fromCloud.map((a) => a.id).toSet();
+      final staticOnly =
+          PortfolioData.apps.where((a) => !idsFromCloud.contains(a.id)).toList();
+      list = [...fromCloud, ...staticOnly];
     } else {
       list = PortfolioData.apps;
     }
