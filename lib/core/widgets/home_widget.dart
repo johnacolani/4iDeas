@@ -300,21 +300,16 @@ class HomeWidget extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF6C5428)
-                                        .withValues(alpha: 0.38),
-                                    offset: const Offset(12, 14),
-                                    blurRadius: 10,
-                                    spreadRadius: 0,
-                                  ),
-                                ],
+
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                child: Image.asset(
-                                  'assets/images/top-web-apps-01.png',
-                                  fit: BoxFit.contain,
+                                child: Opacity(
+                                  opacity: 0.8,
+                                  child: Image.asset(
+                                    'assets/images/my-gif.gif',
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
                             ),
@@ -323,7 +318,7 @@ class HomeWidget extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: isMobile ? 32 : 48,
+                      height: isMobile ? 16 : 24,
                     ),
                     // Title before backend sections
                     Padding(

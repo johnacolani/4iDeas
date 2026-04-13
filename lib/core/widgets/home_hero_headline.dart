@@ -24,13 +24,13 @@ class HomeHeroHeadline extends StatelessWidget {
           textDirection: TextDirection.ltr,
           style: GoogleFonts.albertSans(
             fontSize: titleSize,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             height: 1.05,
             letterSpacing: -1.0,
-            color: HomeWarmColors.headlinePrimary,
+            color: HomeWarmColors.eyebrowMuted,
           ),
         ),
-        SizedBox(height: titleSize * 0.14),
+        SizedBox(height: titleSize * 0.25),
         SelectableText(
           'SOFTWARE · MOBILE · WEB · CLOUD',
           textAlign: TextAlign.center,

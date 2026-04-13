@@ -36,7 +36,7 @@ class AppBackground extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color:
-                      HomeWarmColors.bloomNorth.withValues(alpha: 0.3),
+                      HomeWarmColors.bloomNorth.withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -52,7 +52,7 @@ class AppBackground extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: HomeWarmColors.bloomSouthEast
-                      .withValues(alpha: 0.3),
+                      .withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -65,7 +65,7 @@ class AppBackground extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color:
-                    HomeWarmColors.bloomCenter.withValues(alpha: 0.3),
+                    HomeWarmColors.bloomCenter.withValues(alpha: 0.5),
               ),
             ),
           ),

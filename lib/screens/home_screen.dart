@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           maxLines: 1,
                                           text: TextSpan(
                                             text: 'Based in: Richmond, VA',
-                                            style: TextStyle(
+                                             style: TextStyle(
                                               fontSize:
                                                   wi < 400 ? 11 : 12,
                                               fontWeight: FontWeight.bold,

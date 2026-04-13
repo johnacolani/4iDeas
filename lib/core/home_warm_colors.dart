@@ -44,7 +44,7 @@ abstract final class HomeWarmColors {
 
   /// Hero — single solid headline (see [HomeHeroHeadline]); legacy tokens kept for any lerp
   static const headlinePrimary = Color(0xFF0F172A);
-  static const eyebrowMuted = Color(0xFF64748B);
+  static const eyebrowMuted = Color(0xFF25426E);
   static const heroStroke = Color(0xFFE2E8F0);
   static const heroFill = Color(0xFF0F172A);
 

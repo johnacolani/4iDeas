@@ -278,38 +278,33 @@ class _WebScreenState extends State<WebScreen> {
                   ),
                   SizedBox(
                     width: isMobile
-                        ? wi * 0.9
+                        ? wi * 0.7
                         : (isTablet ? wi * 0.5 : wi * 0.3),
                     child: const AutoScrollImage(),
                   ),
                   Transform.translate(
                     offset: Offset(0, -60),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8.0 : 16.0),
+                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 32.0 : 80.0),
                       child: SizedBox(
-                        width: double.infinity,
-                        height: wi < 600 ? wi * 0.5 : (wi < 1024 ? wi * 0.45 : wi * 0.4),
+                        width: double.infinity/2,
+                        height: wi < 600 ? wi * 0.5 : (wi < 1024 ? wi * 0.6 : wi * 0.6),
                         child: FittedBox(
                           fit: BoxFit.contain,
                           alignment: Alignment.center,
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF0F172A)
-                                      .withValues(alpha: 0.12),
-                                  offset: const Offset(0, 8),
-                                  blurRadius: 24,
-                                  spreadRadius: 0,
-                                ),
-                              ],
+
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
-                              child: Image.asset(
-                                'assets/images/top-web-apps-01.png',
-                                fit: BoxFit.contain,
+                              child: Opacity(
+                                opacity: 0.8,
+                                child: Image.asset(
+                                  'assets/images/my-gif.gif',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
@@ -318,7 +313,7 @@ class _WebScreenState extends State<WebScreen> {
                     ),
                   ),
                   SizedBox(
-                    height: isMobile ? 32 : 48,
+                    height: isMobile ? 16 : 16,
                   ),
                   // Title before backend sections
                   Padding(
@@ -338,7 +333,7 @@ class _WebScreenState extends State<WebScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile ? wi * 0.12 : (isTablet ? wi * 0.2 : wi * 0.25),
-                      vertical: isMobile ? 12 : 16,
+                      vertical: isMobile ? 12 : 12,
                     ),
                     child: Divider(
                       color: HomeWarmColors.dividerLine,
