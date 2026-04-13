@@ -12,6 +12,10 @@ class PortfolioApp {
   final String? appStoreUrl;
   final String? playStoreUrl;
   final String? webUrl;
+  /// macOS download: Mac App Store, hosted `.dmg`/`.zip`, GitHub Release, or Firebase Storage URL (not a bundled asset).
+  final String? macosUrl;
+  /// Windows: Microsoft Store, hosted `.exe`/`.msix`, or GitHub Release URL.
+  final String? windowsUrl;
   /// When set, tapping the app card navigates to this case study (go_router) instead of opening [webUrl].
   /// Use when the product also has a full case study on this site (e.g. ASD USA → case study `asd`).
   final String? caseStudyId;
@@ -26,6 +30,8 @@ class PortfolioApp {
     this.appStoreUrl,
     this.playStoreUrl,
     this.webUrl,
+    this.macosUrl,
+    this.windowsUrl,
     this.caseStudyId,
   });
 
@@ -39,6 +45,8 @@ class PortfolioApp {
         'appStoreUrl': appStoreUrl,
         'playStoreUrl': playStoreUrl,
         'webUrl': webUrl,
+        'macosUrl': macosUrl,
+        'windowsUrl': windowsUrl,
         'caseStudyId': caseStudyId,
       };
 
@@ -53,6 +61,8 @@ class PortfolioApp {
       appStoreUrl: map['appStoreUrl'] as String?,
       playStoreUrl: map['playStoreUrl'] as String?,
       webUrl: map['webUrl'] as String?,
+      macosUrl: map['macosUrl'] as String?,
+      windowsUrl: map['windowsUrl'] as String?,
       caseStudyId: map['caseStudyId'] as String?,
     );
   }
@@ -334,25 +344,16 @@ class PortfolioData {
       'https://sites.google.com/view/senior-interaction-product-d/home';
   static const String githubProfile = 'https://github.com/johnhcolani';
 
-  /// App grid order matches list order (first item appears first). New showcase app: insert at the top.
+  /// App grid order matches list order. Featured App Showcase order (first five): Service Flow → ASD USA → 4iDeas Portfolio Website → My Own Design System → Twin Scriptures; then the rest.
   static List<PortfolioApp> get apps => [
         PortfolioApp(
           id: 'service-flow',
           name: 'Service Flow',
           description:
               'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
-          useComingSoonPlaceholder: true,
+          imagePath: 'assets/images/4ideas/4ideas-web-app.png',
+          showComingSoonOverlay: true,
           caseStudyId: 'service-flow',
-        ),
-        PortfolioApp(
-          id: 'great-t2s',
-          name: 'Great T2S',
-          description:
-              'Designed for people who need assistance with reading—visual challenges, learning differences, or language barriers. Converts written content into natural speech and supports foreign language learners. Accessible, simple experience that reduces cognitive load.',
-          imagePath: 'assets/images/app_store/great-t2s.png',
-          appStoreUrl: 'https://apps.apple.com/us/app/great-t2s/id6751081806',
-          playStoreUrl:
-              'https://play.google.com/store/apps/details?id=com.johnacolani.text_to_speech',
         ),
         PortfolioApp(
           id: 'asdusa',
@@ -366,6 +367,46 @@ class PortfolioData {
               'https://play.google.com/store/apps/details?id=com.JohnColani.asdapp',
           webUrl: 'https://absolute-stone-design-app.web.app/',
           caseStudyId: 'asd',
+        ),
+        PortfolioApp(
+          id: 'my-web-site',
+          name: '4iDeas - Portfolio Website',
+          description:
+              'Portfolio site: Flutter apps, backend services, product design. Responsive showcase, order form, modern UI. Flutter Web on Firebase.',
+          imagePath: 'assets/images/4ideas.png',
+          appStoreUrl: null,
+          playStoreUrl: null,
+          webUrl: 'https://my-web-page-ef286.web.app/',
+        ),
+        PortfolioApp(
+          id: '4ideas-design-system',
+          name: 'My Own Design System',
+          description:
+              'A living design system built in Flutter—components, patterns, and UI primitives. Developed by John Colani.',
+          imagePath: 'assets/images/design_system/design-system.png',
+          webUrl: 'https://my-flutter-apps-f87ea.web.app/',
+        ),
+        PortfolioApp(
+          id: 'twin-scriptures',
+          name: 'Twin Scriptures',
+          description:
+              'Bilingual scripture readers comparing verses side-by-side. Persian–English and Turkish–English. Simultaneous reading for comprehension, language learning, and theological study. Supports spiritual practice and language reinforcement.',
+          imagePath: 'assets/images/app_store/twin-scripture.png',
+          appStoreUrl:
+              'https://apps.apple.com/app/twin-scriptures/id6740755381',
+          playStoreUrl:
+              'https://play.google.com/store/apps/details?id=com.johncolani.twin.scripture',
+          caseStudyId: 'twin-scriptures',
+        ),
+        PortfolioApp(
+          id: 'great-t2s',
+          name: 'Great T2S',
+          description:
+              'Designed for people who need assistance with reading—visual challenges, learning differences, or language barriers. Converts written content into natural speech and supports foreign language learners. Accessible, simple experience that reduces cognitive load.',
+          imagePath: 'assets/images/app_store/great-t2s.png',
+          appStoreUrl: 'https://apps.apple.com/us/app/great-t2s/id6751081806',
+          playStoreUrl:
+              'https://play.google.com/store/apps/details?id=com.johnacolani.text_to_speech',
         ),
         PortfolioApp(
           id: 'solomon-prayers',
@@ -412,18 +453,6 @@ class PortfolioData {
               'https://play.google.com/store/apps/details?id=com.johncolani.greate_note_app',
         ),
         PortfolioApp(
-          id: 'twin-scriptures',
-          name: 'Twin Scriptures',
-          description:
-              'Bilingual scripture readers comparing verses side-by-side. Persian–English and Turkish–English. Simultaneous reading for comprehension, language learning, and theological study. Supports spiritual practice and language reinforcement.',
-          imagePath: 'assets/images/app_store/twin-scripture.png',
-          appStoreUrl:
-              'https://apps.apple.com/app/twin-scriptures/id6740755381',
-          playStoreUrl:
-              'https://play.google.com/store/apps/details?id=com.johncolani.twin.scripture',
-          caseStudyId: 'twin-scriptures',
-        ),
-        PortfolioApp(
           id: 'twin-scripture-en-tr',
           name: 'Twin Scripture EN‑TR',
           description:
@@ -446,16 +475,6 @@ class PortfolioData {
               'https://play.google.com/store/apps/details?id=com.johncolani.fractioflow&pcampaignid=web_share',
         ),
         PortfolioApp(
-          id: 'my-web-site',
-          name: '4iDeas - Portfolio Website',
-          description:
-              'Portfolio site: Flutter apps, backend services, product design. Responsive showcase, order form, modern UI. Flutter Web on Firebase.',
-          imagePath: 'assets/images/app_store/my-web-site-01.png',
-          appStoreUrl: null,
-          playStoreUrl: null,
-          webUrl: 'https://my-web-page-ef286.web.app/',
-        ),
-        PortfolioApp(
           id: 'vision-exercise',
           name: 'Vision Exercise',
           description:
@@ -468,15 +487,47 @@ class PortfolioData {
         ),
       ];
 
-  /// Firestore app docs often omit [PortfolioApp.caseStudyId]. Copy from static [apps] when [id] matches
-  /// so App Showcase still navigates to `/portfolio/case-study/:id` instead of opening [webUrl].
-  ///
-  /// Firestore document ids are often auto-generated (not `asdusa`), so [id] may not match the static catalog.
-  /// In that case we infer the case study from [name] for known products.
-  static PortfolioApp mergePortfolioAppCaseStudyFromCatalog(PortfolioApp app) {
-    if (app.caseStudyId != null) return app;
+  /// Prefer non-empty [fromApp]; otherwise use [fromCatalog] so Firestore can override static URLs.
+  static String? _mergeUrlField(String? fromApp, String? fromCatalog) {
+    final t = fromApp?.trim();
+    if (t != null && t.isNotEmpty) return t;
+    return fromCatalog;
+  }
+
+  /// Static [apps] row that matches this Firestore (or hybrid) app: same id, same case study, or same name.
+  static PortfolioApp? _catalogAppMatching(PortfolioApp app) {
     for (final a in apps) {
-      if (a.id == app.id && a.caseStudyId != null) {
+      if (a.id == app.id) return a;
+    }
+    final inferred = caseStudyIdForPortfolioAppName(app.name);
+    if (inferred != null) {
+      for (final a in apps) {
+        if (a.caseStudyId == inferred) return a;
+      }
+    }
+    if (app.caseStudyId != null) {
+      for (final a in apps) {
+        if (a.caseStudyId == app.caseStudyId) return a;
+      }
+    }
+    for (final a in apps) {
+      if (a.name == app.name) return a;
+    }
+    return null;
+  }
+
+  /// Firestore docs often omit [PortfolioApp.caseStudyId] and store links. Merge from static [apps] when
+  /// the app matches so showcase cards keep case-study navigation and platform buttons.
+  ///
+  /// Previously, returning early when [caseStudyId] was set skipped merging URLs — store chips disappeared
+  /// for apps like ASD USA that only had case study + web in Firestore.
+  static PortfolioApp mergePortfolioAppCaseStudyFromCatalog(PortfolioApp app) {
+    final catalog = _catalogAppMatching(app);
+    final inferredCs = caseStudyIdForPortfolioAppName(app.name);
+    final caseStudyId = app.caseStudyId ?? catalog?.caseStudyId ?? inferredCs;
+
+    if (catalog == null) {
+      if (caseStudyId != null && app.caseStudyId != caseStudyId) {
         return PortfolioApp(
           id: app.id,
           name: app.name,
@@ -487,26 +538,70 @@ class PortfolioData {
           appStoreUrl: app.appStoreUrl,
           playStoreUrl: app.playStoreUrl,
           webUrl: app.webUrl,
-          caseStudyId: a.caseStudyId,
+          macosUrl: app.macosUrl,
+          windowsUrl: app.windowsUrl,
+          caseStudyId: caseStudyId,
         );
       }
+      return app;
     }
-    final inferred = caseStudyIdForPortfolioAppName(app.name);
-    if (inferred != null) {
-      return PortfolioApp(
-        id: app.id,
-        name: app.name,
-        description: app.description,
-        imagePath: app.imagePath,
-        useComingSoonPlaceholder: app.useComingSoonPlaceholder,
-        showComingSoonOverlay: app.showComingSoonOverlay,
-        appStoreUrl: app.appStoreUrl,
-        playStoreUrl: app.playStoreUrl,
-        webUrl: app.webUrl,
-        caseStudyId: inferred,
-      );
+
+    return PortfolioApp(
+      id: app.id,
+      name: app.name,
+      description: app.description,
+      imagePath: app.imagePath,
+      useComingSoonPlaceholder: app.useComingSoonPlaceholder,
+      showComingSoonOverlay: app.showComingSoonOverlay,
+      appStoreUrl: _mergeUrlField(app.appStoreUrl, catalog.appStoreUrl),
+      playStoreUrl: _mergeUrlField(app.playStoreUrl, catalog.playStoreUrl),
+      webUrl: _mergeUrlField(app.webUrl, catalog.webUrl),
+      macosUrl: _mergeUrlField(app.macosUrl, catalog.macosUrl),
+      windowsUrl: _mergeUrlField(app.windowsUrl, catalog.windowsUrl),
+      caseStudyId: caseStudyId,
+    );
+  }
+
+  /// App Showcase: Service Flow → ASD USA → 4iDeas Portfolio Website → My Own Design System → Twin Scriptures; then remaining apps in their original order.
+  static List<PortfolioApp> orderAppsForShowcase(List<PortfolioApp> apps) {
+    int? showcaseSlot(PortfolioApp a) {
+      final id = a.id.toLowerCase();
+      final name = a.name.toLowerCase();
+      if (id == 'service-flow' || name.contains('service flow')) return 0;
+      if (id == 'asdusa' || name.contains('asd usa')) return 1;
+      if (id == 'my-web-site' ||
+          (name.contains('4ideas') && name.contains('portfolio website'))) {
+        return 2;
+      }
+      if (id == '4ideas-design-system' ||
+          id == 'design_system' ||
+          (name.contains('my own design system'))) {
+        return 3;
+      }
+      if (id == 'twin-scriptures') return 4;
+      return null;
     }
-    return app;
+
+    PortfolioApp? takeSlot(int slot) {
+      for (final a in apps) {
+        if (showcaseSlot(a) == slot) return a;
+      }
+      return null;
+    }
+
+    final placed = <String>{};
+    final out = <PortfolioApp>[];
+    for (var s = 0; s < 5; s++) {
+      final a = takeSlot(s);
+      if (a != null) {
+        out.add(a);
+        placed.add(a.id);
+      }
+    }
+    for (final a in apps) {
+      if (!placed.contains(a.id)) out.add(a);
+    }
+    return out;
   }
 
   /// Maps showcase app title to [PortfolioCaseStudy.id] when Firestore id does not match static data.

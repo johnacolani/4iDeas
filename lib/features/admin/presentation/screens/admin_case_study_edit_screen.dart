@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/case_study_content_service.dart';
@@ -203,12 +204,19 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.2),
+                              color: const Color(0xFFFEE2E2),
                               borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFDC2626).withValues(alpha: 0.35),
+                              ),
                             ),
                             child: Text(
                               _error!,
-                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                              style: GoogleFonts.albertSans(
+                                color: const Color(0xFF991B1B),
+                                fontSize: 14,
+                                height: 1.35,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -242,7 +250,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                         Text(
                           'Sections',
                           style: GoogleFonts.albertSans(
-                            color: ColorManager.orange,
+                            color: HomeWarmColors.textInk,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -252,8 +260,13 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                           final i = e.key;
                           final s = e.value;
                           return Card(
-                            color: Colors.white.withValues(alpha: 0.06),
+                            color: Colors.white,
+                            elevation: 0,
                             margin: const EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(color: HomeWarmColors.drawerBorder),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Column(
@@ -265,7 +278,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                         child: Text(
                                           'Section ${i + 1}',
                                           style: GoogleFonts.albertSans(
-                                            color: Colors.white,
+                                            color: HomeWarmColors.textInk,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -303,13 +316,16 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                         }),
                         OutlinedButton.icon(
                           onPressed: _addSection,
-                          icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                          icon: Icon(Icons.add, size: 18, color: HomeWarmColors.sectionAccent),
                           label: Text(
                             'Add section',
-                            style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.albertSans(
+                              color: HomeWarmColors.sectionAccent,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: ColorManager.orange),
+                            side: BorderSide(color: HomeWarmColors.sectionAccent.withValues(alpha: 0.65)),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -350,25 +366,57 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
+    final borderRadius = BorderRadius.circular(8);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         maxLines: maxLines,
         validator: validator,
-        style: GoogleFonts.albertSans(color: Colors.white, fontSize: 15),
+        cursorColor: ColorManager.orange,
+        style: GoogleFonts.albertSans(
+          color: HomeWarmColors.textInk,
+          fontSize: 15,
+          height: 1.35,
+        ),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: GoogleFonts.albertSans(color: Colors.white70),
-          hintStyle: GoogleFonts.albertSans(color: Colors.white38),
+          filled: true,
+          fillColor: Colors.white,
+          labelStyle: GoogleFonts.albertSans(
+            color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.85),
+            fontSize: 14,
+          ),
+          floatingLabelStyle: GoogleFonts.albertSans(
+            color: HomeWarmColors.textInk,
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+          hintStyle: GoogleFonts.albertSans(
+            color: HomeWarmColors.eyebrowMuted,
+            fontSize: 14,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: HomeWarmColors.drawerBorder),
+            borderRadius: borderRadius,
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: ColorManager.orange),
-            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: ColorManager.orange, width: 2),
+            borderRadius: borderRadius,
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Color(0xFFDC2626)),
+            borderRadius: borderRadius,
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Color(0xFFDC2626), width: 2),
+            borderRadius: borderRadius,
+          ),
+          errorStyle: GoogleFonts.albertSans(
+            color: const Color(0xFFB91C1C),
+            fontSize: 12,
           ),
         ),
       ),

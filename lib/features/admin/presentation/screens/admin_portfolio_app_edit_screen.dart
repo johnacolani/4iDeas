@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/portfolio_content_service.dart';
@@ -28,6 +29,8 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
   final _appStoreUrlController = TextEditingController();
   final _playStoreUrlController = TextEditingController();
   final _webUrlController = TextEditingController();
+  final _macosUrlController = TextEditingController();
+  final _windowsUrlController = TextEditingController();
   bool _useComingSoonPlaceholder = false;
   bool _saving = false;
   String? _error;
@@ -45,6 +48,8 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
       _appStoreUrlController.text = app.appStoreUrl ?? '';
       _playStoreUrlController.text = app.playStoreUrl ?? '';
       _webUrlController.text = app.webUrl ?? '';
+      _macosUrlController.text = app.macosUrl ?? '';
+      _windowsUrlController.text = app.windowsUrl ?? '';
       _useComingSoonPlaceholder = app.useComingSoonPlaceholder;
     }
   }
@@ -57,20 +62,33 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
     _appStoreUrlController.dispose();
     _playStoreUrlController.dispose();
     _webUrlController.dispose();
+    _macosUrlController.dispose();
+    _windowsUrlController.dispose();
     super.dispose();
   }
 
+  /// Logical id for [PortfolioApp.id] / merge keys — never the Firestore document id.
+  String _logicalPortfolioAppId() {
+    final fromInitial = widget.initialApp?.id.trim();
+    if (fromInitial != null && fromInitial.isNotEmpty) return fromInitial;
+    return _nameController.text.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '-');
+  }
+
   PortfolioApp _buildApp() {
-    final id = widget.docId ?? _nameController.text.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '-');
+    final idRaw = _logicalPortfolioAppId();
+    final id = idRaw.isEmpty ? 'app-${DateTime.now().millisecondsSinceEpoch}' : idRaw;
     return PortfolioApp(
-      id: id.isEmpty ? 'app-${DateTime.now().millisecondsSinceEpoch}' : id,
+      id: id,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       imagePath: _imagePathController.text.trim().isEmpty ? null : _imagePathController.text.trim(),
       useComingSoonPlaceholder: _useComingSoonPlaceholder,
+      showComingSoonOverlay: widget.initialApp?.showComingSoonOverlay ?? false,
       appStoreUrl: _appStoreUrlController.text.trim().isEmpty ? null : _appStoreUrlController.text.trim(),
       playStoreUrl: _playStoreUrlController.text.trim().isEmpty ? null : _playStoreUrlController.text.trim(),
       webUrl: _webUrlController.text.trim().isEmpty ? null : _webUrlController.text.trim(),
+      macosUrl: _macosUrlController.text.trim().isEmpty ? null : _macosUrlController.text.trim(),
+      windowsUrl: _windowsUrlController.text.trim().isEmpty ? null : _windowsUrlController.text.trim(),
       caseStudyId: widget.initialApp?.caseStudyId,
     );
   }
@@ -148,12 +166,19 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.2),
+                            color: const Color(0xFFFEE2E2),
                             borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: const Color(0xFFDC2626).withValues(alpha: 0.35),
+                            ),
                           ),
                           child: Text(
                             _error!,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                            style: GoogleFonts.albertSans(
+                              color: const Color(0xFF991B1B),
+                              fontSize: 14,
+                              height: 1.35,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -177,29 +202,52 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
                         hint: 'e.g. assets/images/app_store/my-web-site-01.png',
                       ),
                       _buildField(
+                        controller: _webUrlController,
+                        label: 'Web URL (optional)',
+                        hint: 'https://...',
+                      ),
+                      _buildField(
+                        controller: _macosUrlController,
+                        label: 'macOS URL (optional)',
+                        hint: 'Mac App Store, .dmg, GitHub Release, or hosted download',
+                      ),
+                      _buildField(
+                        controller: _windowsUrlController,
+                        label: 'Windows URL (optional)',
+                        hint: 'Microsoft Store, .exe/.msix, or hosted download',
+                      ),
+                      _buildField(
                         controller: _appStoreUrlController,
                         label: 'App Store URL (optional)',
                         hint: 'https://apps.apple.com/...',
                       ),
                       _buildField(
                         controller: _playStoreUrlController,
-                        label: 'Play Store URL (optional)',
+                        label: 'Google Play URL (optional)',
                         hint: 'https://play.google.com/...',
-                      ),
-                      _buildField(
-                        controller: _webUrlController,
-                        label: 'Web URL (optional)',
-                        hint: 'https://...',
                       ),
                       const SizedBox(height: 16),
                       CheckboxListTile(
                         value: _useComingSoonPlaceholder,
                         onChanged: (v) => setState(() => _useComingSoonPlaceholder = v ?? false),
+                        checkColor: Colors.white,
+                        fillColor: WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.selected)) {
+                            return ColorManager.orange;
+                          }
+                          return Colors.transparent;
+                        }),
+                        side: BorderSide(
+                          color: HomeWarmColors.drawerBorder,
+                          width: 1.5,
+                        ),
                         title: Text(
                           'Use "Coming Soon" placeholder (no image)',
-                          style: GoogleFonts.albertSans(color: Colors.white, fontSize: bodySize),
+                          style: GoogleFonts.albertSans(
+                            color: HomeWarmColors.textInk,
+                            fontSize: bodySize,
+                          ),
                         ),
-                        activeColor: ColorManager.orange,
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
@@ -236,25 +284,57 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
+    final borderRadius = BorderRadius.circular(8);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         controller: controller,
         maxLines: maxLines,
         validator: validator,
-        style: GoogleFonts.albertSans(color: Colors.white, fontSize: 15),
+        cursorColor: ColorManager.orange,
+        style: GoogleFonts.albertSans(
+          color: HomeWarmColors.textInk,
+          fontSize: 15,
+          height: 1.35,
+        ),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: GoogleFonts.albertSans(color: Colors.white70),
-          hintStyle: GoogleFonts.albertSans(color: Colors.white38),
+          filled: true,
+          fillColor: Colors.white,
+          labelStyle: GoogleFonts.albertSans(
+            color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.85),
+            fontSize: 14,
+          ),
+          floatingLabelStyle: GoogleFonts.albertSans(
+            color: HomeWarmColors.textInk,
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+          hintStyle: GoogleFonts.albertSans(
+            color: HomeWarmColors.eyebrowMuted,
+            fontSize: 14,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: HomeWarmColors.drawerBorder),
+            borderRadius: borderRadius,
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: ColorManager.orange),
-            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: ColorManager.orange, width: 2),
+            borderRadius: borderRadius,
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Color(0xFFDC2626)),
+            borderRadius: borderRadius,
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Color(0xFFDC2626), width: 2),
+            borderRadius: borderRadius,
+          ),
+          errorStyle: GoogleFonts.albertSans(
+            color: const Color(0xFFB91C1C),
+            fontSize: 12,
           ),
         ),
       ),

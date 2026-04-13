@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 
 class AppBackground extends StatelessWidget {
   const AppBackground({super.key});
 
-  /// On narrow layouts, nudge decorative circles (half their width via [FractionalTranslation]).
   static Widget _shiftOnMobile(bool mobile, Offset translation, Widget child) {
     if (!mobile) return child;
     return FractionalTranslation(translation: translation, child: child);
@@ -15,22 +14,17 @@ class AppBackground extends StatelessWidget {
     final bool isMobileHome = MediaQuery.sizeOf(context).width < 600;
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            const Color(0xFFF9F7F2),
-            const Color(0xFFF3EFE8),
-            const Color(0xFFEDE7DE),
-          ],
-          stops: const [0.0, 0.55, 1.0],
-        ),
+      decoration: const BoxDecoration(
+        color: HomeWarmColors.shellSurfaceSolid,
       ),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Soft color blooms for a modern product feel.
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _StudioGridPainter(),
+            ),
+          ),
           Align(
             alignment: const Alignment(-0.92, -0.96),
             child: _shiftOnMobile(
@@ -41,7 +35,8 @@ class AppBackground extends StatelessWidget {
                 height: 360,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ColorManager.primaryTeal.withValues(alpha: 0.14),
+                  color:
+                      HomeWarmColors.bloomNorth.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -56,7 +51,8 @@ class AppBackground extends StatelessWidget {
                 height: 420,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ColorManager.secondaryPurple.withValues(alpha: 0.12),
+                  color: HomeWarmColors.bloomSouthEast
+                      .withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -64,11 +60,12 @@ class AppBackground extends StatelessWidget {
           Align(
             alignment: const Alignment(0.1, -0.24),
             child: Container(
-              width: 300,
-              height: 300,
+              width: 280,
+              height: 280,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorManager.accentCoral.withValues(alpha: 0.12),
+                color:
+                    HomeWarmColors.bloomCenter.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -76,4 +73,25 @@ class AppBackground extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StudioGridPainter extends CustomPainter {
+  const _StudioGridPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = HomeWarmColors.gridLine
+      ..strokeWidth = 1;
+    const step = 48.0;
+    for (double x = 0; x <= size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y <= size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

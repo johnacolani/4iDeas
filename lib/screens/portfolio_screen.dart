@@ -33,6 +33,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final OpenSourceContentService _openSourceService = OpenSourceContentService();
   final CaseStudyContentService _caseStudyService = CaseStudyContentService();
   List<PortfolioApp>? _appsFromFirestore;
+  /// Firestore collection document id for each [PortfolioApp.id] (logical slug may differ from doc id).
+  Map<String, String>? _portfolioFirestoreDocByAppId;
   List<PortfolioPublication>? _publicationsFromFirestore;
   List<OpenSourceItem>? _openSourceFromFirestore;
   List<PortfolioCaseStudy>? _caseStudiesFromFirestore;
@@ -58,20 +60,40 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _loadPortfolioApps() async {
     try {
       final hasAny = await _portfolioService.hasApps();
-      if (hasAny) {
-        final apps = await _portfolioService.getApps();
-        if (mounted) setState(() => _appsFromFirestore = apps);
+      if (!hasAny) {
+        if (mounted) {
+          setState(() {
+            _appsFromFirestore = null;
+            _portfolioFirestoreDocByAppId = null;
+          });
+        }
+        return;
+      }
+      final withIds = await _portfolioService.getAppsWithDocIds();
+      if (mounted) {
+        setState(() {
+          _appsFromFirestore = withIds.map((t) => t.$2).toList();
+          _portfolioFirestoreDocByAppId = {
+            for (final (docId, app) in withIds) app.id: docId,
+          };
+        });
       }
     } catch (_) {}
   }
 
+  String? _firestoreDocIdForPortfolioApp(PortfolioApp app) =>
+      _portfolioFirestoreDocByAppId?[app.id];
+
   List<PortfolioApp> get _displayApps {
+    final List<PortfolioApp> list;
     if (_appsFromFirestore != null && _appsFromFirestore!.isNotEmpty) {
-      return _appsFromFirestore!
+      list = _appsFromFirestore!
           .map(PortfolioData.mergePortfolioAppCaseStudyFromCatalog)
           .toList();
+    } else {
+      list = PortfolioData.apps;
     }
-    return PortfolioData.apps;
+    return PortfolioData.orderAppsForShowcase(list);
   }
 
   Future<void> _loadPublications() async {
@@ -144,14 +166,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
 
-  PortfolioApp get _designSystemApp => PortfolioApp(
-        id: 'design_system',
-        name: 'My Own Design System',
-        description: 'A living design system built in Flutter—components, patterns, and UI primitives. Developed by John Colani.',
-        imagePath: 'assets/images/design_system/design-system.png',
-        webUrl: _designSystemUrl,
-      );
-
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
@@ -171,7 +185,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToEditApp(PortfolioApp app) async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminPortfolioAppEditScreen(docId: app.id, initialApp: app),
+        builder: (context) => AdminPortfolioAppEditScreen(
+          docId: _firestoreDocIdForPortfolioApp(app),
+          initialApp: app,
+        ),
       ),
     );
     if (result == true) _loadAllPortfolioData();
@@ -200,8 +217,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
     );
     if (confirm != true || !mounted) return;
+    final docId = _firestoreDocIdForPortfolioApp(app);
+    if (docId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This app is only in built-in data. Remove it from code or add a cloud copy first.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
     try {
-      await _portfolioService.deleteApp(app.id);
+      await _portfolioService.deleteApp(docId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('App removed'), backgroundColor: Colors.orange),
@@ -515,21 +544,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: IconThemeData(color: ColorManager.portfolioTextTitle),
         centerTitle: true,
         backgroundColor: ColorManager.accentGold,
         leading: Semantics(
           label: 'Back to home',
           button: true,
           child: IconButton(
-            icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+            icon: Icon(Icons.arrow_back, color: ColorManager.portfolioTextTitle),
             onPressed: () => context.go(AppRoutes.home),
           ),
         ),
         title: Text(
           'Portfolio',
           style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+            color: ColorManager.portfolioTextTitle,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.w600,
           ),
@@ -547,7 +576,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   SliverToBoxAdapter(
                     child: LinearProgressIndicator(
                       backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(ColorManager.orange),
+                      valueColor: AlwaysStoppedAnimation<Color>(ColorManager.portfolioTextTitle),
                     ),
                   ),
                 SliverToBoxAdapter(
@@ -583,7 +612,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           child: SelectableText(
                             'End-to-end product design from research to cross-platform delivery',
                             style: GoogleFonts.albertSans(
-                              color: ColorManager.orange,
+                              color: ColorManager.portfolioTextBody,
                               fontSize: bodySize,
                               fontWeight: FontWeight.w500,
                             ),
@@ -617,13 +646,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           SizedBox(height: gapAfterFeaturedTitle),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddCaseStudy,
-                            icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                            icon: Icon(Icons.add, size: 18, color: ColorManager.portfolioTextBody),
                             label: Text(
                               'Add case study',
-                              style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.albertSans(color: ColorManager.portfolioTextBody, fontWeight: FontWeight.w600),
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: ColorManager.orange),
+                              side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
                             ),
                           ),
                         ],
@@ -659,16 +688,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             padding: EdgeInsets.only(top: 8, bottom: 10),
                             child: OutlinedButton.icon(
                               onPressed: () => context.push(AppRoutes.portfolioDesignSystemPath('4ideas')),
-                              icon: Icon(Icons.design_services_outlined, size: 18, color: ColorManager.orange),
+                              icon: Icon(Icons.design_services_outlined, size: 18, color: ColorManager.portfolioTextBody),
                               label: Text(
                                 'Open 4iDeas Design System',
                                 style: GoogleFonts.albertSans(
-                                  color: ColorManager.orange,
+                                  color: ColorManager.portfolioTextBody,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: ColorManager.orange),
+                                side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
                               ),
                             ),
                           ),
@@ -681,7 +710,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               child: ElevatedButton.icon(
                                 onPressed: _navigateToAddApp,
                                 icon: Icon(Icons.add, size: 18, color: Colors.white),
-                                label: Text('Add app', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark, fontWeight: FontWeight.w600)),
+                                label: Text('Add app', style: GoogleFonts.albertSans(color: Colors.white, fontWeight: FontWeight.w600)),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: ColorManager.orange,
                                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -695,21 +724,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           builder: (context, constraints) {
                             final double availableWidth = constraints.maxWidth;
                             final bool isAdmin = AdminService.isAdmin();
-                            final bool appsFromFirestore = _appsFromFirestore != null && _appsFromFirestore!.isNotEmpty;
                             int crossAxisCount;
                             double mainAxisExtent;
                             double spacing;
+                            // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
                             if (availableWidth > 900) {
                               crossAxisCount = 3;
-                              mainAxisExtent = 340;
+                              mainAxisExtent = 408;
                               spacing = 18;
                             } else if (availableWidth > 600) {
                               crossAxisCount = 2;
-                              mainAxisExtent = 360;
+                              mainAxisExtent = 428;
                               spacing = 16;
                             } else {
                               crossAxisCount = 1;
-                              mainAxisExtent = 380;
+                              mainAxisExtent = 448;
                               spacing = 14;
                             }
                             return GridView.builder(
@@ -722,18 +751,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 crossAxisSpacing: spacing,
                                 mainAxisSpacing: spacing,
                               ),
-                              itemCount: _displayApps.length + 1,
+                              itemCount: _displayApps.length,
                               itemBuilder: (context, index) {
-                                final app = index < _displayApps.length
-                                    ? _displayApps[index]
-                                    : _designSystemApp;
+                                final app = _displayApps[index];
                                 return PortfolioAppCard(
                                   app: app,
                                   isMobile: isMobile,
                                   isTablet: isTablet,
-                                  showAdminActions: index < _displayApps.length && isAdmin && appsFromFirestore,
-                                  onEdit: index < _displayApps.length && isAdmin && appsFromFirestore ? () => _navigateToEditApp(app) : null,
-                                  onDelete: index < _displayApps.length && isAdmin && appsFromFirestore ? () => _deleteApp(app) : null,
+                                  showAdminActions: isAdmin,
+                                  onEdit: isAdmin ? () => _navigateToEditApp(app) : null,
+                                  onDelete: isAdmin && _firestoreDocIdForPortfolioApp(app) != null
+                                      ? () => _deleteApp(app)
+                                      : null,
                                 );
                               },
                             );
@@ -750,13 +779,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           SizedBox(height: gapAfterPublicationsTitle),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddPublication,
-                            icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                            icon: Icon(Icons.add, size: 18, color: ColorManager.portfolioTextBody),
                             label: Text(
                               'Add publication',
-                              style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.albertSans(color: ColorManager.portfolioTextBody, fontWeight: FontWeight.w600),
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: ColorManager.orange),
+                              side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
                             ),
                           ),
                         ],
@@ -782,12 +811,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             icon: Icon(
                               Icons.open_in_new,
                               size: 16,
-                              color: ColorManager.blue,
+                              color: ColorManager.portfolioTextBody,
                             ),
                             label: SelectableText(
                               'View all on Medium',
                               style: GoogleFonts.albertSans(
-                                color: ColorManager.blue,
+                                color: ColorManager.portfolioTextBody,
                                 fontSize: bodySize,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -805,13 +834,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           SizedBox(height: gapAfterOpenSourceTitle),
                           OutlinedButton.icon(
                             onPressed: _navigateToAddOpenSource,
-                            icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
+                            icon: Icon(Icons.add, size: 18, color: ColorManager.portfolioTextBody),
                             label: Text(
                               'Add open source item',
-                              style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.albertSans(color: ColorManager.portfolioTextBody, fontWeight: FontWeight.w600),
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: ColorManager.orange),
+                              side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
                             ),
                           ),
                         ],
@@ -839,12 +868,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             icon: Icon(
                               Icons.open_in_new,
                               size: 16,
-                              color: ColorManager.blue,
+                              color: ColorManager.portfolioTextBody,
                             ),
                             label: SelectableText(
                               'GitHub Profile',
                               style: GoogleFonts.albertSans(
-                                color: ColorManager.blue,
+                                color: ColorManager.portfolioTextBody,
                                 fontSize: bodySize,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -909,7 +938,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     errorBuilder: (_, __, ___) => Icon(
                       Icons.palette_outlined,
                       size: titleSize,
-                      color: ColorManager.orange.withValues(alpha: 0.3),
+                      color: ColorManager.portfolioTextBody.withValues(alpha: 0.4),
                     ),
                   ),
                 ),
@@ -921,7 +950,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     child: SelectableText(
                       'Product Design & Development',
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.accentGoldDark,
+                        color: ColorManager.portfolioTextTitle,
                         fontSize: titleSize,
                         fontWeight: FontWeight.bold,
                       ),
@@ -975,7 +1004,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                   Icon(
                     Icons.palette_outlined,
                     size: 48,
-                    color: ColorManager.orange.withValues(alpha: 0.9),
+                    color: ColorManager.portfolioTextBody,
                   ),
                   SizedBox(width: 24),
                 ],
@@ -986,7 +1015,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                       SelectableText(
                         'My Own Design System',
                         style: GoogleFonts.playfairDisplay(
-                          color: ColorManager.accentGoldDark,
+                          color: ColorManager.portfolioTextTitle,
                           fontSize: designSystemTitleSize,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
@@ -997,7 +1026,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                       SelectableText(
                         'developed by: John Colani',
                         style: GoogleFonts.cormorantGaramond(
-                          color: ColorManager.accentGoldDark.withValues(alpha: 0.9),
+                          color: ColorManager.portfolioTextBody,
                           fontSize: designSystemSubSize + 2,
                           fontWeight: FontWeight.w600,
                           fontStyle: FontStyle.italic,
@@ -1008,7 +1037,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                       SelectableText(
                         'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
                         style: GoogleFonts.albertSans(
-                          color: ColorManager.accentGoldDark.withValues(alpha: 0.8),
+                          color: ColorManager.portfolioTextBody,
                           fontSize: bodySize - 1,
                           height: 1.4,
                           fontWeight: FontWeight.w400,
@@ -1020,13 +1049,13 @@ class _DesignSystemHighlight extends StatelessWidget {
                           Icon(
                             Icons.open_in_new,
                             size: 18,
-                            color: ColorManager.orange,
+                            color: ColorManager.portfolioTextBody,
                           ),
                           SizedBox(width: 8),
                           SelectableText(
                             'Open Design System →',
                             style: GoogleFonts.albertSans(
-                              color: ColorManager.orange,
+                              color: ColorManager.portfolioTextBody,
                               fontSize: bodySize,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.2,
@@ -1042,7 +1071,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                   Icon(
                     Icons.palette_outlined,
                     size: 36,
-                    color: ColorManager.orange.withValues(alpha: 0.9),
+                    color: ColorManager.portfolioTextBody,
                   ),
                 ],
               ],
@@ -1080,7 +1109,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.auto_awesome,
-                color: ColorManager.orange,
+                color: ColorManager.portfolioTextBody,
                 size: isMobile ? 32 : 36,
               ),
               SizedBox(width: 16),
@@ -1091,7 +1120,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
                     SelectableText(
                       'Design Philosophy & Principles',
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.accentGoldDark,
+                        color: ColorManager.portfolioTextTitle,
                         fontSize: bodySize + 2,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1100,7 +1129,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
                     SelectableText(
                       'How I approach product design: empathy, process, and principles.',
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.accentGoldDark.withValues(alpha: 0.85),
+                        color: ColorManager.portfolioTextBody,
                         fontSize: bodySize,
                         height: 1.3,
                       ),
@@ -1110,7 +1139,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: ColorManager.orange.withValues(alpha: 0.9),
+                color: ColorManager.portfolioTextBody,
                 size: 18,
               ),
             ],
@@ -1136,7 +1165,7 @@ class _SectionTitle extends StatelessWidget {
     return SelectableText(
       title,
       style: GoogleFonts.albertSans(
-        color: ColorManager.orange,
+        color: ColorManager.portfolioTextTitle,
         fontSize: sectionTitleSize,
         fontWeight: FontWeight.bold,
       ),
@@ -1195,7 +1224,7 @@ class _OpenSourceCard extends StatelessWidget {
           decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
           child: Row(
             children: [
-              Icon(icon, color: ColorManager.orange, size: 28),
+              Icon(icon, color: ColorManager.portfolioTextBody, size: 28),
               SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -1204,7 +1233,7 @@ class _OpenSourceCard extends StatelessWidget {
                     SelectableText(
                       item.title,
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.accentGoldDark,
+                        color: ColorManager.portfolioTextTitle,
                         fontSize: bodySize + 2,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1213,14 +1242,14 @@ class _OpenSourceCard extends StatelessWidget {
                     SelectableText(
                       item.subtitle,
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.textSecondary,
+                        color: ColorManager.portfolioTextBody,
                         fontSize: bodySize - 1,
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.open_in_new, color: ColorManager.blue, size: 20),
+              Icon(Icons.open_in_new, color: ColorManager.portfolioTextBody, size: 20),
             ],
           ),
         ),
@@ -1240,7 +1269,7 @@ class _OpenSourceCard extends StatelessWidget {
               children: [
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: 20, color: ColorManager.orange),
+                    icon: Icon(Icons.edit, size: 20, color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 32, minHeight: 32),

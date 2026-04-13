@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/helper/menu_item.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
@@ -119,7 +118,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                   },
                   child: Container(
                     color: isSlideOpen
-                        ? ColorManager.primaryTeal.withValues(alpha: 0.10 * progress)
+                        ? const Color(0xFF000000)
+                            .withValues(alpha: 0.08 * progress)
                         : Colors.transparent,
                   ),
                 ),
@@ -135,60 +135,32 @@ class _SlidingMenuState extends State<SlidingMenu>
           child: Row(
             children: [
               Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      ColorManager.accentGold,
-                      ColorManager.accentGold.withValues(alpha: 0.45),
-                    ],
-                  ),
+                decoration: const BoxDecoration(
+                  color: HomeWarmColors.drawerSurfaceSolid,
                 ),
                 width: isMobile ? 2 : 3,
                 height: he,
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.zero,
-                  bottomLeft: Radius.zero,
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: Container(
-                    height: he,
-                    width: drawerWidth,
-                    decoration: BoxDecoration(
-                      // Light-gold frosted glossy background
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withValues(alpha: 0.28),
-                          const Color(0xFFF3E7CF).withValues(alpha: 0.82),
-                          const Color(0xFFE0C695).withValues(alpha: 0.78),
-                        ],
-                      ),
-                      border: Border(
-                        right: BorderSide(
-                          color: const Color(0xFF8A6A2F).withValues(alpha: 0.30),
-                          width: 1,
-                        ),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.22),
-                          blurRadius: 14,
-                          offset: const Offset(-1, -1),
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 14,
-                          offset: const Offset(6, 0),
-                        ),
-                      ],
+              Container(
+                height: he,
+                width: drawerWidth,
+                decoration: BoxDecoration(
+                  color: HomeWarmColors.drawerSurfaceSolid,
+                  border: Border(
+                    right: BorderSide(
+                      color: HomeWarmColors.drawerBorder,
+                      width: 1,
                     ),
-                    child: Stack(
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.10),
+                      blurRadius: 18,
+                      offset: const Offset(6, 0),
+                    ),
+                  ],
+                ),
+                child: Stack(
                       children: [
                         Positioned(
                           top: -20,
@@ -216,7 +188,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                               Container(
                                 padding: EdgeInsets.all(isMobile ? 14 : 16),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFAF7F2).withValues(alpha: 0.92),
+                                  color: HomeWarmColors.shellTop
+                                      .withValues(alpha: 0.98),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
                                     color: ColorManager.primaryTeal.withValues(alpha: 0.28),
@@ -399,8 +372,6 @@ class _SlidingMenuState extends State<SlidingMenu>
                       ],
                     ),
                   ),
-                ),
-              ),
             ],
           ),
         ),
@@ -432,17 +403,9 @@ class _SlidingMenuState extends State<SlidingMenu>
                   width: 35,
                   height: 110,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.28),
-                        const Color(0xFFF3E7CF).withValues(alpha: 0.82),
-                        const Color(0xFFE0C695).withValues(alpha: 0.78),
-                      ],
-                    ),
+                    color: HomeWarmColors.drawerSurfaceSolid,
                     border: Border.all(
-                      color: const Color(0xFF8A6A2F).withValues(alpha: 0.30),
+                      color: HomeWarmColors.drawerBorder,
                       width: 1,
                     ),
                   ),

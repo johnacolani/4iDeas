@@ -6,19 +6,28 @@ class PortfolioContentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _appsCollection = 'portfolio_apps';
 
-  /// Fetch all portfolio apps from Firestore. Returns empty list if none or error.
-  Future<List<PortfolioApp>> getApps() async {
+  /// Each entry is `(firestoreDocumentId, app)` so admin edit/delete use the real doc path
+  /// when [PortfolioApp.id] in data is a logical slug.
+  Future<List<(String docId, PortfolioApp app)>> getAppsWithDocIds() async {
     try {
       final snapshot = await _firestore.collection(_appsCollection).get();
       final list = snapshot.docs.map((doc) {
         final data = doc.data();
-        return (doc.id, PortfolioApp.fromMap(doc.id, data), (data['order'] as num?)?.toInt() ?? 0);
+        final app = PortfolioApp.fromMap(doc.id, data);
+        final order = (data['order'] as num?)?.toInt() ?? 0;
+        return (doc.id, app, order);
       }).toList();
       list.sort((a, b) => a.$3.compareTo(b.$3));
-      return list.map((e) => e.$2).toList();
+      return list.map((e) => (e.$1, e.$2)).toList();
     } catch (_) {
       return [];
     }
+  }
+
+  /// Fetch all portfolio apps from Firestore. Returns empty list if none or error.
+  Future<List<PortfolioApp>> getApps() async {
+    final withIds = await getAppsWithDocIds();
+    return withIds.map((e) => e.$2).toList();
   }
 
   /// Whether Firestore has any portfolio apps (so UI can prefer them over static).

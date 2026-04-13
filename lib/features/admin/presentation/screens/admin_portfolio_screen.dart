@@ -18,6 +18,8 @@ class AdminPortfolioScreen extends StatefulWidget {
 class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
   final PortfolioContentService _service = PortfolioContentService();
   List<PortfolioApp> _apps = [];
+  /// Firestore document id for each [PortfolioApp.id].
+  final Map<String, String> _firestoreDocIdByAppId = {};
   bool _loading = true;
   String? _error;
   bool _useFirestore = false;
@@ -44,11 +46,14 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
       _error = null;
     });
     try {
-      final apps = await _service.getApps();
       final hasAny = await _service.hasApps();
+      final withIds = await _service.getAppsWithDocIds();
       if (mounted) {
         setState(() {
-          _apps = apps;
+          _apps = withIds.map((t) => t.$2).toList();
+          _firestoreDocIdByAppId
+            ..clear()
+            ..addEntries(withIds.map((t) => MapEntry(t.$2.id, t.$1)));
           _useFirestore = hasAny;
           _loading = false;
         });
@@ -86,8 +91,17 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
       ),
     );
     if (confirm != true || !mounted) return;
+    final docId = _firestoreDocIdByAppId[app.id];
+    if (docId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Missing document id'), backgroundColor: Colors.orange),
+        );
+      }
+      return;
+    }
     try {
-      await _service.deleteApp(app.id);
+      await _service.deleteApp(docId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('App removed'), backgroundColor: Colors.orange),
@@ -291,7 +305,10 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.edit, color: ColorManager.orange),
-              onPressed: () => _navigateToEdit(docId: app.id, app: app),
+              onPressed: () => _navigateToEdit(
+                docId: _firestoreDocIdByAppId[app.id],
+                app: app,
+              ),
               tooltip: 'Edit',
             ),
             IconButton(

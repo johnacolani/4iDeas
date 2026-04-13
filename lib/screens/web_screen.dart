@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:auto_scroll_image/auto_scroll_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../core/ColorManager.dart';
+import '../core/home_warm_colors.dart';
 import '../core/widgets/aws_backend_section.dart';
+import '../core/widgets/home_hero_headline.dart';
 import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 
@@ -48,9 +47,8 @@ class _WebScreenState extends State<WebScreen> {
                   SizedBox(height: heroTopSpacing),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20),
-                    child: GlassOutlinedText(
-                      text: 'We design and build',
-                      fontSize: isMobile
+                    child: HomeHeroHeadline(
+                      titleSize: isMobile
                           ? (wi < 400 ? 28 : (wi < 500 ? 35 : 42))
                           : (isTablet ? 56 : 84),
                     ),
@@ -69,10 +67,10 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF0A84FF),
+                                      color: HomeWarmColors.platformIos,
                                       shadows: const [
                                         Shadow(
-                                          color: Color(0xCCFFFFFF),
+                                          color: HomeWarmColors.labelShadow,
                                           blurRadius: 6,
                                           offset: Offset(0, 1),
                                         ),
@@ -84,10 +82,10 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF3DDC84),
+                                      color: HomeWarmColors.platformAndroid,
                                       shadows: const [
                                         Shadow(
-                                          color: Color(0xCCFFFFFF),
+                                          color: HomeWarmColors.labelShadow,
                                           blurRadius: 6,
                                           offset: Offset(0, 1),
                                         ),
@@ -99,10 +97,10 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.w500,
-                                      color: const Color(0xFFA2AAAD),
+                                      color: HomeWarmColors.platformMac,
                                       shadows: const [
                                         Shadow(
-                                          color: Color(0xCCFFFFFF),
+                                          color: HomeWarmColors.labelShadow,
                                           blurRadius: 6,
                                           offset: Offset(0, 1),
                                         ),
@@ -114,10 +112,10 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 14 : 16,
                                     fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF4285F4),
+                                      color: HomeWarmColors.platformWeb,
                                       shadows: const [
                                         Shadow(
-                                          color: Color(0xCCFFFFFF),
+                                          color: HomeWarmColors.labelShadow,
                                           blurRadius: 6,
                                           offset: Offset(0, 1),
                                         ),
@@ -130,10 +128,10 @@ class _WebScreenState extends State<WebScreen> {
                                   style: GoogleFonts.albertSans(
                                     fontSize: wi < 400 ? 13 : 15,
                                     fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF0F5C4A),
+                                    color: HomeWarmColors.platformDesktop,
                                     shadows: const [
                                       Shadow(
-                                        color: Color(0xCCFFFFFF),
+                                        color: HomeWarmColors.labelShadow,
                                         blurRadius: 4,
                                         offset: Offset(0, 1),
                                       ),
@@ -161,10 +159,10 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.w500,
-                                        color: const Color(0xFF0A84FF),
+                                        color: HomeWarmColors.platformIos,
                                         shadows: const [
                                           Shadow(
-                                            color: Color(0xCCFFFFFF),
+                                            color: HomeWarmColors.labelShadow,
                                             blurRadius: 6,
                                             offset: Offset(0, 1),
                                           ),
@@ -176,10 +174,10 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF3DDC84),
+                                        color: HomeWarmColors.platformAndroid,
                                         shadows: const [
                                           Shadow(
-                                            color: Color(0xCCFFFFFF),
+                                            color: HomeWarmColors.labelShadow,
                                             blurRadius: 6,
                                             offset: Offset(0, 1),
                                           ),
@@ -191,10 +189,10 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.w500,
-                                        color: const Color(0xFFA2AAAD),
+                                        color: HomeWarmColors.platformMac,
                                         shadows: const [
                                           Shadow(
-                                            color: Color(0xCCFFFFFF),
+                                            color: HomeWarmColors.labelShadow,
                                             blurRadius: 6,
                                             offset: Offset(0, 1),
                                           ),
@@ -206,10 +204,10 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
                                         fontWeight: FontWeight.w500,
-                                        color: const Color(0xFF4285F4),
+                                        color: HomeWarmColors.platformWeb,
                                         shadows: const [
                                           Shadow(
-                                            color: Color(0xCCFFFFFF),
+                                            color: HomeWarmColors.labelShadow,
                                             blurRadius: 6,
                                             offset: Offset(0, 1),
                                           ),
@@ -222,10 +220,10 @@ class _WebScreenState extends State<WebScreen> {
                                       style: GoogleFonts.albertSans(
                                         fontSize: isMobile ? (wi < 400 ? 13 : 15) : (isTablet ? 17 : 19),
                                         fontWeight: FontWeight.w500,
-                                        color: const Color(0xFF0F5C4A),
+                                        color: HomeWarmColors.platformDesktop,
                                         shadows: const [
                                           Shadow(
-                                            color: Color(0xCCFFFFFF),
+                                            color: HomeWarmColors.labelShadow,
                                             blurRadius: 4,
                                             offset: Offset(0, 1),
                                           ),
@@ -249,7 +247,7 @@ class _WebScreenState extends State<WebScreen> {
                         style: GoogleFonts.albertSans(
                           fontSize: isMobile ? (wi < 400 ? 16 : 18) : (isTablet ? 22 : 26),
                           fontWeight: FontWeight.bold,
-                          color: ColorManager.accentGold,
+                          color: HomeWarmColors.sectionAccent,
                         ),
                       ),
                     ),
@@ -273,7 +271,7 @@ class _WebScreenState extends State<WebScreen> {
                         style: GoogleFonts.albertSans(
                           fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 16 : 20),
                           fontWeight: FontWeight.bold,
-                          color: ColorManager.primaryTealPressed,
+                          color: HomeWarmColors.bodyEmphasis,
                         ),
                       ),
                     ),
@@ -299,10 +297,10 @@ class _WebScreenState extends State<WebScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF6C5428)
-                                      .withValues(alpha: 0.38),
-                                  offset: const Offset(12, 14),
-                                  blurRadius: 10,
+                                  color: const Color(0xFF0F172A)
+                                      .withValues(alpha: 0.12),
+                                  offset: const Offset(0, 8),
+                                  blurRadius: 24,
                                   spreadRadius: 0,
                                 ),
                               ],
@@ -333,7 +331,7 @@ class _WebScreenState extends State<WebScreen> {
                       style: GoogleFonts.albertSans(
                         fontSize: isMobile ? (wi < 400 ? 18 : 20) : (isTablet ? wi * 0.028 : wi * 0.032),
                         fontWeight: FontWeight.bold,
-                        color: ColorManager.accentGold,
+                        color: HomeWarmColors.sectionAccent,
                       ),
                     ),
                   ),
@@ -343,12 +341,8 @@ class _WebScreenState extends State<WebScreen> {
                       vertical: isMobile ? 12 : 16,
                     ),
                     child: Divider(
-                      color: Color.lerp(
-                        ColorManager.accentGold,
-                        ColorManager.backgroundDark,
-                        0.40,
-                      )!.withValues(alpha: 0.85),
-                      thickness: 1.5,
+                      color: HomeWarmColors.dividerLine,
+                      thickness: 1,
                     ),
                   ),
                   SizedBox(height: isMobile ? 20 : 32),
@@ -374,76 +368,6 @@ class _WebScreenState extends State<WebScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Hero headline "We design and build" — border #436E69 (2px), body #AFCECB.
-class GlassOutlinedText extends StatelessWidget {
-  static const Color _border = Color(0xFF436E69);
-  static const Color _body = Color(0xFFAFCECB);
-
-  final String text;
-  final double fontSize;
-
-  const GlassOutlinedText({
-    super.key,
-    required this.text,
-    required this.fontSize,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final w = constraints.maxWidth;
-        return SizedBox(
-          width: w,
-          child: Stack(
-          alignment: Alignment.center,
-          children: [
-            ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-              child: SelectableText(
-                text,
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.ltr,
-                style: GoogleFonts.albertSans(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w700,
-                  color: _body.withValues(alpha: 0.45),
-                ),
-              ),
-            ),
-
-            SelectableText(
-              text,
-              textAlign: TextAlign.center,
-              textDirection: TextDirection.ltr,
-              style: GoogleFonts.albertSans(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w700,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 2
-                  ..color = _border,
-              ),
-            ),
-
-            SelectableText(
-              text,
-              textAlign: TextAlign.center,
-              textDirection: TextDirection.ltr,
-              style: GoogleFonts.albertSans(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w700,
-                color: _body,
-              ),
-            ),
-          ],
-        ),
-      );
-      },
     );
   }
 }

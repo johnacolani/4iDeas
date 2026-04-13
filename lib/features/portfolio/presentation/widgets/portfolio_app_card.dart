@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
@@ -6,9 +5,6 @@ import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-// Conditional import for Platform detection
-import 'dart:io' show Platform if (dart.library.html) 'package:four_ideas/core/platform_stub.dart';
 
 class PortfolioAppCard extends StatefulWidget {
   final PortfolioApp app;
@@ -46,7 +42,11 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     final double titleSize = isMobile ? 15 : (isTablet ? 17 : 18);
     final double bodySize = isMobile ? 12 : (isTablet ? 13 : 14);
 
-    final String? primaryUrl = app.webUrl ?? app.appStoreUrl ?? app.playStoreUrl;
+    final String? primaryUrl = app.webUrl ??
+        app.macosUrl ??
+        app.windowsUrl ??
+        app.appStoreUrl ??
+        app.playStoreUrl;
     /// Light portfolio card surface — chips use dark gold on light wash.
     final Color accentGold = ColorManager.accentGold;
     const bool isDarkCardSurface = false;
@@ -148,7 +148,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               children: [
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: isMobile ? 18 : 20, color: ColorManager.orange),
+                    icon: Icon(Icons.edit, size: isMobile ? 18 : 20, color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -181,7 +181,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         SelectableText(
           app.name,
           style: GoogleFonts.albertSans(
-            color: ColorManager.accentGoldDark,
+            color: ColorManager.portfolioTextTitle,
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
           ),
@@ -190,7 +190,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         Text(
           app.description,
           style: GoogleFonts.albertSans(
-            color: ColorManager.textSecondary,
+            color: ColorManager.portfolioTextBody,
             fontSize: bodySize,
             height: 1.3,
           ),
@@ -205,43 +205,102 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     required bool isDarkSurface,
     required Color accentGold,
   }) {
-    return Center(
-      child: Scrollbar(
-        thumbVisibility: true,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
+    final chips = <Widget>[];
+    void addChip(_LinkChip chip) => chips.add(chip);
+
+    if (app.webUrl != null) {
+      addChip(
+        _LinkChip(
+          label: 'Web App',
+          icon: Icons.language,
+          onTap: () => _launch(app.webUrl!),
+          isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        ),
+      );
+    }
+    if (app.macosUrl != null) {
+      addChip(
+        _LinkChip(
+          label: 'macOS',
+          icon: Icons.laptop_mac,
+          onTap: () => _launch(app.macosUrl!),
+          isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        ),
+      );
+    }
+    if (app.windowsUrl != null) {
+      addChip(
+        _LinkChip(
+          label: 'Windows',
+          icon: Icons.desktop_windows,
+          onTap: () => _launch(app.windowsUrl!),
+          isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        ),
+      );
+    }
+    if (app.appStoreUrl != null) {
+      addChip(
+        _LinkChip(
+          label: 'App Store',
+          icon: Icons.apple,
+          onTap: () => _launch(app.appStoreUrl!),
+          isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        ),
+      );
+    }
+    if (app.playStoreUrl != null) {
+      addChip(
+        _LinkChip(
+          label: 'Google Play',
+          icon: Icons.android,
+          onTap: () => _launch(app.playStoreUrl!),
+          isMobile: isMobile,
+          isDarkSurface: isDarkSurface,
+          accentGold: accentGold,
+        ),
+      );
+    }
+
+    if (chips.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    const int chipsPerRow = 4;
+    const double gapH = 6;
+    const double gapV = 8;
+    final rowWidgets = <Widget>[];
+    for (var i = 0; i < chips.length; i += chipsPerRow) {
+      final end = i + chipsPerRow > chips.length ? chips.length : i + chipsPerRow;
+      final slice = chips.sublist(i, end);
+      rowWidgets.add(
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Show web URL button first if available
-            if (app.webUrl != null)
-              Padding(
-                padding: EdgeInsets.only(right: 6),
-                child: _LinkChip(
-                  label: 'Web App',
-                  icon: Icons.language,
-                  onTap: () => _launch(app.webUrl!),
-                  isMobile: isMobile,
-                  isDarkSurface: isDarkSurface,
-                  accentGold: accentGold,
-                ),
-              ),
-            // Show platform-specific store buttons after web app button
-            if (!kIsWeb)
-              ..._buildPlatformStoreButtonsWithSpacing(
-                isDarkSurface: isDarkSurface,
-                accentGold: accentGold,
-              )
-            else
-              ..._buildAllStoreButtonsWithSpacing(
-                isDarkSurface: isDarkSurface,
-                accentGold: accentGold,
-              ),
+            for (var j = 0; j < slice.length; j++) ...[
+              if (j > 0) const SizedBox(width: gapH),
+              slice[j],
+            ],
           ],
         ),
-        ),
-      ),
+      );
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var r = 0; r < rowWidgets.length; r++) ...[
+          if (r > 0) const SizedBox(height: gapV),
+          Center(child: rowWidgets[r]),
+        ],
+      ],
     );
   }
 
@@ -256,7 +315,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             child: SelectableText(
               'Coming Soon',
               style: GoogleFonts.albertSans(
-                color: accentGold,
+                color: ColorManager.portfolioTextBody,
                 fontSize: isMobile ? 14 : 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -327,182 +386,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       child: Icon(
         Icons.phone_android,
         size: 48,
-        color: ColorManager.orange.withValues(alpha: 0.6),
+        color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
       ),
     );
-  }
-
-  List<Widget> _buildPlatformStoreButtons({
-    required bool isDarkSurface,
-    required Color accentGold,
-  }) {
-    final List<Widget> buttons = [];
-    
-    try {
-      // On iOS, prioritize App Store
-      if (Platform.isIOS && app.appStoreUrl != null) {
-        buttons.add(
-          _LinkChip(
-            label: 'App Store',
-            icon: Icons.apple,
-            onTap: () => _launch(app.appStoreUrl!),
-            isMobile: isMobile,
-            isDarkSurface: isDarkSurface,
-            accentGold: accentGold,
-          ),
-        );
-        // Also show Play Store if available
-        if (app.playStoreUrl != null) {
-          buttons.add(
-            _LinkChip(
-              label: 'Play Store',
-              icon: Icons.android,
-              onTap: () => _launch(app.playStoreUrl!),
-              isMobile: isMobile,
-              isDarkSurface: isDarkSurface,
-              accentGold: accentGold,
-            ),
-          );
-        }
-      }
-      // On Android, prioritize Play Store
-      else if (Platform.isAndroid && app.playStoreUrl != null) {
-        buttons.add(
-          _LinkChip(
-            label: 'Play Store',
-            icon: Icons.android,
-            onTap: () => _launch(app.playStoreUrl!),
-            isMobile: isMobile,
-            isDarkSurface: isDarkSurface,
-            accentGold: accentGold,
-          ),
-        );
-        // Also show App Store if available
-        if (app.appStoreUrl != null) {
-          buttons.add(
-            _LinkChip(
-              label: 'App Store',
-              icon: Icons.apple,
-              onTap: () => _launch(app.appStoreUrl!),
-              isMobile: isMobile,
-              isDarkSurface: isDarkSurface,
-              accentGold: accentGold,
-            ),
-          );
-        }
-      }
-      // On other platforms (macOS, Windows, Linux), show both
-      else {
-        if (app.appStoreUrl != null) {
-          buttons.add(
-            _LinkChip(
-              label: 'App Store',
-              icon: Icons.apple,
-              onTap: () => _launch(app.appStoreUrl!),
-              isMobile: isMobile,
-              isDarkSurface: isDarkSurface,
-              accentGold: accentGold,
-            ),
-          );
-        }
-        if (app.playStoreUrl != null) {
-          buttons.add(
-            _LinkChip(
-              label: 'Play Store',
-              icon: Icons.android,
-              onTap: () => _launch(app.playStoreUrl!),
-              isMobile: isMobile,
-              isDarkSurface: isDarkSurface,
-              accentGold: accentGold,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      // Fallback to showing all buttons if Platform is not available
-      return _buildAllStoreButtons(
-        isDarkSurface: isDarkSurface,
-        accentGold: accentGold,
-      );
-    }
-    
-    return buttons;
-  }
-
-  List<Widget> _buildAllStoreButtons({
-    required bool isDarkSurface,
-    required Color accentGold,
-  }) {
-    final List<Widget> buttons = [];
-    if (app.appStoreUrl != null) {
-      buttons.add(
-        _LinkChip(
-          label: 'App Store',
-          icon: Icons.apple,
-          onTap: () => _launch(app.appStoreUrl!),
-          isMobile: isMobile,
-          isDarkSurface: isDarkSurface,
-          accentGold: accentGold,
-        ),
-      );
-    }
-    if (app.playStoreUrl != null) {
-      buttons.add(
-        _LinkChip(
-          label: 'Play Store',
-          icon: Icons.android,
-          onTap: () => _launch(app.playStoreUrl!),
-          isMobile: isMobile,
-          isDarkSurface: isDarkSurface,
-          accentGold: accentGold,
-        ),
-      );
-    }
-    return buttons;
-  }
-
-  List<Widget> _buildPlatformStoreButtonsWithSpacing({
-    required bool isDarkSurface,
-    required Color accentGold,
-  }) {
-    final List<Widget> buttons =
-        _buildPlatformStoreButtons(
-          isDarkSurface: isDarkSurface,
-          accentGold: accentGold,
-        );
-    return buttons.asMap().entries.map((entry) {
-      final index = entry.key;
-      final button = entry.value;
-      if (index > 0) {
-        return Padding(
-          padding: EdgeInsets.only(left: 6),
-          child: button,
-        );
-      }
-      return button;
-    }).toList();
-  }
-
-  List<Widget> _buildAllStoreButtonsWithSpacing({
-    required bool isDarkSurface,
-    required Color accentGold,
-  }) {
-    final List<Widget> buttons =
-        _buildAllStoreButtons(
-          isDarkSurface: isDarkSurface,
-          accentGold: accentGold,
-        );
-    return buttons.asMap().entries.map((entry) {
-      final index = entry.key;
-      final button = entry.value;
-      if (index > 0) {
-        return Padding(
-          padding: EdgeInsets.only(left: 6),
-          child: button,
-        );
-      }
-      return button;
-    }).toList();
   }
 
   Future<void> _launch(String url) async {
@@ -540,14 +426,12 @@ class _LinkChipState extends State<_LinkChip> {
   @override
   Widget build(BuildContext context) {
     const double minTouchTarget = 48.0;
-    final Color baseTitleColor =
-        Color.lerp(widget.accentGold, Colors.black, 0.22) ?? widget.accentGold;
+    final Color baseTitleColor = ColorManager.portfolioTextBody;
     final Color baseBorderColor =
-        Color.lerp(widget.accentGold, Colors.black, 0.18) ?? widget.accentGold;
-    final Color hoverTitleColor =
-        Color.lerp(widget.accentGold, Colors.white, 0.65) ?? widget.accentGold;
+        ColorManager.portfolioTextBody.withValues(alpha: 0.45);
+    final Color hoverTitleColor = ColorManager.portfolioTextTitle;
     final Color hoverBorderColor =
-        Color.lerp(widget.accentGold, Colors.white, 0.75) ?? widget.accentGold;
+        ColorManager.portfolioTextTitle.withValues(alpha: 0.55);
     final Color buttonTitleColor = _isHovered ? hoverTitleColor : baseTitleColor;
     final Color buttonBorderColor = _isHovered ? hoverBorderColor : baseBorderColor;
     final Color chipBackground = _isHovered

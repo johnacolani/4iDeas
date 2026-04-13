@@ -41,7 +41,7 @@ class PortfolioPublicationCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.article_outlined,
-                color: ColorManager.orange,
+                color: ColorManager.portfolioTextBody,
                 size: isMobile ? 22 : 26,
               ),
               SizedBox(width: 12),
@@ -49,7 +49,7 @@ class PortfolioPublicationCard extends StatelessWidget {
                 child: SelectableText(
                   publication.title,
                   style: GoogleFonts.albertSans(
-                    color: ColorManager.textSecondary,
+                    color: ColorManager.portfolioTextTitle,
                     fontSize: titleSize,
                     fontWeight: FontWeight.w500,
                   ),
@@ -57,7 +57,7 @@ class PortfolioPublicationCard extends StatelessWidget {
               ),
               Icon(
                 Icons.open_in_new,
-                color: ColorManager.blue,
+                color: ColorManager.portfolioTextBody,
                 size: isMobile ? 18 : 20,
               ),
             ],
@@ -79,7 +79,7 @@ class PortfolioPublicationCard extends StatelessWidget {
               children: [
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: 20, color: ColorManager.orange),
+                    icon: Icon(Icons.edit, size: 20, color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 32, minHeight: 32),

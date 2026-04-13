@@ -20,6 +20,10 @@ class ColorManager {
   static const textSecondary = Color(0xFF4A4640);
   static const textMuted = Color(0xFF6E6860);
 
+  /// Portfolio screen (`portfolio_screen.dart`) typography on light shell.
+  static const portfolioTextBody = Color(0xFF4E3D1D);
+  static const portfolioTextTitle = Color(0xFF335551);
+
   /// Light gray surfaces (cards, case study blocks on light backgrounds).
   static const containerSurface = Color(0xFFE8E6E3);
   static const containerSurfaceMuted = Color(0xFFDDDAD6);

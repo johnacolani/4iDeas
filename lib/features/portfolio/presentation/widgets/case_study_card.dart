@@ -49,7 +49,7 @@ class CaseStudyCard extends StatelessWidget {
                 SelectableText(
                   caseStudy.title,
                   style: GoogleFonts.albertSans(
-                    color: ColorManager.accentGoldDark,
+                    color: ColorManager.portfolioTextTitle,
                     fontSize: titleSize,
                     fontWeight: FontWeight.bold,
                   ),
@@ -58,7 +58,7 @@ class CaseStudyCard extends StatelessWidget {
                 SelectableText(
                   caseStudy.subtitle,
                   style: GoogleFonts.albertSans(
-                    color: ColorManager.orange,
+                    color: ColorManager.portfolioTextBody,
                     fontSize: subtitleSize,
                     fontWeight: FontWeight.w600,
                   ),
@@ -68,7 +68,7 @@ class CaseStudyCard extends StatelessWidget {
                   caseStudy.overview,
                   maxLines: 3,
                   style: GoogleFonts.albertSans(
-                    color: ColorManager.textSecondary,
+                    color: ColorManager.portfolioTextBody,
                     fontSize: isMobile ? 14 : 15,
                     height: 1.5,
                   ),
@@ -79,7 +79,7 @@ class CaseStudyCard extends StatelessWidget {
                     SelectableText(
                       'View Case Study',
                       style: GoogleFonts.albertSans(
-                        color: ColorManager.orange,
+                        color: ColorManager.portfolioTextBody,
                         fontSize: isMobile ? 14 : 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -87,7 +87,7 @@ class CaseStudyCard extends StatelessWidget {
                     SizedBox(width: 8),
                     Icon(
                       Icons.arrow_forward,
-                      color: ColorManager.orange,
+                      color: ColorManager.portfolioTextBody,
                       size: isMobile ? 18 : 20,
                     ),
                   ],
@@ -113,7 +113,7 @@ class CaseStudyCard extends StatelessWidget {
               children: [
                 if (onEditAdaptiveSection != null)
                   IconButton(
-                    icon: Icon(Icons.image, size: 22, color: ColorManager.blue),
+                    icon: Icon(Icons.image, size: 22, color: ColorManager.portfolioTextBody),
                     onPressed: onEditAdaptiveSection,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 36, minHeight: 36),
@@ -121,7 +121,7 @@ class CaseStudyCard extends StatelessWidget {
                   ),
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: 22, color: ColorManager.orange),
+                    icon: Icon(Icons.edit, size: 22, color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 36, minHeight: 36),
