@@ -26,6 +26,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
   final _titleController = TextEditingController();
   final _subtitleController = TextEditingController();
   final _overviewController = TextEditingController();
+  final _heroImagePathController = TextEditingController();
   final _designApproachController = TextEditingController();
   final List<_SectionEditing> _sections = [];
   bool _saving = false;
@@ -41,6 +42,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
       _titleController.text = cs.title;
       _subtitleController.text = cs.subtitle;
       _overviewController.text = cs.overview;
+      _heroImagePathController.text = cs.heroImagePath ?? '';
       _designApproachController.text = cs.designApproach ?? '';
       for (final s in cs.sections) {
         _sections.add(_SectionEditing(
@@ -68,6 +70,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
     _titleController.dispose();
     _subtitleController.dispose();
     _overviewController.dispose();
+    _heroImagePathController.dispose();
     _designApproachController.dispose();
     for (final s in _sections) {
       s.title.dispose();
@@ -92,6 +95,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
   }
 
   PortfolioCaseStudy _buildCaseStudy() {
+    final hero = _heroImagePathController.text.trim();
     return PortfolioCaseStudy(
       id: widget.docId ?? 'cs-${DateTime.now().millisecondsSinceEpoch}',
       title: _titleController.text.trim(),
@@ -100,6 +104,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
       designApproach: _designApproachController.text.trim().isEmpty
           ? null
           : _designApproachController.text.trim(),
+      heroImagePath: hero.isEmpty ? null : hero,
       sections: _buildSections(),
     );
   }
@@ -239,6 +244,12 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                           hint: 'Summary text for the card and detail',
                           maxLines: 5,
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        ),
+                        _buildField(
+                          controller: _heroImagePathController,
+                          label: 'Featured card hero image (optional)',
+                          hint: 'assets/images/... or https://... (banner above the featured card title)',
+                          maxLines: 2,
                         ),
                         _buildField(
                           controller: _designApproachController,

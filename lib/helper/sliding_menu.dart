@@ -301,6 +301,12 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         ),
                                         _buildMenuItem(
                                           index: 3,
+                                          icon: Icons.workspace_premium,
+                                          title: 'Featured Case Studies',
+                                          onPressed: () => _closeDrawerAndGo('${AppRoutes.portfolio}?section=featured'),
+                                        ),
+                                        _buildMenuItem(
+                                          index: 4,
                                           icon: Icons.contrast,
                                           title: 'Order Here',
                                           onPressed: () =>
@@ -312,14 +318,14 @@ class _SlidingMenuState extends State<SlidingMenu>
                                               return Column(
                                                 children: [
                                                   _buildMenuItem(
-                                                    index: 4,
+                                                    index: 5,
                                                     icon: Icons.person,
                                                     title: 'Profile',
                                                     onPressed: () => _closeDrawerAndGo(AppRoutes.profile),
                                                   ),
                                                   if (AdminService.isAdmin())
                                                     _buildMenuItem(
-                                                      index: 5,
+                                                      index: 6,
                                                       icon: Icons.admin_panel_settings,
                                                       title: 'Admin - Orders',
                                                       onPressed: () => _closeDrawerAndGo(AppRoutes.adminOrders),
@@ -331,7 +337,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           },
                                         ),
                                         _buildMenuItem(
-                                          index: 6,
+                                          index: 7,
                                           icon: Icons.connect_without_contact,
                                           title: 'Contact Us',
                                           onPressed: () =>

@@ -38,7 +38,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
 
   @override
   Widget build(BuildContext context) {
-    final double cardPadding = isMobile ? 10.0 : 12.0;
+    // Matches portfolio "My Own Design System" highlight inner padding.
+    final double cardPaddingH = isMobile ? 20.0 : 28.0;
+    final double cardPaddingV = isMobile ? 20.0 : 24.0;
     final double titleSize = isMobile ? 15 : (isTablet ? 17 : 18);
     final double bodySize = isMobile ? 12 : (isTablet ? 13 : 14);
 
@@ -73,7 +75,10 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
           borderRadius: BorderRadius.circular(12),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(cardPadding),
+            padding: EdgeInsets.symmetric(
+              horizontal: cardPaddingH,
+              vertical: cardPaddingV,
+            ),
             decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
             child: isMobile
               ? Column(
@@ -87,15 +92,17 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    _buildButtons(
-                      isDarkSurface: isDarkCardSurface,
-                      accentGold: accentGold,
-                    ),
-                    SizedBox(height: 8),
                     Expanded(
                       child: SingleChildScrollView(
                         child: _buildTextContent(titleSize, bodySize),
                       ),
+                    ),
+                    SizedBox(height: 10),
+                    _buildFlutterWatermarkBand(),
+                    SizedBox(height: 10),
+                    _buildButtons(
+                      isDarkSurface: isDarkCardSurface,
+                      accentGold: accentGold,
                     ),
                   ],
                 )
@@ -123,7 +130,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 10),
+                    _buildFlutterWatermarkBand(),
+                    SizedBox(height: 10),
                     _buildButtons(
                       isDarkSurface: isDarkCardSurface,
                       accentGold: accentGold,
@@ -396,6 +405,110 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  /// Reference layout: centered band between main content and platform chips (~¼ card width).
+  Widget _buildFlutterWatermarkBand() {
+    return Transform.translate(
+      offset: const Offset(0, -50),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          // Max width for the pill; word uses real Text fontSize (mark + label), not horizontal FlutterLogo bitmap.
+          final double targetW = isMobile
+              ? (w * 0.5).clamp(140.0, 220.0)
+              : isTablet
+                  ? (w * 0.45).clamp(180.0, 280.0)
+                  : (w * 0.42).clamp(200.0, 320.0);
+          return Center(
+            child: IgnorePointer(
+              child: _PortfolioFlutterWatermarkBadge(
+                isMobile: isMobile,
+                isTablet: isTablet,
+                maxWidth: targetW,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// White pill, light-blue stroke — Flutter mark + real [Text] so font size scales on web (not bitmap wordmark).
+class _PortfolioFlutterWatermarkBadge extends StatelessWidget {
+  final bool isMobile;
+  final bool isTablet;
+  final double maxWidth;
+
+  const _PortfolioFlutterWatermarkBadge({
+    required this.isMobile,
+    required this.isTablet,
+    required this.maxWidth,
+  });
+
+  static const Color _flutterBlue = Color(0xFF02569B);
+
+  @override
+  Widget build(BuildContext context) {
+    final double markSize = isMobile ? 24 : (isTablet ? 28 : 32);
+    // Explicit text size (chips use ~10–11pt); this reads clearly on Flutter Web.
+    final double wordFontSize = isMobile ? 13.5 : (isTablet ? 14.5 : 15.5);
+    final EdgeInsets pad = isMobile
+        ? const EdgeInsets.symmetric(horizontal: 12, vertical: 7)
+        : isTablet
+            ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
+            : const EdgeInsets.symmetric(horizontal: 16, vertical: 10);
+
+    final Widget row = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        FlutterLogo(
+          size: markSize,
+          style: FlutterLogoStyle.markOnly,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'Flutter',
+          style: GoogleFonts.albertSans(
+            color: _flutterBlue,
+            fontSize: wordFontSize,
+            fontWeight: FontWeight.w700,
+            height: 1.05,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ],
+    );
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Container(
+        padding: pad,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: const Color(0xFF90CAF9),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.center,
+          child: row,
+        ),
+      ),
+    );
   }
 }
 

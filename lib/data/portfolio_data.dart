@@ -142,6 +142,8 @@ class PortfolioCaseStudy {
   final String overview;
   /// Optional: design philosophy & principles applied in this case study.
   final String? designApproach;
+  /// Featured case study card strip: asset path (e.g. `assets/images/...`) or `https://` URL.
+  final String? heroImagePath;
   final List<CaseStudySection> sections;
   final int order;
 
@@ -151,6 +153,7 @@ class PortfolioCaseStudy {
     required this.subtitle,
     required this.overview,
     this.designApproach,
+    this.heroImagePath,
     required this.sections,
     this.order = 0,
   });
@@ -160,6 +163,7 @@ class PortfolioCaseStudy {
         'subtitle': subtitle,
         'overview': overview,
         'designApproach': designApproach,
+        'heroImagePath': heroImagePath,
         'sections': sections.map((s) => s.toMap()).toList(),
         'order': order,
       };
@@ -175,6 +179,7 @@ class PortfolioCaseStudy {
       subtitle: map['subtitle'] as String? ?? '',
       overview: map['overview'] as String? ?? '',
       designApproach: map['designApproach'] as String?,
+      heroImagePath: map['heroImagePath'] as String?,
       sections: sections,
       order: (map['order'] as num?)?.toInt() ?? 0,
     );
@@ -197,6 +202,7 @@ class PortfolioCaseStudy {
       subtitle: subtitle,
       overview: overview,
       designApproach: designApproach,
+      heroImagePath: heroImagePath,
       sections: list,
       order: order,
     );
@@ -684,6 +690,68 @@ class PortfolioData {
   /// New featured study: add near the top here and give it the lowest `order` (e.g. 0); increase `order` on older studies if needed.
   static List<PortfolioCaseStudy> get caseStudies => [
         PortfolioCaseStudy(
+          id: 'rose-chat-seasonal-campaign-engine',
+          title: 'Rose Chat Seasonal Campaign Engine',
+          subtitle: 'Backend-Driven Conversational AI Experience Design',
+          overview:
+              'A flagship AI product case study focused on backend-driven conversational UX at production scale. '
+              'I designed a campaign system that dynamically transforms the Rose chat experience with contextual greetings, seasonal themes, dynamic assets, preview controls, and safe rollout logic without app redeploys.',
+          designApproach:
+              'Senior product design framing for AI systems: define interaction outcomes first, then align backend controls, rollout governance, and UX states so non-engineering teams can ship and manage conversational experiences safely.',
+          heroImagePath: 'assets/images/admin/admin_chat_with_amy.jpeg',
+          sections: [
+            CaseStudySection(
+              title: 'Problem',
+              content:
+                  'The conversational AI experience felt static and hard to evolve. Seasonal moments, campaign messaging, and contextual onboarding required code releases, creating delays and operational risk.\n\n'
+                  'Teams needed a way to update the chat experience quickly while preserving trust, quality, and safety.',
+            ),
+            CaseStudySection(
+              title: 'Solution',
+              content:
+                  'Designed and shipped a backend-driven campaign engine for Rose Chat where admins can configure seasonal messaging, greetings, visual themes, dynamic assets, and rollout timing from backend controls.\n\n'
+                  'The system supports preview mode, fallback behavior, and kill-switch patterns so campaign changes can be tested and released safely without app redeploys.',
+            ),
+            CaseStudySection(
+              title: 'My Role',
+              content:
+                  'Led product and UX strategy end-to-end: problem framing, information architecture, campaign UX flows, control-surface design for admins, and delivery alignment with engineering.\n\n'
+                  'Defined design requirements for safe operations (preview, rollback, fallback), clear campaign states, and consistent conversational tone across contexts.',
+            ),
+            CaseStudySection(
+              title: 'System Architecture',
+              content:
+                  'Architected a configurable backend model using Firebase services to drive campaign behavior at runtime.\n\n'
+                  '• Firestore stores campaign definitions and metadata.\n'
+                  '• Firebase Storage serves campaign-specific visual assets.\n'
+                  '• Remote Config controls activation strategy and environment-safe rollout.\n'
+                  '• Runtime fallback logic guarantees graceful defaults when campaigns are missing or invalid.\n\n'
+                  'This structure enabled scalable campaign orchestration across platforms with low operational overhead.',
+            ),
+            CaseStudySection(
+              title: 'Conversational AI Design',
+              content:
+                  'The experience design focused on conversational relevance, emotional timing, and brand consistency. Campaign context dynamically influences greeting patterns, visual tone, and message framing while preserving the core Rose assistant behavior.\n\n'
+                  'Interaction states were intentionally designed for first-run moments, returning users, and campaign expiration so the AI experience feels intentional rather than cosmetic.',
+            ),
+            CaseStudySection(
+              title: 'Outcome',
+              content:
+                  'Rose Chat became a configurable AI surface instead of a hardcoded feature. Product and operations teams can launch seasonal experiences faster, reduce engineering dependency for campaign updates, and maintain safer releases through preview and fallback controls.\n\n'
+                  'The result is a stronger AI product narrative: conversational UX as a governed, scalable system.',
+            ),
+            CaseStudySection(
+              title: 'Future Roadmap',
+              content:
+                  '• Campaign performance analytics by segment and context\n'
+                  '• Smarter personalization rules tied to user states\n'
+                  '• Expanded campaign templates for multi-market storytelling\n'
+                  '• Additional governance tooling for audit and approval workflows',
+            ),
+          ],
+          order: 0,
+        ),
+        PortfolioCaseStudy(
           id: 'service-flow',
           title: 'Service Flow',
           subtitle: 'Multi-tenant SaaS for field service workflows',
@@ -694,6 +762,7 @@ class PortfolioData {
           designApproach:
               'Systems-first IA, Multi-tenant SaaS constraints (isolation, configuration, role policy), and a single source of truth for UI tokens and components. '
               'The design system is maintained as a living document so specs stay shippable alongside the product.',
+          heroImagePath: 'assets/images/design_system/design-system.png',
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -734,7 +803,7 @@ class PortfolioData {
               opensDesignSystemDoc: true,
             ),
           ],
-          order: 0,
+          order: 10,
         ),
         PortfolioCaseStudy(
           id: 'asd',
@@ -748,6 +817,7 @@ class PortfolioData {
               'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
               'Design strategy: systems thinking, role-based IA, explicit governance (audit, human-in-the-loop AI). Partnership with engineering on data model, workflow logic, and config-driven behavior. WCAG 2.2 AA for core flows.',
           order: 10,
+          heroImagePath: 'assets/images/admin/admin_dashboard.jpeg',
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -975,6 +1045,7 @@ class PortfolioData {
               'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
               'Design strategy: empathy-led (respect users, avoid long forms, visual choice over surveys); personalization as a system—onboarding choices drive themes, typography, and content globally. Preference model aligned with implementation. Privacy and ethics by design.',
           order: 20,
+          heroImagePath: 'assets/images/on_boarding_image/default_app_00.png',
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -1107,14 +1178,45 @@ class PortfolioData {
       );
     }).toList();
 
+    final String? hero = firestoreAsd.heroImagePath?.trim();
+    final String? heroResolved =
+        (hero != null && hero.isNotEmpty) ? hero : staticAsd.heroImagePath?.trim();
+
     return PortfolioCaseStudy(
       id: firestoreAsd.id,
       title: firestoreAsd.title,
       subtitle: firestoreAsd.subtitle,
       overview: firestoreAsd.overview,
       designApproach: firestoreAsd.designApproach,
+      heroImagePath: (heroResolved != null && heroResolved.isNotEmpty) ? heroResolved : null,
       sections: newSections,
       order: firestoreAsd.order,
+    );
+  }
+
+  /// When Firestore omits [PortfolioCaseStudy.heroImagePath], use bundled static default.
+  static PortfolioCaseStudy mergeHeroFromStaticIfMissing(PortfolioCaseStudy remote) {
+    PortfolioCaseStudy? local;
+    for (final c in caseStudies) {
+      if (c.id == remote.id) {
+        local = c;
+        break;
+      }
+    }
+    if (local == null) return remote;
+    final h = remote.heroImagePath?.trim();
+    if (h != null && h.isNotEmpty) return remote;
+    final fallback = local.heroImagePath?.trim();
+    if (fallback == null || fallback.isEmpty) return remote;
+    return PortfolioCaseStudy(
+      id: remote.id,
+      title: remote.title,
+      subtitle: remote.subtitle,
+      overview: remote.overview,
+      designApproach: remote.designApproach,
+      heroImagePath: fallback,
+      sections: remote.sections,
+      order: remote.order,
     );
   }
 }

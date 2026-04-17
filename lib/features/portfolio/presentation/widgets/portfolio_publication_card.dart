@@ -33,8 +33,8 @@ class PortfolioPublicationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 14 : 18,
-            vertical: isMobile ? 12 : 16,
+            horizontal: isMobile ? 20 : 28,
+            vertical: isMobile ? 20 : 24,
           ),
           decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
           child: Row(

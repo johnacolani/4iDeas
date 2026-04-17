@@ -1,9 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
-import 'package:four_ideas/features/portfolio/presentation/widgets/case_study_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/helper/app_background.dart';
@@ -32,6 +33,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final PublicationContentService _publicationService = PublicationContentService();
   final OpenSourceContentService _openSourceService = OpenSourceContentService();
   final CaseStudyContentService _caseStudyService = CaseStudyContentService();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _featuredCaseStudiesKey = GlobalKey();
+  final GlobalKey _appShowcaseKey = GlobalKey();
+  final GlobalKey _publicationsKey = GlobalKey();
+  final GlobalKey _openSourceKey = GlobalKey();
+  bool _handledInitialSectionLink = false;
   List<PortfolioApp>? _appsFromFirestore;
   /// Firestore collection document id for each [PortfolioApp.id] (logical slug may differ from doc id).
   Map<String, String>? _portfolioFirestoreDocByAppId;
@@ -44,6 +51,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   void initState() {
     super.initState();
     _loadAllPortfolioData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_handledInitialSectionLink) return;
+    _handledInitialSectionLink = true;
+    final section = GoRouterState.of(context).uri.queryParameters['section'];
+    if (section == 'featured') {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSection(_featuredCaseStudiesKey));
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadAllPortfolioData() async {
@@ -152,7 +176,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       final staticOnly = PortfolioData.caseStudies.where((s) => !firestoreIds.contains(s.id)).toList();
       final mergedFirestore = fromFirestore.map((cs) {
         if (cs.id == 'asd') return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
-        return cs;
+        return PortfolioData.mergeHeroFromStaticIfMissing(cs);
       }).toList();
       list = [...mergedFirestore, ...staticOnly];
     }
@@ -160,7 +184,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       final byOrder = a.order.compareTo(b.order);
       if (byOrder != 0) return byOrder;
       // When order matches (e.g. legacy Firestore defaults), prefer featured static ids first.
-      const tieBreak = {'service-flow': 0, 'asd': 1, 'twin-scriptures': 2};
+      const tieBreak = {
+        'rose-chat-seasonal-campaign-engine': 0,
+        'service-flow': 1,
+        'asd': 2,
+        'twin-scriptures': 3,
+      };
       final ta = tieBreak[a.id] ?? 99;
       final tb = tieBreak[b.id] ?? 99;
       final byTie = ta.compareTo(tb);
@@ -168,6 +197,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       return a.id.compareTo(b.id);
     });
     return list;
+  }
+
+  Future<void> _scrollToSection(GlobalKey key) async {
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+    await Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
+      alignment: 0.04,
+    );
   }
 
   static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
@@ -461,6 +501,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       subtitle: cs.subtitle,
       overview: cs.overview,
       designApproach: cs.designApproach,
+      heroImagePath: cs.heroImagePath,
       sections: newSections,
       order: cs.order,
     );
@@ -577,6 +618,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             child: Scrollbar(
               thumbVisibility: true,
               child: CustomScrollView(
+                controller: _scrollController,
                 slivers: [
                 if (_isLoadingPortfolio)
                   SliverToBoxAdapter(
@@ -588,8 +630,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.only(
-                      left: isMobile ? 16 : (isTablet ? 24 : 32),
-                      right: isMobile ? 16 : (isTablet ? 24 : 32),
+                      // Aligns section edges with "My Own Design System" card (page 16/24/32 + card gutter 12/24).
+                      left: isMobile ? 28 : (isTablet ? 48 : 56),
+                      right: isMobile ? 28 : (isTablet ? 48 : 56),
                       top: 0,
                       bottom: isMobile ? 20 : 28,
                     ),
@@ -642,11 +685,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           isMobile: isMobile,
                         ),
                         SizedBox(height: gapAfterDesignPhilosophy),
+                        _PortfolioSectionNav(
+                          bodySize: bodySize,
+                          isMobile: isMobile,
+                          onTapFeatured: () => _scrollToSection(_featuredCaseStudiesKey),
+                          onTapApps: () => _scrollToSection(_appShowcaseKey),
+                          onTapPublications: () => _scrollToSection(_publicationsKey),
+                          onTapOpenSource: () => _scrollToSection(_openSourceKey),
+                        ),
+                        SizedBox(height: 14),
 
                         // 5. Featured Case Studies
-                        _SectionTitle(
-                          title: 'Featured Case Studies',
-                          sectionTitleSize: sectionTitleSize,
+                        KeyedSubtree(
+                          key: _featuredCaseStudiesKey,
+                          child: _SectionTitle(
+                            title: 'Featured Case Studies',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           SizedBox(height: gapAfterFeaturedTitle),
@@ -663,30 +718,29 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                         ],
                         SizedBox(height: gapAfterFeaturedTitle),
-                        ..._displayCaseStudies.map(
-                          (cs) => Padding(
-                            padding: EdgeInsets.only(bottom: gapBetweenCaseStudyCards),
-                            child: CaseStudyCard(
-                              caseStudy: cs,
-                              isMobile: isMobile,
-                              isTablet: isTablet,
-                              showAdminActions: AdminService.isAdmin(),
-                              onEdit: AdminService.isAdmin() ? () => _navigateToEditCaseStudy(cs) : null,
-                              onDelete: AdminService.isAdmin() && (_caseStudiesFromFirestore?.any((f) => f.id == cs.id) ?? false)
-                                  ? () => _deleteCaseStudy(cs)
-                                  : null,
-                              onEditAdaptiveSection: (AdminService.isAdmin() && cs.id == 'asd')
-                                  ? () => _openEditAdaptiveSection(cs)
-                                  : null,
-                            ),
-                          ),
+                        _FeaturedCaseStudiesShowcase(
+                          caseStudies: _displayCaseStudies,
+                          isMobile: isMobile,
+                          bodySize: bodySize,
+                          gapBetweenCards: gapBetweenCaseStudyCards,
+                          onOpenCaseStudy: (id) => context.go(AppRoutes.portfolioCaseStudyPath(id)),
+                          showAdminActions: AdminService.isAdmin(),
+                          onEdit: AdminService.isAdmin() ? _navigateToEditCaseStudy : null,
+                          onDelete: AdminService.isAdmin() ? _deleteCaseStudy : null,
+                          canDeleteCaseStudy: (id) =>
+                              _caseStudiesFromFirestore?.any((f) => f.id == id) ?? false,
+                          onEditAdaptiveSection:
+                              AdminService.isAdmin() ? (cs) => _openEditAdaptiveSection(cs) : null,
                         ),
                         SizedBox(height: gapAfterCaseStudies),
 
                         // 6. App Showcase (2 columns or responsive grid)
-                        _SectionTitle(
-                          title: 'App Showcase',
-                          sectionTitleSize: sectionTitleSize,
+                        KeyedSubtree(
+                          key: _appShowcaseKey,
+                          child: _SectionTitle(
+                            title: 'App Showcase',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -736,15 +790,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
                             if (availableWidth > 900) {
                               crossAxisCount = 3;
-                              mainAxisExtent = 408;
+                              mainAxisExtent = 432;
                               spacing = 18;
                             } else if (availableWidth > 600) {
                               crossAxisCount = 2;
-                              mainAxisExtent = 428;
+                              mainAxisExtent = 452;
                               spacing = 16;
                             } else {
                               crossAxisCount = 1;
-                              mainAxisExtent = 448;
+                              mainAxisExtent = 476;
                               spacing = 14;
                             }
                             return GridView.builder(
@@ -777,9 +831,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         SizedBox(height: gapAfterAppShowcase),
 
                         // 7. Publications
-                        _SectionTitle(
-                          title: 'Publications',
-                          sectionTitleSize: sectionTitleSize,
+                        KeyedSubtree(
+                          key: _publicationsKey,
+                          child: _SectionTitle(
+                            title: 'Publications',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           SizedBox(height: gapAfterPublicationsTitle),
@@ -832,9 +889,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         SizedBox(height: gapAfterPublications),
 
                         // 8. Open Source & Package
-                        _SectionTitle(
-                          title: 'Open Source & Package',
-                          sectionTitleSize: sectionTitleSize,
+                        KeyedSubtree(
+                          key: _openSourceKey,
+                          child: _SectionTitle(
+                            title: 'Open Source & Package',
+                            sectionTitleSize: sectionTitleSize,
+                          ),
                         ),
                         if (AdminService.isAdmin()) ...[
                           SizedBox(height: gapAfterOpenSourceTitle),
@@ -953,12 +1013,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 child: Center(
                   child: Transform.translate(
                     offset: Offset(0, 60),
-                    child: SelectableText(
-                      'Product Design & Development',
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.portfolioTextTitle,
-                        fontSize: titleSize,
-                        fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: math.max(8.0, wi * 0.04)),
+                      child: SelectableText(
+                        'Product design\n&\ncross-platform app development (Flutter)',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.albertSans(
+                          color: ColorManager.portfolioTextTitle,
+                          fontSize: titleSize,
+                          fontWeight: FontWeight.bold,
+                          height: 1.25,
+                        ),
                       ),
                     ),
                   ),
@@ -989,20 +1054,18 @@ class _DesignSystemHighlight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTapLink,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 20 : 28,
-              vertical: isMobile ? 20 : 24,
-            ),
-            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTapLink,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 28,
+            vertical: isMobile ? 20 : 24,
+          ),
+          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1082,7 +1145,6 @@ class _DesignSystemHighlight extends StatelessWidget {
                 ],
               ],
             ),
-          ),
         ),
       ),
     );
@@ -1100,18 +1162,19 @@ class _DesignPhilosophyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => context.push(AppRoutes.designPhilosophy),
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(isMobile ? 18 : 22),
-            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
-            child: Row(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push(AppRoutes.designPhilosophy),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 28,
+            vertical: isMobile ? 20 : 24,
+          ),
+          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+          child: Row(
             children: [
               Icon(
                 Icons.auto_awesome,
@@ -1152,6 +1215,435 @@ class _DesignPhilosophyCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PortfolioSectionNav extends StatelessWidget {
+  final double bodySize;
+  final bool isMobile;
+  final VoidCallback onTapFeatured;
+  final VoidCallback onTapApps;
+  final VoidCallback onTapPublications;
+  final VoidCallback onTapOpenSource;
+
+  const _PortfolioSectionNav({
+    required this.bodySize,
+    required this.isMobile,
+    required this.onTapFeatured,
+    required this.onTapApps,
+    required this.onTapPublications,
+    required this.onTapOpenSource,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = <(String, VoidCallback)>[
+      ('Featured Case Studies', onTapFeatured),
+      ('App Showcase', onTapApps),
+      ('Publications', onTapPublications),
+      ('Open Source', onTapOpenSource),
+    ];
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: actions
+          .map(
+            (item) => OutlinedButton(
+              onPressed: item.$2,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.45)),
+                padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14, vertical: 10),
+              ),
+              child: Text(
+                item.$1,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextBody,
+                  fontSize: bodySize - 1,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _FeaturedCaseStudiesShowcase extends StatelessWidget {
+  final List<PortfolioCaseStudy> caseStudies;
+  final bool isMobile;
+  final double bodySize;
+  final double gapBetweenCards;
+  final ValueChanged<String> onOpenCaseStudy;
+  final bool showAdminActions;
+  final void Function(PortfolioCaseStudy cs)? onEdit;
+  final void Function(PortfolioCaseStudy cs)? onDelete;
+  final bool Function(String id) canDeleteCaseStudy;
+  final void Function(PortfolioCaseStudy cs)? onEditAdaptiveSection;
+
+  const _FeaturedCaseStudiesShowcase({
+    required this.caseStudies,
+    required this.isMobile,
+    required this.bodySize,
+    required this.gapBetweenCards,
+    required this.onOpenCaseStudy,
+    this.showAdminActions = false,
+    this.onEdit,
+    this.onDelete,
+    required this.canDeleteCaseStudy,
+    this.onEditAdaptiveSection,
+  });
+
+  static const Map<String, List<String>> _featuredTagsById = {
+    'rose-chat-seasonal-campaign-engine': [
+      'Conversational AI',
+      'Product Design',
+      'Flutter',
+      'Firebase',
+      'Dynamic UX',
+      'System Design',
+    ],
+    'service-flow': [
+      'Multi-tenant SaaS',
+      'Product Design',
+      'Flutter',
+      'System Design',
+      'Design System',
+    ],
+    'asd': [
+      'Operations Platform',
+      'Multi-role UX',
+      'AI Governance',
+      'Flutter',
+      'Firebase',
+    ],
+    'twin-scriptures': [
+      'Consumer Product',
+      'Personalization',
+      'RTL & i18n',
+      'Flutter',
+    ],
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    if (caseStudies.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < caseStudies.length; i++) ...[
+          _FeaturedCaseStudyRow(
+            caseStudy: caseStudies[i],
+            isMobile: isMobile,
+            bodySize: bodySize,
+            tags: _featuredTagsById[caseStudies[i].id] ?? const <String>[],
+            onOpen: () => onOpenCaseStudy(caseStudies[i].id),
+            showAdminActions: showAdminActions,
+            onEdit: onEdit,
+            onDelete: onDelete,
+            canDelete: canDeleteCaseStudy(caseStudies[i].id),
+            onEditAdaptiveSection:
+                caseStudies[i].id == 'asd' ? onEditAdaptiveSection : null,
+          ),
+          if (i < caseStudies.length - 1) SizedBox(height: gapBetweenCards),
+        ],
+      ],
+    );
+  }
+}
+
+/// Wraps a premium card with optional admin actions (same pattern as [CaseStudyCard]).
+class _FeaturedCaseStudyRow extends StatelessWidget {
+  final PortfolioCaseStudy caseStudy;
+  final bool isMobile;
+  final double bodySize;
+  final List<String> tags;
+  final VoidCallback onOpen;
+  final bool showAdminActions;
+  final void Function(PortfolioCaseStudy cs)? onEdit;
+  final void Function(PortfolioCaseStudy cs)? onDelete;
+  final bool canDelete;
+  final void Function(PortfolioCaseStudy cs)? onEditAdaptiveSection;
+
+  const _FeaturedCaseStudyRow({
+    required this.caseStudy,
+    required this.isMobile,
+    required this.bodySize,
+    required this.tags,
+    required this.onOpen,
+    this.showAdminActions = false,
+    this.onEdit,
+    this.onDelete,
+    this.canDelete = false,
+    this.onEditAdaptiveSection,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final card = _PremiumFeaturedCard(
+      caseStudy: caseStudy,
+      isMobile: isMobile,
+      bodySize: bodySize,
+      tags: tags,
+      onOpen: onOpen,
+    );
+
+    if (showAdminActions &&
+        (onEdit != null || (onDelete != null && canDelete) || onEditAdaptiveSection != null)) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          card,
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onEditAdaptiveSection != null)
+                  IconButton(
+                    icon: Icon(Icons.image, size: 22, color: ColorManager.portfolioTextBody),
+                    onPressed: () => onEditAdaptiveSection!(caseStudy),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    tooltip: 'Edit Adaptive section images',
+                  ),
+                if (onEdit != null)
+                  IconButton(
+                    icon: Icon(Icons.edit, size: 22, color: ColorManager.portfolioTextBody),
+                    onPressed: () => onEdit!(caseStudy),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  ),
+                if (onDelete != null && canDelete)
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: 22, color: Colors.red),
+                    onPressed: () => onDelete!(caseStudy),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+    return card;
+  }
+}
+
+/// Featured card hero strip: asset path, `https://` URL, or empty → placeholder.
+class _FeaturedCaseStudyHeroStrip extends StatelessWidget {
+  final String? heroImagePath;
+  static const double _height = 150;
+
+  const _FeaturedCaseStudyHeroStrip({required this.heroImagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    final path = heroImagePath?.trim();
+    if (path == null || path.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: _height,
+        color: Colors.white.withValues(alpha: 0.04),
+        alignment: Alignment.center,
+        child: Text(
+          'Hero image placeholder',
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
+    final Widget image = isNetwork
+        ? Image.network(
+            path,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: _height,
+            alignment: Alignment.center,
+            errorBuilder: (_, __, ___) => _placeholder(),
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                width: double.infinity,
+                height: _height,
+                color: Colors.white.withValues(alpha: 0.06),
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+                  ),
+                ),
+              );
+            },
+          )
+        : Image.asset(
+            path,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: _height,
+            alignment: Alignment.center,
+            errorBuilder: (_, __, ___) => _placeholder(),
+          );
+
+    return SizedBox(
+      width: double.infinity,
+      height: _height,
+      child: image,
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      width: double.infinity,
+      height: _height,
+      color: Colors.white.withValues(alpha: 0.04),
+      alignment: Alignment.center,
+      child: Text(
+        'Hero image failed to load',
+        style: GoogleFonts.albertSans(
+          color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumFeaturedCard extends StatelessWidget {
+  final PortfolioCaseStudy caseStudy;
+  final bool isMobile;
+  final double bodySize;
+  final List<String> tags;
+  final VoidCallback onOpen;
+
+  const _PremiumFeaturedCard({
+    required this.caseStudy,
+    required this.isMobile,
+    required this.bodySize,
+    required this.tags,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onOpen,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 28,
+            vertical: isMobile ? 20 : 24,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                ColorManager.portfolioTextBody.withValues(alpha: 0.18),
+                ColorManager.portfolioTextBody.withValues(alpha: 0.08),
+                ColorManager.portfolioTextBody.withValues(alpha: 0.14),
+              ],
+            ),
+            border: Border.all(
+              color: ColorManager.portfolioTextBody.withValues(alpha: 0.40),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: _FeaturedCaseStudyHeroStrip(heroImagePath: caseStudy.heroImagePath),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                caseStudy.title,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextTitle,
+                  fontSize: bodySize + 8,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                caseStudy.subtitle,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextBody,
+                  fontSize: bodySize,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                caseStudy.overview,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextBody,
+                  fontSize: bodySize - 0.5,
+                  height: 1.45,
+                ),
+              ),
+              if (tags.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: tags
+                      .map(
+                        (tag) => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(999),
+                            color: Colors.white.withValues(alpha: 0.08),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+                          ),
+                          child: Text(
+                            tag,
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.portfolioTextBody,
+                              fontSize: bodySize - 2,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Text(
+                    'View Case Study',
+                    style: GoogleFonts.albertSans(
+                      color: ColorManager.portfolioTextBody,
+                      fontSize: bodySize,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(Icons.arrow_forward, color: ColorManager.portfolioTextBody, size: 18),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1226,7 +1718,10 @@ class _OpenSourceCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: EdgeInsets.all(isMobile ? 16 : 20),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 28,
+            vertical: isMobile ? 20 : 24,
+          ),
           decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
           child: Row(
             children: [
