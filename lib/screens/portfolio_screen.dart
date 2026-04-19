@@ -502,6 +502,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       overview: cs.overview,
       designApproach: cs.designApproach,
       heroImagePath: cs.heroImagePath,
+      heroImagePaths: cs.heroImagePaths,
       sections: newSections,
       order: cs.order,
     );
@@ -834,7 +835,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         KeyedSubtree(
                           key: _publicationsKey,
                           child: _SectionTitle(
-                            title: 'Publications',
+                            title: "John Colani's Publications",
                             sectionTitleSize: sectionTitleSize,
                           ),
                         ),
@@ -892,7 +893,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         KeyedSubtree(
                           key: _openSourceKey,
                           child: _SectionTitle(
-                            title: 'Open Source & Package',
+                            title: "John Colani's Packages",
                             sectionTitleSize: sectionTitleSize,
                           ),
                         ),
@@ -913,16 +914,51 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         SizedBox(height: gapAfterOpenSourceTitle),
                         ..._displayOpenSourceItems.asMap().entries.map((e) {
                           final item = e.value;
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: e.key < _displayOpenSourceItems.length - 1 ? 12 : 0),
-                            child: _OpenSourceCard(
-                              item: item,
-                              isMobile: isMobile,
-                              bodySize: bodySize,
-                              showAdminActions: AdminService.isAdmin() && _openSourceFromFirestore != null,
-                              onEdit: AdminService.isAdmin() && _openSourceFromFirestore != null ? () => _navigateToEditOpenSource(item) : null,
-                              onDelete: AdminService.isAdmin() && _openSourceFromFirestore != null ? () => _deleteOpenSource(item) : null,
-                            ),
+                          final prev =
+                              e.key > 0 ? _displayOpenSourceItems[e.key - 1] : null;
+                          final isGithub = item.url.contains('github.com');
+                          final prevWasGithub =
+                              prev?.url.contains('github.com') ?? false;
+                          final showGithubSectionTitle = isGithub && !prevWasGithub;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (showGithubSectionTitle)
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: 8,
+                                    top: e.key > 0 ? 4 : 0,
+                                  ),
+                                  child: SelectableText(
+                                    "John Colani's GitHub repository",
+                                    style: GoogleFonts.albertSans(
+                                      color: ColorManager.portfolioTextTitle,
+                                      fontSize: bodySize + 1,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: e.key < _displayOpenSourceItems.length - 1 ? 12 : 0,
+                                ),
+                                child: _OpenSourceCard(
+                                  item: item,
+                                  isMobile: isMobile,
+                                  bodySize: bodySize,
+                                  showAdminActions: AdminService.isAdmin() &&
+                                      _openSourceFromFirestore != null,
+                                  onEdit: AdminService.isAdmin() &&
+                                          _openSourceFromFirestore != null
+                                      ? () => _navigateToEditOpenSource(item)
+                                      : null,
+                                  onDelete: AdminService.isAdmin() &&
+                                          _openSourceFromFirestore != null
+                                      ? () => _deleteOpenSource(item)
+                                      : null,
+                                ),
+                              ),
+                            ],
                           );
                         }),
                         SizedBox(height: 8),
@@ -1241,8 +1277,8 @@ class _PortfolioSectionNav extends StatelessWidget {
     final actions = <(String, VoidCallback)>[
       ('Featured Case Studies', onTapFeatured),
       ('App Showcase', onTapApps),
-      ('Publications', onTapPublications),
-      ('Open Source', onTapOpenSource),
+      ("John Colani's Publications", onTapPublications),
+      ("John Colani's Packages", onTapOpenSource),
     ];
     return Wrap(
       spacing: 10,
@@ -1435,15 +1471,86 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
 }
 
 /// Featured card hero strip: asset path, `https://` URL, or empty → placeholder.
+/// Fixed strip height 150px. Multi-image portrait strips (Twin, ASD, Rose Chat): narrow
+/// phone-width tiles, [BoxFit.contain], spaced apart (no overlap).
 class _FeaturedCaseStudyHeroStrip extends StatelessWidget {
   final String? heroImagePath;
+  final List<String>? heroImagePaths;
+  final bool isMobile;
+  final String caseStudyId;
   static const double _height = 150;
+  /// Portrait thumbnail width for multi-image strips (mobile-style screenshots).
+  static const double _multiHeroPortraitThumbWidth = 72;
+  /// Horizontal gap between portrait thumbnails so frames don’t stack visually.
+  static const double _multiHeroPortraitGap = 10;
 
-  const _FeaturedCaseStudyHeroStrip({required this.heroImagePath});
+  /// Case studies that use Twin-style multi-hero: contain + narrow tiles + gap.
+  static const Set<String> _portraitMultiHeroCaseStudyIds = {
+    'twin-scriptures',
+    'asd',
+    'rose-chat-seasonal-campaign-engine',
+  };
+
+  const _FeaturedCaseStudyHeroStrip({
+    required this.heroImagePath,
+    this.heroImagePaths,
+    required this.isMobile,
+    required this.caseStudyId,
+  });
+
+  bool get _usePortraitMultiHeroStrip =>
+      _portraitMultiHeroCaseStudyIds.contains(caseStudyId);
+
+  BoxFit get _imageFit {
+    if (_usePortraitMultiHeroStrip) {
+      return BoxFit.contain;
+    }
+    return isMobile ? BoxFit.fitHeight : BoxFit.cover;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final path = heroImagePath?.trim();
+    final paths = heroImagePaths
+        ?.map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+    if (paths != null && paths.length > 1) {
+      final usePortrait = _usePortraitMultiHeroStrip;
+      final thumbW = usePortrait ? _multiHeroPortraitThumbWidth : _height;
+
+      return ClipRect(
+        child: SizedBox(
+          width: double.infinity,
+          height: _height,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.zero,
+            itemCount: paths.length,
+            separatorBuilder: (_, __) => SizedBox(
+              width: usePortrait ? _multiHeroPortraitGap : 0,
+            ),
+            itemBuilder: (context, index) {
+              return SizedBox(
+                width: thumbW,
+                height: _height,
+                child: ClipRect(
+                  child: _stripImageForPath(
+                    paths[index],
+                    _height,
+                    cellWidth: thumbW,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    final path = (paths != null && paths.length == 1)
+        ? paths.first
+        : heroImagePath?.trim();
     if (path == null || path.isEmpty) {
       return Container(
         width: double.infinity,
@@ -1460,53 +1567,60 @@ class _FeaturedCaseStudyHeroStrip extends StatelessWidget {
       );
     }
 
-    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
-    final Widget image = isNetwork
-        ? Image.network(
-            path,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: _height,
-            alignment: Alignment.center,
-            errorBuilder: (_, __, ___) => _placeholder(),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                width: double.infinity,
-                height: _height,
-                color: Colors.white.withValues(alpha: 0.06),
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
-                  ),
-                ),
-              );
-            },
-          )
-        : Image.asset(
-            path,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: _height,
-            alignment: Alignment.center,
-            errorBuilder: (_, __, ___) => _placeholder(),
-          );
-
     return SizedBox(
       width: double.infinity,
       height: _height,
-      child: image,
+      child: ClipRect(
+        child: _stripImageForPath(path, _height, cellWidth: null),
+      ),
     );
   }
 
-  Widget _placeholder() {
+  /// [cellWidth] set for square carousel cells; null = full-width hero row.
+  Widget _stripImageForPath(String path, double side, {double? cellWidth}) {
+    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
+    final w = cellWidth ?? double.infinity;
+    if (isNetwork) {
+      return Image.network(
+        path,
+        fit: _imageFit,
+        width: w,
+        height: side,
+        alignment: Alignment.center,
+        errorBuilder: (_, __, ___) => _placeholder(side),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: w,
+            height: side,
+            color: Colors.white.withValues(alpha: 0.06),
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+              ),
+            ),
+          );
+        },
+      );
+    }
+    return Image.asset(
+      path,
+      fit: _imageFit,
+      width: w,
+      height: side,
+      alignment: Alignment.center,
+      errorBuilder: (_, __, ___) => _placeholder(side),
+    );
+  }
+
+  Widget _placeholder(double side) {
     return Container(
       width: double.infinity,
-      height: _height,
+      height: side,
       color: Colors.white.withValues(alpha: 0.04),
       alignment: Alignment.center,
       child: Text(
@@ -1568,7 +1682,12 @@ class _PremiumFeaturedCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: _FeaturedCaseStudyHeroStrip(heroImagePath: caseStudy.heroImagePath),
+                child: _FeaturedCaseStudyHeroStrip(
+                  heroImagePath: caseStudy.heroImagePath,
+                  heroImagePaths: caseStudy.heroImagePaths,
+                  isMobile: isMobile,
+                  caseStudyId: caseStudy.id,
+                ),
               ),
               const SizedBox(height: 14),
               Text(

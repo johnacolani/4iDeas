@@ -144,6 +144,8 @@ class PortfolioCaseStudy {
   final String? designApproach;
   /// Featured case study card strip: asset path (e.g. `assets/images/...`) or `https://` URL.
   final String? heroImagePath;
+  /// When non-empty, featured hero shows a horizontal strip of images (same height as single-hero); scrolls if needed.
+  final List<String>? heroImagePaths;
   final List<CaseStudySection> sections;
   final int order;
 
@@ -154,6 +156,7 @@ class PortfolioCaseStudy {
     required this.overview,
     this.designApproach,
     this.heroImagePath,
+    this.heroImagePaths,
     required this.sections,
     this.order = 0,
   });
@@ -164,6 +167,7 @@ class PortfolioCaseStudy {
         'overview': overview,
         'designApproach': designApproach,
         'heroImagePath': heroImagePath,
+        if (heroImagePaths != null && heroImagePaths!.isNotEmpty) 'heroImagePaths': heroImagePaths,
         'sections': sections.map((s) => s.toMap()).toList(),
         'order': order,
       };
@@ -173,6 +177,12 @@ class PortfolioCaseStudy {
     final sections = sectionsList != null
         ? sectionsList.map((e) => CaseStudySection.fromMap(Map<String, dynamic>.from(e as Map))).toList()
         : <CaseStudySection>[];
+    final rawHeroPaths = map['heroImagePaths'];
+    List<String>? heroImagePaths;
+    if (rawHeroPaths is List) {
+      heroImagePaths = rawHeroPaths.map((e) => '$e'.trim()).where((e) => e.isNotEmpty).toList();
+      if (heroImagePaths.isEmpty) heroImagePaths = null;
+    }
     return PortfolioCaseStudy(
       id: map['id'] as String? ?? docId,
       title: map['title'] as String? ?? '',
@@ -180,6 +190,7 @@ class PortfolioCaseStudy {
       overview: map['overview'] as String? ?? '',
       designApproach: map['designApproach'] as String?,
       heroImagePath: map['heroImagePath'] as String?,
+      heroImagePaths: heroImagePaths,
       sections: sections,
       order: (map['order'] as num?)?.toInt() ?? 0,
     );
@@ -203,6 +214,7 @@ class PortfolioCaseStudy {
       overview: overview,
       designApproach: designApproach,
       heroImagePath: heroImagePath,
+      heroImagePaths: heroImagePaths,
       sections: list,
       order: order,
     );
@@ -344,8 +356,10 @@ class PortfolioData {
   static const String mediumProfile = 'https://medium.com/@johnacolani_22987';
   static const String pubDevPackage =
       'https://pub.dev/packages/auto_scroll_image';
-  static const String weatherAppRepo =
-      'https://github.com/johnhcolani/Weather-App-Bloc-clean-architecture';
+  static const String githubJohnacolaniRepos =
+      'https://github.com/johnacolani?tab=repositories';
+  static const String githubJohnhcolaniRepos =
+      'https://github.com/johnhcolani?tab=repositories';
   static const String fullPortfolioUrl =
       'https://sites.google.com/view/senior-interaction-product-d/home';
   static const String githubProfile = 'https://github.com/johnhcolani';
@@ -678,12 +692,155 @@ class PortfolioData {
         ),
         OpenSourceItem(
           id: 'static-1',
-          title: 'Weather App',
-          subtitle:
-              'BLoC, Clean Architecture, SOLID, Unit/Widget/Integration tests, Mockito',
-          url: weatherAppRepo,
-          iconName: 'code',
+          title: 'johnacolani on GitHub',
+          subtitle: 'All repositories',
+          url: githubJohnacolaniRepos,
+          iconName: 'github',
         ),
+        OpenSourceItem(
+          id: 'static-2',
+          title: 'johnhcolani on GitHub',
+          subtitle: 'All repositories',
+          url: githubJohnhcolaniRepos,
+          iconName: 'github',
+        ),
+      ];
+
+  /// Subset of Twin Scriptures “Solution” onboarding screens for the featured card hero strip (horizontal scroll).
+  static const List<String> twinScripturesFeaturedHeroPaths = <String>[
+    'assets/images/on_boarding_image/on_boarding_en_1.png',
+    'assets/images/on_boarding_image/on_boarding_fa_2.png',
+    'assets/images/on_boarding_image/on_boarding_tr_3.png',
+    'assets/images/on_boarding_image/seasonal_theme_5.png',
+    'assets/images/on_boarding_image/color_theme_4.png',
+    'assets/images/on_boarding_image/emotional_state_14.png',
+    'assets/images/on_boarding_image/nowruz_image_12.png',
+    'assets/images/on_boarding_image/complete_on_boarding.png',
+    'assets/images/on_boarding_image/spring_image_6.png',
+    'assets/images/on_boarding_image/custome_home_screen_16.png',
+    'assets/images/on_boarding_image/book_mark_home_17.png',
+  ];
+
+  /// ASD featured-card hero: Admin, Sales, Scheduler, Installer, and Content & Material (aligned with section galleries).
+  static const List<String> asdRoleSpecificHeroPaths = <String>[
+    'assets/images/admin/admin_dashboard.jpeg',
+    'assets/images/admin/admin_home_screen.jpeg',
+    'assets/images/sales_rep/salesRep_dashboard.png',
+    'assets/images/sales_rep/salesRep_home.png',
+    'assets/images/scheduler/Scheduler dashboard.png',
+    'assets/images/scheduler/Scheduler dashboard 01.png',
+    'assets/images/installer/installer dashboard.png',
+    'assets/images/installer/installer home screen.png',
+    'assets/images/admin/admin_trending_material.jpeg',
+    'assets/images/admin/admin_new_material.jpeg',
+  ];
+
+  /// ASD: full catalog of section images (narrative order, deduped). Used when a broader hero list is needed.
+  static List<String> get asdFeaturedHeroPaths {
+    const ordered = <String>[
+      'assets/images/asd_app_adaptive/asd-001.jpg',
+      'assets/images/asd_app_adaptive/asd-002.jpg',
+      'assets/images/asd_app_adaptive/asd-003.jpg',
+      'assets/images/asd_app_adaptive/asd-004.jpg',
+      'assets/images/asd_app_adaptive/asd-005.jpg',
+      'assets/images/asd_app_adaptive/asd-006.jpg',
+      'assets/images/asd_app_adaptive/asd-007.jpg',
+      'assets/images/asd_app_adaptive/asd-008.jpg',
+      'assets/images/asd_app_adaptive/asd-009.jpg',
+      'assets/images/asd_app_adaptive/asd-010.jpg',
+      'assets/images/asd_app_adaptive/asd-011.jpg',
+      'assets/images/asd_app_adaptive/asd-012.jpg',
+      'assets/images/design_system/design_system_colors.png',
+      'assets/images/design_system/design_system_typography.png',
+      'assets/images/design_system/design_system_spacing.png',
+      'assets/images/design_system/design_system_borderRadius.png',
+      'assets/images/design_system/design_system_icon_grid.png',
+      'assets/images/admin/admin_dashboard.jpeg',
+      'assets/images/admin/admin_home_screen.jpeg',
+      'assets/images/admin/admin_user_management.jpeg',
+      'assets/images/admin/admin_promote_to_salesRep.jpeg',
+      'assets/images/admin/admin_setting.jpeg',
+      'assets/images/sales_rep/salesRep_dashboard.png',
+      'assets/images/sales_rep/salesRep_home.png',
+      'assets/images/installer/installer dashboard.png',
+      'assets/images/installer/installer home screen.png',
+      'assets/images/scheduler/Scheduler dashboard.png',
+      'assets/images/scheduler/Scheduler dashboard 01.png',
+      'assets/images/sales_rep/salesRep_client.png',
+      'assets/images/sales_rep/salesRep_project.png',
+      'assets/images/sales_rep/create_invoice_01.png',
+      'assets/images/sales_rep/performance analytics.png',
+      'assets/images/scheduler/Create Event.png',
+      'assets/images/scheduler/Date Picker.png',
+      'assets/images/scheduler/Time Picker.png',
+      'assets/images/installer/installer on the map.png',
+      'assets/images/installer/job history.png',
+      'assets/images/installer/installer profile.png',
+      'assets/images/admin/admin_amy_manager.jpeg',
+      'assets/images/admin/admin_chat_with_amy.jpeg',
+      'assets/images/admin/admin_Ai_knowledge_base.jpeg',
+      'assets/images/admin/admin_trending_material.jpeg',
+      'assets/images/admin/admin_new_material.jpeg',
+      'assets/images/admin/admin_popular_material.jpeg',
+      'assets/images/admin/admin_recommended_image.jpeg',
+    ];
+    final seen = <String>{};
+    return [
+      for (final p in ordered)
+        if (seen.add(p)) p,
+    ];
+  }
+
+  /// Rose Chat seasonal campaign: iPhone simulator captures (`assets/images/seasonal UI/`), chronological by filename.
+  static const List<String> _roseSeasonalScreenshotFileNames = <String>[
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-18 at 23.47.21.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-18 at 23.47.39.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.22.58.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.23.10.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.23.17.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.23.54.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.24.03.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.24.08.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.24.36.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.24.46.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.24.54.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.25.29.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.25.35.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.25.45.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.26.18.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.26.37.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.26.48.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.27.53.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.29.47.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.37.30.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.37.36.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.42.29.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.42.42.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.42.49.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.43.33.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.43.42.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.43.50.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.44.44.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.44.52.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.45.33.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.46.01.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.46.11.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.46.18.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.47.04.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.47.11.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.47.18.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.47.47.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.52.03.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.52.09.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.52.41.jpg',
+    'Simulator Screenshot - iPhone 17 Pro Max - 2026-04-19 at 00.52.50.jpg',
+  ];
+
+  static const String _roseSeasonalAssetDir = 'assets/images/seasonal UI';
+
+  /// Featured-card hero strip for Rose Chat seasonal case study (same pattern as Twin Scriptures).
+  static List<String> get roseChatSeasonalFeaturedHeroPaths => [
+        for (final name in _roseSeasonalScreenshotFileNames) '$_roseSeasonalAssetDir/$name',
       ];
 
   /// Featured case studies are sorted by [PortfolioCaseStudy.order] ascending on the portfolio screen (lower = higher on the page).
@@ -698,19 +855,27 @@ class PortfolioData {
               'I designed a campaign system that dynamically transforms the Rose chat experience with contextual greetings, seasonal themes, dynamic assets, preview controls, and safe rollout logic without app redeploys.',
           designApproach:
               'Senior product design framing for AI systems: define interaction outcomes first, then align backend controls, rollout governance, and UX states so non-engineering teams can ship and manage conversational experiences safely.',
-          heroImagePath: 'assets/images/admin/admin_chat_with_amy.jpeg',
+          heroImagePath: roseChatSeasonalFeaturedHeroPaths.first,
+          heroImagePaths: roseChatSeasonalFeaturedHeroPaths,
           sections: [
             CaseStudySection(
               title: 'Problem',
               content:
-                  'The conversational AI experience felt static and hard to evolve. Seasonal moments, campaign messaging, and contextual onboarding required code releases, creating delays and operational risk.\n\n'
-                  'Teams needed a way to update the chat experience quickly while preserving trust, quality, and safety.',
+                  '**Origin.** I conceived and designed the Rose Chat Seasonal Campaign Engine myself as one of my first major product initiatives in the United States—built to give users a **clearer, more attractive path** through the app and a **distinct seasonal flow** they could feel every time they opened chat. The goal was simple: move beyond a generic assistant and deliver something **purpose-built for engagement**—timed to moments that matter, visually alive, and easy to trust.\n\n'
+                  '**Why it mattered.** The conversational AI layer had been **static and expensive to change**. Seasonal beats, campaign messaging, and onboarding that should feel fresh were trapped behind **release cycles**—slow for the business, invisible to users who deserved a product that felt cared for. Operations needed speed; users needed **continuity and delight** without sacrificing safety.\n\n'
+                  '**The gap.** There was no governed way to ship **usable, on-brand seasonal experiences** on demand—only brittle one-offs or code drops. Closing that gap meant designing a system where **special flows** for users and **controlled rollout** for the team could finally live in the same product.',
             ),
             CaseStudySection(
               title: 'Solution',
               content:
                   'Designed and shipped a backend-driven campaign engine for Rose Chat where admins can configure seasonal messaging, greetings, visual themes, dynamic assets, and rollout timing from backend controls.\n\n'
                   'The system supports preview mode, fallback behavior, and kill-switch patterns so campaign changes can be tested and released safely without app redeploys.',
+            ),
+            CaseStudySection(
+              title: 'Seasonal campaign UI',
+              content:
+                  'iPhone simulator captures of the seasonal campaign experience in Rose Chat—greetings, themes, and rollout states in context. Order follows capture time. Tap any screen to view full size.',
+              imagePaths: List<String>.from(roseChatSeasonalFeaturedHeroPaths),
             ),
             CaseStudySection(
               title: 'My Role',
@@ -817,7 +982,8 @@ class PortfolioData {
               'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
               'Design strategy: systems thinking, role-based IA, explicit governance (audit, human-in-the-loop AI). Partnership with engineering on data model, workflow logic, and config-driven behavior. WCAG 2.2 AA for core flows.',
           order: 10,
-          heroImagePath: 'assets/images/admin/admin_dashboard.jpeg',
+          heroImagePath: asdRoleSpecificHeroPaths.first,
+          heroImagePaths: asdRoleSpecificHeroPaths,
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -1045,7 +1211,8 @@ class PortfolioData {
               'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
               'Design strategy: empathy-led (respect users, avoid long forms, visual choice over surveys); personalization as a system—onboarding choices drive themes, typography, and content globally. Preference model aligned with implementation. Privacy and ethics by design.',
           order: 20,
-          heroImagePath: 'assets/images/on_boarding_image/default_app_00.png',
+          heroImagePath: twinScripturesFeaturedHeroPaths.first,
+          heroImagePaths: List<String>.from(twinScripturesFeaturedHeroPaths),
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -1182,6 +1349,15 @@ class PortfolioData {
     final String? heroResolved =
         (hero != null && hero.isNotEmpty) ? hero : staticAsd.heroImagePath?.trim();
 
+    final rp = firestoreAsd.heroImagePaths;
+    final hasRemotePaths = rp != null && rp.isNotEmpty;
+    final staticHeroPaths = staticAsd.heroImagePaths;
+    final heroPathsResolved = hasRemotePaths
+        ? rp
+        : (staticHeroPaths != null && staticHeroPaths.isNotEmpty
+            ? List<String>.from(staticHeroPaths)
+            : null);
+
     return PortfolioCaseStudy(
       id: firestoreAsd.id,
       title: firestoreAsd.title,
@@ -1189,12 +1365,22 @@ class PortfolioData {
       overview: firestoreAsd.overview,
       designApproach: firestoreAsd.designApproach,
       heroImagePath: (heroResolved != null && heroResolved.isNotEmpty) ? heroResolved : null,
+      heroImagePaths: heroPathsResolved,
       sections: newSections,
       order: firestoreAsd.order,
     );
   }
 
-  /// When Firestore omits [PortfolioCaseStudy.heroImagePath], use bundled static default.
+  static bool _heroPathsEqual(List<String>? a, List<String>? b) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null || a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  /// When Firestore omits [PortfolioCaseStudy.heroImagePath] or [PortfolioCaseStudy.heroImagePaths], use bundled static defaults.
   static PortfolioCaseStudy mergeHeroFromStaticIfMissing(PortfolioCaseStudy remote) {
     PortfolioCaseStudy? local;
     for (final c in caseStudies) {
@@ -1204,17 +1390,35 @@ class PortfolioData {
       }
     }
     if (local == null) return remote;
-    final h = remote.heroImagePath?.trim();
-    if (h != null && h.isNotEmpty) return remote;
-    final fallback = local.heroImagePath?.trim();
-    if (fallback == null || fallback.isEmpty) return remote;
+
+    final remoteH = remote.heroImagePath?.trim();
+    final hasRemoteHero = remoteH != null && remoteH.isNotEmpty;
+    final remotePaths = remote.heroImagePaths;
+    final hasRemotePaths = remotePaths != null && remotePaths.isNotEmpty;
+
+    if (hasRemoteHero && hasRemotePaths) return remote;
+
+    final fbH = local.heroImagePath?.trim();
+    final fbP = local.heroImagePaths;
+
+    final mergedHero =
+        hasRemoteHero ? remoteH : (fbH != null && fbH.isNotEmpty ? fbH : null);
+    final mergedPaths = hasRemotePaths
+        ? remotePaths
+        : (fbP != null && fbP.isNotEmpty ? List<String>.from(fbP) : null);
+
+    if (mergedHero == remoteH && _heroPathsEqual(mergedPaths, remotePaths)) {
+      return remote;
+    }
+
     return PortfolioCaseStudy(
       id: remote.id,
       title: remote.title,
       subtitle: remote.subtitle,
       overview: remote.overview,
       designApproach: remote.designApproach,
-      heroImagePath: fallback,
+      heroImagePath: mergedHero,
+      heroImagePaths: mergedPaths,
       sections: remote.sections,
       order: remote.order,
     );

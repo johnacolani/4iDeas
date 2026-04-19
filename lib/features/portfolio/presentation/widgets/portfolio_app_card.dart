@@ -6,6 +6,9 @@ import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Flutter brand blue (logo / wordmark).
+const Color _kFlutterBrandBlue = Color(0xFF02569B);
+
 class PortfolioAppCard extends StatefulWidget {
   final PortfolioApp app;
   final bool isMobile;
@@ -73,72 +76,76 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               ? () => onCardTap(context)
               : null,
           borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              horizontal: cardPaddingH,
-              vertical: cardPaddingV,
-            ),
-            decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
-            child: isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      height: 180,
-                      child: _buildImageBlock(
-                        mobileVertical: true,
-                        accentGold: accentGold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: _buildTextContent(titleSize, bodySize),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildFlutterWatermarkBand(),
-                    SizedBox(height: 10),
-                    _buildButtons(
-                      isDarkSurface: isDarkCardSurface,
-                      accentGold: accentGold,
-                    ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: cardPaddingH,
+                  vertical: cardPaddingV,
+                ),
+                decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
+                child: isMobile
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          SizedBox(
+                            height: 180,
+                            child: _buildImageBlock(
+                              mobileVertical: true,
+                              accentGold: accentGold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
                           Expanded(
-                            flex: 5,
                             child: SingleChildScrollView(
                               child: _buildTextContent(titleSize, bodySize),
                             ),
                           ),
-                          SizedBox(width: 12),
+                          SizedBox(height: 10),
+                          _buildButtons(
+                            isDarkSurface: isDarkCardSurface,
+                            accentGold: accentGold,
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
                           Expanded(
-                            flex: 4,
-                            child: _buildImageBlock(
-                              mobileVertical: false,
-                              accentGold: accentGold,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 5,
+                                  child: SingleChildScrollView(
+                                    child: _buildTextContent(titleSize, bodySize),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  flex: 4,
+                                  child: _buildImageBlock(
+                                    mobileVertical: false,
+                                    accentGold: accentGold,
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                          SizedBox(height: 10),
+                          _buildButtons(
+                            isDarkSurface: isDarkCardSurface,
+                            accentGold: accentGold,
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildFlutterWatermarkBand(),
-                    SizedBox(height: 10),
-                    _buildButtons(
-                      isDarkSurface: isDarkCardSurface,
-                      accentGold: accentGold,
-                    ),
-                  ],
-                ),
+              ),
+              Positioned.fill(
+                child: _buildFlutterWatermark(),
+              ),
+            ],
           ),
         ),
       ),
@@ -407,105 +414,54 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     }
   }
 
-  /// Reference layout: centered band between main content and platform chips (~¼ card width).
-  Widget _buildFlutterWatermarkBand() {
-    return Transform.translate(
-      offset: const Offset(0, -50),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final w = constraints.maxWidth;
-          // Max width for the pill; word uses real Text fontSize (mark + label), not horizontal FlutterLogo bitmap.
-          final double targetW = isMobile
-              ? (w * 0.5).clamp(140.0, 220.0)
-              : isTablet
-                  ? (w * 0.45).clamp(180.0, 280.0)
-                  : (w * 0.42).clamp(200.0, 320.0);
-          return Center(
-            child: IgnorePointer(
-              child: _PortfolioFlutterWatermarkBadge(
-                isMobile: isMobile,
-                isTablet: isTablet,
-                maxWidth: targetW,
+  /// Centered overlay on the full card; does not block taps.
+  Widget _buildFlutterWatermark() {
+    final double iconSize = isMobile ? 36 : 44;
+    final double fontSize = isMobile ? 21 : 23;
+    return Padding(
+      padding: const EdgeInsets.only(top: 100),
+      child: Center(
+        child: IgnorePointer(
+          child: Opacity(
+            opacity: 0.5,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: _kFlutterBrandBlue.withValues(alpha: 0.35)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: iconSize,
+                    width: iconSize * 1.15,
+                    child: Image.asset(
+                      'assets/image_10.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.flutter_dash,
+                        size: iconSize,
+                        color: _kFlutterBrandBlue,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Flutter',
+                    style: GoogleFonts.albertSans(
+                      color: _kFlutterBrandBlue,
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.25,
+                      height: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-/// White pill, light-blue stroke — Flutter mark + real [Text] so font size scales on web (not bitmap wordmark).
-class _PortfolioFlutterWatermarkBadge extends StatelessWidget {
-  final bool isMobile;
-  final bool isTablet;
-  final double maxWidth;
-
-  const _PortfolioFlutterWatermarkBadge({
-    required this.isMobile,
-    required this.isTablet,
-    required this.maxWidth,
-  });
-
-  static const Color _flutterBlue = Color(0xFF02569B);
-
-  @override
-  Widget build(BuildContext context) {
-    final double markSize = isMobile ? 24 : (isTablet ? 28 : 32);
-    // Explicit text size (chips use ~10–11pt); this reads clearly on Flutter Web.
-    final double wordFontSize = isMobile ? 13.5 : (isTablet ? 14.5 : 15.5);
-    final EdgeInsets pad = isMobile
-        ? const EdgeInsets.symmetric(horizontal: 12, vertical: 7)
-        : isTablet
-            ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-            : const EdgeInsets.symmetric(horizontal: 16, vertical: 10);
-
-    final Widget row = Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        FlutterLogo(
-          size: markSize,
-          style: FlutterLogoStyle.markOnly,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'Flutter',
-          style: GoogleFonts.albertSans(
-            color: _flutterBlue,
-            fontSize: wordFontSize,
-            fontWeight: FontWeight.w700,
-            height: 1.05,
-            letterSpacing: 0.2,
           ),
-        ),
-      ],
-    );
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      child: Container(
-        padding: pad,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: const Color(0xFF90CAF9),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.center,
-          child: row,
         ),
       ),
     );

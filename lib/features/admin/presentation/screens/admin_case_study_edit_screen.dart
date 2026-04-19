@@ -31,6 +31,8 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
   final List<_SectionEditing> _sections = [];
   bool _saving = false;
   String? _error;
+  /// Preserved when the admin UI has no field for multi-hero paths (e.g. Twin Scriptures strip).
+  List<String>? _preservedHeroImagePaths;
 
   final CaseStudyContentService _service = CaseStudyContentService();
 
@@ -43,6 +45,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
       _subtitleController.text = cs.subtitle;
       _overviewController.text = cs.overview;
       _heroImagePathController.text = cs.heroImagePath ?? '';
+      _preservedHeroImagePaths = cs.heroImagePaths;
       _designApproachController.text = cs.designApproach ?? '';
       for (final s in cs.sections) {
         _sections.add(_SectionEditing(
@@ -105,6 +108,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
           ? null
           : _designApproachController.text.trim(),
       heroImagePath: hero.isEmpty ? null : hero,
+      heroImagePaths: _preservedHeroImagePaths,
       sections: _buildSections(),
     );
   }

@@ -663,7 +663,11 @@ class _SectionBlock extends StatelessWidget {
                 SizedBox(height: he * 0.02),
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final List<CaseStudyImage> sortedImages = _sortImagesByTrailingNumber(displayImages);
+                    final List<CaseStudyImage> sortedImages =
+                        caseStudyId == 'rose-chat-seasonal-campaign-engine' &&
+                                title == 'Seasonal campaign UI'
+                            ? List<CaseStudyImage>.from(displayImages)
+                            : _sortImagesByTrailingNumber(displayImages);
                     final double availableWidth = constraints.maxWidth.isFinite && constraints.maxWidth > 0
                         ? constraints.maxWidth
                         : wi;
