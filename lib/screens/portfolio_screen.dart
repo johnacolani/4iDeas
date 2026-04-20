@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
@@ -591,10 +592,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     // ---------- END GAPS ----------
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.portfolioTextTitle),
         centerTitle: true,
-        backgroundColor: ColorManager.accentGold,
         leading: Semantics(
           label: 'Back to home',
           button: true,
@@ -615,7 +616,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: CustomScrollView(
@@ -1473,7 +1475,7 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
 /// Featured card hero strip: asset path, `https://` URL, or empty → placeholder.
 /// Fixed strip height 150px. Multi-image portrait strips (Twin, ASD, Rose Chat): narrow
 /// phone-width tiles, [BoxFit.contain], spaced apart (no overlap).
-class _FeaturedCaseStudyHeroStrip extends StatelessWidget {
+class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
   final String? heroImagePath;
   final List<String>? heroImagePaths;
   final bool isMobile;
@@ -1498,122 +1500,353 @@ class _FeaturedCaseStudyHeroStrip extends StatelessWidget {
     required this.caseStudyId,
   });
 
+  @override
+  State<_FeaturedCaseStudyHeroStrip> createState() =>
+      _FeaturedCaseStudyHeroStripState();
+}
+
+class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip> {
+  int? _hoveredIndex;
+  OverlayEntry? _hoverPreviewEntry;
+
   bool get _usePortraitMultiHeroStrip =>
-      _portraitMultiHeroCaseStudyIds.contains(caseStudyId);
+      _FeaturedCaseStudyHeroStrip._portraitMultiHeroCaseStudyIds
+          .contains(widget.caseStudyId);
+
+  bool get _enableHoverFx => !widget.isMobile;
 
   BoxFit get _imageFit {
     if (_usePortraitMultiHeroStrip) {
       return BoxFit.contain;
     }
-    return isMobile ? BoxFit.fitHeight : BoxFit.cover;
+    return widget.isMobile ? BoxFit.fitHeight : BoxFit.cover;
+  }
+
+  String _imageLabelFromPath(String path) {
+    final normalized = path.toLowerCase();
+
+    const exactLabels = <String, String>{
+      'assets/images/admin/admin_dashboard.jpeg': 'Admin Dashboard',
+      'assets/images/admin/admin_home_screen.jpeg': 'Admin Home',
+      'assets/images/sales_rep/salesrep_dashboard.png': 'Sales Dashboard',
+      'assets/images/sales_rep/salesrep_home.png': 'Sales Home',
+      'assets/images/scheduler/scheduler dashboard.png': 'Scheduler Dashboard',
+      'assets/images/scheduler/scheduler dashboard 01.png': 'Scheduler Planning',
+      'assets/images/installer/installer dashboard.png': 'Installer Dashboard',
+      'assets/images/installer/installer home screen.png': 'Installer Home',
+      'assets/images/admin/admin_trending_material.jpeg': 'Trending Materials',
+      'assets/images/admin/admin_new_material.jpeg': 'New Materials',
+    };
+    final exact = exactLabels[normalized];
+    if (exact != null) return exact;
+
+    if (normalized.contains('sales')) return 'Sales Experience';
+    if (normalized.contains('scheduler')) return 'Scheduler Experience';
+    if (normalized.contains('installer')) return 'Installer Experience';
+    if (normalized.contains('admin')) return 'Admin Experience';
+    if (normalized.contains('material')) return 'Materials Management';
+    if (normalized.contains('seasonal')) return 'Seasonal Campaign';
+    if (normalized.contains('design_system')) return 'Design System';
+
+    final file = path.split('/').last;
+    final cleaned = file
+        .replaceAll(RegExp(r'\.(png|jpg|jpeg|webp)$', caseSensitive: false), '')
+        .replaceAll('_', ' ')
+        .replaceAll('-', ' ')
+        .trim();
+    if (cleaned.isEmpty) return 'Case Study Image';
+    return cleaned
+        .split(RegExp(r'\s+'))
+        .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.length > 1 ? w.substring(1) : ''}')
+        .join(' ');
+  }
+
+  void _showHoverPreview(BuildContext context, String path) {
+    if (!_enableHoverFx) return;
+    _hideHoverPreview();
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) return;
+    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
+
+    _hoverPreviewEntry = OverlayEntry(
+      builder: (context) {
+        return IgnorePointer(
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                builder: (context, t, child) {
+                  return Opacity(
+                    opacity: t,
+                    child: Transform.scale(
+                      scale: 0.96 + (0.04 * t),
+                      child: child,
+                    ),
+                  );
+                },
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 1600,
+                    maxHeight: 980,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.32),
+                            width: 1.4,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              blurRadius: 36,
+                              offset: const Offset(0, 18),
+                            ),
+                          ],
+                        ),
+                        child: isNetwork
+                            ? Image.network(
+                                path,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => _placeholder(420),
+                              )
+                            : Image.asset(
+                                path,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => _placeholder(420),
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    overlay.insert(_hoverPreviewEntry!);
+  }
+
+  void _hideHoverPreview() {
+    _hoverPreviewEntry?.remove();
+    _hoverPreviewEntry = null;
+  }
+
+  @override
+  void dispose() {
+    _hideHoverPreview();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final paths = heroImagePaths
+    final paths = widget.heroImagePaths
         ?.map((p) => p.trim())
         .where((p) => p.isNotEmpty)
         .toList();
+    final stripHeight = _FeaturedCaseStudyHeroStrip._height;
+
+    Widget stripContent;
     if (paths != null && paths.length > 1) {
       final usePortrait = _usePortraitMultiHeroStrip;
-      final thumbW = usePortrait ? _multiHeroPortraitThumbWidth : _height;
+      final thumbW = usePortrait
+          ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitThumbWidth
+          : stripHeight;
 
-      return ClipRect(
-        child: SizedBox(
-          width: double.infinity,
-          height: _height,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.zero,
-            itemCount: paths.length,
-            separatorBuilder: (_, __) => SizedBox(
-              width: usePortrait ? _multiHeroPortraitGap : 0,
-            ),
-            itemBuilder: (context, index) {
-              return SizedBox(
-                width: thumbW,
-                height: _height,
-                child: ClipRect(
-                  child: _stripImageForPath(
-                    paths[index],
-                    _height,
-                    cellWidth: thumbW,
+      stripContent = ClipRect(
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: _enableHoverFx ? 6 : 0),
+          itemCount: paths.length,
+          separatorBuilder: (_, __) => SizedBox(
+            width: usePortrait ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitGap : 10,
+          ),
+          itemBuilder: (context, index) {
+            final bool isHoveredTile = _hoveredIndex == index && _enableHoverFx;
+            return MouseRegion(
+              onEnter: (_) {
+                setState(() => _hoveredIndex = index);
+                _showHoverPreview(context, paths[index]);
+              },
+              onExit: (_) {
+                setState(() => _hoveredIndex = null);
+                _hideHoverPreview();
+              },
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                offset: isHoveredTile ? const Offset(0, -0.02) : Offset.zero,
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  scale: isHoveredTile ? 1.04 : 1.0,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    width: thumbW,
+                    height: stripHeight,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: isHoveredTile
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                blurRadius: 18,
+                                offset: const Offset(0, 10),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: _stripImageForPath(
+                            paths[index],
+                            stripHeight,
+                            cellWidth: thumbW,
+                            zoomed: isHoveredTile,
+                          ),
+                        ),
+                        Positioned(
+                          left: 10,
+                          right: 10,
+                          bottom: 10,
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 160),
+                            opacity: isHoveredTile ? 1 : 0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.55),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.24),
+                                ),
+                              ),
+                              child: Text(
+                                _imageLabelFromPath(paths[index]),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.albertSans(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       );
-    }
-
-    final path = (paths != null && paths.length == 1)
-        ? paths.first
-        : heroImagePath?.trim();
-    if (path == null || path.isEmpty) {
-      return Container(
-        width: double.infinity,
-        height: _height,
-        color: Colors.white.withValues(alpha: 0.04),
-        alignment: Alignment.center,
-        child: Text(
-          'Hero image placeholder',
-          style: GoogleFonts.albertSans(
-            color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
-            fontWeight: FontWeight.w600,
+    } else {
+      final path = (paths != null && paths.length == 1)
+          ? paths.first
+          : widget.heroImagePath?.trim();
+      if (path == null || path.isEmpty) {
+        stripContent = Container(
+          width: double.infinity,
+          height: stripHeight,
+          color: Colors.white.withValues(alpha: 0.04),
+          alignment: Alignment.center,
+          child: Text(
+            'Hero image placeholder',
+            style: GoogleFonts.albertSans(
+              color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        stripContent = ClipRect(
+          child: _stripImageForPath(path, stripHeight, cellWidth: null),
+        );
+      }
     }
 
-    return SizedBox(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutCubic,
       width: double.infinity,
-      height: _height,
-      child: ClipRect(
-        child: _stripImageForPath(path, _height, cellWidth: null),
+      height: stripHeight,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.18),
+        ),
       ),
+      child: stripContent,
     );
   }
 
   /// [cellWidth] set for square carousel cells; null = full-width hero row.
-  Widget _stripImageForPath(String path, double side, {double? cellWidth}) {
+  Widget _stripImageForPath(
+    String path,
+    double side, {
+    double? cellWidth,
+    bool zoomed = false,
+  }) {
     final isNetwork = path.startsWith('http://') || path.startsWith('https://');
     final w = cellWidth ?? double.infinity;
-    if (isNetwork) {
-      return Image.network(
-        path,
-        fit: _imageFit,
-        width: w,
-        height: side,
-        alignment: Alignment.center,
-        errorBuilder: (_, __, ___) => _placeholder(side),
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
+    final image = isNetwork
+        ? Image.network(
+            path,
+            fit: _imageFit,
             width: w,
             height: side,
-            color: Colors.white.withValues(alpha: 0.06),
             alignment: Alignment.center,
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
-              ),
-            ),
+            errorBuilder: (_, __, ___) => _placeholder(side),
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                width: w,
+                height: side,
+                color: Colors.white.withValues(alpha: 0.06),
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+                  ),
+                ),
+              );
+            },
+          )
+        : Image.asset(
+            path,
+            fit: _imageFit,
+            width: w,
+            height: side,
+            alignment: Alignment.center,
+            errorBuilder: (_, __, ___) => _placeholder(side),
           );
-        },
-      );
-    }
-    return Image.asset(
-      path,
-      fit: _imageFit,
-      width: w,
-      height: side,
-      alignment: Alignment.center,
-      errorBuilder: (_, __, ___) => _placeholder(side),
+
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      scale: zoomed ? 1.05 : 1.0,
+      child: image,
     );
   }
 

@@ -1,4 +1,3 @@
-import 'package:auto_scroll_image/auto_scroll_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,6 +6,7 @@ import '../core/widgets/aws_backend_section.dart';
 import '../core/widgets/home_hero_headline.dart';
 import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
+import '../core/widgets/app_auto_scroll_image.dart';
 
 class WebScreen extends StatefulWidget {
   const WebScreen({super.key});
@@ -276,19 +276,19 @@ class _WebScreenState extends State<WebScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: isMobile
-                        ? wi * 0.7
-                        : (isTablet ? wi * 0.5 : wi * 0.3),
-                    child: const AutoScrollImage(),
+                  Center(
+                    child: SizedBox(
+                      width: wi * 0.5,
+                      child: const AppAutoScrollImage(),
+                    ),
                   ),
                   Transform.translate(
                     offset: Offset(0, -60),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: isMobile ? 32.0 : 80.0),
                       child: SizedBox(
-                        width: double.infinity/2,
-                        height: wi < 600 ? wi * 0.5 : (wi < 1024 ? wi * 0.6 : wi * 0.6),
+                        width: wi * 0.5,
+                        height: wi * 0.5,
                         child: FittedBox(
                           fit: BoxFit.contain,
                           alignment: Alignment.center,

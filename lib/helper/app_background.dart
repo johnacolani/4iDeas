@@ -15,7 +15,15 @@ class AppBackground extends StatelessWidget {
 
     return DecoratedBox(
       decoration: const BoxDecoration(
-        color: HomeWarmColors.shellSurfaceSolid,
+        // Same shell gradient as [SlidingMenu] frosted panel (full-opacity base under the grid).
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            HomeWarmColors.shellTop,
+            HomeWarmColors.shellBottom,
+          ],
+        ),
       ),
       child: Stack(
         fit: StackFit.expand,

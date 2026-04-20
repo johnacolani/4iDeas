@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../app_router.dart';
 import '../core/ColorManager.dart';
+import '../core/widgets/frosted_app_bar.dart';
 import '../helper/app_background.dart';
 import '../helper/contact_us_content.dart';
 
@@ -17,12 +18,12 @@ class ContactUsScreen extends StatelessWidget {
     final isMobile = wi < 600;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
-        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
@@ -48,7 +49,8 @@ class ContactUsScreen extends StatelessWidget {
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: SingleChildScrollView(

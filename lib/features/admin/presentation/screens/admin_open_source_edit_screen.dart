@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/open_source_content_service.dart';
@@ -103,9 +104,9 @@ class _AdminOpenSourceEditScreenState extends State<AdminOpenSourceEditScreen> {
     final isEdit = widget.docId != null;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: Colors.amber),
-        backgroundColor: const Color(0xff020923),
         title: Text(
           isEdit ? 'Edit Open Source Item' : 'Add Open Source Item',
           style: GoogleFonts.albertSans(
@@ -118,7 +119,8 @@ class _AdminOpenSourceEditScreenState extends State<AdminOpenSourceEditScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: SingleChildScrollView(

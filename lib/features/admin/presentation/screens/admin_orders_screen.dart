@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
+import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/admin_service.dart';
 import '../../../../services/order_service.dart';
@@ -77,7 +78,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
     if (!AdminService.isAdmin()) {
       return Scaffold(
-        appBar: AppBar(
+        appBar: FrostedAppBar.gold(
           centerTitle: true,
           automaticallyImplyLeading: false,
           leadingWidth: 56,
@@ -90,7 +91,6 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          backgroundColor: ColorManager.accentGold,
           iconTheme: IconThemeData(color: ColorManager.backgroundDark),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
@@ -114,12 +114,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
-        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
@@ -152,73 +152,75 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator())
-          else if (_error != null)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 60,
-                    color: Colors.red.withValues(alpha: 0.7),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _error!,
-                    style: TextStyle(
-                      color: ColorManager.textSecondary,
-                      fontSize: isMobile ? 16 : 18,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _loadOrders,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorManager.primaryTeal,
-                      foregroundColor: ColorManager.backgroundDark,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else if (_orders.isEmpty)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.inbox,
-                    size: 60,
-                    color: ColorManager.textMuted,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No orders yet',
-                    style: TextStyle(
-                      color: ColorManager.textSecondary,
-                      fontSize: isMobile ? 18 : 20,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            Scrollbar(
-              thumbVisibility: true,
-              child: ListView.builder(
-                padding: EdgeInsets.all(isMobile ? 16 : 24),
-                itemCount: _orders.length,
-                itemBuilder: (context, index) {
-                  final order = _orders[index];
-                  return _buildOrderCard(order, isMobile);
-                },
-              ),
-            ),
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 60,
+                              color: Colors.red.withValues(alpha: 0.7),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              _error!,
+                              style: TextStyle(
+                                color: ColorManager.textSecondary,
+                                fontSize: isMobile ? 16 : 18,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: _loadOrders,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorManager.primaryTeal,
+                                foregroundColor: ColorManager.backgroundDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : _orders.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.inbox,
+                                  size: 60,
+                                  color: ColorManager.textMuted,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No orders yet',
+                                  style: TextStyle(
+                                    color: ColorManager.textSecondary,
+                                    fontSize: isMobile ? 18 : 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Scrollbar(
+                            thumbVisibility: true,
+                            child: ListView.builder(
+                              padding: EdgeInsets.all(isMobile ? 16 : 24),
+                              itemCount: _orders.length,
+                              itemBuilder: (context, index) {
+                                final order = _orders[index];
+                                return _buildOrderCard(order, isMobile);
+                              },
+                            ),
+                          ),
+          ),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
@@ -1275,12 +1276,12 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
     final bool isMobile = wi < 600;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
-        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
@@ -1306,7 +1307,9 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          Form(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+            child: Form(
             key: _formKey,
             child: Scrollbar(
               thumbVisibility: true,
@@ -1622,6 +1625,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 ],
               ),
             ),
+          ),
           ),
         ],
       ),

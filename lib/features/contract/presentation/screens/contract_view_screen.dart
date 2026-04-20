@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 
 class ContractViewScreen extends StatelessWidget {
@@ -24,9 +25,9 @@ class ContractViewScreen extends StatelessWidget {
     final contractNotes = order['contractNotes']?.toString() ?? '';
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: Colors.amber),
-        backgroundColor: const Color(0xff020923),
         title: Text(
           'Service Agreement',
           style: GoogleFonts.albertSans(
@@ -39,7 +40,9 @@ class ContractViewScreen extends StatelessWidget {
       body: Stack(
         children: [
           const AppBackground(),
-          Scrollbar(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+            child: Scrollbar(
             thumbVisibility: true,
             child: SingleChildScrollView(
               padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -267,6 +270,7 @@ class ContractViewScreen extends StatelessWidget {
                 SizedBox(height: 32),
               ],
             ),
+          ),
           ),
           ),
         ],

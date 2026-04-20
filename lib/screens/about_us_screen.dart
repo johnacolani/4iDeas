@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
@@ -30,14 +31,14 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
     final double subtitleFontSize = isMobile ? 14 : (isTablet ? 15 : 16);
     
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(
           color: ColorManager.backgroundDark,
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
-        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
@@ -63,7 +64,8 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: CustomScrollView(

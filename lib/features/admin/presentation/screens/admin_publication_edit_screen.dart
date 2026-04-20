@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/publication_content_service.dart';
@@ -95,9 +96,9 @@ class _AdminPublicationEditScreenState extends State<AdminPublicationEditScreen>
     final isEdit = widget.docId != null;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: Colors.amber),
-        backgroundColor: const Color(0xff020923),
         title: Text(
           isEdit ? 'Edit Publication' : 'Add Publication',
           style: GoogleFonts.albertSans(
@@ -110,7 +111,8 @@ class _AdminPublicationEditScreenState extends State<AdminPublicationEditScreen>
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: SingleChildScrollView(

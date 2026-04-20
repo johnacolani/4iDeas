@@ -71,40 +71,62 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTopContainer(bool isMobile, bool isTablet, double wi) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 4.0 : (isTablet ? 24.0 : 32.0),
-            vertical: isMobile ? 12.0 : (isTablet ? 24.0 : 28.0),
-          ),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                HomeWarmColors.shellTop,
-                HomeWarmColors.shellBottom,
-              ],
-            ),
-            border: Border(
-              bottom: BorderSide(
-                color: HomeWarmColors.appBarBorderBottom,
-                width: 1.0,
+        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      HomeWarmColors.shellTop.withValues(alpha: 0.36),
+                      HomeWarmColors.shellBottom.withValues(alpha: 0.24),
+                    ],
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: HomeWarmColors.appBarBorderBottom,
+                      width: 1.0,
+                    ),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: HomeWarmColors.appBarShadow,
+                      blurRadius: 22,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
               ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: HomeWarmColors.appBarShadow,
-                blurRadius: 22,
-                offset: const Offset(0, 6),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: const Alignment(-1.0, -1.0),
+                    end: const Alignment(0.45, 0.5),
+                    colors: [
+                      Colors.white.withValues(alpha: 0.19),
+                      Colors.white.withValues(alpha: 0.06),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.26, 1.0],
+                  ),
+                ),
               ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 4.0 : (isTablet ? 24.0 : 32.0),
+                vertical: isMobile ? 12.0 : (isTablet ? 24.0 : 28.0),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
               Expanded(
                 flex: isMobile ? 2 : 1,
                 child: Row(
@@ -487,7 +509,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

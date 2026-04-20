@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:four_ideas/core/ColorManager.dart';
@@ -137,41 +139,55 @@ class _SlidingMenuState extends State<SlidingMenu>
                 width: isMobile ? 2 : 3,
                 height: he,
               ),
-              Container(
-                height: he,
-                width: drawerWidth,
-                decoration: BoxDecoration(
-                  color: HomeWarmColors.drawerSurfaceSolid,
-                  border: Border(
-                    right: BorderSide(
-                      color: HomeWarmColors.drawerBorder,
-                      width: 1,
-                    ),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.10),
-                      blurRadius: 18,
-                      offset: const Offset(6, 0),
-                    ),
-                  ],
-                ),
-                child: Stack(
+              ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                  child: SizedBox(
+                    height: he,
+                    width: drawerWidth,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      clipBehavior: Clip.hardEdge,
                       children: [
-                        Positioned(
-                          top: -20,
-                          left: -30,
-                          right: -20,
-                          child: Container(
-                            height: 130,
+                        Positioned.fill(
+                          child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                                 colors: [
-                                  Colors.white.withValues(alpha: 0.24),
+                                  HomeWarmColors.shellTop.withValues(alpha: 0.40),
+                                  HomeWarmColors.shellBottom.withValues(alpha: 0.24),
+                                ],
+                              ),
+                              border: Border(
+                                right: BorderSide(
+                                  color: HomeWarmColors.drawerBorder,
+                                  width: 1,
+                                ),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.12),
+                                  blurRadius: 20,
+                                  offset: const Offset(6, 0),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: const Alignment(-1.0, -1.0),
+                                end: const Alignment(0.45, 0.52),
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.21),
+                                  Colors.white.withValues(alpha: 0.07),
                                   Colors.transparent,
                                 ],
+                                stops: const [0.0, 0.28, 1.0],
                               ),
                             ),
                           ),
@@ -354,6 +370,8 @@ class _SlidingMenuState extends State<SlidingMenu>
                       ],
                     ),
                   ),
+                ),
+              ),
             ],
           ),
         ),
@@ -378,29 +396,41 @@ class _SlidingMenuState extends State<SlidingMenu>
                 });
               },
               child: Align(
-              alignment: const Alignment(0, -0.5),
+                alignment: const Alignment(0, -0.5),
                 child: ClipPath(
-                clipper: CustomMenuClipper(),
-                child: Container(
-                  width: 35,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    color: HomeWarmColors.drawerSurfaceSolid,
-                    border: Border.all(
-                      color: HomeWarmColors.drawerBorder,
-                      width: 1,
+                  clipper: CustomMenuClipper(),
+                  child: ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                      child: Container(
+                        width: 35,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              HomeWarmColors.shellTop.withValues(alpha: 0.48),
+                              HomeWarmColors.shellBottom.withValues(alpha: 0.30),
+                            ],
+                          ),
+                          border: Border.all(
+                            color: HomeWarmColors.drawerBorder,
+                            width: 1,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: AnimatedIcon(
+                          color: ColorManager.textPrimary,
+                          size: 25,
+                          icon: AnimatedIcons.menu_close,
+                          progress: _animationController.view,
+                        ),
+                      ),
                     ),
-                  ),
-                  alignment: Alignment.center,
-                  child: AnimatedIcon(
-                    color: ColorManager.textPrimary,
-                    size: 25,
-                    icon: AnimatedIcons.menu_close,
-                    progress: _animationController.view,
                   ),
                 ),
               ),
-            ),
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -91,7 +92,9 @@ class _PortfolioWebViewScreenState extends State<PortfolioWebViewScreen> {
 
   Widget _buildWebView() {
     // For web, use url_launcher to open in new tab with in-app web view
+    final topInset = MediaQuery.paddingOf(context).top + kToolbarHeight;
     return Container(
+      padding: EdgeInsets.only(top: topInset),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -167,12 +170,12 @@ class _PortfolioWebViewScreenState extends State<PortfolioWebViewScreen> {
     if (kIsWeb) {
       // For web, open in browser (iframe blocked by Google Sites)
       return Scaffold(
-        appBar: AppBar(
+        extendBodyBehindAppBar: true,
+        appBar: FrostedAppBar.darkNavy(
           iconTheme: IconThemeData(
             color: Colors.amber[100],
           ),
           centerTitle: true,
-          backgroundColor: const Color(0xff020923),
           title: Text(
             'Portfolio',
             style: TextStyle(
@@ -186,13 +189,14 @@ class _PortfolioWebViewScreenState extends State<PortfolioWebViewScreen> {
     }
     
     // For mobile platforms - use WebView
+    final topContent = MediaQuery.paddingOf(context).top + kToolbarHeight;
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.darkNavy(
         iconTheme: IconThemeData(
           color: Colors.amber[100],
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
         title: Text(
           'Portfolio',
           style: TextStyle(
@@ -217,9 +221,20 @@ class _PortfolioWebViewScreenState extends State<PortfolioWebViewScreen> {
       body: _controller != null
           ? Stack(
               children: [
-                WebViewWidget(controller: _controller),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: topContent,
+                  child: WebViewWidget(controller: _controller),
+                ),
                 if (_isLoading)
-                  Container(
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    top: topContent,
+                    child: Container(
                     color: const Color(0xff020923),
                     child: Center(
                       child: Column(
@@ -239,6 +254,7 @@ class _PortfolioWebViewScreenState extends State<PortfolioWebViewScreen> {
                         ],
                       ),
                     ),
+                  ),
                   ),
               ],
             )

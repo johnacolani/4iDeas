@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:go_router/go_router.dart';
 
@@ -221,7 +222,8 @@ class DesignPhilosophyScreen extends StatelessWidget {
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
@@ -236,7 +238,6 @@ class DesignPhilosophyScreen extends StatelessWidget {
         ),
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: ColorManager.accentGold,
         title: SelectableText(
           'Design Philosophy & Principles',
           style: GoogleFonts.albertSans(
@@ -249,7 +250,8 @@ class DesignPhilosophyScreen extends StatelessWidget {
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: CustomScrollView(

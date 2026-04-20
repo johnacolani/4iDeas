@@ -16,7 +16,7 @@ abstract final class HomeWarmColors {
   static const shellTop = Color(0xFFFDFAF9);
   static const shellBottom = Color(0xFFFBF8F4);
 
-  /// Flat fill: same perceived tone as drawer + [AppBackground] (no gradient — matches grid layer).
+  /// Flat fill for opaque chrome (e.g. legacy). [AppBackground] uses [shellTop]→[shellBottom] gradient to match the drawer shell.
   static const shellSurfaceSolid = Color(0xFFFCF9F7);
 
   /// [SlidingMenu] panel, edge strip, and open/close tab — darker than [shellSurfaceSolid] so the left chrome reads when the drawer is closed.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
+import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -28,10 +29,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     final bool isMobile = wi < 600;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.darkNavy(
         iconTheme: IconThemeData(color: Colors.amber[100]),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
         title: Text(
           'Verify Email',
           style: GoogleFonts.albertSans(
@@ -71,7 +72,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               }
             },
             builder: (context, state) {
-              return SafeArea(
+              return Padding(
+                padding: FrostedAppBar.contentPaddingUnderAppBar(context),
                 child: Center(
                   child: Scrollbar(
                       thumbVisibility: true,

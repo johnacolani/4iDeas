@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/design_system_html_platform.dart';
@@ -21,8 +22,8 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
     final paths = PortfolioData.designSystemDocPathsForCaseStudy(designSystemId);
     if (paths == null) {
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: ColorManager.accentGold,
+        extendBodyBehindAppBar: true,
+        appBar: FrostedAppBar.gold(
           iconTheme: IconThemeData(color: ColorManager.backgroundDark),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
@@ -37,24 +38,33 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
             ),
           ),
         ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              'Design system not found for this case study.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.albertSans(
-                color: ColorManager.textSecondary,
-                fontSize: 16,
+        body: Stack(
+          children: [
+            const AppBackground(),
+            Padding(
+              padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Design system not found for this case study.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.albertSans(
+                      color: ColorManager.textSecondary,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
@@ -73,7 +83,6 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
         ),
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: ColorManager.accentGold,
         title: Text(
           'Design system',
           style: GoogleFonts.albertSans(
@@ -88,7 +97,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
           const AppBackground(),
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: FrostedAppBar.contentPaddingUnderAppBar(context).add(const EdgeInsets.all(12)),
               child: Container(
                 decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
                 padding: const EdgeInsets.all(6),

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/app_router.dart';
@@ -111,7 +112,8 @@ class CaseStudyDetailScreen extends StatelessWidget {
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
@@ -126,7 +128,6 @@ class CaseStudyDetailScreen extends StatelessWidget {
         ),
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: ColorManager.accentGold,
         title: SelectableText(
           caseStudy.title,
           style: GoogleFonts.albertSans(
@@ -139,7 +140,8 @@ class CaseStudyDetailScreen extends StatelessWidget {
       body: Stack(
         children: [
           const AppBackground(),
-          SafeArea(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
               thumbVisibility: true,
               child: CustomScrollView(
@@ -429,8 +431,60 @@ class _ImageWithCaption extends StatelessWidget {
 
   /// Display name from path: filename without extension, underscores to spaces, title case.
   static String _imageNameFromPath(String path) {
-    final name = path.split('/').last.replaceAll(RegExp(r'\.(png|jpg|jpeg|webp)$', caseSensitive: false), '');
-    return name.replaceAll('_', ' ').split(' ').map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.length > 1 ? w.substring(1).toLowerCase() : ''}').join(' ');
+    final normalized = path.toLowerCase();
+
+    const exactLabels = <String, String>{
+      'assets/images/admin/admin_dashboard.jpeg': 'Admin Dashboard',
+      'assets/images/admin/admin_home_screen.jpeg': 'Admin Home',
+      'assets/images/admin/admin_user_management.jpeg': 'User Management',
+      'assets/images/admin/admin_promote_to_salesrep.jpeg': 'Promote Sales Representative',
+      'assets/images/admin/admin_setting.jpeg': 'Admin Settings',
+      'assets/images/admin/admin_amy_manager.jpeg': 'Amy Manager',
+      'assets/images/admin/admin_chat_with_amy.jpeg': 'Admin Chat with Amy',
+      'assets/images/admin/admin_ai_knowledge_base.jpeg': 'AI Knowledge Base',
+      'assets/images/admin/admin_trending_material.jpeg': 'Trending Materials',
+      'assets/images/admin/admin_new_material.jpeg': 'New Materials',
+      'assets/images/admin/admin_popular_material.jpeg': 'Popular Materials',
+      'assets/images/admin/admin_recommended_image.jpeg': 'Recommended Materials',
+      'assets/images/sales_rep/salesrep_dashboard.png': 'Sales Dashboard',
+      'assets/images/sales_rep/salesrep_home.png': 'Sales Home',
+      'assets/images/sales_rep/salesrep_client.png': 'Client Management',
+      'assets/images/sales_rep/salesrep_project.png': 'Project Pipeline',
+      'assets/images/sales_rep/create_invoice_01.png': 'Create Invoice',
+      'assets/images/sales_rep/performance analytics.png': 'Performance Analytics',
+      'assets/images/scheduler/scheduler dashboard.png': 'Scheduler Dashboard',
+      'assets/images/scheduler/scheduler dashboard 01.png': 'Scheduler Planning',
+      'assets/images/scheduler/create event.png': 'Create Event',
+      'assets/images/scheduler/date picker.png': 'Date Picker',
+      'assets/images/scheduler/time picker.png': 'Time Picker',
+      'assets/images/installer/installer dashboard.png': 'Installer Dashboard',
+      'assets/images/installer/installer home screen.png': 'Installer Home',
+      'assets/images/installer/installer on the map.png': 'Installer Live Map',
+      'assets/images/installer/job history.png': 'Job History',
+      'assets/images/installer/installer profile.png': 'Installer Profile',
+    };
+    final exact = exactLabels[normalized];
+    if (exact != null) return exact;
+
+    if (normalized.contains('sales')) return 'Sales Experience';
+    if (normalized.contains('scheduler')) return 'Scheduler Experience';
+    if (normalized.contains('installer')) return 'Installer Experience';
+    if (normalized.contains('admin')) return 'Admin Experience';
+    if (normalized.contains('material')) return 'Materials Management';
+    if (normalized.contains('seasonal')) return 'Seasonal Campaign';
+    if (normalized.contains('design_system')) return 'Design System';
+
+    final name = path
+        .split('/')
+        .last
+        .replaceAll(RegExp(r'\.(png|jpg|jpeg|webp)$', caseSensitive: false), '')
+        .replaceAll('_', ' ')
+        .replaceAll('-', ' ')
+        .trim();
+    return name
+        .split(RegExp(r'\s+'))
+        .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.length > 1 ? w.substring(1) : ''}')
+        .join(' ');
   }
 
   @override

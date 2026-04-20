@@ -38,7 +38,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   sizer: ^2.0.15
   marquee: ^2.3.0
-  auto_scroll_image: ^0.2.9-dev
   google_fonts: ^6.3.3
   webview_flutter: ^4.4.2
   url_launcher: ^6.2.5

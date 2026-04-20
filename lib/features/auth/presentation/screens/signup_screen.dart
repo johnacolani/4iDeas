@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
+import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
@@ -39,10 +40,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final bool isMobile = wi < 600;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
-        backgroundColor: ColorManager.accentGold,
         title: Text(
           'Sign Up',
           style: GoogleFonts.albertSans(
@@ -85,7 +86,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               }
             },
             builder: (context, state) {
-              return SafeArea(
+              return Padding(
+                padding: FrostedAppBar.contentPaddingUnderAppBar(context),
                 child: Center(
                   child: Scrollbar(
                       thumbVisibility: true,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
+import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
 import '../../../../app_router.dart';
@@ -130,12 +131,12 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
     final contractNotes = order['contractNotes']?.toString() ?? '';
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
-        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
@@ -161,7 +162,9 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          Scrollbar(
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+            child: Scrollbar(
             thumbVisibility: true,
             child: SingleChildScrollView(
               padding: EdgeInsets.all(isMobile ? 16 : 24),
@@ -677,6 +680,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                 SizedBox(height: isMobile ? 20 : 24),
               ],
             ),
+          ),
           ),
           ),
         ],

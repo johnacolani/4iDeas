@@ -1,4 +1,3 @@
-import 'package:auto_scroll_image/auto_scroll_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,6 +6,7 @@ import 'firebase_backend_section.dart';
 import 'home_hero_headline.dart';
 import 'aws_backend_section.dart';
 import 'seo_optimization_section.dart';
+import 'app_auto_scroll_image.dart';
 
 class HomeWidget extends StatelessWidget {
   const HomeWidget({
@@ -282,9 +282,11 @@ class HomeWidget extends StatelessWidget {
                       ),
                     ),
 
-                    SizedBox(
-                      width: wi * 0.9,
-                      child: const AutoScrollImage(),
+                    Center(
+                      child: SizedBox(
+                        width: wi * 0.5,
+                        child: const AppAutoScrollImage(),
+                      ),
                     ),
 
                     Transform.translate(
@@ -292,8 +294,8 @@ class HomeWidget extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: SizedBox(
-                          width: double.infinity,
-                          height: wi < 600 ? wi * 0.5 : wi * 0.4,
+                          width: wi * 0.5,
+                          height: wi * 0.5,
                           child: FittedBox(
                             fit: BoxFit.contain,
                             alignment: Alignment.center,

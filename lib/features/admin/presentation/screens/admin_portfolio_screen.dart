@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/admin_service.dart';
@@ -137,19 +138,18 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
 
     if (!AdminService.isAdmin()) {
       return Scaffold(
-        appBar: AppBar(
+        appBar: FrostedAppBar.darkNavy(
           title: const Text('Access Denied'),
-          backgroundColor: const Color(0xff020923),
         ),
         body: const Center(child: Text('Admin access required')),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: Colors.amber),
         centerTitle: true,
-        backgroundColor: const Color(0xff020923),
         title: Text(
           'Admin - Portfolio & Info',
           style: GoogleFonts.albertSans(
@@ -169,89 +169,91 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
       body: Stack(
         children: [
           const AppBackground(),
-          if (_loading)
-            const Center(child: CircularProgressIndicator(color: ColorManager.orange))
-          else if (_error != null)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 48, color: Colors.red.withValues(alpha: 0.8)),
-                    const SizedBox(height: 16),
-                    Text(
-                      _error!,
-                      style: GoogleFonts.albertSans(color: Colors.white, fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _load,
-                      style: ElevatedButton.styleFrom(backgroundColor: ColorManager.orange),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            Scrollbar(
-              thumbVisibility: true,
-              child: CustomScrollView(
-                slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(isMobile ? 16 : 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Portfolio Apps',
-                          style: GoogleFonts.albertSans(
-                            color: ColorManager.orange,
-                            fontSize: isMobile ? 20 : 22,
-                            fontWeight: FontWeight.bold,
+          Padding(
+            padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+            child: _loading
+                ? const Center(child: CircularProgressIndicator(color: ColorManager.orange))
+                : _error != null
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline, size: 48, color: Colors.red.withValues(alpha: 0.8)),
+                              const SizedBox(height: 16),
+                              Text(
+                                _error!,
+                                style: GoogleFonts.albertSans(color: Colors.white, fontSize: 14),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _load,
+                                style: ElevatedButton.styleFrom(backgroundColor: ColorManager.orange),
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          _useFirestore
-                              ? 'Managing ${_apps.length} app(s) from Firestore. Add, edit, or remove below.'
-                              : 'No Firestore apps yet. Add one to manage portfolio from here (otherwise the app uses built-in data).',
-                          style: GoogleFonts.albertSans(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: isMobile ? 14 : 15,
-                          ),
+                      )
+                    : Scrollbar(
+                        thumbVisibility: true,
+                        child: CustomScrollView(
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.all(isMobile ? 16 : 24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Portfolio Apps',
+                                      style: GoogleFonts.albertSans(
+                                        color: ColorManager.orange,
+                                        fontSize: isMobile ? 20 : 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _useFirestore
+                                          ? 'Managing ${_apps.length} app(s) from Firestore. Add, edit, or remove below.'
+                                          : 'No Firestore apps yet. Add one to manage portfolio from here (otherwise the app uses built-in data).',
+                                      style: GoogleFonts.albertSans(
+                                        color: Colors.white.withValues(alpha: 0.8),
+                                        fontSize: isMobile ? 14 : 15,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            if (_apps.isEmpty && _useFirestore)
+                              SliverFillRemaining(
+                                child: Center(
+                                  child: Text(
+                                    'No apps in Firestore. Tap + to add.',
+                                    style: GoogleFonts.albertSans(color: Colors.white70, fontSize: 16),
+                                  ),
+                                ),
+                              )
+                            else
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    final app = _apps[index];
+                                    return _buildAppCard(app, isMobile);
+                                  },
+                                  childCount: _apps.length,
+                                ),
+                              ),
+                            const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                ),
-                if (_apps.isEmpty && _useFirestore)
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        'No apps in Firestore. Tap + to add.',
-                        style: GoogleFonts.albertSans(color: Colors.white70, fontSize: 16),
                       ),
-                    ),
-                  )
-                else
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final app = _apps[index];
-                        return _buildAppCard(app, isMobile);
-                      },
-                      childCount: _apps.length,
-                    ),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 80)),
-              ],
-              ),
-            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

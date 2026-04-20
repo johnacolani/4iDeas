@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/ColorManager.dart';
+import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
 import '../../../../app_router.dart';
@@ -70,12 +71,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final bool isMobile = wi < 600;
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.backgroundDark),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
-        backgroundColor: ColorManager.accentGold,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
           onPressed: () {
@@ -120,7 +121,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ? state.user
                     : (state as EmailNotVerified).user;
 
-                return SafeArea(
+                return Padding(
+                  padding: FrostedAppBar.contentPaddingUnderAppBar(context),
                   child: Scrollbar(
                     thumbVisibility: true,
                     child: SingleChildScrollView(
