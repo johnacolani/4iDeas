@@ -119,12 +119,14 @@ class HomeHeroSection extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           height: 1.0,
                           letterSpacing: -0.8,
-                          color: const Color(0xFFF0DA82),
-                          shadows: const [
-                            Shadow(offset: Offset(-2.0, 0), color: HomeWarmColors.sectionAccent),
-                            Shadow(offset: Offset(2.0, 0), color: HomeWarmColors.sectionAccent),
-                            Shadow(offset: Offset(0, -2.0), color: HomeWarmColors.sectionAccent),
-                            Shadow(offset: Offset(0, 2.0), color: HomeWarmColors.sectionAccent),
+                          color: HomeWarmColors.sectionAccent,
+                          shadows: [
+                            Shadow(
+                              offset: const Offset(0, 3),
+                              blurRadius: 14,
+                              color: HomeWarmColors.sectionAccent
+                                  .withValues(alpha: 0.28),
+                            ),
                           ],
                         ),
                       ),
