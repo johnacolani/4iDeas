@@ -6,7 +6,6 @@ import '../core/widgets/aws_backend_section.dart';
 import '../core/widgets/home_hero_section.dart';
 import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
-import '../core/widgets/app_auto_scroll_image.dart';
 import '../core/widgets/trust_home_sections.dart';
 
 class WebScreen extends StatefulWidget {
@@ -76,13 +75,6 @@ class _WebScreenState extends State<WebScreen> {
                   _PlatformProofChips(
                     isMobile: isMobile,
                     isTablet: isTablet,
-                  ),
-                  SizedBox(height: 22),
-                  Center(
-                    child: SizedBox(
-                      width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
-                      child: const AppAutoScrollImage(),
-                    ),
                   ),
                   SizedBox(height: isMobile ? 18 : 22),
                   TrustBuildingHomeSections(
@@ -154,12 +146,12 @@ class _PlatformProofChips extends StatelessWidget {
 
   static const List<({String label, String asset})> _items =
       <({String label, String asset})>[
-    (label: 'iOS', asset: 'platforms/ios.png'),
-    (label: 'Android', asset: 'platforms/android.png'),
-    (label: 'Web', asset: 'platforms/web.png'),
-    (label: 'macOS', asset: 'platforms/macos.png'),
-    (label: 'Windows', asset: 'platforms/windows.png'),
-    (label: 'Linux', asset: 'platforms/linux.png'),
+    (label: 'iOS', asset: 'assets/platforms/ios.png'),
+    (label: 'Android', asset: 'assets/platforms/android.png'),
+    (label: 'Web', asset: 'assets/platforms/web.png'),
+    (label: 'macOS', asset: 'assets/platforms/macos.png'),
+    (label: 'Windows', asset: 'assets/platforms/windows.png'),
+    (label: 'Linux', asset: 'assets/platforms/linux.png'),
   ];
 
   @override
@@ -178,7 +170,10 @@ class _PlatformProofChips extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: HomeWarmColors.dividerLine),
+                border: Border.all(
+                  color: HomeWarmColors.sectionAccent.withValues(alpha: 0.7),
+                  width: 1.2,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,6 +183,12 @@ class _PlatformProofChips extends StatelessWidget {
                     width: isMobile ? 22 : 24,
                     height: isMobile ? 22 : 24,
                     fit: BoxFit.contain,
+                    gaplessPlayback: true,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.image_not_supported_outlined,
+                      size: isMobile ? 18 : 20,
+                      color: HomeWarmColors.eyebrowMuted.withValues(alpha: 0.65),
+                    ),
                   ),
                   SizedBox(width: isMobile ? 8 : 10),
                   Text(

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:four_ideas/app_router.dart';
+import 'package:four_ideas/core/widgets/app_auto_scroll_image.dart';
 
 import '../home_warm_colors.dart';
 
@@ -147,6 +148,13 @@ class HomeHeroSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: isMobile ? 14 : 18),
+          Center(
+            child: SizedBox(
+              width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
+              child: const AppAutoScrollImage(),
+            ),
+          ),
+          SizedBox(height: isMobile ? 12 : 14),
           _CredibilityStrip(isMobile: isMobile, isTablet: isTablet),
           SizedBox(height: isMobile ? 16 : 20),
           SelectableText(

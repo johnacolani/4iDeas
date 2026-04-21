@@ -147,7 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: isMobile
                             ? (wi < 400 ? wi * 0.03 : wi * 0.035)
                             : (isTablet ? wi * 0.035 : wi * 0.035),
-                        backgroundImage:
+                        backgroundColor: Colors.transparent,
+                        foregroundImage:
                             const AssetImage('assets/images/logo.png'),
                       ),
                     ),
@@ -244,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: HomeWarmColors.iconLocation,
+                                        color: const Color(0xFFF0DA82),
                                         size: wi < 400 ? wi * 0.025 : wi * 0.03,
                                       ),
                                       SizedBox(width: wi < 400 ? 3 : 6),
@@ -319,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: HomeWarmColors.iconLocation,
+                                        color: const Color(0xFFF0DA82),
                                         size:
                                             isTablet ? wi * 0.018 : wi * 0.018,
                                       ),
@@ -379,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: TextStyle(
                                           fontSize:
                                               wi < 400 ? 11 : 12,
-                                          color: HomeWarmColors.linkSlash,
+                                          color: const Color(0xFFF0DA82),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -412,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: HomeWarmColors.iconLocation,
+                                        color: const Color(0xFFF0DA82),
                                         size: wi < 400 ? wi * 0.025 : wi * 0.03,
                                       ),
                                       SizedBox(width: wi < 400 ? 3 : 6),
@@ -465,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ' / ',
                                         style: TextStyle(
                                           fontSize: isTablet ? 16 : 18,
-                                          color: HomeWarmColors.linkSlash,
+                                          color: const Color(0xFFF0DA82),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -494,7 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: HomeWarmColors.iconLocation,
+                                        color: const Color(0xFFF0DA82),
                                         size:
                                             isTablet ? wi * 0.018 : wi * 0.018,
                                       ),
