@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
-import 'package:four_ideas/data/portfolio_conversion_copy.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/helper/app_background.dart';
@@ -187,10 +189,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       if (byOrder != 0) return byOrder;
       // When order matches (e.g. legacy Firestore defaults), prefer featured static ids first.
       const tieBreak = {
-        'asd': 0,
+        'rose-chat-seasonal-campaign-engine': 0,
         'service-flow': 1,
-        'twin-scriptures': 2,
-        'rose-chat-seasonal-campaign-engine': 3,
+        'asd': 2,
+        'twin-scriptures': 3,
       };
       final ta = tieBreak[a.id] ?? 99;
       final tb = tieBreak[b.id] ?? 99;
@@ -578,9 +580,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     // ---------- CONTROLLABLE GAPS (adjust these to control distance between sections) ----------
-    final double gapAfterHero = he * 0.004;
+    final double gapAfterHero = 0.0;
     final double gapAfterSubtitle = he * 0.012;
-    final double gapAfterDesignSystemCard = he * 0.012;
+    final double gapAfterDesignSystemCard = he * 0.03;
     final double gapAfterDesignPhilosophy = he * 0.012;
     final double gapAfterFeaturedTitle = 8.0;
     final double gapBetweenCaseStudyCards = 24.0;
@@ -658,30 +660,29 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                        // 2. End-to-end product design from research to cross-platform delivery
-                        Center(
-                          child: SelectableText(
-                            'Product strategy, UX, and Flutter delivery for teams that need shipped software—not slideware.',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.albertSans(
-                              color: ColorManager.portfolioTextBody,
-                              fontSize: bodySize,
-                              fontWeight: FontWeight.w500,
-                              height: 1.45,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: gapAfterSubtitle),
-
-                        // 3. My Own Design System card
+                        // 2. My Own Design System card
                         _DesignSystemHighlight(
-                          designSystemTitleSize: isMobile ? 22 : (sectionTitleSize + 4),
+                          designSystemTitleSize: isMobile ? 24 : (sectionTitleSize + 6),
                           designSystemSubSize: isMobile ? 14 : (bodySize - 1),
                           bodySize: bodySize,
                           isMobile: isMobile,
                           onTapLink: () => _launchUrl(_designSystemUrl),
                         ),
                         SizedBox(height: gapAfterDesignSystemCard),
+
+                        // 3. End-to-end product design from research to cross-platform delivery
+                        Center(
+                          child: SelectableText(
+                            'End-to-end product design from research to cross-platform delivery',
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.portfolioTextTitle,
+                              fontSize: isMobile ? bodySize + 4 : bodySize + 6,
+                              fontWeight: FontWeight.w800,
+                              height: 1.25,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: gapAfterSubtitle),
 
                         // 4. Design Philosophy & Principles card
                         _DesignPhilosophyCard(
@@ -698,16 +699,46 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           onTapOpenSource: () => _scrollToSection(_openSourceKey),
                         ),
                         SizedBox(height: 14),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            TextButton(
+                              onPressed: () => context.go(AppRoutes.services),
+                              child: Text(
+                                'Explore services behind this work',
+                                style: GoogleFonts.albertSans(
+                                  color: ColorManager.portfolioTextBody,
+                                  fontSize: bodySize - 1,
+                                  fontWeight: FontWeight.w700,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: ColorManager.portfolioTextBody.withValues(alpha: 0.45),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => context.go(AppRoutes.contact),
+                              child: Text(
+                                'Discuss a similar product',
+                                style: GoogleFonts.albertSans(
+                                  color: ColorManager.portfolioTextBody,
+                                  fontSize: bodySize - 1,
+                                  fontWeight: FontWeight.w700,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: ColorManager.portfolioTextBody.withValues(alpha: 0.45),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
 
                         // 5. Featured Case Studies
                         KeyedSubtree(
                           key: _featuredCaseStudiesKey,
-                          child: _SectionWithSubtitle(
-                            title: 'Featured case studies',
-                            subtitle:
-                                'Each write-up focuses on business constraints, ownership, and what shipped—so you can see how I work before we talk.',
+                          child: _SectionTitle(
+                            title: 'Featured Case Studies',
                             sectionTitleSize: sectionTitleSize,
-                            bodySize: bodySize,
                           ),
                         ),
                         if (AdminService.isAdmin()) ...[
@@ -745,12 +776,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         // 6. App Showcase (2 columns or responsive grid)
                         KeyedSubtree(
                           key: _appShowcaseKey,
-                          child: _SectionWithSubtitle(
-                            title: 'Shipped products & systems',
-                            subtitle:
-                                'Apps and tools in production—browse stores, web builds, and case studies. If something looks like your problem, we can map it to your scope.',
+                          child: _SectionTitle(
+                            title: 'App Showcase',
                             sectionTitleSize: sectionTitleSize,
-                            bodySize: bodySize,
                           ),
                         ),
                         Align(
@@ -799,18 +827,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             double mainAxisExtent;
                             double spacing;
                             // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
-                            // Taller cells: conversion pitch (context/role/outcome) + dual CTAs + platform chips.
                             if (availableWidth > 900) {
                               crossAxisCount = 3;
-                              mainAxisExtent = 640;
+                              mainAxisExtent = 432;
                               spacing = 18;
                             } else if (availableWidth > 600) {
                               crossAxisCount = 2;
-                              mainAxisExtent = 660;
+                              mainAxisExtent = 452;
                               spacing = 16;
                             } else {
                               crossAxisCount = 1;
-                              mainAxisExtent = 700;
+                              mainAxisExtent = 476;
                               spacing = 14;
                             }
                             return GridView.builder(
@@ -835,8 +862,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   onDelete: isAdmin && _firestoreDocIdForPortfolioApp(app) != null
                                       ? () => _deleteApp(app)
                                       : null,
-                                  conversionPitch: appShowcasePitchForId(app.id),
-                                  onDiscussSimilar: () => context.go(AppRoutes.contact),
                                 );
                               },
                             );
@@ -996,6 +1021,57 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                         ),
                         SizedBox(height: he * 0.03),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(isMobile ? 16 : 20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: ColorManager.portfolioTextBody.withValues(alpha: 0.3)),
+                            color: Colors.white.withValues(alpha: 0.08),
+                          ),
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              FilledButton(
+                                onPressed: () => context.go(AppRoutes.contact),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: ColorManager.portfolioTextTitle,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: Text(
+                                  'Start a project conversation',
+                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                              OutlinedButton(
+                                onPressed: () => context.go(AppRoutes.services),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: ColorManager.portfolioTextTitle,
+                                  side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
+                                ),
+                                child: Text(
+                                  'See service options',
+                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => context.go(AppRoutes.insights),
+                                child: Text(
+                                  'Read implementation insights',
+                                  style: GoogleFonts.albertSans(
+                                    color: ColorManager.portfolioTextBody,
+                                    fontWeight: FontWeight.w700,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: ColorManager.portfolioTextBody.withValues(alpha: 0.45),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: he * 0.02),
                           ],
                         ),
                       ],
@@ -1019,13 +1095,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     required bool isMobile,
     required double sectionTitleSize,
   }) {
-    // Lottie behind title — capped dimensions avoid dramatic spacing shifts.
-    final double lottieHeight = (isMobile ? 280.0 : 360.0);
-    final double lottieWidth = (wi * (isMobile ? 0.84 : 0.72)).clamp(280.0, 640.0);
+    // Keep title clear of frosted app bar, especially on desktop web.
+    final double heroYOffset = isMobile ? -he * 0.05 : -he * 0.06;
+    // Lottie behind title. Keep a tighter hero block height so next section
+    // sits closer while preserving the text position.
+    final double lottieHeight = (isMobile ? he * 0.34 : he * 0.30).clamp(220.0, 300.0);
+    final double lottieWidth = (wi * (isMobile ? 0.9 : 0.82)).clamp(320.0, 780.0);
 
     return Center(
       child: Transform.translate(
-        offset: Offset(0, -he * 0.08),
+        offset: Offset(0, heroYOffset),
         child: Center(
           child: Stack(
             alignment: Alignment.bottomCenter,
@@ -1034,7 +1113,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 width: lottieWidth,
                 height: lottieHeight,
                 child: Center(
-                  child: ExcludeSemantics(
+                  child: Transform.translate(
+                    offset: Offset(0, -he * 0.08),
                     child: Lottie.asset(
                       'assets/waveloop.json',
                       fit: BoxFit.fitHeight,
@@ -1062,21 +1142,49 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               Positioned.fill(
                 child: Center(
                   child: Transform.translate(
-                    offset: const Offset(0, 42),
+                    offset: Offset(0, 44),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: math.max(8.0, wi * 0.04)),
-                      child: Semantics(
-                        header: true,
-                        child: SelectableText(
-                          'Product design\n& cross-platform app development (Flutter)',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.albertSans(
-                            color: ColorManager.portfolioTextTitle,
-                            fontSize: titleSize,
-                            fontWeight: FontWeight.bold,
-                            height: 1.25,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SelectableText.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Product design',
+                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w900),
+                                ),
+                                const TextSpan(text: '\n&\n'),
+                                TextSpan(
+                                  text: 'Flutter',
+                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w900),
+                                ),
+                                const TextSpan(
+                                  text: ' Cross platform development for mobile web and desktop.',
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.portfolioTextTitle,
+                              fontSize: titleSize,
+                              fontWeight: FontWeight.w700,
+                              height: 1.25,
+                            ),
                           ),
-                        ),
+                          const SizedBox(height: 18),
+                          SelectableText(
+                            'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.accentGoldDark,
+                              fontSize: (bodySize - 1).clamp(13.0, 18.0),
+                              fontWeight: FontWeight.w700,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -1090,7 +1198,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 }
 
-class _DesignSystemHighlight extends StatelessWidget {
+class _DesignSystemHighlight extends StatefulWidget {
   final double designSystemTitleSize;
   final double designSystemSubSize;
   final double bodySize;
@@ -1106,23 +1214,72 @@ class _DesignSystemHighlight extends StatelessWidget {
   });
 
   @override
+  State<_DesignSystemHighlight> createState() => _DesignSystemHighlightState();
+}
+
+class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _orbitController;
+
+  @override
+  void initState() {
+    super.initState();
+    _orbitController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _orbitController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTapLink,
+        onTap: widget.onTapLink,
         borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 28,
-            vertical: isMobile ? 20 : 24,
-          ),
-          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+        child: AnimatedBuilder(
+          animation: _orbitController,
+          builder: (context, child) {
+            return Stack(
+              children: [
+                child!,
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      painter: _NeonBorderOrbitPainter(
+                        progress: _orbitController.value,
+                        borderRadius: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isMobile ? 20 : 28,
+              vertical: widget.isMobile ? 20 : 24,
+            ),
+            decoration: ColorManager.portfolioHighlightCardDecoration(
+              borderRadius: 20,
+            ).copyWith(
+              border: Border.all(
+                color: ColorManager.accentGold.withValues(alpha: 0.88),
+                width: 2.6,
+              ),
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (!isMobile) ...[
+                if (!widget.isMobile) ...[
                   Icon(
                     Icons.palette_outlined,
                     size: 48,
@@ -1138,8 +1295,8 @@ class _DesignSystemHighlight extends StatelessWidget {
                         'My Own Design System',
                         style: GoogleFonts.playfairDisplay(
                           color: ColorManager.portfolioTextTitle,
-                          fontSize: designSystemTitleSize,
-                          fontWeight: FontWeight.w700,
+                          fontSize: widget.designSystemTitleSize,
+                          fontWeight: FontWeight.w800,
                           letterSpacing: 0.5,
                           height: 1.2,
                         ),
@@ -1149,7 +1306,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                         'developed by: John Colani',
                         style: GoogleFonts.cormorantGaramond(
                           color: ColorManager.portfolioTextBody,
-                          fontSize: designSystemSubSize + 2,
+                          fontSize: widget.designSystemSubSize + 2,
                           fontWeight: FontWeight.w600,
                           fontStyle: FontStyle.italic,
                           letterSpacing: 0.3,
@@ -1160,7 +1317,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                         'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
                         style: GoogleFonts.albertSans(
                           color: ColorManager.portfolioTextBody,
-                          fontSize: bodySize - 1,
+                          fontSize: widget.bodySize - 1,
                           height: 1.4,
                           fontWeight: FontWeight.w400,
                         ),
@@ -1178,7 +1335,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                             'Open Design System →',
                             style: GoogleFonts.albertSans(
                               color: ColorManager.portfolioTextBody,
-                              fontSize: bodySize,
+                              fontSize: widget.bodySize,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.2,
                             ),
@@ -1188,7 +1345,7 @@ class _DesignSystemHighlight extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (isMobile) ...[
+                if (widget.isMobile) ...[
                   SizedBox(width: 12),
                   Icon(
                     Icons.palette_outlined,
@@ -1198,9 +1355,65 @@ class _DesignSystemHighlight extends StatelessWidget {
                 ],
               ],
             ),
+          ),
         ),
       ),
     );
+  }
+}
+
+class _NeonBorderOrbitPainter extends CustomPainter {
+  const _NeonBorderOrbitPainter({
+    required this.progress,
+    required this.borderRadius,
+  });
+
+  final double progress;
+  final double borderRadius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final rect = Offset.zero & size;
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          rect.deflate(1.3),
+          Radius.circular(borderRadius),
+        ),
+      );
+    final metric = path.computeMetrics().firstOrNull;
+    if (metric == null || metric.length <= 0) return;
+
+    final head = metric.length * progress;
+    // Draw a subtle trailing neon effect.
+    for (int i = 14; i >= 0; i--) {
+      final t = i / 14;
+      final offset = (head - (i * 7.5)) % metric.length;
+      final tangent = metric.getTangentForOffset(offset < 0 ? offset + metric.length : offset);
+      if (tangent == null) continue;
+      final alpha = (1 - t) * 0.85;
+      final radius = 1.5 + ((1 - t) * 3.2);
+      final glowPaint = Paint()
+        ..color = Colors.white.withValues(alpha: alpha)
+        ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 6);
+      canvas.drawCircle(tangent.position, radius + 1.2, glowPaint);
+    }
+
+    final headTangent = metric.getTangentForOffset(head);
+    if (headTangent != null) {
+      canvas.drawCircle(
+        headTangent.position,
+        3.2,
+        Paint()..color = Colors.white.withValues(alpha: 0.98),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NeonBorderOrbitPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.borderRadius != borderRadius;
   }
 }
 
@@ -1292,8 +1505,8 @@ class _PortfolioSectionNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = <(String, VoidCallback)>[
-      ('Case studies', onTapFeatured),
-      ('Shipped products', onTapApps),
+      ('Featured Case Studies', onTapFeatured),
+      ('App Showcase', onTapApps),
       ("John Colani's Publications", onTapPublications),
       ("John Colani's Packages", onTapOpenSource),
     ];
@@ -1391,7 +1604,6 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
         for (var i = 0; i < caseStudies.length; i++) ...[
           _FeaturedCaseStudyRow(
             caseStudy: caseStudies[i],
-            pitch: caseStudyPitchForId(caseStudies[i].id),
             isMobile: isMobile,
             bodySize: bodySize,
             tags: _featuredTagsById[caseStudies[i].id] ?? const <String>[],
@@ -1414,7 +1626,6 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
 /// Wraps a premium card with optional admin actions (same pattern as [CaseStudyCard]).
 class _FeaturedCaseStudyRow extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
-  final CaseStudyConversionPitch? pitch;
   final bool isMobile;
   final double bodySize;
   final List<String> tags;
@@ -1428,7 +1639,6 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
 
   const _FeaturedCaseStudyRow({
     required this.caseStudy,
-    required this.pitch,
     required this.isMobile,
     required this.bodySize,
     required this.tags,
@@ -1445,7 +1655,6 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final card = _PremiumFeaturedCard(
       caseStudy: caseStudy,
-      pitch: pitch,
       isMobile: isMobile,
       bodySize: bodySize,
       tags: tags,
@@ -1533,6 +1742,24 @@ class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
 class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip> {
   int? _hoveredIndex;
   OverlayEntry? _hoverPreviewEntry;
+  final ScrollController _multiHeroScrollController = ScrollController();
+  bool _middleMouseScrolling = false;
+  double _middleMouseStartDy = 0;
+  double _middleMouseStartOffset = 0;
+  Timer? _autoScrollTimer;
+  Timer? _resumeAutoScrollTimer;
+  bool _autoScrollPaused = false;
+  bool _autoScrollForward = true;
+
+  static const Duration _autoScrollTick = Duration(milliseconds: 1700);
+  static const Duration _autoScrollAnimDuration = Duration(milliseconds: 560);
+  static const double _autoScrollStep = 170.0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startAutoScrollIfNeeded());
+  }
 
   bool get _usePortraitMultiHeroStrip =>
       _FeaturedCaseStudyHeroStrip._portraitMultiHeroCaseStudyIds
@@ -1666,8 +1893,96 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
 
   @override
   void dispose() {
+    _autoScrollTimer?.cancel();
+    _resumeAutoScrollTimer?.cancel();
     _hideHoverPreview();
+    _multiHeroScrollController.dispose();
     super.dispose();
+  }
+
+  void _startAutoScrollIfNeeded() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = Timer.periodic(_autoScrollTick, (_) => _autoScrollOnce());
+  }
+
+  void _autoScrollOnce() {
+    if (_autoScrollPaused || _middleMouseScrolling) return;
+    if (!_multiHeroScrollController.hasClients) return;
+    final pos = _multiHeroScrollController.position;
+    if (pos.maxScrollExtent < 20) return;
+
+    final rawTarget = _autoScrollForward
+        ? pos.pixels + _autoScrollStep
+        : pos.pixels - _autoScrollStep;
+    final target = rawTarget.clamp(0.0, pos.maxScrollExtent).toDouble();
+
+    if ((target - pos.pixels).abs() < 0.5) {
+      _autoScrollForward = !_autoScrollForward;
+      return;
+    }
+    if (target == 0.0 || (pos.maxScrollExtent - target).abs() < 0.5) {
+      _autoScrollForward = !_autoScrollForward;
+    }
+
+    _multiHeroScrollController.animateTo(
+      target,
+      duration: _autoScrollAnimDuration,
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  void _pauseAutoScroll() {
+    _autoScrollPaused = true;
+    _resumeAutoScrollTimer?.cancel();
+  }
+
+  void _scheduleAutoScrollResume([Duration delay = const Duration(milliseconds: 1200)]) {
+    _resumeAutoScrollTimer?.cancel();
+    _resumeAutoScrollTimer = Timer(delay, () {
+      _autoScrollPaused = false;
+    });
+  }
+
+  void _scrollMultiHeroBy(double delta) {
+    _pauseAutoScroll();
+    _scheduleAutoScrollResume();
+    if (!_multiHeroScrollController.hasClients) return;
+    final pos = _multiHeroScrollController.position;
+    final target = (pos.pixels + delta).clamp(0.0, pos.maxScrollExtent);
+    _multiHeroScrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _onMiddleMouseDown(PointerDownEvent event) {
+    _pauseAutoScroll();
+    if (event.buttons != kMiddleMouseButton) return;
+    if (!_multiHeroScrollController.hasClients) return;
+    _middleMouseScrolling = true;
+    _middleMouseStartDy = event.position.dy;
+    _middleMouseStartOffset = _multiHeroScrollController.position.pixels;
+    _hideHoverPreview();
+    if (mounted) setState(() => _hoveredIndex = null);
+  }
+
+  void _onMiddleMouseMove(PointerMoveEvent event) {
+    if (!_middleMouseScrolling) return;
+    if (!_multiHeroScrollController.hasClients) return;
+    final deltaY = event.position.dy - _middleMouseStartDy;
+    final pos = _multiHeroScrollController.position;
+    final target = (_middleMouseStartOffset + (deltaY * 1.1))
+        .clamp(0.0, pos.maxScrollExtent)
+        .toDouble();
+    _multiHeroScrollController.jumpTo(target);
+  }
+
+  void _onMiddleMouseUp(PointerEvent event) {
+    if (_middleMouseScrolling) {
+      _middleMouseScrolling = false;
+    }
+    _scheduleAutoScrollResume();
   }
 
   @override
@@ -1685,103 +2000,162 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
           ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitThumbWidth
           : stripHeight;
 
-      stripContent = ClipRect(
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: _enableHoverFx ? 6 : 0),
-          itemCount: paths.length,
-          separatorBuilder: (_, __) => SizedBox(
-            width: usePortrait ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitGap : 10,
+      final list = ClipRect(
+        child: ScrollConfiguration(
+          behavior: const MaterialScrollBehavior().copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.trackpad,
+              PointerDeviceKind.stylus,
+              PointerDeviceKind.unknown,
+            },
           ),
-          itemBuilder: (context, index) {
-            final bool isHoveredTile = _hoveredIndex == index && _enableHoverFx;
-            return MouseRegion(
-              onEnter: (_) {
-                setState(() => _hoveredIndex = index);
-                _showHoverPreview(context, paths[index]);
-              },
-              onExit: (_) {
-                setState(() => _hoveredIndex = null);
-                _hideHoverPreview();
-              },
-              child: AnimatedSlide(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                offset: isHoveredTile ? const Offset(0, -0.02) : Offset.zero,
-                child: AnimatedScale(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOutCubic,
-                  scale: isHoveredTile ? 1.04 : 1.0,
-                  child: AnimatedContainer(
+          child: Listener(
+            onPointerDown: _onMiddleMouseDown,
+            onPointerMove: _onMiddleMouseMove,
+            onPointerUp: _onMiddleMouseUp,
+            onPointerCancel: _onMiddleMouseUp,
+            child: ListView.separated(
+              controller: _multiHeroScrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: _enableHoverFx ? 6 : 0),
+              itemCount: paths.length,
+              separatorBuilder: (_, __) => SizedBox(
+                width: usePortrait ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitGap : 10,
+              ),
+              itemBuilder: (context, index) {
+                final bool isHoveredTile = _hoveredIndex == index && _enableHoverFx;
+                return MouseRegion(
+                  onEnter: (_) {
+                    _pauseAutoScroll();
+                    setState(() => _hoveredIndex = index);
+                    _showHoverPreview(context, paths[index]);
+                  },
+                  onExit: (_) {
+                    _scheduleAutoScrollResume();
+                    setState(() => _hoveredIndex = null);
+                    _hideHoverPreview();
+                  },
+                  child: AnimatedSlide(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    width: thumbW,
-                    height: stripHeight,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: isHoveredTile
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 18,
-                                offset: const Offset(0, 10),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        ClipRRect(
+                    offset: isHoveredTile ? const Offset(0, -0.02) : Offset.zero,
+                    child: AnimatedScale(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      scale: isHoveredTile ? 1.04 : 1.0,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOutCubic,
+                        width: thumbW,
+                        height: stripHeight,
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          child: _stripImageForPath(
-                            paths[index],
-                            stripHeight,
-                            cellWidth: thumbW,
-                            zoomed: isHoveredTile,
-                          ),
+                          boxShadow: isHoveredTile
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.35),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ]
+                              : null,
                         ),
-                        Positioned(
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                          child: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 160),
-                            opacity: isHoveredTile ? 1 : 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: _stripImageForPath(
+                                paths[index],
+                                stripHeight,
+                                cellWidth: thumbW,
+                                zoomed: isHoveredTile,
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.55),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.24),
-                                ),
-                              ),
-                              child: Text(
-                                _imageLabelFromPath(paths[index]),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.albertSans(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 12,
+                            ),
+                            Positioned(
+                              left: 10,
+                              right: 10,
+                              bottom: 10,
+                              child: AnimatedOpacity(
+                                duration: const Duration(milliseconds: 160),
+                                opacity: isHoveredTile ? 1 : 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.55),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.24),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _imageLabelFromPath(paths[index]),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.albertSans(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      stripContent = Stack(
+        children: [
+          Positioned.fill(child: list),
+          if (_enableHoverFx) ...[
+            Positioned(
+              left: 6,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IconButton(
+                  tooltip: 'Scroll left',
+                  onPressed: () => _scrollMultiHeroBy(-220),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black.withValues(alpha: 0.34),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.chevron_left),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+            Positioned(
+              right: 6,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IconButton(
+                  tooltip: 'Scroll right',
+                  onPressed: () => _scrollMultiHeroBy(220),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black.withValues(alpha: 0.34),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.chevron_right),
+                ),
+              ),
+            ),
+          ],
+        ],
       );
     } else {
       final path = (paths != null && paths.length == 1)
@@ -1894,7 +2268,6 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
 
 class _PremiumFeaturedCard extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
-  final CaseStudyConversionPitch? pitch;
   final bool isMobile;
   final double bodySize;
   final List<String> tags;
@@ -1903,7 +2276,6 @@ class _PremiumFeaturedCard extends StatelessWidget {
 
   const _PremiumFeaturedCard({
     required this.caseStudy,
-    required this.pitch,
     required this.isMobile,
     required this.bodySize,
     required this.tags,
@@ -1913,214 +2285,181 @@ class _PremiumFeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sm = bodySize - 0.5;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 28,
-        vertical: isMobile ? 20 : 24,
-      ),
-      decoration: BoxDecoration(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onOpen,
         borderRadius: BorderRadius.circular(22),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            ColorManager.portfolioTextBody.withValues(alpha: 0.18),
-            ColorManager.portfolioTextBody.withValues(alpha: 0.08),
-            ColorManager.portfolioTextBody.withValues(alpha: 0.14),
-          ],
-        ),
-        border: Border.all(
-          color: ColorManager.portfolioTextBody.withValues(alpha: 0.40),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: onOpen,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: _FeaturedCaseStudyHeroStrip(
-                heroImagePath: caseStudy.heroImagePath,
-                heroImagePaths: caseStudy.heroImagePaths,
-                isMobile: isMobile,
-                caseStudyId: caseStudy.id,
-              ),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 28,
+            vertical: isMobile ? 20 : 24,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                ColorManager.portfolioTextBody.withValues(alpha: 0.18),
+                ColorManager.portfolioTextBody.withValues(alpha: 0.08),
+                ColorManager.portfolioTextBody.withValues(alpha: 0.14),
+              ],
+            ),
+            border: Border.all(
+              color: ColorManager.portfolioTextBody.withValues(alpha: 0.40),
             ),
           ),
-          const SizedBox(height: 14),
-          Text(
-            caseStudy.title,
-            style: GoogleFonts.albertSans(
-              color: ColorManager.portfolioTextTitle,
-              fontSize: bodySize + 8,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            caseStudy.subtitle,
-            style: GoogleFonts.albertSans(
-              color: ColorManager.portfolioTextBody,
-              fontSize: bodySize,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (pitch != null) ...[
-            const SizedBox(height: 14),
-            _pitchLine('Context', pitch!.businessContext, sm),
-            const SizedBox(height: 10),
-            _pitchLine('My role', pitch!.myRole, sm),
-            const SizedBox(height: 10),
-            _pitchLine('Key outcome', pitch!.keyOutcome, sm),
-          ] else ...[
-            const SizedBox(height: 12),
-            Text(
-              caseStudy.overview,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.albertSans(
-                color: ColorManager.portfolioTextBody,
-                fontSize: sm,
-                height: 1.45,
-              ),
-            ),
-          ],
-          if (tags.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: tags
-                  .map(
-                    (tag) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
-                        color: Colors.white.withValues(alpha: 0.08),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
-                      ),
-                      child: Text(
-                        tag,
-                        style: GoogleFonts.albertSans(
-                          color: ColorManager.portfolioTextBody,
-                          fontSize: bodySize - 2,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-          SizedBox(height: isMobile ? 16 : 18),
-          isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    FilledButton(
-                      onPressed: onOpen,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: ColorManager.portfolioTextTitle,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'View case study',
-                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    OutlinedButton(
-                      onPressed: onDiscussSimilar,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: ColorManager.portfolioTextTitle,
-                        side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'Discuss a similar project',
-                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
-                      ),
-                    ),
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: onOpen,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: ColorManager.portfolioTextTitle,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'View case study',
-                          style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onDiscussSimilar,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: ColorManager.portfolioTextTitle,
-                          side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'Discuss a similar project',
-                          style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
-                        ),
-                      ),
-                    ),
-                  ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: _FeaturedCaseStudyHeroStrip(
+                  heroImagePath: caseStudy.heroImagePath,
+                  heroImagePaths: caseStudy.heroImagePaths,
+                  isMobile: isMobile,
+                  caseStudyId: caseStudy.id,
                 ),
-        ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                caseStudy.title,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextTitle,
+                  fontSize: bodySize + 8,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                caseStudy.subtitle,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextBody,
+                  fontSize: bodySize,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                caseStudy.overview,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.albertSans(
+                  color: ColorManager.portfolioTextBody,
+                  fontSize: bodySize - 0.5,
+                  height: 1.45,
+                ),
+              ),
+              if (tags.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: tags
+                      .map(
+                        (tag) => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(999),
+                            color: Colors.white.withValues(alpha: 0.08),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+                          ),
+                          child: Text(
+                            tag,
+                            style: GoogleFonts.albertSans(
+                              color: ColorManager.portfolioTextBody,
+                              fontSize: bodySize - 2,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+              SizedBox(height: isMobile ? 16 : 18),
+              isMobile
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        FilledButton(
+                          onPressed: onOpen,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: ColorManager.portfolioTextTitle,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'View case study',
+                            style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        OutlinedButton(
+                          onPressed: onDiscussSimilar,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: ColorManager.portfolioTextTitle,
+                            side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Discuss a similar project',
+                            style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: onOpen,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: ColorManager.portfolioTextTitle,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'View case study',
+                              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: onDiscussSimilar,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: ColorManager.portfolioTextTitle,
+                              side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'Discuss a similar project',
+                              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+            ],
+          ),
+        ),
       ),
-    );
-  }
-
-  Widget _pitchLine(String label, String text, double fontSize) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: GoogleFonts.albertSans(
-            color: ColorManager.portfolioTextBody.withValues(alpha: 0.75),
-            fontSize: fontSize - 2,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.9,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          text,
-          style: GoogleFonts.albertSans(
-            color: ColorManager.portfolioTextBody,
-            fontSize: fontSize,
-            height: 1.45,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -2143,47 +2482,6 @@ class _SectionTitle extends StatelessWidget {
         fontSize: sectionTitleSize,
         fontWeight: FontWeight.bold,
       ),
-    );
-  }
-}
-
-class _SectionWithSubtitle extends StatelessWidget {
-  const _SectionWithSubtitle({
-    required this.title,
-    required this.subtitle,
-    required this.sectionTitleSize,
-    required this.bodySize,
-  });
-
-  final String title;
-  final String subtitle;
-  final double sectionTitleSize;
-  final double bodySize;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SelectableText(
-          title,
-          style: GoogleFonts.albertSans(
-            color: ColorManager.portfolioTextTitle,
-            fontSize: sectionTitleSize,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        SelectableText(
-          subtitle,
-          style: GoogleFonts.albertSans(
-            color: ColorManager.portfolioTextBody,
-            fontSize: bodySize - 1,
-            fontWeight: FontWeight.w500,
-            height: 1.45,
-          ),
-        ),
-      ],
     );
   }
 }

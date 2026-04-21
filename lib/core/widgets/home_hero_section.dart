@@ -21,7 +21,11 @@ class HomeHeroSection extends StatelessWidget {
   final bool isMobile;
   final bool isTablet;
 
-  double get _maxCopyWidth => (wi * 0.92).clamp(320.0, 680.0);
+  double get _maxCopyWidth {
+    if (isMobile) return (wi * 0.94).clamp(320.0, 680.0);
+    if (isTablet) return (wi * 0.9).clamp(600.0, 880.0);
+    return (wi * 0.86).clamp(760.0, 1120.0);
+  }
 
   double get _titleSize {
     if (isMobile) {
@@ -48,24 +52,89 @@ class HomeHeroSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SelectableText(
-            '4ideas studio · Founder-led Flutter consultancy',
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.ltr,
-            style: GoogleFonts.albertSans(
-              fontSize: _eyebrowSize,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-              height: 1.35,
-              color: HomeWarmColors.eyebrowMuted,
+          Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 14 : 18,
+                vertical: isMobile ? 7 : 9,
+              ),
+              decoration: BoxDecoration(
+                color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: HomeWarmColors.dividerLine,
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.auto_awesome,
+                    size: isMobile ? 14 : 16,
+                    color: HomeWarmColors.sectionAccent,
+                  ),
+                  SizedBox(width: isMobile ? 6 : 8),
+                  SelectableText(
+                    '4iDeas studio · Founder-led Flutter consultancy',
+                    textAlign: TextAlign.center,
+                    textDirection: TextDirection.ltr,
+                    style: GoogleFonts.albertSans(
+                      fontSize: _eyebrowSize + 3,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.35,
+                      height: 1.25,
+                      color: HomeWarmColors.eyebrowMuted,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(height: isMobile ? 12 : 16),
           Semantics(
             header: true,
-            child: SelectableText(
-              '4ideas helps startups and businesses design and ship '
-              'iOS, Android, and web products.',
+            child: SelectableText.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '4iDeas helps startups and businesses\n',
+                    style: GoogleFonts.albertSans(
+                      fontSize: isMobile ? _titleSize * 0.72 : (isTablet ? 24 : 26),
+                      fontWeight: FontWeight.w700,
+                      height: 1.08,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        'Design & Ship',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.albertSans(
+                          fontSize: _titleSize * 2,
+                          fontWeight: FontWeight.w800,
+                          height: 1.0,
+                          letterSpacing: -0.8,
+                          color: const Color(0xFFF0DA82),
+                          shadows: const [
+                            Shadow(offset: Offset(-2.0, 0), color: HomeWarmColors.sectionAccent),
+                            Shadow(offset: Offset(2.0, 0), color: HomeWarmColors.sectionAccent),
+                            Shadow(offset: Offset(0, -2.0), color: HomeWarmColors.sectionAccent),
+                            Shadow(offset: Offset(0, 2.0), color: HomeWarmColors.sectionAccent),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const TextSpan(text: '\n'),
+                  const TextSpan(
+                    text: 'iOS, Android, desktop and web products',
+                  ),
+                ],
+              ),
               textAlign: TextAlign.center,
               textDirection: TextDirection.ltr,
               style: GoogleFonts.albertSans(
@@ -81,7 +150,7 @@ class HomeHeroSection extends StatelessWidget {
           _CredibilityStrip(isMobile: isMobile, isTablet: isTablet),
           SizedBox(height: isMobile ? 16 : 20),
           SelectableText(
-            'I lead 4ideas as your senior product and Flutter partner—combining '
+            'I lead 4iDeas as your senior product and Flutter partner—combining '
             'strategy, UX/UI, Flutter engineering, Firebase, and practical AI features. '
             'You get studio-level rigor with founder-level accountability.',
             textAlign: TextAlign.center,
@@ -243,11 +312,15 @@ class _SeoTopicLinks extends StatelessWidget {
         spacing: 2,
         runSpacing: 6,
         children: [
+          link('Flutter developer in Virginia', AppRoutes.flutterDeveloperVirginia),
+          Text('·', style: dotStyle),
           link('Richmond & Virginia · Flutter apps', AppRoutes.flutterDeveloperRichmondVa),
           Text('·', style: dotStyle),
           link('MVP app development', AppRoutes.mvpAppDevelopment),
           Text('·', style: dotStyle),
           link('Product design + Flutter', AppRoutes.productDesignFlutterEngineering),
+          Text('·', style: dotStyle),
+          link('Firebase app development services', AppRoutes.firebaseAppDevelopmentServices),
         ],
       ),
     );

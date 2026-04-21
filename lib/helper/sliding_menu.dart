@@ -318,7 +318,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         _buildMenuItem(
                                           index: 1,
                                           icon: Icons.people,
-                                          title: 'About 4ideas',
+                                          title: 'About 4iDeas',
                                           onPressed: () => _closeDrawerAndGo(AppRoutes.about),
                                         ),
                                         _buildMenuItem(

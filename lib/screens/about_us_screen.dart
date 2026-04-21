@@ -51,7 +51,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
         title: Text(
-          'About 4ideas',
+          'About 4iDeas',
           style: GoogleFonts.albertSans(
             color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
@@ -91,7 +91,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   Semantics(
                                     header: true,
                                     child: Text(
-                                      '4ideas',
+                                      '4iDeas',
                                       style: GoogleFonts.albertSans(
                                         color: ColorManager.accentGoldDark,
                                         fontSize: titleFontSize,
@@ -138,7 +138,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             // Summary Section
                             _buildSection(
                               title: 'About',
-                              content: '4ideas is a founder-led product consultancy focused on turning business ideas into shipped software. We combine product strategy, UX/UI, and Flutter engineering so teams can move from concept to production with less handoff friction and better decision quality.\n\nJohn A. Colani leads every engagement directly. With 6+ years across enterprise and startup-style products, the work covers multi-role platforms, workflow-heavy apps, design systems, and AI-assisted product features with practical governance.',
+                              content: '4iDeas is a founder-led product consultancy focused on turning business ideas into shipped software. We combine product strategy, UX/UI, and Flutter engineering so teams can move from concept to production with less handoff friction and better decision quality.\n\nJohn A. Colani leads every engagement directly. With 6+ years across enterprise and startup-style products, the work covers multi-role platforms, workflow-heavy apps, design systems, and AI-assisted product features with practical governance.',
                               fontSize: bodyFontSize,
                               he: he,
                               isMobile: isMobile,

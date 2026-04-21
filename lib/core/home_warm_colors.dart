@@ -36,16 +36,16 @@ abstract final class HomeWarmColors {
 
   // Bar typography & chrome
   static const textInk = Color(0xFF0F172A);
-  static const linkLogin = Color(0xFF2563EB);
+  static const linkLogin = Color(0xFF0D2F55);
   static const linkSlash = Color(0xFF94A3B8);
-  static const linkSignUp = Color(0xFF1D4ED8);
+  static const linkSignUp = Color(0xFF123A66);
   static const iconLocation = Color(0xFF64748B);
   static const iconLogout = Color(0xFF475569);
   static const avatarRing = Color(0xFFCBD5E1);
 
   /// Hero — headline & home marketing copy (see [HomeHeroSection]); legacy tokens kept for any lerp
   static const headlinePrimary = Color(0xFF0F172A);
-  static const eyebrowMuted = Color(0xFF25426E);
+  static const eyebrowMuted = Color(0xFF1D3657);
   static const heroStroke = Color(0xFFE2E8F0);
   static const heroFill = Color(0xFF0F172A);
 
@@ -54,13 +54,13 @@ abstract final class HomeWarmColors {
   static const labelShadow = Color(0x14000000);
 
   // Section titles / emphasis (replaces cosmetic gold on home)
-  static const sectionAccent = Color(0xFF1D4ED8);
+  static const sectionAccent = Color(0xFF123A66);
   static const dividerLine = Color(0xFFE2E8F0);
 
   // Platform row — standard recognizable hues, minimal glow
   static const platformIos = Color(0xFF007AFF);
   static const platformAndroid = Color(0xFF3DDC84);
   static const platformMac = Color(0xFF86868B);
-  static const platformWeb = Color(0xFF4285F4);
+  static const platformWeb = Color(0xFF1A3E68);
   static const platformDesktop = Color(0xFF0F766E);
 }

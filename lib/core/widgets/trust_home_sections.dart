@@ -148,13 +148,20 @@ class _WhyWorkWithMe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool useUniformDesktopCardHeight = !isMobile && wi >= 720;
+    final double uniformCardHeight = isTablet ? 278 : 250;
     final cards = _points.map((p) {
-      return _ReasonCard(
+      final card = _ReasonCard(
         icon: p.$1,
         title: p.$2,
         body: p.$3,
         bodyFont: bodyFont,
         isMobile: isMobile,
+      );
+      if (!useUniformDesktopCardHeight) return card;
+      return SizedBox(
+        height: uniformCardHeight,
+        child: card,
       );
     }).toList();
 
@@ -202,7 +209,7 @@ class _WhyWorkWithMe extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Why teams hire 4ideas',
+          'Why teams hire 4iDeas',
           textAlign: TextAlign.center,
           style: GoogleFonts.albertSans(
             fontSize: titleFont,
@@ -597,7 +604,7 @@ class _FaqBlock extends StatelessWidget {
   static final _faqs = [
     (
       'Can you handle both product design and development?',
-      'Yes. Most engagements combine UX/UI, product decisions, and Flutter implementation. 4ideas stays founder-led, so you get senior continuity from strategy through shipping.',
+      'Yes. Most engagements combine UX/UI, product decisions, and Flutter implementation. 4iDeas stays founder-led, so you get senior continuity from strategy through shipping.',
     ),
     (
       'Do you work with startups?',

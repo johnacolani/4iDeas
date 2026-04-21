@@ -28,6 +28,11 @@ class InsightArticleScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
         centerTitle: true,
+        leading: IconButton(
+          tooltip: 'Back to insights',
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go(AppRoutes.insights),
+        ),
         title: Text(
           'Insight',
           style: GoogleFonts.albertSans(

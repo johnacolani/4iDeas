@@ -90,6 +90,7 @@ flutter:
     - assets/images/on_boarding_image/
     - assets/images/4ideas/
     - assets/images/seasonal UI/
+    - assets/platforms/
     - assets/icons/
     - assets/docs/serviceflow-design-system.html
     - assets/docs/4ideas-design-system.html

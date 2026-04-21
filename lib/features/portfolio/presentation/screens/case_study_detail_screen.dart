@@ -161,6 +161,19 @@ class CaseStudyDetailScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Semantics(
+                            header: true,
+                            child: SelectableText(
+                              caseStudy.title,
+                              style: GoogleFonts.albertSans(
+                                color: ColorManager.orange,
+                                fontSize: isMobile ? sectionTitleSize + 4 : sectionTitleSize + 6,
+                                fontWeight: FontWeight.w800,
+                                height: 1.18,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: he * 0.014),
                           SelectableText(
                             caseStudy.subtitle,
                             style: GoogleFonts.albertSans(
@@ -170,6 +183,13 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: he * 0.02),
+                          _CaseStudyIntentLinks(
+                            bodySize: bodySize,
+                            onServices: () => context.go(AppRoutes.services),
+                            onPortfolio: () => context.go('${AppRoutes.portfolio}?section=featured'),
+                            onContact: () => context.go(AppRoutes.contact),
+                          ),
+                          SizedBox(height: he * 0.022),
                           SelectableText(
                             caseStudy.overview,
                             style: GoogleFonts.albertSans(
@@ -221,6 +241,70 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             )),
                           ),
                           SizedBox(height: he * 0.06),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(isMobile ? 16 : 20),
+                            decoration: BoxDecoration(
+                              color: ColorManager.containerSurface,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: ColorManager.containerBorder),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Next steps',
+                                  style: GoogleFonts.albertSans(
+                                    color: ColorManager.orange,
+                                    fontSize: bodySize + 1,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Explore related service options, review more proof, or start a project conversation.',
+                                  style: GoogleFonts.albertSans(
+                                    color: ColorManager.textSecondary,
+                                    fontSize: bodySize - 1,
+                                    height: 1.45,
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: [
+                                    FilledButton(
+                                      onPressed: () => context.go(AppRoutes.contact),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: ColorManager.orange,
+                                        foregroundColor: ColorManager.backgroundDark,
+                                      ),
+                                      child: Text(
+                                        'Discuss a similar project',
+                                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                    OutlinedButton(
+                                      onPressed: () => context.go(AppRoutes.services),
+                                      child: Text(
+                                        'View services',
+                                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                    OutlinedButton(
+                                      onPressed: () => context.go('${AppRoutes.portfolio}?section=featured'),
+                                      child: Text(
+                                        'Back to featured case studies',
+                                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: he * 0.03),
                         ],
                       ),
                     ),
@@ -820,12 +904,15 @@ class _SectionBlock extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SelectableText(
-                title,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.orange,
-                  fontSize: bodySize + 4,
-                  fontWeight: FontWeight.bold,
+              Semantics(
+                header: true,
+                child: SelectableText(
+                  title,
+                  style: GoogleFonts.albertSans(
+                    color: ColorManager.orange,
+                    fontSize: bodySize + 4,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: he * 0.015),
@@ -1016,6 +1103,63 @@ class _SectionBlock extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CaseStudyIntentLinks extends StatelessWidget {
+  const _CaseStudyIntentLinks({
+    required this.bodySize,
+    required this.onServices,
+    required this.onPortfolio,
+    required this.onContact,
+  });
+
+  final double bodySize;
+  final VoidCallback onServices;
+  final VoidCallback onPortfolio;
+  final VoidCallback onContact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        TextButton(
+          onPressed: onServices,
+          child: Text(
+            'Related Flutter and product design services',
+            style: GoogleFonts.albertSans(
+              fontSize: bodySize - 2,
+              fontWeight: FontWeight.w700,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: onPortfolio,
+          child: Text(
+            'More featured case studies',
+            style: GoogleFonts.albertSans(
+              fontSize: bodySize - 2,
+              fontWeight: FontWeight.w700,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: onContact,
+          child: Text(
+            'Discuss a similar project scope',
+            style: GoogleFonts.albertSans(
+              fontSize: bodySize - 2,
+              fontWeight: FontWeight.w700,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

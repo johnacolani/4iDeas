@@ -4,10 +4,20 @@ class SeoMetadata {
   const SeoMetadata({
     required this.title,
     required this.description,
+    this.robots = 'index, follow',
+    this.ogType = 'website',
+    this.ogImage,
+    this.twitterCard = 'summary_large_image',
+    this.twitterImage,
   });
 
   final String title;
   final String description;
+  final String robots;
+  final String ogType;
+  final String? ogImage;
+  final String twitterCard;
+  final String? twitterImage;
 
   /// Max ~60 chars for titles; ~150–160 for descriptions (Google often shows ~155).
   static String clipDescription(String s, [int max = 158]) {

@@ -152,12 +152,14 @@ class _PlatformProofChips extends StatelessWidget {
   final bool isMobile;
   final bool isTablet;
 
-  static const List<String> _items = <String>[
-    'iOS',
-    'Android',
-    'Web',
-    'macOS',
-    'Windows',
+  static const List<({String label, String asset})> _items =
+      <({String label, String asset})>[
+    (label: 'iOS', asset: 'platforms/ios.png'),
+    (label: 'Android', asset: 'platforms/android.png'),
+    (label: 'Web', asset: 'platforms/web.png'),
+    (label: 'macOS', asset: 'platforms/macos.png'),
+    (label: 'Windows', asset: 'platforms/windows.png'),
+    (label: 'Linux', asset: 'platforms/linux.png'),
   ];
 
   @override
@@ -170,19 +172,33 @@ class _PlatformProofChips extends StatelessWidget {
       children: _items
           .map(
             (item) => Container(
+              width: isMobile ? 108 : 122,
+              height: isMobile ? 36 : 40,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: HomeWarmColors.dividerLine),
               ),
-              child: Text(
-                item,
-                style: GoogleFonts.albertSans(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w700,
-                  color: HomeWarmColors.eyebrowMuted,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset(
+                    item.asset,
+                    width: isMobile ? 22 : 24,
+                    height: isMobile ? 22 : 24,
+                    fit: BoxFit.contain,
+                  ),
+                  SizedBox(width: isMobile ? 8 : 10),
+                  Text(
+                    item.label,
+                    style: GoogleFonts.albertSans(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w700,
+                      color: HomeWarmColors.eyebrowMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
           )

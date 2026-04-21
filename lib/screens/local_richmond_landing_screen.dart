@@ -203,6 +203,36 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               ),
                             ),
+                            OutlinedButton.icon(
+                              onPressed: () => context.go(AppRoutes.flutterDeveloperVirginia),
+                              icon: Icon(Icons.public, size: 20, color: HomeWarmColors.sectionAccent),
+                              label: Text(
+                                'Virginia Flutter page',
+                                style: GoogleFonts.albertSans(
+                                  fontWeight: FontWeight.w700,
+                                  color: HomeWarmColors.headlinePrimary,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: () => context.go(AppRoutes.firebaseAppDevelopmentServices),
+                              icon: Icon(Icons.cloud_outlined, size: 20, color: HomeWarmColors.sectionAccent),
+                              label: Text(
+                                'Firebase services page',
+                                style: GoogleFonts.albertSans(
+                                  fontWeight: FontWeight.w700,
+                                  color: HomeWarmColors.headlinePrimary,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                            ),
                           ],
                         ),
                         SizedBox(height: isMobile ? 36 : 44),
@@ -249,6 +279,23 @@ class _HeroIntro extends StatelessWidget {
               fontSize: isMobile ? 11.5 : 12.5,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.4,
+              color: HomeWarmColors.eyebrowMuted,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            color: HomeWarmColors.sectionAccent.withValues(alpha: 0.09),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: HomeWarmColors.sectionAccent.withValues(alpha: 0.28)),
+          ),
+          child: Text(
+            'Target keyword: flutter developer in richmond va',
+            style: GoogleFonts.albertSans(
+              fontSize: isMobile ? 12.5 : 13,
+              fontWeight: FontWeight.w700,
               color: HomeWarmColors.eyebrowMuted,
             ),
           ),

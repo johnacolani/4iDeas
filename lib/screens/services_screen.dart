@@ -244,7 +244,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                     Semantics(
                                       header: true,
                                       child: SelectableText(
-                                        'How 4ideas helps teams ship',
+                                        'How 4iDeas helps teams ship',
                                         textAlign: TextAlign.center,
                                         style: GoogleFonts.albertSans(
                                           color: HomeWarmColors.headlinePrimary,
@@ -266,6 +266,37 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                       ),
                                     ),
                                     SizedBox(height: he * 0.028),
+                                    Wrap(
+                                      alignment: WrapAlignment.center,
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () => context.go('${AppRoutes.portfolio}?section=featured'),
+                                          child: Text(
+                                            'See featured case studies',
+                                            style: GoogleFonts.albertSans(
+                                              color: HomeWarmColors.sectionAccent,
+                                              fontWeight: FontWeight.w700,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => context.go(AppRoutes.insights),
+                                          child: Text(
+                                            'Read implementation insights',
+                                            style: GoogleFonts.albertSans(
+                                              color: HomeWarmColors.sectionAccent,
+                                              fontWeight: FontWeight.w700,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -376,6 +407,38 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                               decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
                                             ),
                                           ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Wrap(
+                                          alignment: WrapAlignment.center,
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () => context.go(AppRoutes.portfolio),
+                                              child: Text(
+                                                'Review portfolio proof',
+                                                style: GoogleFonts.albertSans(
+                                                  color: HomeWarmColors.sectionAccent,
+                                                  fontWeight: FontWeight.w700,
+                                                  decoration: TextDecoration.underline,
+                                                  decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => context.go(AppRoutes.insights),
+                                              child: Text(
+                                                'Read delivery insights',
+                                                style: GoogleFonts.albertSans(
+                                                  color: HomeWarmColors.sectionAccent,
+                                                  fontWeight: FontWeight.w700,
+                                                  decoration: TextDecoration.underline,
+                                                  decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),

@@ -47,9 +47,11 @@ abstract class AppRoutes {
   static String insightsArticlePath(String slug) => '$insights/$slug';
 
   /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
+  static const String flutterDeveloperVirginia = '/flutter-developer-virginia';
   static const String flutterDeveloperRichmondVa = '/flutter-developer-richmond-va';
   static const String mvpAppDevelopment = '/mvp-app-development';
   static const String productDesignFlutterEngineering = '/product-design-flutter-engineering';
+  static const String firebaseAppDevelopmentServices = '/firebase-app-development-services';
 
   static const String login = '/login';
   static const String signUp = '/signup';
@@ -159,6 +161,12 @@ GoRouter createAppRouter() {
         },
       ),
       GoRoute(
+        path: AppRoutes.flutterDeveloperVirginia,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.flutterDeveloperVirginia,
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.flutterDeveloperRichmondVa,
         builder: (context, state) => const LocalRichmondLandingScreen(),
       ),
@@ -172,6 +180,12 @@ GoRouter createAppRouter() {
         path: AppRoutes.productDesignFlutterEngineering,
         builder: (context, state) => const SeoTopicLandingScreen(
           topic: SeoLandingTopic.productDesignFlutterEngineering,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.firebaseAppDevelopmentServices,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.firebaseAppDevelopmentServices,
         ),
       ),
       // Auth

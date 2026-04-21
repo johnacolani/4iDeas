@@ -6,25 +6,36 @@ import 'package:four_ideas/seo/seo_metadata.dart';
 
 /// Public site origin — keep in sync with [web/index.html] Open Graph URLs.
 const String kSiteOrigin = 'https://4ideas.com';
+const String kDefaultSocialImage = 'https://4ideas.com/icons/icon-512.png';
 
 void applySeoDocument(SeoMetadata meta, {required String canonicalPath}) {
   final path = canonicalPath.startsWith('/') ? canonicalPath : '/$canonicalPath';
   final canonical = '$kSiteOrigin$path';
+  final socialImage = meta.ogImage ?? meta.twitterImage ?? kDefaultSocialImage;
 
   html.document.title = meta.title;
 
   _upsertMetaName('title', meta.title);
   _upsertMetaName('description', meta.description);
+  _upsertMetaName('robots', meta.robots);
 
+  _setOg('type', meta.ogType);
   _setOg('title', meta.title);
   _setOg('description', meta.description);
   _setOg('url', canonical);
+  _setOg('image', socialImage);
 
+  _upsertMetaName('twitter:card', meta.twitterCard);
+  _upsertMetaName('twitter:url', canonical);
   _upsertMetaName('twitter:title', meta.title);
   _upsertMetaName('twitter:description', SeoMetadata.clipDescription(meta.description, 200));
+  _upsertMetaName('twitter:image', socialImage);
 
-  final link = html.document.querySelector('link[rel="canonical"]');
-  link?.setAttribute('href', canonical);
+  html.LinkElement? link =
+      html.document.querySelector('link[rel="canonical"]') as html.LinkElement?;
+  link ??= html.LinkElement()..setAttribute('rel', 'canonical');
+  link.setAttribute('href', canonical);
+  if (link.parent == null) html.document.head?.append(link);
 }
 
 void _upsertMetaName(String name, String content) {

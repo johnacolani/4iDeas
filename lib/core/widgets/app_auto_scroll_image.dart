@@ -11,19 +11,22 @@ import 'package:flutter/material.dart';
 class AppAutoScrollImage extends StatefulWidget {
   const AppAutoScrollImage({super.key});
 
-  static const List<String> _assets = <String>[
-    'assets/images/asd_app_adaptive/asd-001.jpg',
-    'assets/images/asd_app_adaptive/asd-002.jpg',
-    'assets/images/asd_app_adaptive/asd-003.jpg',
-    'assets/images/asd_app_adaptive/asd-004.jpg',
-    'assets/images/asd_app_adaptive/asd-005.jpg',
-    'assets/images/asd_app_adaptive/asd-006.jpg',
-    'assets/images/asd_app_adaptive/asd-007.jpg',
-    'assets/images/asd_app_adaptive/asd-008.jpg',
-    'assets/images/asd_app_adaptive/asd-009.jpg',
-    'assets/images/asd_app_adaptive/asd-010.jpg',
-    'assets/images/asd_app_adaptive/asd-011.jpg',
-    'assets/images/asd_app_adaptive/asd-012.jpg',
+  static const List<String> _platformAssets = <String>[
+    'platforms/android.png',
+    'platforms/appstore.png',
+    'platforms/dart.png',
+    'platforms/firebase.png',
+    'platforms/flutter.png',
+    'platforms/flutterdash.png',
+    'platforms/google.png',
+    'platforms/googlestore.png',
+    'platforms/ios.png',
+    'platforms/kotlin.png',
+    'platforms/linux.png',
+    'platforms/macos.png',
+    'platforms/swift.jpg',
+    'platforms/web.png',
+    'platforms/windows.png',
   ];
 
   @override
@@ -119,7 +122,7 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
   }
 
   double _stripHeightForItemWidth(double itemWidth) {
-    return (itemWidth + 18 * _imageSizeScale).clamp(46.0, 82.0);
+    return (itemWidth + 20 * _imageSizeScale).clamp(52.0, 94.0);
   }
 
   /// Each tile’s laid-out width including horizontal padding (must match item [Padding]).
@@ -156,7 +159,8 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
             physics: const ClampingScrollPhysics(),
             itemCount: tileCount,
             itemBuilder: (context, index) {
-              final assetIndex = index % AppAutoScrollImage._assets.length;
+              final assetPath = AppAutoScrollImage._platformAssets[
+                  index % AppAutoScrollImage._platformAssets.length];
               return Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: _tileHorizontalPadding,
@@ -164,14 +168,14 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
                 ),
                 child: Center(
                   child: Image.asset(
-                    AppAutoScrollImage._assets[assetIndex],
-                    width: itemWidth,
-                    height: itemWidth,
+                    assetPath,
+                    width: itemWidth * 1.22,
+                    height: itemWidth * 1.22,
                     fit: BoxFit.contain,
                     gaplessPlayback: true,
                     errorBuilder: (_, __, ___) => SizedBox(
-                      width: itemWidth,
-                      height: itemWidth,
+                      width: itemWidth * 1.22,
+                      height: itemWidth * 1.22,
                     ),
                   ),
                 ),
