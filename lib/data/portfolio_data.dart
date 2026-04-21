@@ -706,33 +706,69 @@ class PortfolioData {
         ),
       ];
 
-  /// Subset of Twin Scriptures “Solution” onboarding screens for the featured card hero strip (horizontal scroll).
+  /// Twin Scriptures "Solution" onboarding screens for the featured card hero strip (full set).
   static const List<String> twinScripturesFeaturedHeroPaths = <String>[
+    'assets/images/on_boarding_image/access_camera_10_1.png',
+    'assets/images/on_boarding_image/book_mark_home_17.png',
+    'assets/images/on_boarding_image/choos_fonts_15.png',
+    'assets/images/on_boarding_image/christmas_image_13.png',
+    'assets/images/on_boarding_image/color_theme_4.png',
+    'assets/images/on_boarding_image/complete_on_boarding.png',
+    'assets/images/on_boarding_image/create_new_color_4_1.png',
+    'assets/images/on_boarding_image/custome_home_screen_16.png',
+    'assets/images/on_boarding_image/default_app_00.png',
+    'assets/images/on_boarding_image/emotional_state_14.png',
+    'assets/images/on_boarding_image/fall_image_8.png',
+    'assets/images/on_boarding_image/import_image_10.png',
+    'assets/images/on_boarding_image/navigate_book_mark_18.png',
+    'assets/images/on_boarding_image/new_year_image_11.png',
+    'assets/images/on_boarding_image/nowruz_image_12.png',
     'assets/images/on_boarding_image/on_boarding_en_1.png',
     'assets/images/on_boarding_image/on_boarding_fa_2.png',
     'assets/images/on_boarding_image/on_boarding_tr_3.png',
     'assets/images/on_boarding_image/seasonal_theme_5.png',
-    'assets/images/on_boarding_image/color_theme_4.png',
-    'assets/images/on_boarding_image/emotional_state_14.png',
-    'assets/images/on_boarding_image/nowruz_image_12.png',
-    'assets/images/on_boarding_image/complete_on_boarding.png',
     'assets/images/on_boarding_image/spring_image_6.png',
-    'assets/images/on_boarding_image/custome_home_screen_16.png',
-    'assets/images/on_boarding_image/book_mark_home_17.png',
+    'assets/images/on_boarding_image/summer_image_7.png',
+    'assets/images/on_boarding_image/system_theme_4_2.png',
+    'assets/images/on_boarding_image/winter_image_9.png',
   ];
 
-  /// ASD featured-card hero: Admin, Sales, Scheduler, Installer, and Content & Material (aligned with section galleries).
+  /// ASD featured-card hero: ordered by narrative sections in the featured case study.
   static const List<String> asdRoleSpecificHeroPaths = <String>[
+    // Admin dashboard section
     'assets/images/admin/admin_dashboard.jpeg',
     'assets/images/admin/admin_home_screen.jpeg',
+    'assets/images/admin/admin_user_management.jpeg',
+    'assets/images/admin/admin_promote_to_salesRep.jpeg',
+    'assets/images/admin/admin_setting.jpeg',
+    // Sales representative experience
     'assets/images/sales_rep/salesRep_dashboard.png',
     'assets/images/sales_rep/salesRep_home.png',
+    'assets/images/sales_rep/salesRep_client.png',
+    'assets/images/sales_rep/salesRep_project.png',
+    'assets/images/sales_rep/create_invoice_01.png',
+    'assets/images/sales_rep/performance analytics.png',
+    // Scheduler experience
     'assets/images/scheduler/Scheduler dashboard.png',
     'assets/images/scheduler/Scheduler dashboard 01.png',
+    'assets/images/scheduler/Create Event.png',
+    'assets/images/scheduler/Date Picker.png',
+    'assets/images/scheduler/Time Picker.png',
+    // Installer experience
     'assets/images/installer/installer dashboard.png',
     'assets/images/installer/installer home screen.png',
+    'assets/images/installer/installer on the map.png',
+    'assets/images/installer/job history.png',
+    'assets/images/installer/installer profile.png',
+    // AI workflow and governance
+    'assets/images/admin/admin_amy_manager.jpeg',
+    'assets/images/admin/admin_chat_with_amy.jpeg',
+    'assets/images/admin/admin_Ai_knowledge_base.jpeg',
+    // Content and material management
     'assets/images/admin/admin_trending_material.jpeg',
     'assets/images/admin/admin_new_material.jpeg',
+    'assets/images/admin/admin_popular_material.jpeg',
+    'assets/images/admin/admin_recommended_image.jpeg',
   ];
 
   /// ASD: full catalog of section images (narrative order, deduped). Used when a broader hero list is needed.
@@ -847,11 +883,11 @@ class PortfolioData {
   static List<PortfolioCaseStudy> get caseStudies => [
         PortfolioCaseStudy(
           id: 'rose-chat-seasonal-campaign-engine',
-          title: 'Rose Chat Seasonal Campaign Engine',
-          subtitle: 'Backend-Driven Conversational AI Experience Design',
+          title: 'Rose AI Seasonal Experience Engine',
+          subtitle: 'Designed and Built: Dynamic Campaign UX, Governance, and Rollout at Scale',
           overview:
-              'A flagship AI product case study focused on backend-driven conversational UX at production scale. '
-              'I designed a campaign system that dynamically transforms the Rose chat experience with contextual greetings, seasonal themes, dynamic assets, preview controls, and safe rollout logic without app redeploys.',
+              'A flagship Rose AI case study showing how I designed and built a backend-driven seasonal experience system at production scale. '
+              'The campaign engine transforms chat with contextual greetings, seasonal themes, dynamic assets, preview controls, and safe rollout logic without app redeploys.',
           designApproach:
               'Senior product design framing for AI systems: define interaction outcomes first, then align backend controls, rollout governance, and UX states so non-engineering teams can ship and manage conversational experiences safely.',
           heroImagePath: roseChatSeasonalFeaturedHeroPaths.first,
