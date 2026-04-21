@@ -22,6 +22,7 @@ abstract final class HomeWarmColors {
   /// [SlidingMenu] panel, edge strip, and open/close tab — darker than [shellSurfaceSolid] so the left chrome reads when the drawer is closed.
   static const drawerSurfaceSolid = Color(0xFFE6DFD7);
   static const drawerBorder = Color(0xFFC9C0B6);
+  static const drawerNavyTint = Color(0xFF12243A);
 
   /// App bar uses [shellTop] → [shellBottom] gradient in [HomeScreen]; shadow/border below
   static final appBarBorderBottom =

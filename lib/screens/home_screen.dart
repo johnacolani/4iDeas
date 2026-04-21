@@ -78,15 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      HomeWarmColors.shellTop.withValues(alpha: 0.36),
-                      HomeWarmColors.shellBottom.withValues(alpha: 0.24),
-                    ],
+                  color: Color.alphaBlend(
+                    HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
+                    Colors.white.withValues(alpha: 0.025),
                   ),
                   border: Border(
+                    top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+                    left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+                    right: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
                     bottom: BorderSide(
                       color: HomeWarmColors.appBarBorderBottom,
                       width: 1.0,
@@ -109,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     begin: const Alignment(-1.0, -1.0),
                     end: const Alignment(0.45, 0.5),
                     colors: [
-                      Colors.white.withValues(alpha: 0.19),
+                      Colors.white.withValues(alpha: 0.16),
                       Colors.white.withValues(alpha: 0.06),
                       Colors.transparent,
                     ],
@@ -154,15 +153,30 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(width: isMobile ? (wi < 400 ? 3 : 5) : 12),
                     Flexible(
-                      child: SelectableText(
-                        '4iDeas',
-                        style: TextStyle(
-                          fontSize: isMobile
-                              ? (wi < 400 ? 14 : 16)
-                              : (isTablet ? 18 : 22),
-                          color: HomeWarmColors.textInk,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SelectableText(
+                            '4iDeas',
+                            style: TextStyle(
+                              fontSize: isMobile
+                                  ? (wi < 400 ? 14 : 16)
+                                  : (isTablet ? 18 : 22),
+                              color: HomeWarmColors.textInk,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          SelectableText(
+                            'info@4ideasapp.com',
+                            style: TextStyle(
+                              fontSize: isMobile ? (wi < 400 ? 9 : 10) : (isTablet ? 11 : 12),
+                              color: HomeWarmColors.textInk,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

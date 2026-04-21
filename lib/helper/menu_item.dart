@@ -7,6 +7,7 @@ class MenuItem extends StatefulWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final Color? cardColor;
+  final Gradient? cardGradient;
   final Color? accentColor;
 
 
@@ -16,6 +17,7 @@ class MenuItem extends StatefulWidget {
     required this.title,
     required this.onPressed,
     this.cardColor,
+    this.cardGradient,
     this.accentColor,
   });
 
@@ -44,7 +46,10 @@ class _MenuItemState extends State<MenuItem> {
         duration: const Duration(milliseconds: 0),
         margin: EdgeInsets.symmetric(vertical: isMobile ? 4.0 : 3.0),
         decoration: BoxDecoration(
-          color: Colors.transparent,
+          color: widget.cardGradient == null
+              ? (widget.cardColor ?? Colors.transparent)
+              : null,
+          gradient: widget.cardGradient,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: accent.withValues(alpha: 0.55),

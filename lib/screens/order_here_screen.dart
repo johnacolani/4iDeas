@@ -53,7 +53,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
   // Recipient email (where you want to receive the form submissions)
   // Note: For Formspree free tier, this should match the email in your Formspree dashboard.
   // The _recipientEmail constant is currently only used by Web3Forms.
-  static const String _recipientEmail = 'johnacolani@gmail.com';
+  static const String _recipientEmail = 'info@4ideasapp.com';
 
   // Controllers
   final TextEditingController _clientNameController = TextEditingController();

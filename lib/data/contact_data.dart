@@ -52,7 +52,7 @@ class ContactData {
           id: 'static-1',
           type: 'email',
           label: 'Email',
-          value: 'johnacolani@gmail.com',
+          value: 'info@4ideasapp.com',
           urlOrRoute: null,
           order: 1,
         ),

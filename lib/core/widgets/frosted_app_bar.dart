@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 
 /// Frosted-glass app bars: blur + translucent tint so content behind reads through slightly.
 abstract final class FrostedAppBar {
@@ -223,15 +224,14 @@ abstract final class FrostedAppBar {
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          tint.withValues(alpha: tintOpacityTop),
-                          tint.withValues(alpha: tintOpacityBottom),
-                        ],
+                      color: Color.alphaBlend(
+                        HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
+                        Colors.white.withValues(alpha: 0.025),
                       ),
                       border: Border(
+                        top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+                        left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+                        right: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
                         bottom: BorderSide(
                           color: ColorManager.backgroundDark.withValues(alpha: borderBottomAlpha),
                           width: 1,
@@ -245,8 +245,8 @@ abstract final class FrostedAppBar {
                         begin: const Alignment(-1.0, -1.0),
                         end: const Alignment(0.5, 0.55),
                         colors: [
-                          Colors.white.withValues(alpha: 0.20),
-                          Colors.white.withValues(alpha: 0.07),
+                          Colors.white.withValues(alpha: 0.16),
+                          Colors.white.withValues(alpha: 0.06),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.28, 1.0],

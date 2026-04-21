@@ -187,8 +187,8 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                     _buildContactLink(
                                       icon: Icons.email,
                                       label: 'Email',
-                                      value: 'johnacolani@gmail.com',
-                                      onTap: () => _launchEmail('johnacolani@gmail.com'),
+                                      value: 'info@4ideasapp.com',
+                                      onTap: () => _launchEmail('info@4ideasapp.com'),
                                       isMobile: isMobile,
                                       bodyFontSize: bodyFontSize,
                                     ),

@@ -64,7 +64,7 @@ class _SlidingMenuState extends State<SlidingMenu>
       title: title,
       onPressed: onPressed,
       accentColor: _menuAccentAt(index),
-      cardColor: ColorManager.primaryTealPressed.withValues(alpha: 0.72),
+      cardColor: const Color(0xFFFCF9F8),
     );
   }
 
@@ -152,19 +152,18 @@ class _SlidingMenuState extends State<SlidingMenu>
                         Positioned.fill(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  HomeWarmColors.shellTop.withValues(alpha: 0.40),
-                                  HomeWarmColors.shellBottom.withValues(alpha: 0.24),
-                                ],
+                              color: Color.alphaBlend(
+                                HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
+                                Colors.white.withValues(alpha: 0.025),
                               ),
                               border: Border(
+                                top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+                                left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
                                 right: BorderSide(
-                                  color: HomeWarmColors.drawerBorder,
+                                  color: Colors.white.withValues(alpha: 0.12),
                                   width: 1,
                                 ),
+                                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
                               ),
                               boxShadow: [
                                 BoxShadow(
@@ -183,7 +182,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                 begin: const Alignment(-1.0, -1.0),
                                 end: const Alignment(0.45, 0.52),
                                 colors: [
-                                  Colors.white.withValues(alpha: 0.21),
+                                  Colors.white.withValues(alpha: 0.16),
                                   Colors.white.withValues(alpha: 0.07),
                                   Colors.transparent,
                                 ],
@@ -278,6 +277,15 @@ class _SlidingMenuState extends State<SlidingMenu>
                                               color: ColorManager.textPrimary,
                                               fontWeight: FontWeight.bold,
                                               letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          SelectableText(
+                                            "info@4ideasapp.com",
+                                            style: TextStyle(
+                                              fontSize: isMobile ? 14 : (isTablet ? 13 : 12),
+                                              color: ColorManager.textPrimary,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ],
@@ -406,16 +414,12 @@ class _SlidingMenuState extends State<SlidingMenu>
                         width: 35,
                         height: 110,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              HomeWarmColors.shellTop.withValues(alpha: 0.48),
-                              HomeWarmColors.shellBottom.withValues(alpha: 0.30),
-                            ],
+                          color: Color.alphaBlend(
+                            HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
+                            Colors.white.withValues(alpha: 0.025),
                           ),
                           border: Border.all(
-                            color: HomeWarmColors.drawerBorder,
+                            color: Colors.white.withValues(alpha: 0.12),
                             width: 1,
                           ),
                         ),
