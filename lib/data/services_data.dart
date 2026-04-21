@@ -4,8 +4,14 @@ class ServiceItem {
   final String iconName;
   final String title;
   final String subtitle;
+  /// Core offering in plain language (how you work / what they get).
   final String description;
+  /// Business outcome line—why this matters commercially.
+  final String valueProposition;
   final List<String> details;
+  /// Who this engagement fits—sets expectations before the call.
+  final String idealClient;
+  final String ctaLabel;
   final int order;
 
   const ServiceItem({
@@ -14,7 +20,10 @@ class ServiceItem {
     required this.title,
     required this.subtitle,
     required this.description,
+    required this.valueProposition,
     required this.details,
+    required this.idealClient,
+    this.ctaLabel = 'Discuss your project',
     this.order = 0,
   });
 
@@ -23,7 +32,10 @@ class ServiceItem {
         'title': title,
         'subtitle': subtitle,
         'description': description,
+        'valueProposition': valueProposition,
         'details': details,
+        'idealClient': idealClient,
+        'ctaLabel': ctaLabel,
         'order': order,
       };
 
@@ -36,7 +48,10 @@ class ServiceItem {
       title: map['title'] as String? ?? '',
       subtitle: map['subtitle'] as String? ?? '',
       description: map['description'] as String? ?? '',
+      valueProposition: map['valueProposition'] as String? ?? '',
       details: details,
+      idealClient: map['idealClient'] as String? ?? '',
+      ctaLabel: map['ctaLabel'] as String? ?? 'Discuss your project',
       order: (map['order'] as num?)?.toInt() ?? 0,
     );
   }
@@ -45,90 +60,86 @@ class ServiceItem {
 class ServicesData {
   ServicesData._();
 
-  static List<ServiceItem> get defaultServices => [
-        const ServiceItem(
-          id: 'static-0',
-          iconName: 'design_services',
-          title: 'UX Design',
-          subtitle: 'User Experience Design',
-          description: 'Comprehensive UX design services including user flows, wireframes, user journeys, information architecture, and interactive prototyping.',
+  static List<ServiceItem> get defaultServices => const [
+        ServiceItem(
+          id: 'hire-mvp',
+          iconName: 'rocket_launch',
+          title: 'MVP app development',
+          subtitle: 'From idea to a ship-ready first version',
+          valueProposition:
+              'Reach market with a focused scope, clear milestones, and a product you can show investors or early users—not a bloated wish list.',
+          description:
+              'Plan and build an initial release that proves your concept: core user flows, solid Flutter implementation, and Firebase when you need auth, data, and hosting without running your own servers.',
           details: [
-            'User flows & journey mapping',
-            'Wireframes & low-fidelity prototypes',
-            'Information architecture (IA)',
-            'Usability testing & research integration',
-            'Interaction design patterns',
+            'Product and technical scoping for v1',
+            'UX/UI tailored to the MVP footprint',
+            'Flutter for iOS, Android, and/or web from one codebase',
+            'Firebase setup (Auth, Firestore, hosting, etc.) as needed',
+            'TestFlight / Play tracks, build handover, and release notes',
           ],
+          idealClient:
+              'Early-stage founders and teams validating an idea who want one accountable partner from sketch to first release.',
+          ctaLabel: 'Discuss your MVP',
         ),
-        const ServiceItem(
-          id: 'static-1',
-          iconName: 'palette',
-          title: 'UI Design',
-          subtitle: 'Visual & Interface Design',
-          description: 'High-fidelity UI design with attention to visual hierarchy, layout systems, and pixel-perfect implementation.',
+        ServiceItem(
+          id: 'hire-design-engineering',
+          iconName: 'integration_instructions',
+          title: 'Product design + engineering',
+          subtitle: 'One workflow from problem to shipped code',
+          valueProposition:
+              'Fewer handoff gaps—design decisions stay tied to what actually ships, so you move faster with fewer development surprises.',
+          description:
+              'Work with one person who owns both the product experience and the Flutter build. Strategy and UX/UI stay aligned with implementation, performance, and your timeline.',
           details: [
-            'Visual design & layout systems',
-            'High-fidelity UI components',
-            'Responsive design (mobile, tablet, web)',
-            'Accessibility (WCAG 2.2 compliance)',
-            'Design specifications & handoff',
+            'Discovery, flows, and UX/UI for your product',
+            'Design systems and component-level thinking',
+            'Flutter implementation matched to the design',
+            'Iteration with your stakeholders and realistic tradeoffs',
+            'Documentation so your team can extend the product later',
           ],
+          idealClient:
+              'Startups and businesses that want design and engineering in sync—not separate vendors pointing at each other.',
+          ctaLabel: 'Talk design and build',
         ),
-        const ServiceItem(
-          id: 'static-2',
-          iconName: 'extension',
-          title: 'Design Systems',
-          subtitle: 'Component Libraries & Documentation',
-          description: 'Build scalable design systems with reusable components, design tokens, and comprehensive documentation.',
+        ServiceItem(
+          id: 'hire-ai',
+          iconName: 'auto_awesome',
+          title: 'AI-enhanced app features',
+          subtitle: 'Practical AI inside your product',
+          valueProposition:
+              'Ship AI where it improves outcomes—summaries, recommendations, or in-app help—not features users ignore because they do not work reliably.',
+          description:
+              'Integrate AI-assisted features into new or existing Flutter apps: clear use cases, sensible data handling, Firebase or cloud glue where it fits, and UX that sets honest expectations.',
           details: [
-            'Component libraries & patterns',
-            'Design tokens (colors, typography, spacing)',
-            'Design system documentation',
-            'Component maintenance & governance',
-            'Cross-platform design systems',
+            'Use-case definition and feasibility review',
+            'Integration with the models or APIs you choose',
+            'Flutter UI for AI-driven flows, loading, and errors',
+            'Backend wiring (including Firebase) as needed',
+            'Guardrails and copy so users know what the system can and cannot do',
           ],
+          idealClient:
+              'Teams adding smart features to a product or MVP without standing up a full-time ML org.',
+          ctaLabel: 'Explore AI features',
         ),
-        const ServiceItem(
-          id: 'static-3',
-          iconName: 'psychology',
-          title: 'Research & Usability Testing',
-          subtitle: 'User-Centered Design Process',
-          description: 'Data-driven design decisions through user research, usability testing, and iterative improvements.',
+        ServiceItem(
+          id: 'hire-modernize',
+          iconName: 'autorenew',
+          title: 'App modernization & improvement',
+          subtitle: 'Stability, UX, and maintainable releases',
+          valueProposition:
+              'Lower the risk of slow releases and fragile code by stabilizing what you already have and improving what users notice first.',
+          description:
+              'Review and improve existing Flutter (or suitable) codebases: UX fixes, dependency and structure cleanup, Firebase upgrades, and a sane plan for ongoing releases.',
           details: [
-            'User research & interviews',
-            'Usability testing & analysis',
-            'Research integration',
-            'Iterative design improvements',
-            'User-centered design methodologies',
+            'Code and UX audit with a prioritized backlog',
+            'Refactors for readability, tests where they pay off',
+            'Dependency and platform updates with regression checks',
+            'Performance and crash-reduction work',
+            'Roadmap for the next releases—not only a one-time patch',
           ],
-        ),
-        const ServiceItem(
-          id: 'static-4',
-          iconName: 'phone_android',
-          title: 'Product Design',
-          subtitle: 'End-to-End Product Design',
-          description: 'Full product design services for web, mobile, enterprise platforms, dashboards, CMS environments, workflow tools.',
-          details: [
-            'Web & mobile app design',
-            'Enterprise platform design',
-            'Dashboard & data visualization',
-            'CMS & workflow tools',
-            'AI-powered product experiences',
-          ],
-        ),
-        const ServiceItem(
-          id: 'static-5',
-          iconName: 'handshake',
-          title: 'Engineering Collaboration',
-          subtitle: 'Design-to-Development Partnership',
-          description: 'Close collaboration with engineering teams to ensure accurate implementation and maintain design consistency.',
-          details: [
-            'Design-to-development handoff',
-            'Engineering collaboration & validation',
-            'Design consistency enforcement',
-            'Storytelling & communication',
-            'Agile design processes',
-          ],
+          idealClient:
+              'Businesses with a live app that needs reliability, updates, or a design refresh—without assuming a full rewrite unless you decide you need one.',
+          ctaLabel: 'Review your app',
         ),
       ];
 }

@@ -154,7 +154,9 @@ class CaseStudyDetailScreen extends StatelessWidget {
                     ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: isMobile ? double.infinity : 800,
+                        maxWidth: isMobile
+                            ? double.infinity
+                            : (caseStudy.id == 'asd' ? 920 : 800),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,6 +178,12 @@ class CaseStudyDetailScreen extends StatelessWidget {
                               height: 1.6,
                             ),
                           ),
+                          if (caseStudy.id == 'asd') ...[
+                            SizedBox(height: he * 0.022),
+                            const _AsdCaseStudyAtAGlance(),
+                            SizedBox(height: he * 0.026),
+                            _AsdCaseStudyOutline(bodySize: bodySize, he: he),
+                          ],
                           if (caseStudy.designApproach != null && caseStudy.designApproach!.isNotEmpty) ...[
                             SizedBox(height: he * 0.025),
                             _DesignApproachBlock(
@@ -222,6 +230,147 @@ class CaseStudyDetailScreen extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Quick scan line for the ASD enterprise case study (portfolio id [asd]).
+class _AsdCaseStudyAtAGlance extends StatelessWidget {
+  const _AsdCaseStudyAtAGlance();
+
+  @override
+  Widget build(BuildContext context) {
+    const chips = [
+      'Flutter + Firebase',
+      'Multi-role (admin · sales · scheduler · installer · client)',
+      'Workflows & dashboards',
+      'Governed AI',
+      'iOS · Android · Web',
+    ];
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: ColorManager.containerSurface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: ColorManager.containerBorder),
+        ),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: chips.map((t) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+              decoration: BoxDecoration(
+                color: ColorManager.backgroundDark.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: ColorManager.containerBorder.withValues(alpha: 0.85),
+                ),
+              ),
+              child: Text(
+                t,
+                style: GoogleFonts.albertSans(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: ColorManager.textSecondary,
+                  letterSpacing: 0.15,
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Numbered map of the eight-part ASD narrative for fast scanning.
+class _AsdCaseStudyOutline extends StatelessWidget {
+  const _AsdCaseStudyOutline({
+    required this.bodySize,
+    required this.he,
+  });
+
+  final double bodySize;
+  final double he;
+
+  static const List<String> _items = [
+    'Project overview',
+    'Business and problem context',
+    'My role and responsibilities',
+    'UX and technical challenges',
+    'What I designed and built',
+    'Adaptive platform (cross–form-factor)',
+    'Product decisions, workflows, and AI governance',
+    'Outcome, impact, and technologies',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: ColorManager.primaryTeal.withValues(alpha: 0.35)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ColorManager.primaryTeal.withValues(alpha: 0.09),
+            ColorManager.containerSurface,
+          ],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'In this case study',
+            style: GoogleFonts.albertSans(
+              color: ColorManager.orange,
+              fontSize: bodySize + 1,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: he * 0.012),
+          ...List.generate(_items.length, (i) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: i == _items.length - 1 ? 0 : 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 28,
+                    child: Text(
+                      '${i + 1}.',
+                      style: GoogleFonts.albertSans(
+                        color: ColorManager.textMuted,
+                        fontSize: bodySize - 1,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      _items[i],
+                      style: GoogleFonts.albertSans(
+                        color: ColorManager.textSecondary,
+                        fontSize: bodySize - 1,
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );

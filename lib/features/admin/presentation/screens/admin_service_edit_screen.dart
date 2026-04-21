@@ -26,6 +26,9 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
   final _titleController = TextEditingController();
   final _subtitleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _valuePropositionController = TextEditingController();
+  final _idealClientController = TextEditingController();
+  final _ctaLabelController = TextEditingController();
   final _iconNameController = TextEditingController();
   final List<TextEditingController> _detailControllers = [];
   bool _saving = false;
@@ -41,6 +44,9 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
       _titleController.text = item.title;
       _subtitleController.text = item.subtitle;
       _descriptionController.text = item.description;
+      _valuePropositionController.text = item.valueProposition;
+      _idealClientController.text = item.idealClient;
+      _ctaLabelController.text = item.ctaLabel;
       _iconNameController.text = item.iconName;
       for (final d in item.details) {
         _detailControllers.add(TextEditingController(text: d));
@@ -74,7 +80,10 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
       title: _titleController.text.trim(),
       subtitle: _subtitleController.text.trim(),
       description: _descriptionController.text.trim(),
+      valueProposition: _valuePropositionController.text.trim(),
       details: details,
+      idealClient: _idealClientController.text.trim(),
+      ctaLabel: _ctaLabelController.text.trim().isEmpty ? 'Discuss your project' : _ctaLabelController.text.trim(),
     );
   }
 
@@ -193,9 +202,26 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                         ),
                         _buildField(
+                          controller: _valuePropositionController,
+                          label: 'Business value (outcome line)',
+                          hint: 'Why this matters for the buyer—one or two sentences',
+                          maxLines: 3,
+                        ),
+                        _buildField(
+                          controller: _idealClientController,
+                          label: 'Ideal client',
+                          hint: 'Who this engagement is for',
+                          maxLines: 3,
+                        ),
+                        _buildField(
+                          controller: _ctaLabelController,
+                          label: 'CTA button label',
+                          hint: 'e.g. Discuss your MVP (default: Discuss your project)',
+                        ),
+                        _buildField(
                           controller: _iconNameController,
                           label: 'Icon name (optional)',
-                          hint: 'e.g. design_services, palette, extension',
+                          hint: 'rocket_launch, integration_instructions, auto_awesome, autorenew, design_services, …',
                         ),
                         const SizedBox(height: 12),
                         Text(

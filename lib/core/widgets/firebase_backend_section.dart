@@ -107,6 +107,7 @@ class FirebaseBackendSection extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/firebase.png',
                     fit: BoxFit.contain,
+                    semanticLabel: 'Firebase logo',
                   ),
                 ),
               ),
@@ -177,6 +178,7 @@ class FirebaseBackendSection extends StatelessWidget {
                         child: Image.asset(
                           service['iconPath']!,
                           fit: BoxFit.contain,
+                          semanticLabel: '${service['name'] ?? 'Firebase'} icon',
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
                               Icons.broken_image,

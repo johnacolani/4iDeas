@@ -51,7 +51,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
         title: Text(
-          'About Us',
+          'About 4ideas',
           style: GoogleFonts.albertSans(
             color: ColorManager.backgroundDark,
             fontSize: isMobile ? 20 : 22,
@@ -88,18 +88,21 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             Center(
                               child: Column(
                                 children: [
-                                  Text(
-                                    'John A. Colani',
-                                    style: GoogleFonts.albertSans(
-                                      color: ColorManager.accentGoldDark,
-                                      fontSize: titleFontSize,
-                                      fontWeight: FontWeight.bold,
+                                  Semantics(
+                                    header: true,
+                                    child: Text(
+                                      '4ideas',
+                                      style: GoogleFonts.albertSans(
+                                        color: ColorManager.accentGoldDark,
+                                        fontSize: titleFontSize,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
                                   SizedBox(height: he * 0.01),
                                   Text(
-                                    'Senior Product Designer • UX/UI Designer • Design Systems',
+                                    'Founder-led product design & Flutter consultancy',
                                     style: TextStyle(
                                       color: ColorManager.primaryTeal,
                                       fontSize: bodyFontSize,
@@ -108,6 +111,17 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                     textAlign: TextAlign.center,
                                   ),
                                   SizedBox(height: he * 0.01),
+                                  SizedBox(height: he * 0.006),
+                                  Text(
+                                    'Led by John A. Colani',
+                                    style: TextStyle(
+                                      color: ColorManager.textSecondary,
+                                      fontSize: subtitleFontSize,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  SizedBox(height: he * 0.008),
                                   Text(
                                     'Richmond, VA',
                                     style: TextStyle(
@@ -124,7 +138,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             // Summary Section
                             _buildSection(
                               title: 'About',
-                              content: 'Product Designer with 6+ years designing intuitive, accessible, and scalable digital experiences for web, mobile, enterprise, and data-driven platforms. Skilled in user research, interaction design, IA, prototyping, and design systems. Known for simplifying complexity, creating clear flows, and collaborating closely with engineers to bring ideas to life with accuracy and consistency. Experienced in multi-role platforms, dashboards, CMS environments, workflow tools, and AI-assisted product experiences.\n\nRecently led the design of "Amy," an AI-powered assistant for Absolute Stone Design, including client chat UI, admin oversight tools, knowledge governance, and multi-level AI training workflows.',
+                              content: '4ideas is a founder-led product consultancy focused on turning business ideas into shipped software. We combine product strategy, UX/UI, and Flutter engineering so teams can move from concept to production with less handoff friction and better decision quality.\n\nJohn A. Colani leads every engagement directly. With 6+ years across enterprise and startup-style products, the work covers multi-role platforms, workflow-heavy apps, design systems, and AI-assisted product features with practical governance.',
                               fontSize: bodyFontSize,
                               he: he,
                               isMobile: isMobile,

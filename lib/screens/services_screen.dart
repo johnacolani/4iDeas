@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
+import 'package:four_ideas/core/widgets/service_offering_card.dart';
 import 'package:four_ideas/data/services_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/app_router.dart';
@@ -44,25 +46,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
       (_servicesFromFirestore != null && _servicesFromFirestore!.isNotEmpty)
           ? _servicesFromFirestore!
           : ServicesData.defaultServices;
-
-  static IconData _iconFromName(String name) {
-    switch (name) {
-      case 'design_services':
-        return Icons.design_services;
-      case 'palette':
-        return Icons.palette;
-      case 'extension':
-        return Icons.extension;
-      case 'psychology':
-        return Icons.psychology;
-      case 'phone_android':
-        return Icons.phone_android;
-      case 'handshake':
-        return Icons.handshake;
-      default:
-        return Icons.design_services;
-    }
-  }
 
   Future<void> _navigateToAddService() async {
     final result = await Navigator.of(context).push<bool>(
@@ -122,20 +105,82 @@ class _ServicesScreenState extends State<ServicesScreen> {
     }
   }
 
+  void _goContact(BuildContext context) => context.go(AppRoutes.contact);
+
+  Widget _buildServiceOfferings({
+    required List<ServiceItem> items,
+    required bool isMobile,
+    required double wi,
+    required double sectionTitleSize,
+    required double bodyFontSize,
+    required bool showAdminActions,
+  }) {
+    final useTwoCols = !isMobile && wi >= 960;
+
+    Widget cardFor(ServiceItem item) {
+      return ServiceOfferingCard(
+        item: item,
+        isMobile: isMobile,
+        sectionTitleSize: sectionTitleSize,
+        bodyFontSize: bodyFontSize,
+        onCta: () => _goContact(context),
+        showAdminActions: showAdminActions,
+        onEdit: showAdminActions ? () => _navigateToEditService(item) : null,
+        onDelete: showAdminActions ? () => _deleteService(item) : null,
+      );
+    }
+
+    if (!useTwoCols) {
+      return Column(
+        children: [
+          for (int i = 0; i < items.length; i++) ...[
+            if (i > 0) SizedBox(height: isMobile ? 20 : 24),
+            cardFor(items[i]),
+          ],
+        ],
+      );
+    }
+
+    final rows = <Widget>[];
+    for (int i = 0; i < items.length; i += 2) {
+      final left = items[i];
+      final right = i + 1 < items.length ? items[i + 1] : null;
+      rows.add(
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(child: cardFor(left)),
+              const SizedBox(width: 24),
+              Expanded(
+                child: right != null ? cardFor(right) : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (i + 2 < items.length) {
+        rows.add(const SizedBox(height: 24));
+      }
+    }
+    return Column(children: rows);
+  }
+
   @override
   Widget build(BuildContext context) {
     double he = MediaQuery.of(context).size.height;
     double wi = MediaQuery.of(context).size.width;
-    
-    // Responsive breakpoints
+
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    
-    // Responsive font sizes
-    final double titleFontSize = isMobile ? 28 : (isTablet ? 32 : 36);
-    final double sectionTitleSize = isMobile ? 22 : (isTablet ? 24 : 26);
+
+    final double titleFontSize = isMobile ? 28 : (isTablet ? 32 : 34);
+    final double sectionTitleSize = isMobile ? 19 : (isTablet ? 20 : 21);
     final double bodyFontSize = isMobile ? 16 : (isTablet ? 17 : 18);
-    
+    final double maxShell = isMobile ? double.infinity : 1120;
+
+    final bool showAdminActions = AdminService.isAdmin() && _servicesFromFirestore != null;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
@@ -174,262 +219,182 @@ class _ServicesScreenState extends State<ServicesScreen> {
               thumbVisibility: true,
               child: CustomScrollView(
                 slivers: [
-                if (_isLoadingServices)
+                  if (_isLoadingServices)
+                    SliverToBoxAdapter(
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.white.withValues(alpha: 0.1),
+                        valueColor: AlwaysStoppedAnimation<Color>(HomeWarmColors.sectionAccent),
+                      ),
+                    ),
                   SliverToBoxAdapter(
-                    child: LinearProgressIndicator(
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(ColorManager.orange),
-                    ),
-                  ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 16.0 : (isTablet ? 24.0 : 32.0),
-                      vertical: isMobile ? 20.0 : 24.0,
-                    ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: isMobile ? double.infinity : (isTablet ? 700 : 800),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header
-                            Center(
-                              child: Column(
-                                children: [
-                                  SelectableText(
-                                    'Our Services',
-                                    style: GoogleFonts.albertSans(
-                                      color: ColorManager.accentGoldDark,
-                                      fontSize: titleFontSize,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: he * 0.01),
-                                  SelectableText(
-                                    'Professional Product Design Services',
-                                    style: TextStyle(
-                                      color: ColorManager.orange,
-                                      fontSize: bodyFontSize,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: he * 0.03),
-                                ],
-                              ),
-                            ),
-                            if (AdminService.isAdmin()) ...[
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 16),
-                                child: OutlinedButton.icon(
-                                  onPressed: _navigateToAddService,
-                                  icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
-                                  label: Text(
-                                    'Add service',
-                                    style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
-                                  ),
-                                  style: OutlinedButton.styleFrom(side: BorderSide(color: ColorManager.orange)),
-                                ),
-                              ),
-                            ],
-                            ..._displayServices.asMap().entries.map((e) {
-                              final item = e.value;
-                              final isLast = e.key == _displayServices.length - 1;
-                              return Column(
-                                children: [
-                                  _buildServiceCard(
-                                    item: item,
-                                    he: he,
-                                    isMobile: isMobile,
-                                    sectionTitleSize: sectionTitleSize,
-                                    bodyFontSize: bodyFontSize,
-                                    showAdminActions: AdminService.isAdmin() && _servicesFromFirestore != null,
-                                    onEdit: AdminService.isAdmin() && _servicesFromFirestore != null ? () => _navigateToEditService(item) : null,
-                                    onDelete: AdminService.isAdmin() && _servicesFromFirestore != null ? () => _deleteService(item) : null,
-                                  ),
-                                  SizedBox(height: isLast ? he * 0.04 : he * 0.025),
-                                ],
-                              );
-                            }),
-                            SizedBox(height: he * 0.02),
-                            
-                            // Call to Action
-                            Center(
-                              child: Container(
-                                padding: EdgeInsets.all(isMobile ? 20 : 24),
-                                decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 16.0 : (isTablet ? 24.0 : 32.0),
+                        vertical: isMobile ? 20.0 : 28.0,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxShell),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
                                 child: Column(
                                   children: [
-                                    SelectableText(
-                                      'Ready to start your project?',
-                                      style: GoogleFonts.albertSans(
-                                        color: ColorManager.accentGoldDark,
-                                        fontSize: sectionTitleSize,
-                                        fontWeight: FontWeight.bold,
+                                    Semantics(
+                                      header: true,
+                                      child: SelectableText(
+                                        'How 4ideas helps teams ship',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.albertSans(
+                                          color: HomeWarmColors.headlinePrimary,
+                                          fontSize: titleFontSize,
+                                          fontWeight: FontWeight.w800,
+                                          height: 1.15,
+                                        ),
                                       ),
                                     ),
-                                    SizedBox(height: 12),
+                                    SizedBox(height: he * 0.012),
                                     SelectableText(
-                                      'Let\'s discuss how we can bring your ideas to life',
-                                      style: TextStyle(
-                                        color: ColorManager.primaryTeal,
+                                      'Founder-led studio services for startups and businesses—MVP delivery, product design with engineering, practical AI features, and ongoing improvement for products already in market.',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.albertSans(
+                                        color: HomeWarmColors.bodyEmphasis,
                                         fontSize: bodyFontSize,
                                         fontWeight: FontWeight.w500,
+                                        height: 1.5,
                                       ),
                                     ),
+                                    SizedBox(height: he * 0.028),
                                   ],
                                 ),
                               ),
-                            ),
-                            
-                            SizedBox(height: he * 0.04),
-                          ],
+                              if (AdminService.isAdmin()) ...[
+                                OutlinedButton.icon(
+                                  onPressed: _navigateToAddService,
+                                  icon: Icon(Icons.add, size: 18, color: HomeWarmColors.sectionAccent),
+                                  label: Text(
+                                    'Add service',
+                                    style: GoogleFonts.albertSans(
+                                      color: HomeWarmColors.sectionAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(color: HomeWarmColors.sectionAccent),
+                                  ),
+                                ),
+                                SizedBox(height: isMobile ? 16 : 20),
+                              ],
+                              _buildServiceOfferings(
+                                items: _displayServices,
+                                isMobile: isMobile,
+                                wi: wi,
+                                sectionTitleSize: sectionTitleSize,
+                                bodyFontSize: bodyFontSize,
+                                showAdminActions: showAdminActions,
+                              ),
+                              SizedBox(height: he * 0.04),
+                              Center(
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 560),
+                                  child: Container(
+                                    padding: EdgeInsets.all(isMobile ? 20 : 26),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(18),
+                                      border: Border.all(color: HomeWarmColors.dividerLine),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          HomeWarmColors.shellSurfaceSolid,
+                                          Colors.white,
+                                        ],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.06),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        SelectableText(
+                                          'Ready to discuss your product?',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.albertSans(
+                                            color: HomeWarmColors.headlinePrimary,
+                                            fontSize: sectionTitleSize + 1,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        SelectableText(
+                                          'Send a short note about your product, timeline, and budget band. I respond with candid next steps—whether we are a fit or not.',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.albertSans(
+                                            color: HomeWarmColors.bodyEmphasis,
+                                            fontSize: bodyFontSize - 1,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          child: FilledButton(
+                                            style: FilledButton.styleFrom(
+                                              backgroundColor: HomeWarmColors.sectionAccent,
+                                              foregroundColor: Colors.white,
+                                              padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                            onPressed: () => _goContact(context),
+                                            child: Text(
+                                              'Discuss your project',
+                                              style: GoogleFonts.albertSans(
+                                                fontSize: bodyFontSize,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                        TextButton(
+                                          onPressed: () => context.go(AppRoutes.orderHere),
+                                          child: Text(
+                                            'Prefer a structured brief? Submit a project form',
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.albertSans(
+                                              color: HomeWarmColors.sectionAccent,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: bodyFontSize - 2,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: he * 0.05),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildServiceCard({
-    required ServiceItem item,
-    required double he,
-    required bool isMobile,
-    required double sectionTitleSize,
-    required double bodyFontSize,
-    bool showAdminActions = false,
-    VoidCallback? onEdit,
-    VoidCallback? onDelete,
-  }) {
-    final icon = _iconFromName(item.iconName);
-    Widget cardContent = Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 16 : 20),
-      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(isMobile ? 10 : 12),
-                decoration: BoxDecoration(
-                  color: ColorManager.primaryTeal.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  icon,
-                  color: ColorManager.primaryTeal,
-                  size: isMobile ? 28 : 32,
-                ),
-              ),
-              SizedBox(width: isMobile ? 12 : 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectableText(
-                      item.title,
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.textPrimary,
-                        fontSize: sectionTitleSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    SelectableText(
-                      item.subtitle,
-                      style: TextStyle(
-                        color: ColorManager.textSecondary,
-                        fontSize: bodyFontSize - 2,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: he * 0.015),
-          SelectableText(
-            item.description,
-            style: TextStyle(
-              color: ColorManager.textPrimary,
-              fontSize: bodyFontSize,
-              height: 1.6,
-            ),
-          ),
-          SizedBox(height: he * 0.015),
-          ...item.details.map((detail) => Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 6, right: 8),
-                      child: Icon(
-                        Icons.check_circle,
-                        color: ColorManager.primaryTeal,
-                        size: 18,
-                      ),
-                    ),
-                    Expanded(
-                      child: SelectableText(
-                        detail,
-                        style: TextStyle(
-                          color: ColorManager.textSecondary,
-                          fontSize: bodyFontSize - 1,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-        ],
-      ),
-    );
-
-    if (showAdminActions && (onEdit != null || onDelete != null)) {
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          cardContent,
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (onEdit != null)
-                  IconButton(
-                    icon: Icon(Icons.edit, size: 22, color: ColorManager.orange),
-                    onPressed: onEdit,
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(minWidth: 36, minHeight: 36),
-                  ),
-                if (onDelete != null)
-                  IconButton(
-                    icon: Icon(Icons.delete_outline, size: 22, color: Colors.red),
-                    onPressed: onDelete,
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(minWidth: 36, minHeight: 36),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-    return cardContent;
   }
 }

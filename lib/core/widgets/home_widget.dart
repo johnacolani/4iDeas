@@ -3,10 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../home_warm_colors.dart';
 import 'firebase_backend_section.dart';
-import 'home_hero_headline.dart';
+import 'home_hero_section.dart';
 import 'aws_backend_section.dart';
 import 'seo_optimization_section.dart';
 import 'app_auto_scroll_image.dart';
+import 'trust_home_sections.dart';
 
 class HomeWidget extends StatelessWidget {
   const HomeWidget({
@@ -48,15 +49,33 @@ class HomeWidget extends StatelessWidget {
                     SizedBox(height: heroTopSpacing),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: wi < 400 ? 12 : 16),
-                      child: HomeHeroHeadline(
-                        titleSize: isMobile
-                            ? (wi < 400 ? 28 : (wi < 500 ? 35 : 42))
-                            : (isTablet ? 56 : 84),
+                      child: Center(
+                        child: HomeHeroSection(
+                          wi: wi,
+                          isMobile: isMobile,
+                          isTablet: isTablet,
+                        ),
                       ),
                     ),
 
-                    SizedBox(height: 24),
-                    // On very small mobile screens, stack vertically; otherwise horizontal
+                    SizedBox(height: 28),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: wi < 400 ? 12 : 16),
+                      child: SelectableText(
+                        'Mobile, web, and desktop from one codebase.',
+                        textAlign: TextAlign.center,
+                        textDirection: TextDirection.ltr,
+                        style: GoogleFonts.albertSans(
+                          fontSize: isMobile
+                              ? (wi < 400 ? 14 : 15)
+                              : (isTablet ? 16 : 17),
+                          fontWeight: FontWeight.w600,
+                          color: HomeWarmColors.bodyEmphasis,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    // Platform labels
                     wi < 400
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -242,45 +261,6 @@ class HomeWidget extends StatelessWidget {
                             ),
                           ),
                     SizedBox(height: 24),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: wi < 400 ? 12 : 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: SelectableText(
-                          'Just with single Codebase',
-                          textAlign: TextAlign.center,
-                          textDirection: TextDirection.ltr,
-                          style: GoogleFonts.albertSans(
-                            fontSize: isMobile ? (wi < 400 ? 16 : 18) : (isTablet ? 22 : 26),
-                            fontWeight: FontWeight.bold,
-                            color: HomeWarmColors.sectionAccent,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: he * 0.01,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile
-                            ? wi * 0.05
-                            : (isTablet ? wi * 0.08 : wi * 0.1),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: SelectableText(
-                          'that give you and your customers the best experience possible',
-                          textAlign: TextAlign.center,
-                          textDirection: TextDirection.ltr,
-                          style: GoogleFonts.albertSans(
-                            fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 16 : 20),
-                            fontWeight: FontWeight.bold,
-                            color: HomeWarmColors.bodyEmphasis,
-                          ),
-                        ),
-                      ),
-                    ),
 
                     Center(
                       child: SizedBox(
@@ -322,6 +302,12 @@ class HomeWidget extends StatelessWidget {
                     SizedBox(
                       height: isMobile ? 16 : 24,
                     ),
+                    TrustBuildingHomeSections(
+                      wi: wi,
+                      isMobile: isMobile,
+                      isTablet: isTablet,
+                    ),
+                    SizedBox(height: isMobile ? 28 : 36),
                     // Title before backend sections
                     Padding(
                       padding: EdgeInsets.symmetric(

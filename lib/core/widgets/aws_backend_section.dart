@@ -107,6 +107,7 @@ class AWSBackendSection extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/aws.png',
                     fit: BoxFit.contain,
+                    semanticLabel: 'Amazon Web Services logo',
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
                         Icons.cloud,
@@ -184,6 +185,7 @@ class AWSBackendSection extends StatelessWidget {
                         child: Image.asset(
                           service['iconPath']!,
                           fit: BoxFit.contain,
+                          semanticLabel: '${service['name'] ?? 'AWS'} icon',
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
                               Icons.broken_image,

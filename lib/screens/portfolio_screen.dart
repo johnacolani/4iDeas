@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/data/portfolio_conversion_copy.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/helper/app_background.dart';
@@ -186,10 +187,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       if (byOrder != 0) return byOrder;
       // When order matches (e.g. legacy Firestore defaults), prefer featured static ids first.
       const tieBreak = {
-        'rose-chat-seasonal-campaign-engine': 0,
+        'asd': 0,
         'service-flow': 1,
-        'asd': 2,
-        'twin-scriptures': 3,
+        'twin-scriptures': 2,
+        'rose-chat-seasonal-campaign-engine': 3,
       };
       final ta = tieBreak[a.id] ?? 99;
       final tb = tieBreak[b.id] ?? 99;
@@ -653,20 +654,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         ),
                         SizedBox(height: gapAfterHero),
 
-                        // Content below hero: moved up 200px to reduce gap
-                        Transform.translate(
-                          offset: const Offset(0, -200),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                        // Content below hero
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                         // 2. End-to-end product design from research to cross-platform delivery
                         Center(
                           child: SelectableText(
-                            'End-to-end product design from research to cross-platform delivery',
+                            'Product strategy, UX, and Flutter delivery for teams that need shipped software—not slideware.',
+                            textAlign: TextAlign.center,
                             style: GoogleFonts.albertSans(
                               color: ColorManager.portfolioTextBody,
                               fontSize: bodySize,
                               fontWeight: FontWeight.w500,
+                              height: 1.45,
                             ),
                           ),
                         ),
@@ -701,9 +702,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         // 5. Featured Case Studies
                         KeyedSubtree(
                           key: _featuredCaseStudiesKey,
-                          child: _SectionTitle(
-                            title: 'Featured Case Studies',
+                          child: _SectionWithSubtitle(
+                            title: 'Featured case studies',
+                            subtitle:
+                                'Each write-up focuses on business constraints, ownership, and what shipped—so you can see how I work before we talk.',
                             sectionTitleSize: sectionTitleSize,
+                            bodySize: bodySize,
                           ),
                         ),
                         if (AdminService.isAdmin()) ...[
@@ -727,6 +731,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           bodySize: bodySize,
                           gapBetweenCards: gapBetweenCaseStudyCards,
                           onOpenCaseStudy: (id) => context.go(AppRoutes.portfolioCaseStudyPath(id)),
+                          onDiscussSimilar: () => context.go(AppRoutes.contact),
                           showAdminActions: AdminService.isAdmin(),
                           onEdit: AdminService.isAdmin() ? _navigateToEditCaseStudy : null,
                           onDelete: AdminService.isAdmin() ? _deleteCaseStudy : null,
@@ -740,9 +745,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         // 6. App Showcase (2 columns or responsive grid)
                         KeyedSubtree(
                           key: _appShowcaseKey,
-                          child: _SectionTitle(
-                            title: 'App Showcase',
+                          child: _SectionWithSubtitle(
+                            title: 'Shipped products & systems',
+                            subtitle:
+                                'Apps and tools in production—browse stores, web builds, and case studies. If something looks like your problem, we can map it to your scope.',
                             sectionTitleSize: sectionTitleSize,
+                            bodySize: bodySize,
                           ),
                         ),
                         Align(
@@ -791,17 +799,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             double mainAxisExtent;
                             double spacing;
                             // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
+                            // Taller cells: conversion pitch (context/role/outcome) + dual CTAs + platform chips.
                             if (availableWidth > 900) {
                               crossAxisCount = 3;
-                              mainAxisExtent = 432;
+                              mainAxisExtent = 640;
                               spacing = 18;
                             } else if (availableWidth > 600) {
                               crossAxisCount = 2;
-                              mainAxisExtent = 452;
+                              mainAxisExtent = 660;
                               spacing = 16;
                             } else {
                               crossAxisCount = 1;
-                              mainAxisExtent = 476;
+                              mainAxisExtent = 700;
                               spacing = 14;
                             }
                             return GridView.builder(
@@ -826,6 +835,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   onDelete: isAdmin && _firestoreDocIdForPortfolioApp(app) != null
                                       ? () => _deleteApp(app)
                                       : null,
+                                  conversionPitch: appShowcasePitchForId(app.id),
+                                  onDiscussSimilar: () => context.go(AppRoutes.contact),
                                 );
                               },
                             );
@@ -985,8 +996,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                         ),
                         SizedBox(height: he * 0.03),
-                            ],
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -1009,13 +1019,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     required bool isMobile,
     required double sectionTitleSize,
   }) {
-    // Lottie behind title — animation + title only (layout kept as-is)
-    final double lottieHeight = titleSize * 1.3 * 9;
-    final double lottieWidth = titleSize * 12 * 9;
+    // Lottie behind title — capped dimensions avoid dramatic spacing shifts.
+    final double lottieHeight = (isMobile ? 280.0 : 360.0);
+    final double lottieWidth = (wi * (isMobile ? 0.84 : 0.72)).clamp(280.0, 640.0);
 
     return Center(
       child: Transform.translate(
-        offset: Offset(0, -he * 0.20),
+        offset: Offset(0, -he * 0.08),
         child: Center(
           child: Stack(
             alignment: Alignment.bottomCenter,
@@ -1024,25 +1034,27 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 width: lottieWidth * 0.3,
                 height: lottieHeight,
                 child: Center(
-                  child: Lottie.asset(
-                    'assets/waveloop.json',
-                    fit: BoxFit.fitHeight,
-                    delegates: LottieDelegates(
-                      values: [
-                        // Apply a teal tint to the full composition.
-                        ValueDelegate.colorFilter(
-                          ['**'],
-                          value: const ColorFilter.mode(
-                            Color(0xFF8FD3CB),
-                            BlendMode.srcATop,
+                  child: ExcludeSemantics(
+                    child: Lottie.asset(
+                      'assets/waveloop.json',
+                      fit: BoxFit.fitHeight,
+                      delegates: LottieDelegates(
+                        values: [
+                          // Apply a teal tint to the full composition.
+                          ValueDelegate.colorFilter(
+                            ['**'],
+                            value: const ColorFilter.mode(
+                              Color(0xFF8FD3CB),
+                              BlendMode.srcATop,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    errorBuilder: (_, __, ___) => Icon(
-                      Icons.palette_outlined,
-                      size: titleSize,
-                      color: ColorManager.portfolioTextBody.withValues(alpha: 0.4),
+                        ],
+                      ),
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.palette_outlined,
+                        size: titleSize,
+                        color: ColorManager.portfolioTextBody.withValues(alpha: 0.4),
+                      ),
                     ),
                   ),
                 ),
@@ -1050,17 +1062,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               Positioned.fill(
                 child: Center(
                   child: Transform.translate(
-                    offset: Offset(0, 60),
+                    offset: const Offset(0, 42),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: math.max(8.0, wi * 0.04)),
-                      child: SelectableText(
-                        'Product design\n&\ncross-platform app development (Flutter)',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.albertSans(
-                          color: ColorManager.portfolioTextTitle,
-                          fontSize: titleSize,
-                          fontWeight: FontWeight.bold,
-                          height: 1.25,
+                      child: Semantics(
+                        header: true,
+                        child: SelectableText(
+                          'Product design\n&\ncross-platform app development (Flutter)',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.albertSans(
+                            color: ColorManager.portfolioTextTitle,
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.bold,
+                            height: 1.25,
+                          ),
                         ),
                       ),
                     ),
@@ -1277,8 +1292,8 @@ class _PortfolioSectionNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = <(String, VoidCallback)>[
-      ('Featured Case Studies', onTapFeatured),
-      ('App Showcase', onTapApps),
+      ('Case studies', onTapFeatured),
+      ('Shipped products', onTapApps),
       ("John Colani's Publications", onTapPublications),
       ("John Colani's Packages", onTapOpenSource),
     ];
@@ -1314,6 +1329,7 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
   final double bodySize;
   final double gapBetweenCards;
   final ValueChanged<String> onOpenCaseStudy;
+  final VoidCallback onDiscussSimilar;
   final bool showAdminActions;
   final void Function(PortfolioCaseStudy cs)? onEdit;
   final void Function(PortfolioCaseStudy cs)? onDelete;
@@ -1326,6 +1342,7 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
     required this.bodySize,
     required this.gapBetweenCards,
     required this.onOpenCaseStudy,
+    required this.onDiscussSimilar,
     this.showAdminActions = false,
     this.onEdit,
     this.onDelete,
@@ -1374,10 +1391,12 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
         for (var i = 0; i < caseStudies.length; i++) ...[
           _FeaturedCaseStudyRow(
             caseStudy: caseStudies[i],
+            pitch: caseStudyPitchForId(caseStudies[i].id),
             isMobile: isMobile,
             bodySize: bodySize,
             tags: _featuredTagsById[caseStudies[i].id] ?? const <String>[],
             onOpen: () => onOpenCaseStudy(caseStudies[i].id),
+            onDiscussSimilar: onDiscussSimilar,
             showAdminActions: showAdminActions,
             onEdit: onEdit,
             onDelete: onDelete,
@@ -1395,10 +1414,12 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
 /// Wraps a premium card with optional admin actions (same pattern as [CaseStudyCard]).
 class _FeaturedCaseStudyRow extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
+  final CaseStudyConversionPitch? pitch;
   final bool isMobile;
   final double bodySize;
   final List<String> tags;
   final VoidCallback onOpen;
+  final VoidCallback onDiscussSimilar;
   final bool showAdminActions;
   final void Function(PortfolioCaseStudy cs)? onEdit;
   final void Function(PortfolioCaseStudy cs)? onDelete;
@@ -1407,10 +1428,12 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
 
   const _FeaturedCaseStudyRow({
     required this.caseStudy,
+    required this.pitch,
     required this.isMobile,
     required this.bodySize,
     required this.tags,
     required this.onOpen,
+    required this.onDiscussSimilar,
     this.showAdminActions = false,
     this.onEdit,
     this.onDelete,
@@ -1422,10 +1445,12 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final card = _PremiumFeaturedCard(
       caseStudy: caseStudy,
+      pitch: pitch,
       isMobile: isMobile,
       bodySize: bodySize,
       tags: tags,
       onOpen: onOpen,
+      onDiscussSimilar: onDiscussSimilar,
     );
 
     if (showAdminActions &&
@@ -1869,134 +1894,233 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
 
 class _PremiumFeaturedCard extends StatelessWidget {
   final PortfolioCaseStudy caseStudy;
+  final CaseStudyConversionPitch? pitch;
   final bool isMobile;
   final double bodySize;
   final List<String> tags;
   final VoidCallback onOpen;
+  final VoidCallback onDiscussSimilar;
 
   const _PremiumFeaturedCard({
     required this.caseStudy,
+    required this.pitch,
     required this.isMobile,
     required this.bodySize,
     required this.tags,
     required this.onOpen,
+    required this.onDiscussSimilar,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onOpen,
+    final sm = bodySize - 0.5;
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 20 : 28,
+        vertical: isMobile ? 20 : 24,
+      ),
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 28,
-            vertical: isMobile ? 20 : 24,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                ColorManager.portfolioTextBody.withValues(alpha: 0.18),
-                ColorManager.portfolioTextBody.withValues(alpha: 0.08),
-                ColorManager.portfolioTextBody.withValues(alpha: 0.14),
-              ],
-            ),
-            border: Border.all(
-              color: ColorManager.portfolioTextBody.withValues(alpha: 0.40),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: _FeaturedCaseStudyHeroStrip(
-                  heroImagePath: caseStudy.heroImagePath,
-                  heroImagePaths: caseStudy.heroImagePaths,
-                  isMobile: isMobile,
-                  caseStudyId: caseStudy.id,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                caseStudy.title,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextTitle,
-                  fontSize: bodySize + 8,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                caseStudy.subtitle,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextBody,
-                  fontSize: bodySize,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                caseStudy.overview,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextBody,
-                  fontSize: bodySize - 0.5,
-                  height: 1.45,
-                ),
-              ),
-              if (tags.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: tags
-                      .map(
-                        (tag) => Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(999),
-                            color: Colors.white.withValues(alpha: 0.08),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
-                          ),
-                          child: Text(
-                            tag,
-                            style: GoogleFonts.albertSans(
-                              color: ColorManager.portfolioTextBody,
-                              fontSize: bodySize - 2,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Text(
-                    'View Case Study',
-                    style: GoogleFonts.albertSans(
-                      color: ColorManager.portfolioTextBody,
-                      fontSize: bodySize,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, color: ColorManager.portfolioTextBody, size: 18),
-                ],
-              ),
-            ],
-          ),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ColorManager.portfolioTextBody.withValues(alpha: 0.18),
+            ColorManager.portfolioTextBody.withValues(alpha: 0.08),
+            ColorManager.portfolioTextBody.withValues(alpha: 0.14),
+          ],
+        ),
+        border: Border.all(
+          color: ColorManager.portfolioTextBody.withValues(alpha: 0.40),
         ),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: onOpen,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: _FeaturedCaseStudyHeroStrip(
+                heroImagePath: caseStudy.heroImagePath,
+                heroImagePaths: caseStudy.heroImagePaths,
+                isMobile: isMobile,
+                caseStudyId: caseStudy.id,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            caseStudy.title,
+            style: GoogleFonts.albertSans(
+              color: ColorManager.portfolioTextTitle,
+              fontSize: bodySize + 8,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            caseStudy.subtitle,
+            style: GoogleFonts.albertSans(
+              color: ColorManager.portfolioTextBody,
+              fontSize: bodySize,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (pitch != null) ...[
+            const SizedBox(height: 14),
+            _pitchLine('Context', pitch!.businessContext, sm),
+            const SizedBox(height: 10),
+            _pitchLine('My role', pitch!.myRole, sm),
+            const SizedBox(height: 10),
+            _pitchLine('Key outcome', pitch!.keyOutcome, sm),
+          ] else ...[
+            const SizedBox(height: 12),
+            Text(
+              caseStudy.overview,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.portfolioTextBody,
+                fontSize: sm,
+                height: 1.45,
+              ),
+            ),
+          ],
+          if (tags.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: tags
+                  .map(
+                    (tag) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: Colors.white.withValues(alpha: 0.08),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+                      ),
+                      child: Text(
+                        tag,
+                        style: GoogleFonts.albertSans(
+                          color: ColorManager.portfolioTextBody,
+                          fontSize: bodySize - 2,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          SizedBox(height: isMobile ? 16 : 18),
+          isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FilledButton(
+                      onPressed: onOpen,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: ColorManager.portfolioTextTitle,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'View case study',
+                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    OutlinedButton(
+                      onPressed: onDiscussSimilar,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: ColorManager.portfolioTextTitle,
+                        side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Discuss a similar project',
+                        style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: onOpen,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: ColorManager.portfolioTextTitle,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'View case study',
+                          style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: onDiscussSimilar,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: ColorManager.portfolioTextTitle,
+                          side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Discuss a similar project',
+                          style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pitchLine(String label, String text, double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextBody.withValues(alpha: 0.75),
+            fontSize: fontSize - 2,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.9,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          text,
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextBody,
+            fontSize: fontSize,
+            height: 1.45,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -2019,6 +2143,47 @@ class _SectionTitle extends StatelessWidget {
         fontSize: sectionTitleSize,
         fontWeight: FontWeight.bold,
       ),
+    );
+  }
+}
+
+class _SectionWithSubtitle extends StatelessWidget {
+  const _SectionWithSubtitle({
+    required this.title,
+    required this.subtitle,
+    required this.sectionTitleSize,
+    required this.bodySize,
+  });
+
+  final String title;
+  final String subtitle;
+  final double sectionTitleSize;
+  final double bodySize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SelectableText(
+          title,
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextTitle,
+            fontSize: sectionTitleSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        SelectableText(
+          subtitle,
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextBody,
+            fontSize: bodySize - 1,
+            fontWeight: FontWeight.w500,
+            height: 1.45,
+          ),
+        ),
+      ],
     );
   }
 }

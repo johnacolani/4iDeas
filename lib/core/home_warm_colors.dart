@@ -43,7 +43,7 @@ abstract final class HomeWarmColors {
   static const iconLogout = Color(0xFF475569);
   static const avatarRing = Color(0xFFCBD5E1);
 
-  /// Hero — single solid headline (see [HomeHeroHeadline]); legacy tokens kept for any lerp
+  /// Hero — headline & home marketing copy (see [HomeHeroSection]); legacy tokens kept for any lerp
   static const headlinePrimary = Color(0xFF0F172A);
   static const eyebrowMuted = Color(0xFF25426E);
   static const heroStroke = Color(0xFFE2E8F0);

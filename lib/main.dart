@@ -8,6 +8,7 @@ import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/app_theme.dart';
+import 'package:four_ideas/seo/seo_binding.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
 
@@ -35,6 +36,7 @@ void main() async {
   }
   
   final goRouter = createAppRouter();
+  attachSeoToRouter(goRouter);
   runApp(MyApp(router: goRouter));
 }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -19,36 +19,39 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta name="theme-color" content="#0f1419">
+
   <!-- Google Sign-In Client ID -->
-  <!-- TODO: Replace YOUR_CLIENT_ID with your actual Google OAuth Client ID from Firebase Console -->
-  <!-- Get it from: Firebase Console > Authentication > Sign-in method > Google > Web SDK configuration -->
   <meta name="google-signin-client_id" content="68544054220-79l4f4aiijvh7ed0at19tp19c4bjsvm8.apps.googleusercontent.com">
   
-  <!-- Primary Meta Tags -->
-  <title>4iDeas - Flutter App Development & Backend Services</title>
-  <meta name="title" content="4iDeas - Flutter App Development & Backend Services">
-  <meta name="description" content="4iDeas provides custom iOS, Android, macOS, and web app development using Flutter. We offer Firebase and AWS backend services, SEO optimization, and full-stack solutions with a single codebase.">
-  <meta name="keywords" content="Flutter development, mobile app development, web app development, Firebase services, AWS services, app development company, custom app development, cross-platform development, iOS apps, Android apps, backend services, SEO optimization">
-  <meta name="author" content="4iDeas">
+  <!--
+    Default / shell tags for the initial HTML response. On Flutter Web, the SPA updates
+    <title>, description, Open Graph, and canonical per route via lib/seo/seo_document_web.dart.
+    Crawlers that run JavaScript will see updated values after navigation.
+  -->
+  <title>Flutter Developer & Product Designer | MVP & Firebase | 4iDeas</title>
+  <meta name="title" content="Flutter Developer & Product Designer | MVP & Firebase | 4iDeas">
+  <meta name="description" content="US-focused Flutter developer and product designer: MVP apps, Flutter + Firebase, iOS, Android, and web from Richmond, VA. Clear scopes and one accountable build path.">
+  <meta name="keywords" content="Flutter developer, Flutter engineer, product designer, MVP app development, Flutter Firebase, Richmond VA, cross-platform app, US clients, UX UI Flutter">
+  <meta name="author" content="John A. Colani, 4iDeas">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
-  <meta name="revisit-after" content="7 days">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://4ideas.com/">
-  <meta property="og:title" content="4iDeas - Flutter App Development & Backend Services">
-  <meta property="og:description" content="Custom iOS, Android, macOS, and web app development using Flutter. Firebase and AWS backend services with SEO optimization.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Flutter Developer & Product Designer | MVP & Firebase | 4iDeas">
+  <meta property="og:description" content="US-focused Flutter developer and product designer: MVP apps, Flutter + Firebase, iOS, Android, and web. Based in Richmond, VA; serving US clients nationwide.">
   <meta property="og:image" content="https://4ideas.com/icons/icon-512.png">
   <meta property="og:site_name" content="4iDeas">
   
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://4ideas.com/">
-  <meta property="twitter:title" content="4iDeas - Flutter App Development & Backend Services">
-  <meta property="twitter:description" content="Custom iOS, Android, macOS, and web app development using Flutter. Firebase and AWS backend services with SEO optimization.">
-  <meta property="twitter:image" content="https://4ideas.com/icons/icon-512.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://4ideas.com/">
+  <meta name="twitter:title" content="Flutter Developer & Product Designer | MVP & Firebase | 4iDeas">
+  <meta name="twitter:description" content="US-focused Flutter developer and product designer: MVP apps, Flutter + Firebase, iOS, Android, and web from Richmond, VA.">
+  <meta name="twitter:image" content="https://4ideas.com/icons/icon-512.png">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -59,36 +62,73 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
   
-  <!-- Canonical URL -->
   <link rel="canonical" href="https://4ideas.com/">
   <link rel="manifest" href="manifest.json">
 
+  <!-- Structured data: Organization, WebSite, Person, ProfessionalService (see docs/SEO.md) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://4ideas.com/#organization",
+        "name": "4iDeas",
+        "url": "https://4ideas.com/",
+        "logo": "https://4ideas.com/icons/icon-512.png",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Richmond",
+          "addressRegion": "VA",
+          "addressCountry": "US"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://4ideas.com/#website",
+        "url": "https://4ideas.com/",
+        "name": "4iDeas",
+        "inLanguage": "en-US",
+        "publisher": { "@id": "https://4ideas.com/#organization" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://4ideas.com/#person",
+        "name": "John A. Colani",
+        "jobTitle": "Product Designer & Flutter Engineer",
+        "url": "https://4ideas.com/about",
+        "image": "https://4ideas.com/icons/icon-512.png",
+        "knowsAbout": ["Flutter", "Dart", "Firebase", "Product design", "UX", "UI", "MVP development"],
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Richmond",
+          "addressRegion": "VA",
+          "addressCountry": "US"
+        },
+        "worksFor": { "@id": "https://4ideas.com/#organization" }
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": "https://4ideas.com/#service",
+        "name": "4iDeas — Flutter app development & product design",
+        "url": "https://4ideas.com/services",
+        "provider": { "@id": "https://4ideas.com/#organization" },
+        "areaServed": { "@type": "Country", "name": "United States" },
+        "serviceType": ["Custom Flutter development", "MVP development", "Firebase backend integration", "Product design", "UX/UI design"],
+        "description": "End-to-end Flutter development and product design for startups and businesses: iOS, Android, and web, often with Firebase. US clients; studio based in Richmond, Virginia."
+      }
+    ]
+  }
+  </script>
+
   <!-- Firebase SDK - Commented out until configured -->
-  <!-- Uncomment and add your Firebase config below once you've set up Firebase -->
   <!--
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script>
-    // Your web app's Firebase configuration
-    // Replace with your actual Firebase config from Firebase Console
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-    
-    // Initialize Firebase
-    if (typeof firebase !== 'undefined') {
-      firebase.initializeApp(firebaseConfig);
-    }
-  </script>
+  ...
   -->
 </head>
 <body>
-  <!-- Flutter bootstrap (uses FlutterLoader.load; service worker is optional) -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

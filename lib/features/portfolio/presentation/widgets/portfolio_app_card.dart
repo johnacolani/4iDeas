@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/data/portfolio_conversion_copy.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,6 +17,9 @@ class PortfolioAppCard extends StatefulWidget {
   final bool showAdminActions;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  /// When set, card shows business context / role / outcome and conversion CTAs (not gallery-only copy).
+  final AppShowcasePitch? conversionPitch;
+  final VoidCallback? onDiscussSimilar;
 
   const PortfolioAppCard({
     super.key,
@@ -25,6 +29,8 @@ class PortfolioAppCard extends StatefulWidget {
     this.showAdminActions = false,
     this.onEdit,
     this.onDelete,
+    this.conversionPitch,
+    this.onDiscussSimilar,
   });
 
   @override
@@ -38,6 +44,8 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
   bool get showAdminActions => widget.showAdminActions;
   VoidCallback? get onEdit => widget.onEdit;
   VoidCallback? get onDelete => widget.onDelete;
+  AppShowcasePitch? get conversionPitch => widget.conversionPitch;
+  VoidCallback? get onDiscussSimilar => widget.onDiscussSimilar;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +65,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     const bool isDarkCardSurface = false;
 
     void onCardTap(BuildContext context) {
+      if (conversionPitch != null) return;
       if (app.caseStudyId != null) {
         // go (not push) so browser URL shows /portfolio/case-study/:id on web.
         context.go(AppRoutes.portfolioCaseStudyPath(app.caseStudyId!));
@@ -67,87 +76,106 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       }
     }
 
+    final bool useConversion = conversionPitch != null;
+    final double mobileImageH = useConversion ? 150 : 180;
+
+    final Widget cardBody = Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: cardPaddingH,
+            vertical: cardPaddingV,
+          ),
+          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
+          child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: mobileImageH,
+                      child: _buildImageBlock(
+                        mobileVertical: true,
+                        accentGold: accentGold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: useConversion
+                            ? _buildConversionTextContent(titleSize, bodySize, conversionPitch!)
+                            : _buildTextContent(titleSize, bodySize),
+                      ),
+                    ),
+                    if (useConversion) ...[
+                      SizedBox(height: 12),
+                      _buildConversionActions(context, bodySize, primaryUrl),
+                    ],
+                    SizedBox(height: 10),
+                    _buildButtons(
+                      isDarkSurface: isDarkCardSurface,
+                      accentGold: accentGold,
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 5,
+                            child: SingleChildScrollView(
+                              child: useConversion
+                                  ? _buildConversionTextContent(titleSize, bodySize, conversionPitch!)
+                                  : _buildTextContent(titleSize, bodySize),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            flex: 4,
+                            child: _buildImageBlock(
+                              mobileVertical: false,
+                              accentGold: accentGold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (useConversion) ...[
+                      SizedBox(height: 12),
+                      _buildConversionActions(context, bodySize, primaryUrl),
+                    ],
+                    SizedBox(height: 10),
+                    _buildButtons(
+                      isDarkSurface: isDarkCardSurface,
+                      accentGold: accentGold,
+                    ),
+                  ],
+                ),
+        ),
+        Positioned.fill(
+          child: _buildFlutterWatermark(),
+        ),
+      ],
+    );
+
     final Widget cardContent = ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          onTap: (app.caseStudyId != null || primaryUrl != null)
-              ? () => onCardTap(context)
-              : null,
-          borderRadius: BorderRadius.circular(12),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: cardPaddingH,
-                  vertical: cardPaddingV,
-                ),
-                decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
-                child: isMobile
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          SizedBox(
-                            height: 180,
-                            child: _buildImageBlock(
-                              mobileVertical: true,
-                              accentGold: accentGold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: _buildTextContent(titleSize, bodySize),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          _buildButtons(
-                            isDarkSurface: isDarkCardSurface,
-                            accentGold: accentGold,
-                          ),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex: 5,
-                                  child: SingleChildScrollView(
-                                    child: _buildTextContent(titleSize, bodySize),
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  flex: 4,
-                                  child: _buildImageBlock(
-                                    mobileVertical: false,
-                                    accentGold: accentGold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          _buildButtons(
-                            isDarkSurface: isDarkCardSurface,
-                            accentGold: accentGold,
-                          ),
-                        ],
-                      ),
+        child: useConversion
+            ? cardBody
+            : InkWell(
+                onTap: (app.caseStudyId != null || primaryUrl != null)
+                    ? () => onCardTap(context)
+                    : null,
+                borderRadius: BorderRadius.circular(12),
+                child: cardBody,
               ),
-              Positioned.fill(
-                child: _buildFlutterWatermark(),
-              ),
-            ],
-          ),
-        ),
       ),
     );
 
@@ -213,6 +241,194 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
           maxLines: 5,
           overflow: TextOverflow.ellipsis,
         ),
+      ],
+    );
+  }
+
+  Widget _buildConversionTextContent(
+    double titleSize,
+    double bodySize,
+    AppShowcasePitch pitch,
+  ) {
+    final sm = bodySize;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SelectableText(
+          app.name,
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextTitle,
+            fontSize: titleSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _conversionPitchLine('Context', pitch.businessContext, sm),
+        const SizedBox(height: 10),
+        _conversionPitchLine('My role', pitch.myRole, sm),
+        const SizedBox(height: 10),
+        _conversionPitchLine('Key outcome', pitch.keyOutcome, sm),
+      ],
+    );
+  }
+
+  Widget _conversionPitchLine(String label, String text, double fontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextBody.withValues(alpha: 0.75),
+            fontSize: fontSize - 2,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.9,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          text,
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextBody,
+            fontSize: fontSize,
+            height: 1.45,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConversionActions(
+    BuildContext context,
+    double bodySize,
+    String? primaryUrl,
+  ) {
+    final String? cs = app.caseStudyId;
+    final VoidCallback? discuss = onDiscussSimilar;
+
+    void openCaseStudy() {
+      if (cs != null) context.go(AppRoutes.portfolioCaseStudyPath(cs));
+    }
+
+    void openProduct() {
+      if (primaryUrl != null) _launch(primaryUrl);
+    }
+
+    final Widget? primaryButton = cs != null
+        ? FilledButton(
+            onPressed: openCaseStudy,
+            style: FilledButton.styleFrom(
+              backgroundColor: ColorManager.portfolioTextTitle,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'View case study',
+              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+            ),
+          )
+        : (primaryUrl != null
+            ? FilledButton(
+                onPressed: openProduct,
+                style: FilledButton.styleFrom(
+                  backgroundColor: ColorManager.portfolioTextTitle,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Open live product',
+                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+                ),
+              )
+            : null);
+
+    final Widget? discussButton = discuss != null
+        ? OutlinedButton(
+            onPressed: discuss,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: ColorManager.portfolioTextTitle,
+              side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Discuss a similar project',
+              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
+            ),
+          )
+        : null;
+
+    if (primaryButton == null && discussButton == null) {
+      return const SizedBox.shrink();
+    }
+
+    final bool showOpenProductLink =
+        cs != null && primaryUrl != null && primaryUrl.isNotEmpty;
+
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (primaryButton != null) primaryButton,
+          if (primaryButton != null && discussButton != null) const SizedBox(height: 10),
+          if (discussButton != null) discussButton,
+          if (showOpenProductLink) ...[
+            const SizedBox(height: 6),
+            TextButton(
+              onPressed: openProduct,
+              child: Text(
+                'Open live product',
+                style: GoogleFonts.albertSans(
+                  fontWeight: FontWeight.w700,
+                  fontSize: bodySize - 1,
+                  color: ColorManager.portfolioTextTitle,
+                ),
+              ),
+            ),
+          ],
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (primaryButton != null)
+              Expanded(child: primaryButton),
+            if (primaryButton != null && discussButton != null) const SizedBox(width: 12),
+            if (discussButton != null) Expanded(child: discussButton),
+          ],
+        ),
+        if (showOpenProductLink) ...[
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: openProduct,
+              child: Text(
+                'Open live product',
+                style: GoogleFonts.albertSans(
+                  fontWeight: FontWeight.w700,
+                  fontSize: bodySize - 1,
+                  color: ColorManager.portfolioTextTitle,
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

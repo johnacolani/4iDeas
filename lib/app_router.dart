@@ -7,6 +7,7 @@ import 'package:four_ideas/screens/about_us_screen.dart';
 import 'package:four_ideas/screens/order_here_screen.dart';
 import 'package:four_ideas/screens/contact_us_screen.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/data/content_articles_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/case_study_detail_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/signup_screen.dart';
@@ -19,6 +20,10 @@ import 'package:four_ideas/features/payment/presentation/screens/payment_screen.
 import 'package:four_ideas/features/contract/presentation/screens/contract_view_screen.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/design_philosophy_screen.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/case_study_design_system_screen.dart';
+import 'package:four_ideas/screens/insight_article_screen.dart';
+import 'package:four_ideas/screens/insights_screen.dart';
+import 'package:four_ideas/screens/local_richmond_landing_screen.dart';
+import 'package:four_ideas/screens/seo_topic_landing_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -38,6 +43,13 @@ abstract class AppRoutes {
   static const String orderHere = '/order-here';
   /// Full-page contact (matches drawer + deep link); same content as the legacy modal.
   static const String contact = '/contact';
+  static const String insights = '/insights';
+  static String insightsArticlePath(String slug) => '$insights/$slug';
+
+  /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
+  static const String flutterDeveloperRichmondVa = '/flutter-developer-richmond-va';
+  static const String mvpAppDevelopment = '/mvp-app-development';
+  static const String productDesignFlutterEngineering = '/product-design-flutter-engineering';
 
   static const String login = '/login';
   static const String signUp = '/signup';
@@ -126,6 +138,41 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.contact,
         builder: (context, state) => const ContactUsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.insights,
+        builder: (context, state) => const InsightsScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.insights}/:slug',
+        builder: (context, state) {
+          final slug = state.pathParameters['slug'] ?? '';
+          final article = ContentArticlesData.bySlug(slug);
+          if (article == null) {
+            return const Scaffold(
+              body: Center(
+                child: Text('Article not found'),
+              ),
+            );
+          }
+          return InsightArticleScreen(article: article);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.flutterDeveloperRichmondVa,
+        builder: (context, state) => const LocalRichmondLandingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.mvpAppDevelopment,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.mvpAppDevelopment,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.productDesignFlutterEngineering,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.productDesignFlutterEngineering,
+        ),
       ),
       // Auth
       GoRoute(
