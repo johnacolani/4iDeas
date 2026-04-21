@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// Horizontal auto-scrolling strip of [assets/image_0.png] … [assets/image_10.png].
+/// Horizontal auto-scrolling strip of real mobile screenshots.
 ///
 /// Repeats tiles so total width always exceeds the viewport (fixes wide screens /
 /// web where [ScrollPosition.maxScrollExtent] was 0 and no motion occurred).
@@ -11,8 +11,20 @@ import 'package:flutter/material.dart';
 class AppAutoScrollImage extends StatefulWidget {
   const AppAutoScrollImage({super.key});
 
-  /// Number of distinct assets in `assets/image_*.png`.
-  static const int kAssetCount = 11;
+  static const List<String> _assets = <String>[
+    'assets/images/asd_app_adaptive/asd-001.jpg',
+    'assets/images/asd_app_adaptive/asd-002.jpg',
+    'assets/images/asd_app_adaptive/asd-003.jpg',
+    'assets/images/asd_app_adaptive/asd-004.jpg',
+    'assets/images/asd_app_adaptive/asd-005.jpg',
+    'assets/images/asd_app_adaptive/asd-006.jpg',
+    'assets/images/asd_app_adaptive/asd-007.jpg',
+    'assets/images/asd_app_adaptive/asd-008.jpg',
+    'assets/images/asd_app_adaptive/asd-009.jpg',
+    'assets/images/asd_app_adaptive/asd-010.jpg',
+    'assets/images/asd_app_adaptive/asd-011.jpg',
+    'assets/images/asd_app_adaptive/asd-012.jpg',
+  ];
 
   @override
   State<AppAutoScrollImage> createState() => _AppAutoScrollImageState();
@@ -144,7 +156,7 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
             physics: const ClampingScrollPhysics(),
             itemCount: tileCount,
             itemBuilder: (context, index) {
-              final assetIndex = index % AppAutoScrollImage.kAssetCount;
+              final assetIndex = index % AppAutoScrollImage._assets.length;
               return Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: _tileHorizontalPadding,
@@ -152,7 +164,7 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
                 ),
                 child: Center(
                   child: Image.asset(
-                    'assets/image_$assetIndex.png',
+                    AppAutoScrollImage._assets[assetIndex],
                     width: itemWidth,
                     height: itemWidth,
                     fit: BoxFit.contain,

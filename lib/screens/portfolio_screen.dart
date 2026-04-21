@@ -1031,7 +1031,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             alignment: Alignment.bottomCenter,
             children: [
               SizedBox(
-                width: lottieWidth * 0.3,
+                width: lottieWidth,
                 height: lottieHeight,
                 child: Center(
                   child: ExcludeSemantics(
@@ -1068,7 +1068,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       child: Semantics(
                         header: true,
                         child: SelectableText(
-                          'Product design\n&\ncross-platform app development (Flutter)',
+                          'Product design\n& cross-platform app development (Flutter)',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.albertSans(
                             color: ColorManager.portfolioTextTitle,
