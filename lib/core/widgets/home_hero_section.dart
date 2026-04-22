@@ -16,11 +16,14 @@ class HomeHeroSection extends StatelessWidget {
     required this.wi,
     required this.isMobile,
     required this.isTablet,
+    this.imageBelowPlatforms,
   });
 
   final double wi;
   final bool isMobile;
   final bool isTablet;
+
+  final Widget? imageBelowPlatforms;
 
   double get _maxCopyWidth {
     if (isMobile) return (wi * 0.94).clamp(320.0, 680.0);
@@ -149,14 +152,20 @@ class HomeHeroSection extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: isMobile ? 14 : 18),
-          Center(
-            child: SizedBox(
-              width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
-              child: const AppAutoScrollImage(),
+          if (imageBelowPlatforms != null) ...[
+            SizedBox(height: isMobile ? 10 : 14),
+            Center(child: imageBelowPlatforms!),
+          ],
+          SizedBox(height: isMobile ? 10 : 18),
+          if (!isMobile) ...[
+            Center(
+              child: SizedBox(
+                width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
+                child: const AppAutoScrollImage(),
+              ),
             ),
-          ),
-          SizedBox(height: isMobile ? 12 : 14),
+            const SizedBox(height: 14),
+          ],
           _CredibilityStrip(isMobile: isMobile, isTablet: isTablet),
           SizedBox(height: isMobile ? 16 : 20),
           SelectableText(

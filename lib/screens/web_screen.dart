@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../core/home_warm_colors.dart';
 import '../core/widgets/aws_backend_section.dart';
+import '../core/widgets/hero_platforms_gif.dart';
 import '../core/widgets/home_hero_section.dart';
 import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
@@ -52,6 +53,7 @@ class _WebScreenState extends State<WebScreen> {
                         wi: wi,
                         isMobile: isMobile,
                         isTablet: isTablet,
+                        imageBelowPlatforms: HeroPlatformsGif(screenWidth: wi),
                       ),
                     ),
                   ),
