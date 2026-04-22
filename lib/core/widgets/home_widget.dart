@@ -27,10 +27,10 @@ class HomeWidget extends StatelessWidget {
     // Space below the overlaid frosted header only (SafeArea already clears the notch).
     // ~90–124px matches one- to two-row bar height; wider buffers on very narrow widths.
     final double heroTopSpacing = () {
-      if (wi < 360) return 124.0;
-      if (wi < 400) return 116.0;
-      if (wi < 480) return 108.0;
-      if (wi < 600) return 100.0;
+      if (wi < 360) return 88.0;
+      if (wi < 400) return 82.0;
+      if (wi < 480) return 76.0;
+      if (wi < 600) return 72.0;
       if (wi < 1024) return 248.0;
       return 270.0;
     }();
@@ -63,7 +63,7 @@ class HomeWidget extends StatelessWidget {
                       isMobile: isMobile,
                       isTablet: isTablet,
                     ),
-                    SizedBox(height: isMobile ? 28 : 36),
+                    SizedBox(height: isMobile ? 18 : 26),
                     // Title before backend sections
                     Padding(
                       padding: EdgeInsets.symmetric(

@@ -30,8 +30,8 @@ class _WebScreenState extends State<WebScreen> {
     final double heroTopSpacing = isMobile
         ? 0
         : (isTablet
-            ? (he * 0.14).clamp(168.0, 220.0)
-            : (he * 0.22).clamp(180.0, 260.0));
+            ? (he * 0.10).clamp(112.0, 168.0)
+            : (he * 0.14).clamp(120.0, 200.0));
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -73,12 +73,12 @@ class _WebScreenState extends State<WebScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 8),
                   _PlatformProofChips(
                     isMobile: isMobile,
                     isTablet: isTablet,
                   ),
-                  SizedBox(height: isMobile ? 18 : 22),
+                  SizedBox(height: isMobile ? 12 : 16),
                   TrustBuildingHomeSections(
                     wi: wi,
                     isMobile: isMobile,

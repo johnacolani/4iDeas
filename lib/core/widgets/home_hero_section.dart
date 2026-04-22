@@ -60,7 +60,7 @@ class HomeHeroSection extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(
                 horizontal: isMobile ? 14 : 18,
-                vertical: isMobile ? 7 : 9,
+                vertical: isMobile ? 4 : 5,
               ),
               decoration: BoxDecoration(
                 color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.04),
@@ -95,7 +95,7 @@ class HomeHeroSection extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: isMobile ? 12 : 16),
+          SizedBox(height: isMobile ? 6 : 10),
           Semantics(
             header: true,
             child: SelectableText.rich(
@@ -106,14 +106,14 @@ class HomeHeroSection extends StatelessWidget {
                     style: GoogleFonts.albertSans(
                       fontSize: isMobile ? _titleSize * 0.72 : (isTablet ? 24 : 26),
                       fontWeight: FontWeight.w700,
-                      height: 1.08,
+                      height: 1.0,
                       letterSpacing: -0.2,
                     ),
                   ),
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Text(
                         'Design & Ship',
                         textAlign: TextAlign.center,
@@ -146,28 +146,31 @@ class HomeHeroSection extends StatelessWidget {
               style: GoogleFonts.albertSans(
                 fontSize: _titleSize,
                 fontWeight: FontWeight.w700,
-                height: 1.12,
+                height: 1.06,
                 letterSpacing: -0.6,
                 color: HomeWarmColors.headlinePrimary,
               ),
             ),
           ),
           if (imageBelowPlatforms != null) ...[
-            SizedBox(height: isMobile ? 10 : 14),
+            const SizedBox.shrink(),
             Center(child: imageBelowPlatforms!),
           ],
-          SizedBox(height: isMobile ? 10 : 18),
+          const SizedBox(height: 0),
           if (!isMobile) ...[
             Center(
-              child: SizedBox(
-                width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
-                child: const AppAutoScrollImage(),
+              child: Transform.translate(
+                offset: const Offset(0, -12),
+                child: SizedBox(
+                  width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
+                  child: const AppAutoScrollImage(),
+                ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 8),
           ],
           _CredibilityStrip(isMobile: isMobile, isTablet: isTablet),
-          SizedBox(height: isMobile ? 16 : 20),
+          SizedBox(height: isMobile ? 10 : 14),
           SelectableText(
             'I lead 4iDeas as your senior product and Flutter partner—combining '
             'strategy, UX/UI, Flutter engineering, Firebase, and practical AI features. '
@@ -181,11 +184,11 @@ class HomeHeroSection extends StatelessWidget {
               color: HomeWarmColors.bodyEmphasis,
             ),
           ),
-          SizedBox(height: isMobile ? 18 : 22),
+          SizedBox(height: isMobile ? 12 : 16),
           _ServiceThemesRow(isMobile: isMobile),
-          SizedBox(height: isMobile ? 14 : 16),
+          SizedBox(height: isMobile ? 10 : 12),
           _SeoTopicLinks(isMobile: isMobile),
-          SizedBox(height: isMobile ? 20 : 24),
+          SizedBox(height: isMobile ? 14 : 18),
           _HeroCtas(
             isMobile: isMobile,
             isNarrow: wi < 440,
@@ -267,7 +270,7 @@ class _ServiceThemesRow extends StatelessWidget {
       runSpacing: 8,
       children: _themes.map((t) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(20),

@@ -8,31 +8,22 @@ class HeroPlatformsGif extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double box = screenWidth < 600
-        ? screenWidth * 0.5
-        : (screenWidth * 0.36).clamp(280.0, 520.0);
+    final bool isWebLayout = screenWidth >= 600;
+    final double width = screenWidth < 600
+        ? (screenWidth * 0.58).clamp(180.0, 320.0)
+        : (screenWidth * 0.34).clamp(240.0, 460.0);
+    final double height = width * 0.56;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.symmetric(vertical: isWebLayout ? 24 : 0),
       child: SizedBox(
-        width: box,
-        height: box,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          alignment: Alignment.center,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Opacity(
-                opacity: 0.8,
-                child: Image.asset(
-                  'assets/images/my-gif.gif',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
+        width: width,
+        height: height,
+        child: Opacity(
+          opacity: 0.8,
+          child: Image.asset(
+            'assets/images/my-gif.gif',
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
           ),
         ),
       ),
