@@ -7,7 +7,7 @@ import 'package:four_ideas/injection/injection_container.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/app_router.dart';
-import 'package:four_ideas/core/app_theme.dart';
+import 'package:four_ideas/core/design_system/theme.dart';
 import 'package:four_ideas/seo/seo_binding.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
@@ -17,13 +17,13 @@ import 'url_strategy_stub.dart' if (dart.library.html) 'url_strategy_web.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   configureWebUrlStrategy();
-  
+
   // Lock orientation to portrait only for mobile devices
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
+
   // Initialize Firebase
   try {
     await Firebase.initializeApp(
@@ -34,7 +34,7 @@ void main() async {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will continue but authentication features may not work');
   }
-  
+
   final goRouter = createAppRouter();
   attachSeoToRouter(goRouter);
   runApp(MyApp(router: goRouter));
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     try {
       final injectionContainer = InjectionContainer();
-      
+
       return BlocProvider<AuthBloc>(
         create: (context) {
           try {
@@ -72,8 +72,8 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               title: '4iDeas – Product Design & Development',
               themeMode: ThemeMode.dark,
-              darkTheme: AppTheme.dark,
-              theme: AppTheme.dark,
+              darkTheme: DesignSystemTheme.dark,
+              theme: DesignSystemTheme.dark,
             );
           },
         ),
@@ -113,7 +113,10 @@ class MyApp extends StatelessWidget {
                   Text(
                     'Error: ${e.toString()}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500], fontFamily: 'monospace'),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                        fontFamily: 'monospace'),
                   ),
                 ],
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:four_ideas/core/design_system/theme.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/data/services_data.dart';
 
@@ -56,6 +57,10 @@ class ServiceOfferingCard extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
+  static const LinearGradient _goldGradient = LinearGradient(
+    colors: [AppColors.primaryGold, AppColors.primaryGoldDark],
+  );
+
   @override
   Widget build(BuildContext context) {
     final icon = serviceIconDataFromKey(item.iconName);
@@ -67,12 +72,12 @@ class ServiceOfferingCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: HomeWarmColors.dividerLine,
+            color: Colors.white24,
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: 0.35),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),
@@ -81,8 +86,8 @@ class ServiceOfferingCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white,
-              HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.92),
+              const Color(0xFF0F172A).withValues(alpha: 0.95),
+              const Color(0xFF111827).withValues(alpha: 0.9),
             ],
           ),
         ),
@@ -96,7 +101,7 @@ class ServiceOfferingCard extends StatelessWidget {
               child: Container(
                 width: 4,
                 decoration: BoxDecoration(
-                  color: HomeWarmColors.sectionAccent,
+                  gradient: _goldGradient,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(17),
                     bottomLeft: Radius.circular(17),
@@ -115,12 +120,15 @@ class ServiceOfferingCard extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(isMobile ? 11 : 13),
                         decoration: BoxDecoration(
-                          color: HomeWarmColors.sectionAccent.withValues(alpha: 0.1),
+                          color: Colors.black.withValues(alpha: 0.28),
+                          border: Border.all(
+                            color: AppColors.primaryGold.withValues(alpha: 0.42),
+                          ),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
                           icon,
-                          color: HomeWarmColors.sectionAccent,
+                          color: AppColors.primaryGold,
                           size: isMobile ? 26 : 30,
                         ),
                       ),
@@ -129,20 +137,25 @@ class ServiceOfferingCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SelectableText(
-                              item.title,
-                              style: GoogleFonts.albertSans(
-                                color: HomeWarmColors.headlinePrimary,
-                                fontSize: sectionTitleSize,
-                                fontWeight: FontWeight.w700,
-                                height: 1.2,
+                            ShaderMask(
+                              shaderCallback: (bounds) =>
+                                  _goldGradient.createShader(bounds),
+                              blendMode: BlendMode.srcIn,
+                              child: Text(
+                                item.title,
+                                style: GoogleFonts.albertSans(
+                                  color: Colors.white,
+                                  fontSize: sectionTitleSize,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.2,
+                                ),
                               ),
                             ),
                             SizedBox(height: isMobile ? 4 : 6),
                             SelectableText(
                               item.subtitle,
                               style: GoogleFonts.albertSans(
-                                color: HomeWarmColors.eyebrowMuted,
+                                color: const Color(0xFFD1D5DB),
                                 fontSize: bodyFontSize - 1,
                                 fontWeight: FontWeight.w600,
                                 height: 1.35,
@@ -158,7 +171,7 @@ class ServiceOfferingCard extends StatelessWidget {
                     SelectableText(
                       item.valueProposition,
                       style: GoogleFonts.albertSans(
-                        color: HomeWarmColors.sectionAccent,
+                        color: AppColors.primaryGold,
                         fontSize: bodyFontSize,
                         fontWeight: FontWeight.w600,
                         height: 1.45,
@@ -169,7 +182,7 @@ class ServiceOfferingCard extends StatelessWidget {
                   SelectableText(
                     item.description,
                     style: GoogleFonts.albertSans(
-                      color: HomeWarmColors.bodyEmphasis,
+                      color: const Color(0xFFD1D5DB),
                       fontSize: bodyFontSize,
                       height: 1.55,
                       fontWeight: FontWeight.w500,
@@ -179,7 +192,7 @@ class ServiceOfferingCard extends StatelessWidget {
                   Text(
                     'What’s included',
                     style: GoogleFonts.albertSans(
-                      color: HomeWarmColors.headlinePrimary,
+                      color: Colors.white,
                       fontSize: bodyFontSize - 1,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.2,
@@ -196,7 +209,7 @@ class ServiceOfferingCard extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4, right: 10),
                             child: Icon(
                               Icons.check_circle_rounded,
-                              color: HomeWarmColors.sectionAccent.withValues(alpha: 0.85),
+                              color: AppColors.primaryGold.withValues(alpha: 0.85),
                               size: 18,
                             ),
                           ),
@@ -204,7 +217,7 @@ class ServiceOfferingCard extends StatelessWidget {
                             child: SelectableText(
                               detail,
                               style: GoogleFonts.albertSans(
-                                color: HomeWarmColors.bodyEmphasis,
+                                color: const Color(0xFFD1D5DB),
                                 fontSize: bodyFontSize - 1,
                                 height: 1.5,
                               ),
@@ -223,10 +236,10 @@ class ServiceOfferingCard extends StatelessWidget {
                         vertical: isMobile ? 10 : 12,
                       ),
                       decoration: BoxDecoration(
-                        color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.04),
+                        color: Colors.black.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: HomeWarmColors.dividerLine,
+                          color: Colors.white24,
                         ),
                       ),
                       child: Column(
@@ -235,7 +248,7 @@ class ServiceOfferingCard extends StatelessWidget {
                           Text(
                             'Best for',
                             style: GoogleFonts.albertSans(
-                              color: HomeWarmColors.eyebrowMuted,
+                              color: AppColors.primaryGold,
                               fontSize: bodyFontSize - 2,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.4,
@@ -245,7 +258,7 @@ class ServiceOfferingCard extends StatelessWidget {
                           SelectableText(
                             item.idealClient,
                             style: GoogleFonts.albertSans(
-                              color: HomeWarmColors.bodyEmphasis,
+                              color: const Color(0xFFD1D5DB),
                               fontSize: bodyFontSize - 1,
                               height: 1.45,
                             ),
@@ -259,8 +272,8 @@ class ServiceOfferingCard extends StatelessWidget {
                     width: double.infinity,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
-                        backgroundColor: HomeWarmColors.sectionAccent,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.primaryGold,
+                        foregroundColor: const Color(0xFF0B0F19),
                         padding: EdgeInsets.symmetric(
                           vertical: isMobile ? 14 : 16,
                         ),
@@ -293,7 +306,7 @@ class ServiceOfferingCard extends StatelessWidget {
                       if (onEdit != null)
                         IconButton(
                           tooltip: 'Edit',
-                          icon: Icon(Icons.edit_rounded, size: 22, color: HomeWarmColors.sectionAccent),
+                          icon: Icon(Icons.edit_rounded, size: 22, color: AppColors.primaryGold),
                           onPressed: onEdit,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),

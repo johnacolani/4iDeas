@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../core/design_system/theme.dart';
 import '../core/home_warm_colors.dart';
 import '../core/widgets/aws_backend_section.dart';
-import '../core/widgets/hero_platforms_gif.dart';
-import '../core/widgets/home_hero_section.dart';
 import '../core/widgets/firebase_backend_section.dart';
+import '../core/widgets/modern_hero_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 import '../core/widgets/trust_home_sections.dart';
 
@@ -25,13 +25,8 @@ class _WebScreenState extends State<WebScreen> {
     // Responsive breakpoints (WebScreen is used at width >= 600 from HomeScreen.)
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Keep hero text below the overlaid frosted top bar (same bar as HomeScreen).
-    // Tablet needs extra clearance vs phone web; desktop scales with window height.
-    final double heroTopSpacing = isMobile
-        ? 0
-        : (isTablet
-            ? (he * 0.10).clamp(112.0, 168.0)
-            : (he * 0.14).clamp(120.0, 200.0));
+    // Top bar is removed, so keep hero close to top.
+    final double heroTopSpacing = isMobile ? 0 : (isTablet ? 10 : 6);
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -40,96 +35,87 @@ class _WebScreenState extends State<WebScreen> {
           thumbVisibility: true,
           child: CustomScrollView(
             slivers: [
-            SliverToBoxAdapter(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: heroTopSpacing),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20),
-                    child: Center(
-                      child: HomeHeroSection(
-                        wi: wi,
-                        isMobile: isMobile,
-                        isTablet: isTablet,
-                        imageBelowPlatforms: HeroPlatformsGif(screenWidth: wi),
+              SliverToBoxAdapter(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: heroTopSpacing),
+                    const ModernHeroSection(),
+                    SizedBox(height: isMobile ? 20 : 28),
+                    Container(
+                      width: double.infinity,
+                      color: Colors.transparent,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 12 : 70,
+                        vertical: isMobile ? 10 : 12,
+                      ),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: _PlatformProofChips(
+                          isMobile: isMobile,
+                          isTablet: isTablet,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 28),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20),
-                    child: SelectableText(
-                      'Mobile, web, and desktop from one codebase.',
-                      textAlign: TextAlign.center,
-                      textDirection: TextDirection.ltr,
-                      style: GoogleFonts.albertSans(
-                        fontSize: isMobile
-                            ? (wi < 400 ? 14 : 15)
-                            : (isTablet ? 16 : 17),
-                        fontWeight: FontWeight.w600,
-                        color: HomeWarmColors.bodyEmphasis,
+                    SizedBox(height: isMobile ? 12 : 16),
+                    TrustBuildingHomeSections(
+                      wi: wi,
+                      isMobile: isMobile,
+                      isTablet: isTablet,
+                    ),
+                    SizedBox(height: isMobile ? 28 : 36),
+                    // Title before backend sections
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile
+                            ? wi * 0.05
+                            : (isTablet ? wi * 0.08 : wi * 0.1),
+                      ),
+                      child: SelectableText(
+                        'Your backend could be',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.albertSans(
+                          fontSize: isMobile
+                              ? (wi < 400 ? 18 : 20)
+                              : (isTablet ? wi * 0.028 : wi * 0.032),
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryGold,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  _PlatformProofChips(
-                    isMobile: isMobile,
-                    isTablet: isTablet,
-                  ),
-                  SizedBox(height: isMobile ? 12 : 16),
-                  TrustBuildingHomeSections(
-                    wi: wi,
-                    isMobile: isMobile,
-                    isTablet: isTablet,
-                  ),
-                  SizedBox(height: isMobile ? 28 : 36),
-                  // Title before backend sections
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? wi * 0.05 : (isTablet ? wi * 0.08 : wi * 0.1),
-                    ),
-                    child: SelectableText(
-                      'Your backend could be',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.albertSans(
-                        fontSize: isMobile ? (wi < 400 ? 18 : 20) : (isTablet ? wi * 0.028 : wi * 0.032),
-                        fontWeight: FontWeight.bold,
-                        color: HomeWarmColors.sectionAccent,
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile
+                            ? wi * 0.12
+                            : (isTablet ? wi * 0.2 : wi * 0.25),
+                        vertical: isMobile ? 12 : 12,
+                      ),
+                      child: Divider(
+                        color: HomeWarmColors.dividerLine,
+                        thickness: 1,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? wi * 0.12 : (isTablet ? wi * 0.2 : wi * 0.25),
-                      vertical: isMobile ? 12 : 12,
+                    SizedBox(height: isMobile ? 20 : 32),
+                    // Firebase Backend Section
+                    FirebaseBackendSection(
+                      wi: wi,
+                      isMobile: isMobile,
                     ),
-                    child: Divider(
-                      color: HomeWarmColors.dividerLine,
-                      thickness: 1,
+                    // AWS Backend Section
+                    AWSBackendSection(
+                      wi: wi,
+                      isMobile: isMobile,
                     ),
-                  ),
-                  SizedBox(height: isMobile ? 20 : 32),
-                  // Firebase Backend Section
-                  FirebaseBackendSection(
-                    wi: wi,
-                    isMobile: isMobile,
-                  ),
-                  // AWS Backend Section
-                  AWSBackendSection(
-                    wi: wi,
-                    isMobile: isMobile,
-                  ),
-                  // SEO Optimization Section
-                  SEOOptimizationSection(
-                    wi: wi,
-                    isMobile: isMobile,
-                  ),
-                ],
+                    // SEO Optimization Section
+                    SEOOptimizationSection(
+                      wi: wi,
+                      isMobile: isMobile,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
           ),
         ),
       ),
@@ -146,59 +132,118 @@ class _PlatformProofChips extends StatelessWidget {
   final bool isMobile;
   final bool isTablet;
 
-  static const List<({String label, String asset})> _items =
-      <({String label, String asset})>[
-    (label: 'iOS', asset: 'assets/platforms/ios.png'),
-    (label: 'Android', asset: 'assets/platforms/android.png'),
-    (label: 'Web', asset: 'assets/platforms/web.png'),
-    (label: 'macOS', asset: 'assets/platforms/macos.png'),
-    (label: 'Windows', asset: 'assets/platforms/windows.png'),
-    (label: 'Linux', asset: 'assets/platforms/linux.png'),
+  static const List<({String label, String subtitle, String asset})> _items =
+      <({String label, String subtitle, String asset})>[
+    (
+      label: 'iOS',
+      subtitle: 'Native-quality experience',
+      asset: 'assets/platforms/ios.png'
+    ),
+    (
+      label: 'Android',
+      subtitle: 'One codebase, broad reach',
+      asset: 'assets/platforms/android.png'
+    ),
+    (
+      label: 'Web',
+      subtitle: 'Fast and responsive web apps',
+      asset: 'assets/platforms/web.png'
+    ),
+    (
+      label: 'macOS',
+      subtitle: 'Desktop apps for modern teams',
+      asset: 'assets/platforms/macos.png'
+    ),
+    (
+      label: 'Windows',
+      subtitle: 'Cross-platform productivity',
+      asset: 'assets/platforms/windows.png'
+    ),
+    (
+      label: 'Linux',
+      subtitle: 'Stable apps for power users',
+      asset: 'assets/platforms/linux.png'
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final double fontSize = isMobile ? 12.5 : (isTablet ? 13.5 : 14.0);
+    final double titleSize = isMobile ? 12.5 : (isTablet ? 13.0 : 13.5);
+    final double subtitleSize = isMobile ? 9.8 : 10.5;
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: 8,
-      runSpacing: 8,
+      spacing: isMobile ? 8 : 10,
+      runSpacing: isMobile ? 8 : 10,
       children: _items
           .map(
             (item) => Container(
-              width: isMobile ? 108 : 122,
-              height: isMobile ? 36 : 40,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              width: isMobile ? 206 : 236,
+              height: isMobile ? 76 : 84,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 14,
+                vertical: isMobile ? 9 : 10,
+              ),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(
-                  color: HomeWarmColors.sectionAccent.withValues(alpha: 0.7),
-                  width: 1.2,
-                ),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    item.asset,
-                    width: isMobile ? 22 : 24,
-                    height: isMobile ? 22 : 24,
-                    fit: BoxFit.contain,
-                    gaplessPlayback: true,
-                    errorBuilder: (_, __, ___) => Icon(
-                      Icons.image_not_supported_outlined,
-                      size: isMobile ? 18 : 20,
-                      color: HomeWarmColors.eyebrowMuted.withValues(alpha: 0.65),
+                  Container(
+                    width: isMobile ? 42 : 46,
+                    height: isMobile ? 42 : 46,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.transparent,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.32),
+                        width: 1,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Image.asset(
+                      item.asset,
+                      fit: BoxFit.contain,
+                      gaplessPlayback: true,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.image_not_supported_outlined,
+                        size: isMobile ? 20 : 22,
+                        color:
+                            HomeWarmColors.eyebrowMuted.withValues(alpha: 0.75),
+                      ),
                     ),
                   ),
-                  SizedBox(width: isMobile ? 8 : 10),
-                  Text(
-                    item.label,
-                    style: GoogleFonts.albertSans(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.w700,
-                      color: HomeWarmColors.eyebrowMuted,
+                  SizedBox(width: isMobile ? 10 : 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.albertSans(
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.subtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                          style: GoogleFonts.albertSans(
+                            fontSize: subtitleSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.7),
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

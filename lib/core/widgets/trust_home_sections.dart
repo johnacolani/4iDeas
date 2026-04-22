@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:four_ideas/app_router.dart';
 
+import '../design_system/theme.dart';
 import '../home_warm_colors.dart';
 
 /// Trust-building blocks for the marketing home: why hire, process, proof, FAQ, final CTA.
@@ -67,7 +70,8 @@ class TrustBuildingHomeSections extends StatelessWidget {
               _RichmondVaLocalPromo(
                 bodyFont: _bodyFont,
                 isMobile: isMobile,
-                onOpen: () => _go(context, AppRoutes.flutterDeveloperRichmondVa),
+                onOpen: () =>
+                    _go(context, AppRoutes.flutterDeveloperRichmondVa),
               ),
               SizedBox(height: _sectionGap),
               _MyProcessBlock(
@@ -150,13 +154,16 @@ class _WhyWorkWithMe extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool useUniformDesktopCardHeight = !isMobile && wi >= 720;
     final double uniformCardHeight = isTablet ? 278 : 250;
-    final cards = _points.map((p) {
+    final cards = _points.asMap().entries.map((entry) {
+      final index = entry.key;
+      final p = entry.value;
       final card = _ReasonCard(
         icon: p.$1,
         title: p.$2,
         body: p.$3,
         bodyFont: bodyFont,
         isMobile: isMobile,
+        reverseGradient: index.isOdd,
       );
       if (!useUniformDesktopCardHeight) return card;
       return SizedBox(
@@ -208,14 +215,33 @@ class _WhyWorkWithMe extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Why teams hire 4iDeas',
+        RichText(
           textAlign: TextAlign.center,
-          style: GoogleFonts.albertSans(
-            fontSize: titleFont,
-            fontWeight: FontWeight.w800,
-            color: HomeWarmColors.headlinePrimary,
-            height: 1.2,
+          text: TextSpan(
+            style: GoogleFonts.albertSans(
+              fontSize: titleFont,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.2,
+            ),
+            children: [
+              const TextSpan(text: 'Why teams hire '),
+              TextSpan(
+                text: '4i',
+                style: TextStyle(
+                  foreground: Paint()
+                    ..shader = const LinearGradient(
+                      colors: [
+                        Color(0xFFF5B32F),
+                        Color(0xFFD89A1C),
+                      ],
+                    ).createShader(
+                      const Rect.fromLTWH(0, 0, 46, 20),
+                    ),
+                ),
+              ),
+              const TextSpan(text: 'Deas'),
+            ],
           ),
         ),
         SizedBox(height: isMobile ? 10 : 12),
@@ -225,7 +251,7 @@ class _WhyWorkWithMe extends StatelessWidget {
           style: GoogleFonts.albertSans(
             fontSize: bodyFont,
             fontWeight: FontWeight.w500,
-            color: HomeWarmColors.bodyEmphasis,
+            color: const Color(0xFF9CA3AF),
             height: 1.5,
           ),
         ),
@@ -244,6 +270,7 @@ class _ReasonCard extends StatelessWidget {
     required this.body,
     required this.bodyFont,
     required this.isMobile,
+    required this.reverseGradient,
   });
 
   final IconData icon;
@@ -251,18 +278,26 @@ class _ReasonCard extends StatelessWidget {
   final String body;
   final double bodyFont;
   final bool isMobile;
+  final bool reverseGradient;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 14 : 18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: reverseGradient ? Alignment.topRight : Alignment.topLeft,
+          end: reverseGradient ? Alignment.bottomLeft : Alignment.bottomRight,
+          colors: [
+            Color(0xFF0F3079),
+            Color(0xFF040F2D),
+          ],
+        ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: HomeWarmColors.dividerLine),
+        border: Border.all(color: Colors.white24),
         boxShadow: [
           BoxShadow(
-            color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.04),
+            color: Colors.black.withValues(alpha: 0.28),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -271,14 +306,14 @@ class _ReasonCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: HomeWarmColors.sectionAccent, size: isMobile ? 26 : 28),
+          Icon(icon, color: const Color(0xFFE5E7EB), size: isMobile ? 26 : 28),
           SizedBox(height: isMobile ? 8 : 10),
           Text(
             title,
             style: GoogleFonts.albertSans(
               fontSize: bodyFont + 1,
               fontWeight: FontWeight.w700,
-              color: HomeWarmColors.headlinePrimary,
+              color: Colors.white,
               height: 1.25,
             ),
           ),
@@ -288,7 +323,7 @@ class _ReasonCard extends StatelessWidget {
             style: GoogleFonts.albertSans(
               fontSize: bodyFont,
               fontWeight: FontWeight.w500,
-              color: HomeWarmColors.bodyEmphasis,
+              color: const Color(0xFFD1D5DB),
               height: 1.5,
             ),
           ),
@@ -310,106 +345,124 @@ class _MyProcessBlock extends StatelessWidget {
   final bool isMobile;
 
   static const _steps = [
-    ('Discovery', 'We align on goals, users, constraints, and timeline—so scope matches what you can fund.'),
-    ('Scope and UX', 'Flows, priorities, and UX decisions documented before heavy build. No mystery backlog.'),
-    ('Build and iterate', 'Flutter implementation with steady demos, tight feedback loops, and clear tradeoffs.'),
-    ('Launch and support', 'Release planning, handoff notes, and a path for fixes and follow-on work.'),
+    (
+      'Discovery',
+      'We align on goals, users, constraints, and timeline—so scope matches what you can fund.'
+    ),
+    (
+      'Scope and UX',
+      'Flows, priorities, and UX decisions documented before heavy build. No mystery backlog.'
+    ),
+    (
+      'Build and iterate',
+      'Flutter implementation with steady demos, tight feedback loops, and clear tradeoffs.'
+    ),
+    (
+      'Launch and support',
+      'Release planning, handoff notes, and a path for fixes and follow-on work.'
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(isMobile ? 18 : 22),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            HomeWarmColors.shellSurfaceSolid,
-            Colors.white,
-          ],
-        ),
-        border: Border.all(color: HomeWarmColors.dividerLine),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Studio process',
-            style: GoogleFonts.albertSans(
-              fontSize: titleFont,
-              fontWeight: FontWeight.w800,
-              color: HomeWarmColors.headlinePrimary,
-            ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.all(isMobile ? 18 : 22),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.black.withValues(alpha: 0.5),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
           ),
-          SizedBox(height: 8),
-          Text(
-            'Simple, repeatable, and easy to communicate to stakeholders.',
-            style: GoogleFonts.albertSans(
-              fontSize: bodyFont,
-              fontWeight: FontWeight.w500,
-              color: HomeWarmColors.bodyEmphasis,
-              height: 1.45,
-            ),
-          ),
-          SizedBox(height: isMobile ? 18 : 22),
-          ...List.generate(_steps.length, (i) {
-            final s = _steps[i];
-            final isLast = i == _steps.length - 1;
-            return Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: HomeWarmColors.sectionAccent.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      '${i + 1}',
-                      style: GoogleFonts.albertSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: HomeWarmColors.sectionAccent,
-                      ),
-                    ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
+                ).createShader(bounds),
+                child: Text(
+                  'Studio process',
+                  style: GoogleFonts.albertSans(
+                    fontSize: titleFont,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          s.$1,
-                          style: GoogleFonts.albertSans(
-                            fontSize: bodyFont + 0.5,
-                            fontWeight: FontWeight.w700,
-                            color: HomeWarmColors.headlinePrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          s.$2,
-                          style: GoogleFonts.albertSans(
-                            fontSize: bodyFont,
-                            fontWeight: FontWeight.w500,
-                            color: HomeWarmColors.bodyEmphasis,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            );
-          }),
-        ],
+              SizedBox(height: 8),
+              Text(
+                'Simple, repeatable, and easy to communicate to stakeholders.',
+                style: GoogleFonts.albertSans(
+                  fontSize: bodyFont,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFD1D5DB),
+                  height: 1.45,
+                ),
+              ),
+              SizedBox(height: isMobile ? 18 : 22),
+              ...List.generate(_steps.length, (i) {
+                final s = _steps[i];
+                final isLast = i == _steps.length - 1;
+                return Padding(
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
+                          ),
+                        ),
+                        child: Text(
+                          '${i + 1}',
+                          style: GoogleFonts.albertSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF1F2937),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              s.$1,
+                              style: GoogleFonts.albertSans(
+                                fontSize: bodyFont + 0.5,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              s.$2,
+                              style: GoogleFonts.albertSans(
+                                fontSize: bodyFont,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFFD1D5DB),
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -441,7 +494,7 @@ class _ProofCredibilityBlock extends StatelessWidget {
           style: GoogleFonts.albertSans(
             fontSize: titleFont,
             fontWeight: FontWeight.w800,
-            color: HomeWarmColors.headlinePrimary,
+            color: Colors.white,
           ),
         ),
         SizedBox(height: isMobile ? 8 : 10),
@@ -451,7 +504,7 @@ class _ProofCredibilityBlock extends StatelessWidget {
           style: GoogleFonts.albertSans(
             fontSize: bodyFont,
             fontWeight: FontWeight.w500,
-            color: HomeWarmColors.bodyEmphasis,
+            color: const Color(0xFFD1D5DB),
             height: 1.45,
           ),
         ),
@@ -475,7 +528,8 @@ class _ProofCredibilityBlock extends StatelessWidget {
         _ProofLinkTile(
           icon: Icons.factory_rounded,
           label: 'Case study: enterprise operations (ASD)',
-          subtitle: 'Roles, workflows, Firebase, and governed AI—narrative, not a screenshot dump.',
+          subtitle:
+              'Roles, workflows, Firebase, and governed AI—narrative, not a screenshot dump.',
           bodyFont: bodyFont,
           isMobile: isMobile,
           onTap: () => onInternal(AppRoutes.portfolioCaseStudyPath('asd')),
@@ -486,7 +540,8 @@ class _ProofCredibilityBlock extends StatelessWidget {
           subtitle: 'Tenancy, IA, and a living design-system spec.',
           bodyFont: bodyFont,
           isMobile: isMobile,
-          onTap: () => onInternal(AppRoutes.portfolioCaseStudyPath('service-flow')),
+          onTap: () =>
+              onInternal(AppRoutes.portfolioCaseStudyPath('service-flow')),
         ),
         _ProofLinkTile(
           icon: Icons.palette_rounded,
@@ -501,7 +556,8 @@ class _ProofCredibilityBlock extends StatelessWidget {
         _ProofLinkTile(
           icon: Icons.auto_stories_outlined,
           label: 'Insights and articles',
-          subtitle: 'Practical write-ups on Flutter, MVPs, Firebase, and AI-assisted product features.',
+          subtitle:
+              'Practical write-ups on Flutter, MVPs, Firebase, and AI-assisted product features.',
           bodyFont: bodyFont,
           isMobile: isMobile,
           onTap: () => onInternal(AppRoutes.insights),
@@ -532,56 +588,68 @@ class _ProofLinkTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: Material(
-        color: Colors.white,
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 12 : 16,
-              vertical: isMobile ? 12 : 14,
-            ),
-            decoration: BoxDecoration(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Material(
+            color: Colors.black.withValues(alpha: 0.32),
+            borderRadius: BorderRadius.circular(12),
+            child: InkWell(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: HomeWarmColors.dividerLine),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: HomeWarmColors.sectionAccent, size: 22),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: GoogleFonts.albertSans(
-                          fontSize: bodyFont,
-                          fontWeight: FontWeight.w700,
-                          color: HomeWarmColors.headlinePrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: GoogleFonts.albertSans(
-                          fontSize: bodyFont - 1,
-                          fontWeight: FontWeight.w500,
-                          color: HomeWarmColors.bodyEmphasis,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
+              onTap: onTap,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 12 : 16,
+                  vertical: isMobile ? 12 : 14,
                 ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.45),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.16)),
                 ),
-              ],
+                child: Row(
+                  children: [
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
+                      ).createShader(bounds),
+                      child: Icon(icon, color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: GoogleFonts.albertSans(
+                              fontSize: bodyFont,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: GoogleFonts.albertSans(
+                              fontSize: bodyFont - 1,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFFD1D5DB),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: Colors.white.withValues(alpha: 0.65),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -639,63 +707,86 @@ class _FaqBlock extends StatelessWidget {
           style: GoogleFonts.albertSans(
             fontSize: titleFont,
             fontWeight: FontWeight.w800,
-            color: HomeWarmColors.headlinePrimary,
+            color: Colors.white,
           ),
         ),
         SizedBox(height: isMobile ? 16 : 18),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: HomeWarmColors.dividerLine),
-          ),
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              dividerColor: Colors.transparent,
-              splashColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.08),
-            ),
-            child: Column(
-              children: List.generate(_faqs.length, (i) {
-                final item = _faqs[i];
-                return ExpansionTile(
-                  key: PageStorageKey('faq_$i'),
-                  tilePadding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 12 : 16,
-                    vertical: 4,
-                  ),
-                  childrenPadding: EdgeInsets.fromLTRB(
-                    isMobile ? 12 : 16,
-                    0,
-                    isMobile ? 12 : 16,
-                    12,
-                  ),
-                  title: Text(
-                    item.$1,
-                    style: GoogleFonts.albertSans(
-                      fontSize: bodyFont,
-                      fontWeight: FontWeight.w700,
-                      color: HomeWarmColors.headlinePrimary,
-                      height: 1.35,
-                    ),
-                  ),
-                  iconColor: HomeWarmColors.sectionAccent,
-                  collapsedIconColor: HomeWarmColors.eyebrowMuted,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        item.$2,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.32),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+              ),
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  dividerColor: Colors.transparent,
+                  splashColor:
+                      HomeWarmColors.sectionAccent.withValues(alpha: 0.08),
+                ),
+                child: Column(
+                  children: List.generate(_faqs.length, (i) {
+                    final item = _faqs[i];
+                    final tile = ExpansionTile(
+                      key: PageStorageKey('faq_$i'),
+                      tilePadding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 12 : 16,
+                        vertical: 4,
+                      ),
+                      childrenPadding: EdgeInsets.fromLTRB(
+                        isMobile ? 12 : 16,
+                        0,
+                        isMobile ? 12 : 16,
+                        12,
+                      ),
+                      title: Text(
+                        item.$1,
                         style: GoogleFonts.albertSans(
-                          fontSize: bodyFont - 0.5,
-                          fontWeight: FontWeight.w500,
-                          color: HomeWarmColors.bodyEmphasis,
-                          height: 1.55,
+                          fontSize: bodyFont,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 1.35,
                         ),
                       ),
-                    ),
-                  ],
-                );
-              }),
+                      iconColor: AppColors.primaryGold,
+                      collapsedIconColor: const Color(0xFFD1D5DB),
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item.$2,
+                            style: GoogleFonts.albertSans(
+                              fontSize: bodyFont - 0.5,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFFD1D5DB),
+                              height: 1.55,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                    if (i == _faqs.length - 1) return tile;
+                    return Column(
+                      children: [
+                        tile,
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 12 : 16,
+                          ),
+                          child: Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
             ),
           ),
         ),
@@ -769,8 +860,8 @@ class _FinalCtaBlock extends StatelessWidget {
       padding: EdgeInsets.all(isMobile ? 20 : 28),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.03),
-        border: Border.all(color: HomeWarmColors.dividerLine),
+        color: Colors.black.withValues(alpha: 0.32),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -781,7 +872,7 @@ class _FinalCtaBlock extends StatelessWidget {
             style: GoogleFonts.albertSans(
               fontSize: titleFont - 1,
               fontWeight: FontWeight.w800,
-              color: HomeWarmColors.headlinePrimary,
+              color: Colors.white,
               height: 1.2,
             ),
           ),
@@ -792,7 +883,7 @@ class _FinalCtaBlock extends StatelessWidget {
             style: GoogleFonts.albertSans(
               fontSize: bodyFont,
               fontWeight: FontWeight.w500,
-              color: HomeWarmColors.bodyEmphasis,
+              color: const Color(0xFFD1D5DB),
               height: 1.5,
             ),
           ),
@@ -862,20 +953,21 @@ class _RichmondVaLocalPromo extends StatelessWidget {
           padding: EdgeInsets.all(isMobile ? 14 : 18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: HomeWarmColors.sectionAccent.withValues(alpha: 0.4)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                HomeWarmColors.sectionAccent.withValues(alpha: 0.08),
-                Colors.white,
+                const Color(0xFF0F3079),
+                const Color(0xFF040F2D),
               ],
             ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.map_outlined, color: HomeWarmColors.sectionAccent, size: isMobile ? 26 : 28),
+              Icon(Icons.map_outlined,
+                  color: const Color(0xFFE5E7EB), size: isMobile ? 26 : 28),
               SizedBox(width: isMobile ? 12 : 14),
               Expanded(
                 child: Column(
@@ -886,7 +978,7 @@ class _RichmondVaLocalPromo extends StatelessWidget {
                       style: GoogleFonts.albertSans(
                         fontSize: bodyFont + 1,
                         fontWeight: FontWeight.w800,
-                        color: HomeWarmColors.headlinePrimary,
+                        color: Colors.white,
                         height: 1.25,
                       ),
                     ),
@@ -896,7 +988,7 @@ class _RichmondVaLocalPromo extends StatelessWidget {
                       style: GoogleFonts.albertSans(
                         fontSize: bodyFont,
                         fontWeight: FontWeight.w500,
-                        color: HomeWarmColors.bodyEmphasis,
+                        color: const Color(0xFFD1D5DB),
                         height: 1.45,
                       ),
                     ),

@@ -38,12 +38,12 @@ class ContactUsScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -56,7 +56,7 @@ class ContactUsScreen extends StatelessWidget {
         title: Text(
           'Contact',
           style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+            color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -115,7 +115,8 @@ class ContactUsScreen extends StatelessWidget {
                             SizedBox(height: isMobile ? 18 : 22),
                             OutlinedButton.icon(
                               onPressed: _openCalendly,
-                              icon: Icon(Icons.calendar_month_rounded, color: HomeWarmColors.sectionAccent),
+                              icon: Icon(Icons.calendar_month_rounded,
+                                  color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Schedule a short intro call',
                                 style: GoogleFonts.albertSans(
@@ -129,7 +130,9 @@ class ContactUsScreen extends StatelessWidget {
                                   horizontal: 20,
                                   vertical: isMobile ? 14 : 16,
                                 ),
-                                side: const BorderSide(color: HomeWarmColors.sectionAccent, width: 1.5),
+                                side: const BorderSide(
+                                    color: HomeWarmColors.sectionAccent,
+                                    width: 1.5),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -150,20 +153,26 @@ class ContactUsScreen extends StatelessWidget {
                           SizedBox(height: isMobile ? 36 : 44),
                           Row(
                             children: [
-                              Expanded(child: Divider(color: HomeWarmColors.dividerLine)),
+                              Expanded(
+                                  child: Divider(
+                                      color: HomeWarmColors.dividerLine)),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
                                 child: Text(
                                   'Or reach me directly',
                                   style: GoogleFonts.albertSans(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.4,
-                                    color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.7),
+                                    color: HomeWarmColors.bodyEmphasis
+                                        .withValues(alpha: 0.7),
                                   ),
                                 ),
                               ),
-                              Expanded(child: Divider(color: HomeWarmColors.dividerLine)),
+                              Expanded(
+                                  child: Divider(
+                                      color: HomeWarmColors.dividerLine)),
                             ],
                           ),
                           SizedBox(height: isMobile ? 20 : 24),

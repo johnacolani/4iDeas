@@ -1,16 +1,12 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:four_ideas/core/home_warm_colors.dart';
-import 'package:four_ideas/helper/sliding_menu.dart';
-import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
-import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/screens/web_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../helper/app_background.dart';
+import '../core/design_system/theme.dart';
 
 import 'mobile_screen.dart';
 
@@ -24,511 +20,249 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    double wi = MediaQuery.of(context).size.width;
-    final bool isMobile = wi < 600;
-    final bool isTablet = wi >= 600 && wi < 1024;
+    final double wi = MediaQuery.of(context).size.width;
+    final bool isMobile = wi < 800;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: isMobile
-          ? Stack(
-              children: [
-                const AppBackground(),
-                const MobileScreen(),
-                // Transparent container at top like appbar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: SafeArea(
-                    child: _buildTopContainer(isMobile, isTablet, wi),
-                  ),
-                ),
-                const SlidingMenu(),
-              ],
-            )
-          : Stack(
-              children: [
-                const AppBackground(),
-                Positioned.fill(
-                  child: const WebScreen(),
-                ),
-                // Transparent container at top like appbar
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: SafeArea(
-                    child: _buildTopContainer(isMobile, isTablet, wi),
-                  ),
-                ),
-                const SlidingMenu(),
-              ],
-            ),
+      body: Stack(
+        children: [
+          const AppBackground(),
+          Positioned.fill(
+            child: isMobile ? const MobileScreen() : const WebScreen(),
+          ),
+          SafeArea(
+            child: _ModernTopAppBar(isMobile: isMobile),
+          ),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildTopContainer(bool isMobile, bool isTablet, double wi) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-        child: Stack(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Color.alphaBlend(
-                    HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
-                    Colors.white.withValues(alpha: 0.025),
-                  ),
-                  border: Border(
-                    top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                    left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                    right: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                    bottom: BorderSide(
-                      color: HomeWarmColors.appBarBorderBottom,
-                      width: 1.0,
-                    ),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: HomeWarmColors.appBarShadow,
-                      blurRadius: 22,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-              ),
+class _ModernTopAppBar extends StatelessWidget {
+  const _ModernTopAppBar({required this.isMobile});
+
+  final bool isMobile;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentPath = GoRouterState.of(context).uri.path;
+    final navStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        );
+    return Padding(
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.zero,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            height: isMobile ? 124 : 136,
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 24),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.14),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
             ),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: const Alignment(-1.0, -1.0),
-                    end: const Alignment(0.45, 0.5),
-                    colors: [
-                      Colors.white.withValues(alpha: 0.16),
-                      Colors.white.withValues(alpha: 0.06),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.26, 1.0],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 4.0 : (isTablet ? 24.0 : 32.0),
-                vertical: isMobile ? 12.0 : (isTablet ? 24.0 : 28.0),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-              Expanded(
-                flex: isMobile ? 2 : 1,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
+            child: Row(
+              children: [
+                Row(
                   children: [
-                    SizedBox(width: isMobile ? 4 : 8),
-                    Container(
-                      padding:
-                          EdgeInsets.all(isMobile ? (wi < 400 ? 1.5 : 2) : 3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: HomeWarmColors.avatarRing,
-                          width: isMobile ? (wi < 400 ? 1 : 1.5) : 2,
-                        ),
-                      ),
-                      child: CircleAvatar(
-                        radius: isMobile
-                            ? (wi < 400 ? wi * 0.03 : wi * 0.035)
-                            : (isTablet ? wi * 0.035 : wi * 0.035),
-                        backgroundColor: Colors.transparent,
-                        foregroundImage:
-                            const AssetImage('assets/images/logo.png'),
-                      ),
-                    ),
-                    SizedBox(width: isMobile ? (wi < 400 ? 3 : 5) : 12),
-                    Flexible(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(width: 20),
+                    Image.asset('assets/images/logo.png',
+                        width: isMobile ? 28 : 34, height: isMobile ? 28 : 34),
+                    const SizedBox(width: 10),
+                    RichText(
+                      text: TextSpan(
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontSize: isMobile ? 24 : 34,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
                         children: [
-                          SelectableText(
-                            '4iDeas',
+                          TextSpan(
+                            text: '4i',
                             style: TextStyle(
-                              fontSize: isMobile
-                                  ? (wi < 400 ? 14 : 16)
-                                  : (isTablet ? 18 : 22),
-                              color: HomeWarmColors.textInk,
-                              fontWeight: FontWeight.bold,
+                              foreground: Paint()
+                                ..shader = const LinearGradient(
+                                  colors: [
+                                    Color(0xFFF5B32F),
+                                    Color(0xFFD89A1C),
+                                  ],
+                                ).createShader(
+                                  const Rect.fromLTWH(0, 0, 56, 24),
+                                ),
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          SelectableText(
-                            'info@4ideasapp.com',
-                            style: TextStyle(
-                              fontSize: isMobile ? (wi < 400 ? 9 : 10) : (isTablet ? 11 : 12),
-                              color: HomeWarmColors.textInk,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                          const TextSpan(text: 'DEAS'),
                         ],
                       ),
                     ),
                   ],
                 ),
+                if (!isMobile) ...[
+                  const Spacer(),
+                  Expanded(
+                    child: _TopNavTabs(
+                      currentPath: currentPath,
+                      style: navStyle,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const _AccountMetaBlock(),
+                  const SizedBox(width: 16),
+                  OutlinedButton(
+                    onPressed: () => context.go(AppRoutes.contact),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                          color: AppColors.primaryGold, width: 1.1),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
+                    ),
+                    child: Text(
+                      "Let's Talk",
+                      style: navStyle?.copyWith(
+                          color: AppColors.primaryGold,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ] else ...[
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () => context.go(AppRoutes.contact),
+                    icon: const Icon(Icons.chat_bubble_outline,
+                        color: AppColors.primaryGold),
+                    tooltip: "Let's Talk",
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopNavTabs extends StatelessWidget {
+  const _TopNavTabs({
+    required this.currentPath,
+    required this.style,
+  });
+
+  final String currentPath;
+  final TextStyle? style;
+
+  static const List<(String label, String route)> _items = [
+    ('Home', AppRoutes.home),
+    ('Services', AppRoutes.services),
+    ('Work', AppRoutes.portfolio),
+    ('Process', AppRoutes.designPhilosophy),
+    ('About', AppRoutes.about),
+    ('Blog', AppRoutes.insights),
+  ];
+
+  int _indexForPath(String path) {
+    if (path == AppRoutes.home) return 0;
+    if (path == AppRoutes.services) return 1;
+    if (path.startsWith(AppRoutes.portfolio)) return 2;
+    if (path == AppRoutes.designPhilosophy) return 3;
+    if (path == AppRoutes.about) return 4;
+    if (path.startsWith(AppRoutes.insights)) return 5;
+    return 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = _indexForPath(currentPath);
+    return DefaultTabController(
+      key: ValueKey<String>(currentPath),
+      initialIndex: selected,
+      length: _items.length,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: TabBar(
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          indicatorSize: TabBarIndicatorSize.label,
+          dividerColor: Colors.transparent,
+          indicatorColor: AppColors.primaryGold,
+          indicatorWeight: 2.4,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white,
+          labelStyle: style,
+          unselectedLabelStyle: style,
+          onTap: (index) => context.go(_items[index].$2),
+          tabs: _items.map((item) => Tab(text: item.$1)).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountMetaBlock extends StatelessWidget {
+  const _AccountMetaBlock();
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () => context.go(AppRoutes.login),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              SizedBox(width: isMobile ? 16 : 24),
-              // Auth buttons
-              Expanded(
-                flex: isMobile ? 1 : 1,
-                child: BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    if (state is Authenticated) {
-                      return isMobile
-                          ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () => context.push(AppRoutes.profile),
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: wi < 400 ? 2 : 4,
-                                            vertical: wi < 400 ? 2 : 4,
-                                          ),
-                                          minimumSize: Size.zero,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                        ),
-                                        child: Text(
-                                          state.user.email ?? 'User',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                            fontSize: wi < 400 ? 11 : 12,
-                                            color: HomeWarmColors.textInk,
-                                            decoration: TextDecoration.underline,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: wi < 400 ? 4 : 6),
-                                      IconButton(
-                                        onPressed: () {
-                                          context.read<AuthBloc>().add(
-                                                const AuthLogoutRequested(),
-                                              );
-                                        },
-                                        icon: Icon(
-                                          Icons.logout,
-                                          size: wi < 400 ? 12 : 14,
-                                          color: HomeWarmColors.iconLogout,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: BoxConstraints(),
-                                        tooltip: 'Sign Out',
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        color: const Color(0xFFF0DA82),
-                                        size: wi < 400 ? wi * 0.025 : wi * 0.03,
-                                      ),
-                                      SizedBox(width: wi < 400 ? 3 : 6),
-                                      Flexible(
-                                        child: RichText(
-                                          overflow: TextOverflow.visible,
-                                          maxLines: 1,
-                                          text: TextSpan(
-                                            text: 'Based in: Richmond, VA',
-                                             style: TextStyle(
-                                              fontSize:
-                                                  wi < 400 ? 11 : 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: HomeWarmColors.textInk,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () => context.push(AppRoutes.profile),
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 8,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          state.user.email ?? 'User',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                            fontSize: isTablet ? 14 : 16,
-                                            color: HomeWarmColors.textInk,
-                                            decoration: TextDecoration.underline,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 8),
-                                      IconButton(
-                                        onPressed: () {
-                                          context.read<AuthBloc>().add(
-                                                const AuthLogoutRequested(),
-                                              );
-                                        },
-                                        icon: Icon(
-                                          Icons.logout,
-                                          size: isTablet ? 18 : 20,
-                                          color: HomeWarmColors.iconLogout,
-                                        ),
-                                        padding: EdgeInsets.all(4),
-                                        constraints: BoxConstraints(),
-                                        tooltip: 'Sign Out',
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        color: const Color(0xFFF0DA82),
-                                        size:
-                                            isTablet ? wi * 0.018 : wi * 0.018,
-                                      ),
-                                      SizedBox(width: 6),
-                                      Flexible(
-                                        child: RichText(
-                                          overflow: TextOverflow.visible,
-                                          maxLines: 1,
-                                          text: TextSpan(
-                                            text: 'Based in: Richmond, VA',
-                                            style: TextStyle(
-                                              fontSize: isTablet ? 12 : 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: HomeWarmColors.textInk,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                    } else {
-                      return isMobile
-                          ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () => context.push(AppRoutes.login),
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: wi < 400 ? 4 : 6,
-                                            vertical: wi < 400 ? 2 : 4,
-                                          ),
-                                          minimumSize: Size.zero,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                        ),
-                                        child: Text(
-                                          'Login',
-                                          style: TextStyle(
-                                            fontSize:
-                                                wi < 400 ? 11 : 12,
-                                            color: HomeWarmColors.linkLogin,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      SelectableText(
-                                        ' / ',
-                                        style: TextStyle(
-                                          fontSize:
-                                              wi < 400 ? 11 : 12,
-                                          color: const Color(0xFFF0DA82),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => context.push(AppRoutes.signUp),
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: wi < 400 ? 4 : 6,
-                                            vertical: wi < 400 ? 2 : 4,
-                                          ),
-                                          minimumSize: Size.zero,
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                        ),
-                                        child: Text(
-                                          'Sign Up',
-                                          style: TextStyle(
-                                            fontSize:
-                                                wi < 400 ? 11 : 12,
-                                            color: HomeWarmColors.linkSignUp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        color: const Color(0xFFF0DA82),
-                                        size: wi < 400 ? wi * 0.025 : wi * 0.03,
-                                      ),
-                                      SizedBox(width: wi < 400 ? 3 : 6),
-                                      Flexible(
-                                        child: RichText(
-                                          overflow: TextOverflow.visible,
-                                          maxLines: 1,
-                                          text: TextSpan(
-                                            text: 'Based in: Richmond, VA',
-                                            style: TextStyle(
-                                              fontSize:
-                                                  wi < 400 ? 11 : 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: HomeWarmColors.textInk,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () => context.push(AppRoutes.login),
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 13,
-                                            vertical: 8,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Login',
-                                          style: TextStyle(
-                                            fontSize: isTablet ? 16 : 18,
-                                            color: HomeWarmColors.linkLogin,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      SelectableText(
-                                        ' / ',
-                                        style: TextStyle(
-                                          fontSize: isTablet ? 16 : 18,
-                                          color: const Color(0xFFF0DA82),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => context.push(AppRoutes.signUp),
-                                        style: TextButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 13,
-                                            vertical: 8,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Sign Up',
-                                          style: TextStyle(
-                                            fontSize: isTablet ? 16 : 18,
-                                            color: HomeWarmColors.linkSignUp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        color: const Color(0xFFF0DA82),
-                                        size:
-                                            isTablet ? wi * 0.018 : wi * 0.018,
-                                      ),
-                                      SizedBox(width: 6),
-                                      Flexible(
-                                        child: RichText(
-                                          overflow: TextOverflow.visible,
-                                          maxLines: 1,
-                                          text: TextSpan(
-                                            text: 'Based in: Richmond, VA',
-                                            style: TextStyle(
-                                              fontSize: isTablet ? 12 : 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: HomeWarmColors.textInk,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
-                    }
-                  },
-                ),
+              child: Text('Sign in', style: textStyle),
+            ),
+            Text(
+              ' / ',
+              style: textStyle?.copyWith(color: AppColors.primaryGold),
+            ),
+            TextButton(
+              onPressed: () => context.go(AppRoutes.signUp),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-            ],
+              child: Text('Sign Up', style: textStyle),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.location_on,
+                color: AppColors.primaryGold, size: 15),
+            const SizedBox(width: 4),
+            Text(
+              'Based in: Richmond, VA',
+              style: textStyle?.copyWith(
+                color: const Color(0xFFD1D5DB),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }

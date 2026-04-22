@@ -63,7 +63,7 @@ abstract final class FrostedAppBar {
       shadowColor: shadowColor,
       surfaceTintColor: surfaceTintColor,
       shape: shape,
-      iconTheme: iconTheme,
+      iconTheme: iconTheme ?? const IconThemeData(color: Colors.white),
       actionsIconTheme: actionsIconTheme,
       titleSpacing: titleSpacing,
       toolbarHeight: toolbarHeight,
@@ -229,11 +229,18 @@ abstract final class FrostedAppBar {
                         Colors.white.withValues(alpha: 0.025),
                       ),
                       border: Border(
-                        top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                        left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                        right: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+                        top: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            width: 1),
+                        left: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            width: 1),
+                        right: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            width: 1),
                         bottom: BorderSide(
-                          color: ColorManager.backgroundDark.withValues(alpha: borderBottomAlpha),
+                          color: ColorManager.backgroundDark
+                              .withValues(alpha: borderBottomAlpha),
                           width: 1,
                         ),
                       ),

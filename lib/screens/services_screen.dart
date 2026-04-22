@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/design_system/theme.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/core/widgets/service_offering_card.dart';
@@ -50,7 +51,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
   Future<void> _navigateToAddService() async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminServiceEditScreen(docId: null, initialItem: null),
+        builder: (context) =>
+            AdminServiceEditScreen(docId: null, initialItem: null),
       ),
     );
     if (result == true) _loadServices();
@@ -59,7 +61,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
   Future<void> _navigateToEditService(ServiceItem item) async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminServiceEditScreen(docId: item.id, initialItem: item),
+        builder: (context) =>
+            AdminServiceEditScreen(docId: item.id, initialItem: item),
       ),
     );
     if (result == true) _loadServices();
@@ -70,19 +73,23 @@ class _ServicesScreenState extends State<ServicesScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${item.title}"?', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+        title: Text('Delete "${item.title}"?',
+            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the service from the list.',
-          style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
+          style: GoogleFonts.albertSans(
+              color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel',
+                style: GoogleFonts.albertSans(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete',
+                style: GoogleFonts.albertSans(color: Colors.red)),
           ),
         ],
       ),
@@ -92,7 +99,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
       await _servicesService.deleteService(item.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Service removed'), backgroundColor: Colors.orange),
+          const SnackBar(
+              content: Text('Service removed'), backgroundColor: Colors.orange),
         );
         _loadServices();
       }
@@ -106,6 +114,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   void _goContact(BuildContext context) => context.go(AppRoutes.contact);
+
+  static const LinearGradient _goldGradient = LinearGradient(
+    colors: [AppColors.primaryGold, AppColors.primaryGoldDark],
+  );
 
   Widget _buildServiceOfferings({
     required List<ServiceItem> items,
@@ -179,17 +191,18 @@ class _ServicesScreenState extends State<ServicesScreen> {
     final double bodyFontSize = isMobile ? 16 : (isTablet ? 17 : 18);
     final double maxShell = isMobile ? double.infinity : 1120;
 
-    final bool showAdminActions = AdminService.isAdmin() && _servicesFromFirestore != null;
+    final bool showAdminActions =
+        AdminService.isAdmin() && _servicesFromFirestore != null;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -202,7 +215,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         title: Text(
           'Services',
           style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+            color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -223,7 +236,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     SliverToBoxAdapter(
                       child: LinearProgressIndicator(
                         backgroundColor: Colors.white.withValues(alpha: 0.1),
-                        valueColor: AlwaysStoppedAnimation<Color>(HomeWarmColors.sectionAccent),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            HomeWarmColors.sectionAccent),
                       ),
                     ),
                   SliverToBoxAdapter(
@@ -243,14 +257,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                   children: [
                                     Semantics(
                                       header: true,
-                                      child: SelectableText(
-                                        'How 4iDeas helps teams ship',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.albertSans(
-                                          color: HomeWarmColors.headlinePrimary,
-                                          fontSize: titleFontSize,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.15,
+                                      child: ShaderMask(
+                                        shaderCallback: (bounds) =>
+                                            _goldGradient.createShader(bounds),
+                                        blendMode: BlendMode.srcIn,
+                                        child: Text(
+                                          'How 4iDeas helps teams ship',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.albertSans(
+                                            color: Colors.white,
+                                            fontSize: titleFontSize,
+                                            fontWeight: FontWeight.w800,
+                                            height: 1.15,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -259,7 +278,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                       'Founder-led studio services for startups and businesses—MVP delivery, product design with engineering, practical AI features, and ongoing improvement for products already in market.',
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.albertSans(
-                                        color: HomeWarmColors.bodyEmphasis,
+                                        color: const Color(0xFFD1D5DB),
                                         fontSize: bodyFontSize,
                                         fontWeight: FontWeight.w500,
                                         height: 1.5,
@@ -272,26 +291,34 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                       runSpacing: 10,
                                       children: [
                                         TextButton(
-                                          onPressed: () => context.go('${AppRoutes.portfolio}?section=featured'),
+                                          onPressed: () => context.go(
+                                              '${AppRoutes.portfolio}?section=featured'),
                                           child: Text(
                                             'See featured case studies',
                                             style: GoogleFonts.albertSans(
-                                              color: HomeWarmColors.sectionAccent,
+                                              color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w700,
-                                              decoration: TextDecoration.underline,
-                                              decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor: AppColors
+                                                  .primaryGold
+                                                  .withValues(alpha: 0.5),
                                             ),
                                           ),
                                         ),
                                         TextButton(
-                                          onPressed: () => context.go(AppRoutes.insights),
+                                          onPressed: () =>
+                                              context.go(AppRoutes.insights),
                                           child: Text(
                                             'Read implementation insights',
                                             style: GoogleFonts.albertSans(
-                                              color: HomeWarmColors.sectionAccent,
+                                              color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w700,
-                                              decoration: TextDecoration.underline,
-                                              decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor: AppColors
+                                                  .primaryGold
+                                                  .withValues(alpha: 0.5),
                                             ),
                                           ),
                                         ),
@@ -303,16 +330,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
                               if (AdminService.isAdmin()) ...[
                                 OutlinedButton.icon(
                                   onPressed: _navigateToAddService,
-                                  icon: Icon(Icons.add, size: 18, color: HomeWarmColors.sectionAccent),
+                                  icon: Icon(Icons.add,
+                                      size: 18,
+                                      color: AppColors.primaryGold),
                                   label: Text(
                                     'Add service',
                                     style: GoogleFonts.albertSans(
-                                      color: HomeWarmColors.sectionAccent,
+                                      color: AppColors.primaryGold,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   style: OutlinedButton.styleFrom(
-                                    side: BorderSide(color: HomeWarmColors.sectionAccent),
+                                    side: BorderSide(
+                                        color: AppColors.primaryGold),
                                   ),
                                 ),
                                 SizedBox(height: isMobile ? 16 : 20),
@@ -328,23 +358,28 @@ class _ServicesScreenState extends State<ServicesScreen> {
                               SizedBox(height: he * 0.04),
                               Center(
                                 child: ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 560),
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 560),
                                   child: Container(
                                     padding: EdgeInsets.all(isMobile ? 20 : 26),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(18),
-                                      border: Border.all(color: HomeWarmColors.dividerLine),
+                                      border: Border.all(
+                                          color: Colors.white24),
                                       gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          HomeWarmColors.shellSurfaceSolid,
-                                          Colors.white,
+                                          const Color(0xFF0F172A)
+                                              .withValues(alpha: 0.94),
+                                          const Color(0xFF111827)
+                                              .withValues(alpha: 0.9),
                                         ],
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: HomeWarmColors.headlinePrimary.withValues(alpha: 0.06),
+                                          color: HomeWarmColors.headlinePrimary
+                                              .withValues(alpha: 0.06),
                                           blurRadius: 20,
                                           offset: const Offset(0, 8),
                                         ),
@@ -352,13 +387,18 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                     ),
                                     child: Column(
                                       children: [
-                                        SelectableText(
-                                          'Ready to discuss your product?',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.albertSans(
-                                            color: HomeWarmColors.headlinePrimary,
-                                            fontSize: sectionTitleSize + 1,
-                                            fontWeight: FontWeight.w800,
+                                        ShaderMask(
+                                          shaderCallback: (bounds) =>
+                                              _goldGradient.createShader(bounds),
+                                          blendMode: BlendMode.srcIn,
+                                          child: Text(
+                                            'Ready to discuss your product?',
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.albertSans(
+                                              color: Colors.white,
+                                              fontSize: sectionTitleSize + 1,
+                                              fontWeight: FontWeight.w800,
+                                            ),
                                           ),
                                         ),
                                         SizedBox(height: 10),
@@ -366,7 +406,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                           'Send a short note about your product, timeline, and budget band. I respond with candid next steps—whether we are a fit or not.',
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.albertSans(
-                                            color: HomeWarmColors.bodyEmphasis,
+                                            color: const Color(0xFFD1D5DB),
                                             fontSize: bodyFontSize - 1,
                                             height: 1.5,
                                           ),
@@ -376,14 +416,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                           width: double.infinity,
                                           child: FilledButton(
                                             style: FilledButton.styleFrom(
-                                              backgroundColor: HomeWarmColors.sectionAccent,
-                                              foregroundColor: Colors.white,
-                                              padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
+                                              foregroundColor:
+                                                  const Color(0xFF0B0F19),
+                                              backgroundColor:
+                                                  AppColors.primaryGold,
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: isMobile ? 14 : 16),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
                                             ),
-                                            onPressed: () => _goContact(context),
+                                            onPressed: () =>
+                                                _goContact(context),
                                             child: Text(
                                               'Discuss your project',
                                               style: GoogleFonts.albertSans(
@@ -395,16 +440,20 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                         ),
                                         SizedBox(height: 12),
                                         TextButton(
-                                          onPressed: () => context.go(AppRoutes.orderHere),
+                                          onPressed: () =>
+                                              context.go(AppRoutes.orderHere),
                                           child: Text(
                                             'Prefer a structured brief? Submit a project form',
                                             textAlign: TextAlign.center,
                                             style: GoogleFonts.albertSans(
-                                              color: HomeWarmColors.sectionAccent,
+                                              color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w600,
                                               fontSize: bodyFontSize - 2,
-                                              decoration: TextDecoration.underline,
-                                              decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor: AppColors
+                                                  .primaryGold
+                                                  .withValues(alpha: 0.5),
                                             ),
                                           ),
                                         ),
@@ -415,26 +464,38 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                           runSpacing: 8,
                                           children: [
                                             TextButton(
-                                              onPressed: () => context.go(AppRoutes.portfolio),
+                                              onPressed: () => context
+                                                  .go(AppRoutes.portfolio),
                                               child: Text(
                                                 'Review portfolio proof',
                                                 style: GoogleFonts.albertSans(
-                                                  color: HomeWarmColors.sectionAccent,
+                                                  color: AppColors.primaryGold,
                                                   fontWeight: FontWeight.w700,
-                                                  decoration: TextDecoration.underline,
-                                                  decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor:
+                                                      AppColors
+                                                          .primaryGold
+                                                          .withValues(
+                                                              alpha: 0.5),
                                                 ),
                                               ),
                                             ),
                                             TextButton(
-                                              onPressed: () => context.go(AppRoutes.insights),
+                                              onPressed: () => context
+                                                  .go(AppRoutes.insights),
                                               child: Text(
                                                 'Read delivery insights',
                                                 style: GoogleFonts.albertSans(
-                                                  color: HomeWarmColors.sectionAccent,
+                                                  color: AppColors.primaryGold,
                                                   fontWeight: FontWeight.w700,
-                                                  decoration: TextDecoration.underline,
-                                                  decorationColor: HomeWarmColors.sectionAccent.withValues(alpha: 0.5),
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor:
+                                                      AppColors
+                                                          .primaryGold
+                                                          .withValues(
+                                                              alpha: 0.5),
                                                 ),
                                               ),
                                             ),

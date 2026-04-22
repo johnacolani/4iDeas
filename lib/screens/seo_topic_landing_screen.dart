@@ -37,11 +37,11 @@ class SeoTopicLandingScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -54,7 +54,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
         title: Text(
           page.appBarTitle,
           style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+            color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w700,
           ),
@@ -94,12 +94,15 @@ class SeoTopicLandingScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 14),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: HomeWarmColors.sectionAccent.withValues(alpha: 0.09),
+                            color: HomeWarmColors.sectionAccent
+                                .withValues(alpha: 0.09),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: HomeWarmColors.sectionAccent.withValues(alpha: 0.3),
+                              color: HomeWarmColors.sectionAccent
+                                  .withValues(alpha: 0.3),
                             ),
                           ),
                           child: Text(
@@ -166,9 +169,11 @@ class SeoTopicLandingScreen extends StatelessWidget {
                                 onPressed: () => context.go(item.route),
                                 style: TextButton.styleFrom(
                                   foregroundColor: HomeWarmColors.sectionAccent,
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
                                   item.label,
@@ -190,35 +195,43 @@ class SeoTopicLandingScreen extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                 backgroundColor: HomeWarmColors.sectionAccent,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 14),
                               ),
                               child: Text(
                                 'Discuss your project',
-                                style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                style: GoogleFonts.albertSans(
+                                    fontWeight: FontWeight.w700),
                               ),
                             ),
                             OutlinedButton(
                               onPressed: () => context.go(AppRoutes.portfolio),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: HomeWarmColors.headlinePrimary,
-                                side: BorderSide(color: HomeWarmColors.dividerLine),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                side: BorderSide(
+                                    color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 14),
                               ),
                               child: Text(
                                 'View portfolio',
-                                style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                style: GoogleFonts.albertSans(
+                                    fontWeight: FontWeight.w700),
                               ),
                             ),
                             OutlinedButton(
                               onPressed: () => context.go(AppRoutes.services),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: HomeWarmColors.headlinePrimary,
-                                side: BorderSide(color: HomeWarmColors.dividerLine),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                side: BorderSide(
+                                    color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 14),
                               ),
                               child: Text(
                                 'Services overview',
-                                style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                                style: GoogleFonts.albertSans(
+                                    fontWeight: FontWeight.w700),
                               ),
                             ),
                           ],

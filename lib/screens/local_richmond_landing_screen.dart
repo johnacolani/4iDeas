@@ -24,11 +24,11 @@ class LocalRichmondLandingScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -41,7 +41,7 @@ class LocalRichmondLandingScreen extends StatelessWidget {
         title: Text(
           'Richmond · Virginia · US',
           style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+            color: Colors.white,
             fontSize: isMobile ? 17 : 19,
             fontWeight: FontWeight.w700,
           ),
@@ -57,7 +57,8 @@ class LocalRichmondLandingScreen extends StatelessWidget {
             child: Scrollbar(
               thumbVisibility: true,
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 32, vertical: 24),
+                padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 20 : 32, vertical: 24),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: maxW),
@@ -175,7 +176,9 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                           children: [
                             OutlinedButton.icon(
                               onPressed: () => context.go(AppRoutes.portfolio),
-                              icon: Icon(Icons.folder_open_outlined, size: 20, color: HomeWarmColors.sectionAccent),
+                              icon: Icon(Icons.folder_open_outlined,
+                                  size: 20,
+                                  color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Portfolio & case studies',
                                 style: GoogleFonts.albertSans(
@@ -184,13 +187,17 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: HomeWarmColors.dividerLine),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                side: BorderSide(
+                                    color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                               ),
                             ),
                             OutlinedButton.icon(
                               onPressed: () => context.go(AppRoutes.services),
-                              icon: Icon(Icons.design_services_outlined, size: 20, color: HomeWarmColors.sectionAccent),
+                              icon: Icon(Icons.design_services_outlined,
+                                  size: 20,
+                                  color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Full services list',
                                 style: GoogleFonts.albertSans(
@@ -199,13 +206,18 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: HomeWarmColors.dividerLine),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                side: BorderSide(
+                                    color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                               ),
                             ),
                             OutlinedButton.icon(
-                              onPressed: () => context.go(AppRoutes.flutterDeveloperVirginia),
-                              icon: Icon(Icons.public, size: 20, color: HomeWarmColors.sectionAccent),
+                              onPressed: () => context
+                                  .go(AppRoutes.flutterDeveloperVirginia),
+                              icon: Icon(Icons.public,
+                                  size: 20,
+                                  color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Virginia Flutter page',
                                 style: GoogleFonts.albertSans(
@@ -214,13 +226,18 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: HomeWarmColors.dividerLine),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                side: BorderSide(
+                                    color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                               ),
                             ),
                             OutlinedButton.icon(
-                              onPressed: () => context.go(AppRoutes.firebaseAppDevelopmentServices),
-                              icon: Icon(Icons.cloud_outlined, size: 20, color: HomeWarmColors.sectionAccent),
+                              onPressed: () => context
+                                  .go(AppRoutes.firebaseAppDevelopmentServices),
+                              icon: Icon(Icons.cloud_outlined,
+                                  size: 20,
+                                  color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Firebase services page',
                                 style: GoogleFonts.albertSans(
@@ -229,8 +246,10 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: HomeWarmColors.dividerLine),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                side: BorderSide(
+                                    color: HomeWarmColors.dividerLine),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                               ),
                             ),
                           ],
@@ -271,7 +290,8 @@ class _HeroIntro extends StatelessWidget {
           decoration: BoxDecoration(
             color: HomeWarmColors.sectionAccent.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: HomeWarmColors.sectionAccent.withValues(alpha: 0.35)),
+            border: Border.all(
+                color: HomeWarmColors.sectionAccent.withValues(alpha: 0.35)),
           ),
           child: Text(
             'Flutter development · App strategy · Virginia & US',
@@ -289,7 +309,8 @@ class _HeroIntro extends StatelessWidget {
           decoration: BoxDecoration(
             color: HomeWarmColors.sectionAccent.withValues(alpha: 0.09),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: HomeWarmColors.sectionAccent.withValues(alpha: 0.28)),
+            border: Border.all(
+                color: HomeWarmColors.sectionAccent.withValues(alpha: 0.28)),
           ),
           child: Text(
             'Target keyword: flutter developer in richmond va',
@@ -413,7 +434,8 @@ class _ValueCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: HomeWarmColors.sectionAccent, size: isMobile ? 26 : 28),
+          Icon(icon,
+              color: HomeWarmColors.sectionAccent, size: isMobile ? 26 : 28),
           SizedBox(width: isMobile ? 12 : 14),
           Expanded(
             child: Column(
@@ -469,7 +491,8 @@ class _ServiceRow extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: Icon(Icons.check_circle_outline, size: 22, color: HomeWarmColors.sectionAccent),
+            child: Icon(Icons.check_circle_outline,
+                size: 22, color: HomeWarmColors.sectionAccent),
           ),
           SizedBox(width: isMobile ? 12 : 14),
           Expanded(
@@ -566,11 +589,13 @@ class _FinalCtaPanel extends StatelessWidget {
               backgroundColor: HomeWarmColors.sectionAccent,
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             child: Text(
               'Discuss your project',
-              style: GoogleFonts.albertSans(fontSize: body, fontWeight: FontWeight.w700),
+              style: GoogleFonts.albertSans(
+                  fontSize: body, fontWeight: FontWeight.w700),
             ),
           ),
           const SizedBox(height: 10),
@@ -583,7 +608,8 @@ class _FinalCtaPanel extends StatelessWidget {
             ),
             child: Text(
               'Start with a brief or scope request',
-              style: GoogleFonts.albertSans(fontSize: body - 0.5, fontWeight: FontWeight.w700),
+              style: GoogleFonts.albertSans(
+                  fontSize: body - 0.5, fontWeight: FontWeight.w700),
             ),
           ),
         ],

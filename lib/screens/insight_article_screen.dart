@@ -135,7 +135,8 @@ class InsightArticleScreen extends StatelessWidget {
                                 ),
                                 if (idx == 1) ...[
                                   _InlineCtaPanel(
-                                    onContact: () => context.go(AppRoutes.contact),
+                                    onContact: () =>
+                                        context.go(AppRoutes.contact),
                                   ),
                                   const SizedBox(height: 6),
                                 ],
@@ -145,7 +146,8 @@ class InsightArticleScreen extends StatelessWidget {
                         }),
                         _RelatedInsights(
                           related: ContentArticlesData.related(article),
-                          onOpen: (slug) => context.go(AppRoutes.insightsArticlePath(slug)),
+                          onOpen: (slug) =>
+                              context.go(AppRoutes.insightsArticlePath(slug)),
                         ),
                         const SizedBox(height: 20),
                         _ArticleFooterActions(
@@ -251,7 +253,8 @@ class _RelatedInsights extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 onTap: () => onOpen(article.slug),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: Row(
                     children: [
                       Expanded(
