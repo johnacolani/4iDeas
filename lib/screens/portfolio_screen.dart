@@ -188,8 +188,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           .where((s) => !firestoreIds.contains(s.id))
           .toList();
       final mergedFirestore = fromFirestore.map((cs) {
-        if (cs.id == 'asd')
+        if (cs.id == 'asd') {
           return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
+        }
         return PortfolioData.mergeHeroFromStaticIfMissing(cs);
       }).toList();
       list = [...mergedFirestore, ...staticOnly];
@@ -702,7 +703,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         // Aligns section edges with "My Own Design System" card (page 16/24/32 + card gutter 12/24).
                         left: isMobile ? 28 : (isTablet ? 48 : 56),
                         right: isMobile ? 28 : (isTablet ? 48 : 56),
-                        top: 0,
+                        top: isMobile ? 0 : 24,
                         bottom: isMobile ? 20 : 28,
                       ),
                       child: Column(
@@ -870,32 +871,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 child: _SectionTitle(
                                   title: 'App Showcase',
                                   sectionTitleSize: sectionTitleSize,
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: 8, bottom: 10),
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => context.push(
-                                        AppRoutes.portfolioDesignSystemPath(
-                                            '4ideas')),
-                                    icon: Icon(Icons.design_services_outlined,
-                                        size: 18,
-                                        color: ColorManager.portfolioTextBody),
-                                    label: Text(
-                                      'Open 4iDeas Design System',
-                                      style: GoogleFonts.albertSans(
-                                        color: ColorManager.portfolioTextBody,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    style: OutlinedButton.styleFrom(
-                                      side: BorderSide(
-                                          color: ColorManager.portfolioTextBody
-                                              .withValues(alpha: 0.5)),
-                                    ),
-                                  ),
                                 ),
                               ),
                               if (AdminService.isAdmin()) ...[
@@ -1344,9 +1319,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       ),
                                   ),
                                 ),
-                                const TextSpan(
+                                TextSpan(
                                   text:
                                       ' Cross platform development for mobile web and desktop.',
+                                  style: GoogleFonts.albertSans(
+                                    fontSize: (titleSize - 7).clamp(14.0, 26.0),
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                    color: ColorManager.portfolioTextTitle,
+                                  ),
                                 ),
                               ],
                             ),
@@ -1455,36 +1436,41 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                 width: double.infinity,
                 padding: const EdgeInsets.all(1.6),
                 decoration: BoxDecoration(
+                  color: const Color(0xFF0B1B3A).withValues(alpha: 0.46),
                   borderRadius: BorderRadius.circular(20),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryGold,
-                      AppColors.primaryGoldDark,
-                    ],
+                  border: Border.all(
+                    color: const Color(0xFF9EDB4D),
+                    width: 1.6,
                   ),
                 ),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: widget.isMobile ? 20 : 28,
-                    vertical: widget.isMobile ? 20 : 24,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0B1B3A).withValues(alpha: 0.62),
-                    borderRadius: BorderRadius.circular(18.4),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.08),
-                        Colors.white.withValues(alpha: 0.02),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.35, 1.0],
-                    ),
-                  ),
-                  child: Row(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18.4),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.isMobile ? 20 : 28,
+                        vertical: widget.isMobile ? 20 : 24,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0B1B3A).withValues(alpha: 0.38),
+                        borderRadius: BorderRadius.circular(18.4),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.24),
+                          width: 1.0,
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.14),
+                            Colors.white.withValues(alpha: 0.06),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.38, 1.0],
+                        ),
+                      ),
+                      child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (!widget.isMobile) ...[
@@ -1563,6 +1549,8 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                 ],
               ],
             ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -2540,7 +2528,8 @@ class _PremiumFeaturedCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
             color: Colors.black.withValues(alpha: 0.45),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.22),
+              color: const Color(0xFFD1D5DB).withValues(alpha: 0.58),
+              width: 1.1,
             ),
           ),
           child: Column(

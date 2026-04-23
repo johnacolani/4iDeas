@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:four_ideas/core/design_system/theme.dart';
-import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/data/services_data.dart';
 
 /// Resolves [ServiceItem.iconName] to Material [IconData] for the public site and admin hints.

@@ -85,8 +85,9 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
   }
 
   Widget _buildDetailRow(String label, String value, bool isMobile) {
-    if (value.isEmpty || value == 'Not specified')
+    if (value.isEmpty || value == 'Not specified') {
       return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: EdgeInsets.only(bottom: isMobile ? 12 : 16),

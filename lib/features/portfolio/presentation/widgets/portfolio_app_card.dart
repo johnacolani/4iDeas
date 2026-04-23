@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
@@ -8,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Flutter brand blue (logo / wordmark).
-const Color _kFlutterBrandBlue = Color(0xFF02569B);
+const Color _kFlutterBrandBlue = Color(0xFF81D4FA);
 
 class PortfolioAppCard extends StatefulWidget {
   final PortfolioApp app;
@@ -82,15 +84,36 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     final Widget cardBody = Stack(
       fit: StackFit.expand,
       children: [
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: cardPaddingH,
-            vertical: cardPaddingV,
-          ),
-          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 12),
-          child: isMobile
-              ? Column(
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: cardPaddingH,
+                vertical: cardPaddingV,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B7280).withValues(alpha: 0.20),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.26),
+                  width: 1.0,
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.14),
+                    const Color(0xFF9CA3AF).withValues(alpha: 0.10),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.42, 1.0],
+                ),
+              ),
+              child: isMobile
+                  ? Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(
@@ -117,9 +140,11 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       isDarkSurface: isDarkCardSurface,
                       accentGold: accentGold,
                     ),
+                    const SizedBox(height: 10),
+                    _buildOpenDesignSystemButton(context, bodySize),
                   ],
                 )
-              : Column(
+                  : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Expanded(
@@ -154,11 +179,18 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       isDarkSurface: isDarkCardSurface,
                       accentGold: accentGold,
                     ),
+                    const SizedBox(height: 10),
+                    _buildOpenDesignSystemButton(context, bodySize),
                   ],
                 ),
+            ),
+          ),
         ),
         Positioned.fill(
-          child: _buildFlutterWatermark(),
+          child: _buildFlutterWatermark(
+            useConversion: useConversion,
+            hasPinnedDesignSystemButton: false,
+          ),
         ),
       ],
     );
@@ -329,7 +361,11 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             ),
             child: Text(
               'View case study',
-              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.albertSans(
+                  fontWeight: FontWeight.w700, fontSize: bodySize),
             ),
           )
         : (primaryUrl != null
@@ -345,7 +381,11 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                 ),
                 child: Text(
                   'Open live product',
-                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.albertSans(
+                      fontWeight: FontWeight.w700, fontSize: bodySize),
                 ),
               )
             : null);
@@ -363,7 +403,11 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             ),
             child: Text(
               'Discuss a similar project',
-              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700, fontSize: bodySize - 1),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.albertSans(
+                  fontWeight: FontWeight.w700, fontSize: bodySize - 1),
             ),
           )
         : null;
@@ -400,18 +444,30 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       );
     }
 
+    final bool stackActions = isMobile || isTablet;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (primaryButton != null)
-              Expanded(child: primaryButton),
-            if (primaryButton != null && discussButton != null) const SizedBox(width: 12),
-            if (discussButton != null) Expanded(child: discussButton),
-          ],
-        ),
+        if (stackActions)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (primaryButton != null) primaryButton,
+              if (primaryButton != null && discussButton != null)
+                const SizedBox(height: 10),
+              if (discussButton != null) discussButton,
+            ],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (primaryButton != null) Expanded(child: primaryButton),
+              if (primaryButton != null && discussButton != null)
+                const SizedBox(width: 12),
+              if (discussButton != null) Expanded(child: discussButton),
+            ],
+          ),
         if (showOpenProductLink) ...[
           const SizedBox(height: 8),
           Align(
@@ -504,35 +560,58 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     if (chips.isEmpty) {
       return const SizedBox.shrink();
     }
-    const int chipsPerRow = 4;
-    const double gapH = 6;
-    const double gapV = 8;
-    final rowWidgets = <Widget>[];
-    for (var i = 0; i < chips.length; i += chipsPerRow) {
-      final end = i + chipsPerRow > chips.length ? chips.length : i + chipsPerRow;
-      final slice = chips.sublist(i, end);
-      rowWidgets.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var j = 0; j < slice.length; j++) ...[
-              if (j > 0) const SizedBox(width: gapH),
-              slice[j],
-            ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (int i = 0; i < chips.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            chips[i],
           ],
-        ),
-      );
-    }
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var r = 0; r < rowWidgets.length; r++) ...[
-          if (r > 0) const SizedBox(height: gapV),
-          Center(child: rowWidgets[r]),
         ],
-      ],
+      ),
+    );
+  }
+
+  Widget _buildOpenDesignSystemButton(BuildContext context, double bodySize) {
+    final String label = 'Open ${app.name} Design System';
+    return OutlinedButton(
+      onPressed: () => context.push(AppRoutes.portfolioDesignSystemPath(app.id)),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(
+          color: ColorManager.portfolioTextBody.withValues(alpha: 0.55),
+        ),
+        backgroundColor: Colors.black.withValues(alpha: 0.18),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.design_services_outlined,
+            size: isMobile ? 16 : 18,
+            color: ColorManager.portfolioTextBody,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.portfolioTextBody,
+                fontWeight: FontWeight.w700,
+                fontSize: bodySize - 1,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -631,11 +710,19 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
   }
 
   /// Centered overlay on the full card; does not block taps.
-  Widget _buildFlutterWatermark() {
-    final double iconSize = isMobile ? 36 : 44;
-    final double fontSize = isMobile ? 21 : 23;
+  Widget _buildFlutterWatermark({
+    required bool useConversion,
+    required bool hasPinnedDesignSystemButton,
+  }) {
+    final double iconSize =
+        (useConversion ? (isMobile ? 32 : 38) : (isMobile ? 36 : 44)) * 0.5;
+    final double fontSize =
+        (useConversion ? (isMobile ? 19 : 21) : (isMobile ? 21 : 23)) * 0.5;
+    final double topPadding = hasPinnedDesignSystemButton
+        ? (isMobile ? 52 : 62)
+        : (useConversion ? (isMobile ? 58 : 68) : 100);
     return Padding(
-      padding: const EdgeInsets.only(top: 100),
+      padding: EdgeInsets.only(top: topPadding),
       child: Center(
         child: IgnorePointer(
           child: Opacity(

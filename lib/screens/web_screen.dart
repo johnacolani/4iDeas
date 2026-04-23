@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
+import '../app_router.dart';
 import '../core/design_system/theme.dart';
 import '../core/home_warm_colors.dart';
 import '../core/widgets/aws_backend_section.dart';
@@ -17,23 +19,34 @@ class WebScreen extends StatefulWidget {
 }
 
 class _WebScreenState extends State<WebScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double he = MediaQuery.of(context).size.height;
     double wi = MediaQuery.of(context).size.width;
 
-    // Responsive breakpoints (WebScreen is used at width >= 600 from HomeScreen.)
+    // Home body: narrow vs mid vs wide (used for padding and type scale).
     final bool isMobile = wi < 600;
+    final bool showBodyMenuButton = wi < 800;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Top bar is removed, so keep hero close to top.
-    final double heroTopSpacing = isMobile ? 0 : (isTablet ? 10 : 6);
+    // Keep hero as close as possible to app bar.
+    final double heroTopSpacing = 0;
 
     return Directionality(
       textDirection: TextDirection.ltr,
       child: SafeArea(
+        top: false,
         child: Scrollbar(
+          controller: _scrollController,
           thumbVisibility: true,
           child: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
                 child: Column(
@@ -41,7 +54,12 @@ class _WebScreenState extends State<WebScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(height: heroTopSpacing),
-                    const ModernHeroSection(),
+                    if (showBodyMenuButton)
+                      const _MobileBodyMenuButton(),
+                    Transform.translate(
+                      offset: Offset.zero,
+                      child: const ModernHeroSection(),
+                    ),
                     SizedBox(height: isMobile ? 20 : 28),
                     Container(
                       width: double.infinity,
@@ -251,6 +269,71 @@ class _PlatformProofChips extends StatelessWidget {
             ),
           )
           .toList(),
+    );
+  }
+}
+
+class _MobileBodyMenuButton extends StatelessWidget {
+  const _MobileBodyMenuButton();
+
+  static const List<(String label, String route)> _items = [
+    ('Home', AppRoutes.home),
+    ('Services', AppRoutes.services),
+    ('Work', AppRoutes.portfolio),
+    ('Process', AppRoutes.designPhilosophy),
+    ('About', AppRoutes.about),
+    ('Contact Us', AppRoutes.contact),
+    ('Blog', AppRoutes.insights),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: PopupMenuButton<String>(
+          color: const Color(0xFF111827),
+          tooltip: 'Menu',
+          onSelected: (route) => context.go(route),
+          itemBuilder: (context) => _items
+              .map(
+                (item) => PopupMenuItem<String>(
+                  value: item.$2,
+                  child: Text(
+                    item.$1,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              )
+              .toList(),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.25),
+                width: 1,
+              ),
+              color: Colors.black.withValues(alpha: 0.18),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.menu, color: AppColors.primaryGold, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

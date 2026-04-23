@@ -24,20 +24,13 @@ class HomeWidget extends StatelessWidget {
     // Responsive breakpoints (HomeWidget is only used from MobileScreen, width under 600.)
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Space below the overlaid frosted header only (SafeArea already clears the notch).
-    // ~90–124px matches one- to two-row bar height; wider buffers on very narrow widths.
-    final double heroTopSpacing = () {
-      if (wi < 360) return 88.0;
-      if (wi < 400) return 82.0;
-      if (wi < 480) return 76.0;
-      if (wi < 600) return 72.0;
-      if (wi < 1024) return 248.0;
-      return 270.0;
-    }();
+    // Home route: chrome is above scroll in [HomeScreen]; only a small breath under the CTA row.
+    final double heroTopSpacing = 0.0;
 
     return Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
+          top: false,
           child: Scrollbar(
             thumbVisibility: true,
             child: CustomScrollView(

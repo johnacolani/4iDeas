@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
-import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/helper/app_background.dart';

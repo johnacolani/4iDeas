@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import '../ColorManager.dart';
 
 class AWSBackendSection extends StatelessWidget {
   final double wi;

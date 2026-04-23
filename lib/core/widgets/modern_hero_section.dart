@@ -6,7 +6,6 @@ import '../design_system/responsive.dart';
 import '../design_system/theme.dart';
 import '../design_system/widgets/primary_button.dart';
 import '../design_system/widgets/secondary_button.dart';
-import '../design_system/widgets/section_container.dart';
 
 class ModernHeroSection extends StatelessWidget {
   const ModernHeroSection({super.key});
@@ -19,34 +18,34 @@ class ModernHeroSection extends StatelessWidget {
           fontSize: Responsive.heroTitleSize(context),
         );
 
-    return SectionContainer(
-      maxWidth: 4000,
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: isMobile ? 172 : 190,
-          bottom: isMobile ? AppSpacing.lg : AppSpacing.xl,
-        ),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Transform.translate(
-            offset: const Offset(30, 0),
-            child: isDesktop
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: _HeroContent(titleStyle: titleStyle),
-                      ),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _HeroContent(titleStyle: titleStyle),
-                    ],
-                  ),
-          ),
+    final double horizontalPadding = isMobile ? 16 : (Responsive.isTablet(context) ? 24 : 40);
+    return Padding(
+      padding: EdgeInsets.only(
+        left: horizontalPadding,
+        right: horizontalPadding,
+        top: 0,
+        bottom: isMobile ? AppSpacing.lg : AppSpacing.xl,
+      ),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: Transform.translate(
+          offset: const Offset(30, 0),
+          child: isDesktop
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: _HeroContent(titleStyle: titleStyle),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _HeroContent(titleStyle: titleStyle),
+                  ],
+                ),
         ),
       ),
     );
@@ -82,7 +81,7 @@ class _HeroContent extends StatelessWidget {
                 ),
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.lg + 32 + 24),
         RichText(
           text: TextSpan(
             style: titleStyle,
@@ -107,14 +106,11 @@ class _HeroContent extends StatelessWidget {
               ),
         ),
         const SizedBox(height: AppSpacing.md),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 620),
-          child: Text(
-            'Product Design + Flutter + Firebase + AI.\nFrom idea to App Store - we build scalable products.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white,
-                ),
-          ),
+        Text(
+          'Product Design + Flutter + Firebase + AI.\nFrom idea to App Store - we build scalable products.',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Colors.white,
+              ),
         ),
         const SizedBox(height: AppSpacing.md),
         Wrap(

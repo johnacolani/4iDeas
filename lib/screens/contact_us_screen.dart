@@ -87,7 +87,7 @@ class ContactUsScreen extends StatelessWidget {
                             style: GoogleFonts.albertSans(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w800,
-                              color: HomeWarmColors.headlinePrimary,
+                              color: Colors.white,
                               height: 1.15,
                             ),
                           ),
@@ -98,7 +98,7 @@ class ContactUsScreen extends StatelessWidget {
                             style: GoogleFonts.albertSans(
                               fontSize: bodySize,
                               fontWeight: FontWeight.w500,
-                              color: HomeWarmColors.bodyEmphasis,
+                              color: Colors.white,
                               height: 1.55,
                             ),
                           ),
@@ -108,7 +108,7 @@ class ContactUsScreen extends StatelessWidget {
                             style: GoogleFonts.albertSans(
                               fontSize: bodySize - 0.5,
                               fontWeight: FontWeight.w600,
-                              color: HomeWarmColors.eyebrowMuted,
+                              color: Colors.white.withValues(alpha: 0.85),
                             ),
                           ),
                           if (showCalendly) ...[

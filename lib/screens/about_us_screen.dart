@@ -76,67 +76,69 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                         horizontal: isMobile ? 16.0 : (isTablet ? 24.0 : 32.0),
                         vertical: isMobile ? 20.0 : 24.0,
                       ),
-                      child: Center(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                             maxWidth: isMobile
                                 ? double.infinity
-                                : (isTablet ? 700 : 800),
+                                : (isTablet
+                                      ? 700
+                                      : (wi * 0.5).clamp(620.0, 800.0)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Header
-                              Center(
-                                child: Column(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Semantics(
                                       header: true,
                                       child: Text(
                                         '4iDeas',
                                         style: GoogleFonts.albertSans(
-                                          color: ColorManager.accentGoldDark,
+                                          color: Colors.white,
                                           fontSize: titleFontSize,
                                           fontWeight: FontWeight.bold,
                                         ),
-                                        textAlign: TextAlign.center,
+                                        textAlign: TextAlign.left,
                                       ),
                                     ),
                                     SizedBox(height: he * 0.01),
                                     Text(
                                       'Founder-led product design & Flutter consultancy',
                                       style: TextStyle(
-                                        color: ColorManager.primaryTeal,
+                                        color: Colors.white,
                                         fontSize: bodyFontSize,
                                         fontWeight: FontWeight.w500,
                                       ),
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.left,
                                     ),
                                     SizedBox(height: he * 0.01),
                                     SizedBox(height: he * 0.006),
                                     Text(
                                       'Led by John A. Colani',
                                       style: TextStyle(
-                                        color: ColorManager.textSecondary,
+                                        color: Colors.white,
                                         fontSize: subtitleFontSize,
                                         fontWeight: FontWeight.w600,
                                       ),
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.left,
                                     ),
                                     SizedBox(height: he * 0.008),
                                     Text(
                                       'Richmond, VA',
                                       style: TextStyle(
-                                        color: ColorManager.accentGoldDark
+                                        color: Colors.white
                                             .withValues(alpha: 0.8),
                                         fontSize: subtitleFontSize,
                                       ),
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.left,
                                     ),
                                     SizedBox(height: he * 0.03),
                                   ],
                                 ),
-                              ),
 
                               // Summary Section
                               _buildSection(
@@ -189,18 +191,18 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                               SizedBox(height: he * 0.04),
 
                               // Contact Links Section
-                              Center(
-                                child: Container(
+                              Container(
                                   padding: EdgeInsets.all(isMobile ? 20 : 24),
                                   decoration:
                                       ColorManager.loginAuthCardDecoration(
                                           borderRadius: 16),
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       SelectableText(
                                         'Let\'s Connect',
                                         style: GoogleFonts.albertSans(
-                                          color: ColorManager.accentGoldDark,
+                                          color: Colors.white,
                                           fontSize: sectionTitleSize,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -248,7 +250,6 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                     ],
                                   ),
                                 ),
-                              ),
 
                               SizedBox(height: he * 0.04),
                             ],
@@ -285,7 +286,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           SelectableText(
             title,
             style: GoogleFonts.albertSans(
-              color: ColorManager.accentGoldDark,
+              color: Colors.white,
               fontSize: sectionTitleSize,
               fontWeight: FontWeight.bold,
             ),
@@ -294,7 +295,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           SelectableText(
             content,
             style: TextStyle(
-              color: ColorManager.textSecondary,
+              color: Colors.white,
               fontSize: fontSize,
               height: 1.6,
             ),
@@ -370,7 +371,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
           Text(
             title,
             style: GoogleFonts.albertSans(
-              color: ColorManager.accentGoldDark,
+              color: Colors.white,
               fontSize: sectionTitleSize,
               fontWeight: FontWeight.bold,
             ),
@@ -395,7 +396,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             SelectableText(
                               exp['company'] as String,
                               style: GoogleFonts.albertSans(
-                                color: ColorManager.accentGoldDark,
+                                color: Colors.white,
                                 fontSize: bodyFontSize + 2,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -404,7 +405,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                             SelectableText(
                               exp['role'] as String,
                               style: TextStyle(
-                                color: ColorManager.primaryTeal,
+                                color: Colors.white,
                                 fontSize: bodyFontSize,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -415,7 +416,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                       SelectableText(
                         exp['period'] as String,
                         style: TextStyle(
-                          color: ColorManager.accentGoldDark
+                          color: Colors.white
                               .withValues(alpha: 0.7),
                           fontSize: bodyFontSize - 1,
                         ),
@@ -441,7 +442,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                   child: SelectableText(
                                     highlight,
                                     style: TextStyle(
-                                      color: ColorManager.textSecondary,
+                                      color: Colors.white,
                                       fontSize: bodyFontSize - 1,
                                       height: 1.5,
                                     ),
@@ -481,10 +482,10 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: ColorManager.containerSurface,
+          color: const Color(0xFF0B1F4A),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: ColorManager.containerBorder,
+            color: const Color(0xFF1F3D7A),
           ),
         ),
         child: Row(
@@ -502,7 +503,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   SelectableText(
                     label,
                     style: TextStyle(
-                      color: ColorManager.textMuted,
+                      color: Colors.white.withValues(alpha: 0.78),
                       fontSize: bodyFontSize - 2,
                     ),
                   ),
@@ -510,7 +511,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                   SelectableText(
                     value,
                     style: TextStyle(
-                      color: ColorManager.textPrimary,
+                      color: Colors.white,
                       fontSize: bodyFontSize,
                       fontWeight: FontWeight.w500,
                     ),
@@ -520,7 +521,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: ColorManager.textMuted,
+              color: Colors.white.withValues(alpha: 0.78),
               size: 16,
             ),
           ],

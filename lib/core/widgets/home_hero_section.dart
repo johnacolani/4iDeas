@@ -158,9 +158,9 @@ class HomeHeroSection extends StatelessWidget {
           ],
           const SizedBox(height: 0),
           if (!isMobile) ...[
-            Center(
-              child: Transform.translate(
-                offset: const Offset(0, -12),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Center(
                 child: SizedBox(
                   width: (wi * 0.5).clamp(260.0, 560.0).toDouble(),
                   child: const AppAutoScrollImage(),

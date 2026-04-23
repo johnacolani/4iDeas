@@ -393,7 +393,7 @@ class PortfolioData {
           name: '4iDeas - Portfolio Website',
           description:
               'Portfolio site: Flutter apps, backend services, product design. Responsive showcase, order form, modern UI. Flutter Web on Firebase.',
-          imagePath: 'assets/images/4ideas.png',
+          imagePath: 'assets/images/4ideas-avatar.png',
           appStoreUrl: null,
           playStoreUrl: null,
           webUrl: 'https://my-web-page-ef286.web.app/',

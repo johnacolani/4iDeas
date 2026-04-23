@@ -4,11 +4,104 @@ import 'package:flutter/material.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/screens/web_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../helper/app_background.dart';
 import '../core/design_system/theme.dart';
 
-import 'mobile_screen.dart';
+const String _kHomePhoneDigits = '8047749008';
+
+Future<void> _launchHomePhone() async {
+  final uri = Uri(scheme: 'tel', path: _kHomePhoneDigits);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+void _showLetsTalkDialog(BuildContext context) {
+  showDialog<String>(
+    context: context,
+    barrierDismissible: true,
+    useRootNavigator: true,
+    builder: (dialogContext) {
+      return AlertDialog(
+          backgroundColor: AppColors.bgCard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: AppColors.borderColor),
+          ),
+          title: const Text(
+            "Let's Talk",
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+              fontSize: 20,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Tap the number to call, or open the contact page to send a message.',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Material(
+                color: AppColors.borderColor.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  onTap: () => Navigator.of(dialogContext).pop('call'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    child: Row(
+                      children: [
+                        Icon(Icons.phone, color: AppColors.primaryGold, size: 24),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            '(804) 774-9008',
+                            style: TextStyle(
+                              color: AppColors.primaryGold,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.primaryGold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop('dismissed'),
+              child: Text('Close', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop('contact'),
+              child: const Text('Contact page', style: TextStyle(color: AppColors.primaryGold, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        );
+    },
+  ).then((result) {
+    if (result == 'call') {
+      _launchHomePhone();
+    } else if (result == 'contact' && context.mounted) {
+      context.go(AppRoutes.contact);
+    }
+  });
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,12 +122,78 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const AppBackground(),
           Positioned.fill(
-            child: isMobile ? const MobileScreen() : const WebScreen(),
-          ),
-          SafeArea(
-            child: _ModernTopAppBar(isMobile: isMobile),
+            child: Column(
+              children: [
+                SafeArea(
+                  bottom: false,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _ModernTopAppBar(isMobile: isMobile),
+                      if (isMobile) ...[
+                        const SizedBox(height: 8),
+                        const _AccountMetaBlock(),
+                      ],
+                      const SizedBox(height: 12),
+                      _HomeLetsTalkBar(isMobile: isMobile),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SafeArea(
+                    top: false,
+                    // Same home content on phone, tablet, and desktop (see [WebScreen]).
+                    child: const WebScreen(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HomeLetsTalkBar extends StatelessWidget {
+  const _HomeLetsTalkBar({required this.isMobile});
+
+  final bool isMobile;
+
+  @override
+  Widget build(BuildContext context) {
+    final navStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        );
+    return Padding(
+      padding: EdgeInsets.only(
+        left: isMobile ? 14 : 24,
+        right: 64,
+        bottom: 8,
+      ),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: OutlinedButton(
+          onPressed: () => _showLetsTalkDialog(context),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(
+              color: AppColors.primaryGold,
+              width: 1.1,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          ),
+          child: Text(
+            "Let's Talk",
+            style: navStyle?.copyWith(
+              color: AppColors.primaryGold,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -68,10 +227,11 @@ class _ModernTopAppBar extends StatelessWidget {
             child: Row(
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     const SizedBox(width: 20),
                     Image.asset('assets/images/logo.png',
-                        width: isMobile ? 28 : 34, height: isMobile ? 28 : 34),
+                        width: isMobile ? 56 : 68, height: isMobile ? 56 : 68),
                     const SizedBox(width: 10),
                     RichText(
                       text: TextSpan(
@@ -96,7 +256,7 @@ class _ModernTopAppBar extends StatelessWidget {
                                 ),
                             ),
                           ),
-                          const TextSpan(text: 'DEAS'),
+                          const TextSpan(text: 'Deas'),
                         ],
                       ),
                     ),
@@ -112,32 +272,8 @@ class _ModernTopAppBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 16),
                   const _AccountMetaBlock(),
-                  const SizedBox(width: 16),
-                  OutlinedButton(
-                    onPressed: () => context.go(AppRoutes.contact),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                          color: AppColors.primaryGold, width: 1.1),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 14),
-                    ),
-                    child: Text(
-                      "Let's Talk",
-                      style: navStyle?.copyWith(
-                          color: AppColors.primaryGold,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
                 ] else ...[
                   const Spacer(),
-                  IconButton(
-                    onPressed: () => context.go(AppRoutes.contact),
-                    icon: const Icon(Icons.chat_bubble_outline,
-                        color: AppColors.primaryGold),
-                    tooltip: "Let's Talk",
-                  ),
                 ],
               ],
             ),
@@ -163,6 +299,7 @@ class _TopNavTabs extends StatelessWidget {
     ('Work', AppRoutes.portfolio),
     ('Process', AppRoutes.designPhilosophy),
     ('About', AppRoutes.about),
+    ('Contact Us', AppRoutes.contact),
     ('Blog', AppRoutes.insights),
   ];
 
@@ -172,7 +309,8 @@ class _TopNavTabs extends StatelessWidget {
     if (path.startsWith(AppRoutes.portfolio)) return 2;
     if (path == AppRoutes.designPhilosophy) return 3;
     if (path == AppRoutes.about) return 4;
-    if (path.startsWith(AppRoutes.insights)) return 5;
+    if (path == AppRoutes.contact) return 5;
+    if (path.startsWith(AppRoutes.insights)) return 6;
     return 0;
   }
 
@@ -213,18 +351,21 @@ class _AccountMetaBlock extends StatelessWidget {
           color: Colors.white,
           fontWeight: FontWeight.w600,
         );
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
         Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
               onPressed: () => context.go(AppRoutes.login),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -238,7 +379,7 @@ class _AccountMetaBlock extends StatelessWidget {
               onPressed: () => context.go(AppRoutes.signUp),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -246,13 +387,14 @@ class _AccountMetaBlock extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 16),
         Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.location_on,
                 color: AppColors.primaryGold, size: 15),
-            const SizedBox(width: 4),
+            const SizedBox(width: 6),
             Text(
               'Based in: Richmond, VA',
               style: textStyle?.copyWith(
@@ -263,6 +405,7 @@ class _AccountMetaBlock extends StatelessWidget {
           ],
         ),
       ],
+      ),
     );
   }
 }
