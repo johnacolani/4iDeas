@@ -25,6 +25,7 @@ class ModernHeroSection extends StatelessWidget {
     final double horizontalPadding = isMobile
         ? 10
         : (Responsive.isTablet(context) ? 18 : 32);
+    final double w = MediaQuery.sizeOf(context).width;
     return Padding(
       padding: EdgeInsets.only(
         left: horizontalPadding,
@@ -49,9 +50,12 @@ class ModernHeroSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  // Top-right: outline CTA on web desktop only.
-                  const _DesktopTopRightLetsTalk(
-                    ctaWidth: 278.0,
+                  // Top-right: outline CTA; extra 3% viewport inset on the right.
+                  Padding(
+                    padding: EdgeInsets.only(right: w * 0.03),
+                    child: const _DesktopTopRightLetsTalk(
+                      ctaWidth: 278.0,
+                    ),
                   ),
                 ],
               )
@@ -152,11 +156,15 @@ class _HeroContent extends StatelessWidget {
           LayoutBuilder(
             builder: (context, c) {
               // Narrower than Discuss / Explore so the outline CTA does not read as a full bar.
-              final double w = (ctaWidth * 0.3).clamp(108.0, c.maxWidth);
-              if (w <= 0) return const SizedBox.shrink();
-              return _LetsTalkPillButton(
-                width: w,
-                alignToStart: !center,
+              final double pillW = (ctaWidth * 0.3).clamp(108.0, c.maxWidth);
+              if (pillW <= 0) return const SizedBox.shrink();
+              final double vw = MediaQuery.sizeOf(context).width;
+              return Padding(
+                padding: EdgeInsets.only(right: vw * 0.03),
+                child: _LetsTalkPillButton(
+                  width: pillW,
+                  alignToStart: !center,
+                ),
               );
             },
           ),

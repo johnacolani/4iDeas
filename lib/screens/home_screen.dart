@@ -163,7 +163,8 @@ class _ModernTopAppBar extends StatelessWidget {
               left: isMobile
                   ? 6.0
                   : AppBreakpoints.homeContentGutter,
-              right: isMobile ? 6.0 : 24.0,
+              // Extra 3% viewport to the right of sign-in / sign-up and founder chip.
+              right: (isMobile ? 6.0 : 24.0) + viewportWidth * 0.03,
               top: topInset + contentTopNudge,
               bottom: bottomContentPadding,
             ),
