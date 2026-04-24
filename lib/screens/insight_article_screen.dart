@@ -35,7 +35,7 @@ class InsightArticleScreen extends StatelessWidget {
         ),
         title: Text(
           'Insight',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: HomeWarmColors.textInk,
             fontWeight: FontWeight.w700,
             fontSize: isMobile ? 20 : 22,
@@ -62,7 +62,7 @@ class InsightArticleScreen extends StatelessWidget {
                       children: [
                         Text(
                           article.topic.toUpperCase(),
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
                             color: HomeWarmColors.sectionAccent,
@@ -74,7 +74,7 @@ class InsightArticleScreen extends StatelessWidget {
                           header: true,
                           child: Text(
                             article.title,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w800,
                               color: HomeWarmColors.headlinePrimary,
@@ -85,7 +85,7 @@ class InsightArticleScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         Text(
                           '${article.readTimeMinutes} min read · ${article.publishedAtIso}',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: bodySize - 2,
                             fontWeight: FontWeight.w600,
                             color: HomeWarmColors.eyebrowMuted,
@@ -94,7 +94,7 @@ class InsightArticleScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                         Text(
                           article.excerpt,
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: bodySize + 1,
                             fontWeight: FontWeight.w500,
                             color: HomeWarmColors.bodyEmphasis,
@@ -112,7 +112,7 @@ class InsightArticleScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   section.heading,
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontSize: bodySize + 4,
                                     fontWeight: FontWeight.w800,
                                     color: HomeWarmColors.headlinePrimary,
@@ -124,7 +124,7 @@ class InsightArticleScreen extends StatelessWidget {
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: Text(
                                       p,
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         fontSize: bodySize,
                                         fontWeight: FontWeight.w500,
                                         color: HomeWarmColors.bodyEmphasis,
@@ -186,7 +186,7 @@ class _InlineCtaPanel extends StatelessWidget {
         children: [
           Text(
             'Applying this in your app?',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: HomeWarmColors.headlinePrimary,
@@ -195,7 +195,7 @@ class _InlineCtaPanel extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'If you need help turning strategy into shipped product decisions, I can help.',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: 15,
               fontWeight: FontWeight.w500,
               color: HomeWarmColors.bodyEmphasis,
@@ -210,7 +210,7 @@ class _InlineCtaPanel extends StatelessWidget {
             ),
             child: Text(
               'Discuss your project',
-              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+              style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -236,7 +236,7 @@ class _RelatedInsights extends StatelessWidget {
       children: [
         Text(
           'Related insights',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             fontSize: 22,
             fontWeight: FontWeight.w800,
             color: HomeWarmColors.headlinePrimary,
@@ -260,7 +260,7 @@ class _RelatedInsights extends StatelessWidget {
                       Expanded(
                         child: Text(
                           article.title,
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w700,
                             color: HomeWarmColors.headlinePrimary,
@@ -300,7 +300,7 @@ class _ArticleFooterActions extends StatelessWidget {
           icon: const Icon(Icons.article_outlined, size: 18),
           label: Text(
             'Back to insights',
-            style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+            style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
           ),
         ),
         FilledButton.icon(
@@ -312,7 +312,7 @@ class _ArticleFooterActions extends StatelessWidget {
           ),
           label: Text(
             'Discuss your project',
-            style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+            style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
           ),
         ),
       ],

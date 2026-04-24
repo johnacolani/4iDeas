@@ -52,7 +52,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
         ),
         title: Text(
           page.appBarTitle,
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w700,
@@ -83,7 +83,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                           header: true,
                           child: SelectableText(
                             page.h1,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.headlinePrimary,
                               fontSize: isMobile ? 26 : 32,
                               fontWeight: FontWeight.w800,
@@ -106,7 +106,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                           ),
                           child: Text(
                             'Target keyword: ${page.targetKeyword}',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.eyebrowMuted,
                               fontSize: isMobile ? 13 : 13.5,
                               fontWeight: FontWeight.w700,
@@ -117,7 +117,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                         for (final p in page.paragraphs) ...[
                           SelectableText(
                             p,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.bodyEmphasis,
                               fontSize: body,
                               height: 1.55,
@@ -130,7 +130,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                           header: true,
                           child: Text(
                             'How engagements usually run',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.headlinePrimary,
                               fontSize: isMobile ? 20 : 22,
                               fontWeight: FontWeight.w800,
@@ -140,7 +140,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         SelectableText(
                           page.processBlurb,
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             color: HomeWarmColors.bodyEmphasis,
                             fontSize: body,
                             height: 1.5,
@@ -151,7 +151,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                           header: true,
                           child: Text(
                             'Related commercial services',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.headlinePrimary,
                               fontSize: isMobile ? 20 : 22,
                               fontWeight: FontWeight.w800,
@@ -176,7 +176,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                                 ),
                                 child: Text(
                                   item.label,
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700,
                                     decoration: TextDecoration.underline,
                                   ),
@@ -199,7 +199,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 'Discuss your project',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700),
                               ),
                             ),
@@ -214,7 +214,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 'View portfolio',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700),
                               ),
                             ),
@@ -229,7 +229,7 @@ class SeoTopicLandingScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 'Services overview',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700),
                               ),
                             ),

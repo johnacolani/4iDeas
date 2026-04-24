@@ -109,7 +109,7 @@ class _AdminOpenSourceEditScreenState extends State<AdminOpenSourceEditScreen> {
         iconTheme: const IconThemeData(color: Colors.amber),
         title: Text(
           isEdit ? 'Edit Open Source Item' : 'Add Open Source Item',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -185,7 +185,7 @@ class _AdminOpenSourceEditScreenState extends State<AdminOpenSourceEditScreen> {
                                 )
                               : Text(
                                   isEdit ? 'Update' : 'Add',
-                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
                                 ),
                         ),
                       ],
@@ -213,12 +213,12 @@ class _AdminOpenSourceEditScreenState extends State<AdminOpenSourceEditScreen> {
         controller: controller,
         maxLines: maxLines,
         validator: validator,
-        style: GoogleFonts.albertSans(color: Colors.white, fontSize: 15),
+        style: GoogleFonts.roboto(color: Colors.white, fontSize: 15),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: GoogleFonts.albertSans(color: Colors.white70),
-          hintStyle: GoogleFonts.albertSans(color: Colors.white38),
+          labelStyle: GoogleFonts.roboto(color: Colors.white70),
+          hintStyle: GoogleFonts.roboto(color: Colors.white38),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(8),

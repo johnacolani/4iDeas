@@ -25,7 +25,7 @@ class InsightsScreen extends StatelessWidget {
         centerTitle: true,
         title: Text(
           'Insights',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: HomeWarmColors.textInk,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.w700,
@@ -54,7 +54,7 @@ class InsightsScreen extends StatelessWidget {
                           header: true,
                           child: Text(
                             'Practical product insights for teams building with Flutter',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w800,
                               color: HomeWarmColors.headlinePrimary,
@@ -66,7 +66,7 @@ class InsightsScreen extends StatelessWidget {
                         Text(
                           'Articles on Flutter app development, MVP planning, product design, Firebase, and AI-assisted features. '
                           'Written for founders and product teams who need clear decisions, not hype.',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: bodySize,
                             fontWeight: FontWeight.w500,
                             color: HomeWarmColors.bodyEmphasis,
@@ -130,7 +130,7 @@ class _TopicChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           fontSize: 12.5,
           fontWeight: FontWeight.w700,
           color: HomeWarmColors.eyebrowMuted,
@@ -184,7 +184,7 @@ class _ArticleCard extends StatelessWidget {
                 ),
                 child: Text(
                   article.topic,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: HomeWarmColors.sectionAccent,
@@ -193,7 +193,7 @@ class _ArticleCard extends StatelessWidget {
               ),
               Text(
                 '${article.readTimeMinutes} min read',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: HomeWarmColors.eyebrowMuted,
@@ -204,7 +204,7 @@ class _ArticleCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             article.title,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: bodySize + 4,
               fontWeight: FontWeight.w800,
               color: HomeWarmColors.headlinePrimary,
@@ -214,7 +214,7 @@ class _ArticleCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             article.excerpt,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: bodySize,
               fontWeight: FontWeight.w500,
               color: HomeWarmColors.bodyEmphasis,
@@ -235,7 +235,7 @@ class _ArticleCard extends StatelessWidget {
                 ),
                 child: Text(
                   'Read article',
-                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                  style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
                 ),
               ),
               OutlinedButton(
@@ -247,7 +247,7 @@ class _ArticleCard extends StatelessWidget {
                 ),
                 child: Text(
                   'Discuss your project',
-                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+                  style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
@@ -286,7 +286,7 @@ class _InsightsBottomCta extends StatelessWidget {
         children: [
           Text(
             'Need help applying this to your product?',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: bodySize + 2,
               fontWeight: FontWeight.w800,
               color: HomeWarmColors.headlinePrimary,
@@ -295,7 +295,7 @@ class _InsightsBottomCta extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Share your current stage, constraints, and what you need to ship next.',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: bodySize,
               fontWeight: FontWeight.w500,
               color: HomeWarmColors.bodyEmphasis,
@@ -310,7 +310,7 @@ class _InsightsBottomCta extends StatelessWidget {
             ),
             child: Text(
               'Discuss your project',
-              style: GoogleFonts.albertSans(fontWeight: FontWeight.w700),
+              style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
             ),
           ),
         ],

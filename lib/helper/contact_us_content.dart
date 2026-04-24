@@ -247,7 +247,7 @@ class _ContactUsContentState extends State<ContactUsContent> {
                 SizedBox(height: isMobile ? 12 : 16),
                 Text(
                   'John A. Colani',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: isMobile ? 22 : 24,
                     fontWeight: FontWeight.bold,
                     color: ColorManager.textPrimary,
@@ -258,7 +258,7 @@ class _ContactUsContentState extends State<ContactUsContent> {
                 Text(
                   'Senior Flutter engineer · Product designer',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: isMobile ? 14 : 15,
                     color: ColorManager.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -341,7 +341,7 @@ class _ContactUsContentState extends State<ContactUsContent> {
                 ),
                 child: Text(
                   'Close',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: isMobile ? 16 : 17,
                     fontWeight: FontWeight.bold,
                   ),

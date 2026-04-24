@@ -99,43 +99,43 @@ class DesignSystemTheme {
 
   static TextTheme _textTheme(TextTheme base) {
     return base.copyWith(
-      displayLarge: GoogleFonts.poppins(
+      displayLarge: GoogleFonts.roboto(
         fontSize: 64,
         fontWeight: FontWeight.w700,
         letterSpacing: -1.5,
         color: AppColors.textPrimary,
         height: 1.1,
       ),
-      headlineMedium: GoogleFonts.poppins(
+      headlineMedium: GoogleFonts.roboto(
         fontSize: 40,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
         height: 1.2,
       ),
-      headlineSmall: GoogleFonts.poppins(
+      headlineSmall: GoogleFonts.roboto(
         fontSize: 28,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
         height: 1.3,
       ),
-      bodyLarge: GoogleFonts.inter(
+      bodyLarge: GoogleFonts.roboto(
         fontSize: 18,
         fontWeight: FontWeight.w400,
         color: AppColors.textSecondary,
         height: 1.7,
       ),
-      bodyMedium: GoogleFonts.inter(
+      bodyMedium: GoogleFonts.roboto(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: AppColors.textSecondary,
         height: 1.6,
       ),
-      bodySmall: GoogleFonts.inter(
+      bodySmall: GoogleFonts.roboto(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: AppColors.textMuted,
       ),
-      labelLarge: GoogleFonts.poppins(
+      labelLarge: GoogleFonts.roboto(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,

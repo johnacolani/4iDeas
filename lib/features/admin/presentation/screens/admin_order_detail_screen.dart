@@ -154,7 +154,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
         ),
         title: Text(
           'Order Details',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -185,7 +185,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         children: [
                           Text(
                             appName,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: ColorManager.textPrimary,
                               fontSize: isMobile ? 24 : 26,
                               fontWeight: FontWeight.bold,
@@ -361,7 +361,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                             existingResponse.isEmpty
                                 ? 'Send Response to Client'
                                 : 'Update Response',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: ColorManager.textPrimary,
                               fontSize: isMobile ? 20 : 22,
                               fontWeight: FontWeight.bold,
@@ -432,7 +432,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                     )
                                   : Text(
                                       'Send Response',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         fontSize: isMobile ? 16 : 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -480,7 +480,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                               Expanded(
                                 child: Text(
                                   'Contract',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     color: ColorManager.textPrimary,
                                     fontSize: isMobile ? 20 : 22,
                                     fontWeight: FontWeight.bold,
@@ -762,7 +762,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                                     color: ColorManager.onDarkPrimary),
                                 label: Text(
                                   'Send Contract',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontSize: isMobile ? 16 : 18,
                                     fontWeight: FontWeight.bold,
                                   ),

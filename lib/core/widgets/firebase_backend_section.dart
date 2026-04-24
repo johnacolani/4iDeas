@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/core/design_system/responsive.dart';
 import 'package:sizer/sizer.dart';
 
 class FirebaseBackendSection extends StatelessWidget {
@@ -14,6 +15,11 @@ class FirebaseBackendSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final bodyAlign = isDesktop ? TextAlign.start : TextAlign.center;
+    final colCross = isDesktop
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.center;
     final List<Map<String, String>> services = [
       {
         'name': 'Firestore',
@@ -93,12 +99,14 @@ class FirebaseBackendSection extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: colCross,
         mainAxisSize: MainAxisSize.min,
         children: [
           // Firebase Logo/Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: isDesktop
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -120,7 +128,7 @@ class FirebaseBackendSection extends StatelessWidget {
               SizedBox(width: isMobile ? 12 : 16),
               SelectableText(
                 'Firebase',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontSize: isMobile ? (wi < 400 ? 24 : 28) : wi * 0.028,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFFFFCA28),
@@ -131,12 +139,12 @@ class FirebaseBackendSection extends StatelessWidget {
           SizedBox(height: isMobile ? 16 : 24),
           SelectableText(
             'Complete Backend Solutions',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile ? (wi < 400 ? 14 : 16) : wi * 0.018,
               color: const Color(0xFFE5E7EB),
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
+            textAlign: bodyAlign,
           ),
           SizedBox(height: isMobile ? 20 : 28),
           // Services List
@@ -171,8 +179,9 @@ class FirebaseBackendSection extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: colCross,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: isMobile ? 50 : wi * 0.05,
@@ -196,35 +205,29 @@ class FirebaseBackendSection extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(width: isMobile ? 12 : 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SelectableText(
-                              service['name']!,
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile
-                                    ? (wi < 400 ? 14 : 16)
-                                    : wi * 0.018,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: isMobile ? 6 : 8),
-                            SelectableText(
-                              service['description'] ?? '',
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile
-                                    ? (wi < 400 ? 12 : 14)
-                                    : (wi < 1024 ? 11 : 13),
-                                color: const Color(0xFFD1D5DB),
-                                fontWeight: FontWeight.w400,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
+                      SizedBox(height: isMobile ? 10 : 12),
+                      SelectableText(
+                        service['name']!,
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400 ? 14 : 16)
+                              : wi * 0.018,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 6 : 8),
+                      SelectableText(
+                        service['description'] ?? '',
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400 ? 12 : 14)
+                              : (wi < 1024 ? 11 : 13),
+                          color: const Color(0xFFD1D5DB),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
                         ),
                       ),
                     ],

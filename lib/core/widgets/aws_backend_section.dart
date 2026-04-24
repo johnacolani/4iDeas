@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/core/design_system/responsive.dart';
 import 'package:sizer/sizer.dart';
 
 class AWSBackendSection extends StatelessWidget {
@@ -14,6 +15,11 @@ class AWSBackendSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final bodyAlign = isDesktop ? TextAlign.start : TextAlign.center;
+    final colCross = isDesktop
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.center;
     final List<Map<String, String>> services = [
       {
         'name': 'EC2',
@@ -94,12 +100,14 @@ class AWSBackendSection extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: colCross,
         mainAxisSize: MainAxisSize.min,
         children: [
           // AWS Logo/Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: isDesktop
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -128,7 +136,7 @@ class AWSBackendSection extends StatelessWidget {
               SizedBox(width: isMobile ? 12 : 16),
               SelectableText(
                 'AWS',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontSize: isMobile
                       ? (wi < 400 ? 24.sp * 1.3 : 28.sp * 1.3)
                       : wi * 0.028,
@@ -141,7 +149,7 @@ class AWSBackendSection extends StatelessWidget {
           SizedBox(height: isMobile ? 16 : 24),
           SelectableText(
             'Enterprise Cloud Infrastructure',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile
                   ? (wi < 400
                       ? 16.sp * 1.3 * 0.7 * 0.7 * 0.8
@@ -150,7 +158,7 @@ class AWSBackendSection extends StatelessWidget {
               color: const Color(0xFFE5E7EB),
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
+            textAlign: bodyAlign,
           ),
           SizedBox(height: isMobile ? 20 : 28),
           // Services List
@@ -185,8 +193,9 @@ class AWSBackendSection extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: colCross,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: isMobile ? 50 : wi * 0.05,
@@ -209,39 +218,33 @@ class AWSBackendSection extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(width: isMobile ? 12 : 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SelectableText(
-                              service['name']!,
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile
-                                    ? (wi < 400
-                                        ? 14.sp * 1.3 * 0.7 * 0.7
-                                        : 16.sp * 1.3 * 0.7 * 0.7)
-                                    : wi * 0.018,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: isMobile ? 6 : 8),
-                            SelectableText(
-                              service['description'] ?? '',
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile
-                                    ? (wi < 400
-                                        ? 12.sp * 1.3 * 0.7
-                                        : 14.sp * 1.3 * 0.7)
-                                    : (wi < 1024 ? 11 : 13),
-                                color: const Color(0xFFD1D5DB),
-                                fontWeight: FontWeight.w400,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
+                      SizedBox(height: isMobile ? 10 : 12),
+                      SelectableText(
+                        service['name']!,
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400
+                                  ? 14.sp * 1.3 * 0.7 * 0.7
+                                  : 16.sp * 1.3 * 0.7 * 0.7)
+                              : wi * 0.018,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 6 : 8),
+                      SelectableText(
+                        service['description'] ?? '',
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400
+                                  ? 12.sp * 1.3 * 0.7
+                                  : 14.sp * 1.3 * 0.7)
+                              : (wi < 1024 ? 11 : 13),
+                          color: const Color(0xFFD1D5DB),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
                         ),
                       ),
                     ],

@@ -142,7 +142,7 @@ class ServiceOfferingCard extends StatelessWidget {
                               blendMode: BlendMode.srcIn,
                               child: Text(
                                 item.title,
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                   color: Colors.white,
                                   fontSize: sectionTitleSize,
                                   fontWeight: FontWeight.w700,
@@ -153,7 +153,7 @@ class ServiceOfferingCard extends StatelessWidget {
                             SizedBox(height: isMobile ? 4 : 6),
                             SelectableText(
                               item.subtitle,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: const Color(0xFFD1D5DB),
                                 fontSize: bodyFontSize - 1,
                                 fontWeight: FontWeight.w600,
@@ -169,7 +169,7 @@ class ServiceOfferingCard extends StatelessWidget {
                     SizedBox(height: isMobile ? 14 : 16),
                     SelectableText(
                       item.valueProposition,
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: AppColors.primaryGold,
                         fontSize: bodyFontSize,
                         fontWeight: FontWeight.w600,
@@ -180,7 +180,7 @@ class ServiceOfferingCard extends StatelessWidget {
                   SizedBox(height: isMobile ? 12 : 14),
                   SelectableText(
                     item.description,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: const Color(0xFFD1D5DB),
                       fontSize: bodyFontSize,
                       height: 1.55,
@@ -190,7 +190,7 @@ class ServiceOfferingCard extends StatelessWidget {
                   SizedBox(height: isMobile ? 16 : 18),
                   Text(
                     'What’s included',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: bodyFontSize - 1,
                       fontWeight: FontWeight.w700,
@@ -215,7 +215,7 @@ class ServiceOfferingCard extends StatelessWidget {
                           Expanded(
                             child: SelectableText(
                               detail,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: const Color(0xFFD1D5DB),
                                 fontSize: bodyFontSize - 1,
                                 height: 1.5,
@@ -246,7 +246,7 @@ class ServiceOfferingCard extends StatelessWidget {
                         children: [
                           Text(
                             'Best for',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: AppColors.primaryGold,
                               fontSize: bodyFontSize - 2,
                               fontWeight: FontWeight.w700,
@@ -256,7 +256,7 @@ class ServiceOfferingCard extends StatelessWidget {
                           SizedBox(height: 6),
                           SelectableText(
                             item.idealClient,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: const Color(0xFFD1D5DB),
                               fontSize: bodyFontSize - 1,
                               height: 1.45,
@@ -283,7 +283,7 @@ class ServiceOfferingCard extends StatelessWidget {
                       onPressed: onCta,
                       child: Text(
                         item.ctaLabel,
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           fontSize: bodyFontSize - 1,
                           fontWeight: FontWeight.w700,
                         ),

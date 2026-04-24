@@ -67,7 +67,7 @@ class HomeWidget extends StatelessWidget {
                       child: Center(
                         child: SelectableText(
                           'Your backend could be',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: isMobile
                                 ? (wi < 400 ? 18 : 20)
                                 : (isTablet ? wi * 0.028 : wi * 0.032),

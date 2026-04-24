@@ -7,8 +7,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:four_ideas/app_router.dart';
 
+import '../design_system/responsive.dart';
 import '../design_system/theme.dart';
 import '../home_warm_colors.dart';
+
+TextAlign _homeTextAlign(BuildContext c) =>
+    Responsive.isDesktop(c) ? TextAlign.start : TextAlign.center;
 
 /// Trust-building blocks for the marketing home: why hire, process, proof, FAQ, final CTA.
 class TrustBuildingHomeSections extends StatelessWidget {
@@ -51,63 +55,63 @@ class TrustBuildingHomeSections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final box = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: _maxContentWidth),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _WhyWorkWithMe(
+            titleFont: _titleFont,
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+            isTablet: isTablet,
+            wi: wi,
+          ),
+          SizedBox(height: _sectionGap * 0.85),
+          _RichmondVaLocalPromo(
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+            onOpen: () => _go(context, AppRoutes.flutterDeveloperRichmondVa),
+          ),
+          SizedBox(height: _sectionGap),
+          _MyProcessBlock(
+            titleFont: _titleFont,
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+          ),
+          SizedBox(height: _sectionGap),
+          _ProofCredibilityBlock(
+            titleFont: _titleFont,
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+            onInternal: (path) => _go(context, path),
+            onExternal: (u) => _openExternal(context, u),
+          ),
+          SizedBox(height: _sectionGap),
+          _FaqBlock(
+            titleFont: _titleFont,
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+          ),
+          SizedBox(height: _sectionGap),
+          _FinalCtaBlock(
+            titleFont: _titleFont,
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+            isNarrow: wi < 440,
+            onContact: () => _go(context, AppRoutes.contact),
+            onServices: () => _go(context, AppRoutes.services),
+            onBrief: () => _go(context, AppRoutes.orderHere),
+          ),
+          SizedBox(height: isMobile ? 28 : 36),
+        ],
+      ),
+    );
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: _horizontalPad),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: _maxContentWidth),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _WhyWorkWithMe(
-                titleFont: _titleFont,
-                bodyFont: _bodyFont,
-                isMobile: isMobile,
-                isTablet: isTablet,
-                wi: wi,
-              ),
-              SizedBox(height: _sectionGap * 0.85),
-              _RichmondVaLocalPromo(
-                bodyFont: _bodyFont,
-                isMobile: isMobile,
-                onOpen: () =>
-                    _go(context, AppRoutes.flutterDeveloperRichmondVa),
-              ),
-              SizedBox(height: _sectionGap),
-              _MyProcessBlock(
-                titleFont: _titleFont,
-                bodyFont: _bodyFont,
-                isMobile: isMobile,
-              ),
-              SizedBox(height: _sectionGap),
-              _ProofCredibilityBlock(
-                titleFont: _titleFont,
-                bodyFont: _bodyFont,
-                isMobile: isMobile,
-                onInternal: (path) => _go(context, path),
-                onExternal: (u) => _openExternal(context, u),
-              ),
-              SizedBox(height: _sectionGap),
-              _FaqBlock(
-                titleFont: _titleFont,
-                bodyFont: _bodyFont,
-                isMobile: isMobile,
-              ),
-              SizedBox(height: _sectionGap),
-              _FinalCtaBlock(
-                titleFont: _titleFont,
-                bodyFont: _bodyFont,
-                isMobile: isMobile,
-                isNarrow: wi < 440,
-                onContact: () => _go(context, AppRoutes.contact),
-                onServices: () => _go(context, AppRoutes.services),
-                onBrief: () => _go(context, AppRoutes.orderHere),
-              ),
-              SizedBox(height: isMobile ? 28 : 36),
-            ],
-          ),
-        ),
-      ),
+      child: Responsive.isDesktop(context)
+          ? Align(alignment: Alignment.topLeft, child: box)
+          : Center(child: box),
     );
   }
 }
@@ -154,17 +158,16 @@ class _WhyWorkWithMe extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool useUniformDesktopCardHeight = !isMobile && wi >= 720;
     final double uniformCardHeight = isTablet ? 278 : 250;
-    final cards = _points.asMap().entries.map((entry) {
-      final index = entry.key;
-      final p = entry.value;
-      final card = _ReasonCard(
+    final baseCards = _points.map((p) {
+      return _ReasonCard(
         icon: p.$1,
         title: p.$2,
         body: p.$3,
         bodyFont: bodyFont,
         isMobile: isMobile,
-        reverseGradient: index.isOdd,
       );
+    }).toList();
+    final cards = baseCards.map((card) {
       if (!useUniformDesktopCardHeight) return card;
       return SizedBox(
         height: uniformCardHeight,
@@ -216,9 +219,9 @@ class _WhyWorkWithMe extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         RichText(
-          textAlign: TextAlign.center,
+          textAlign: _homeTextAlign(context),
           text: TextSpan(
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: titleFont,
               fontWeight: FontWeight.w800,
               color: Colors.white,
@@ -247,8 +250,8 @@ class _WhyWorkWithMe extends StatelessWidget {
         SizedBox(height: isMobile ? 10 : 12),
         Text(
           'A founder-led studio model: strategic senior ownership with practical shipping discipline.',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.albertSans(
+          textAlign: _homeTextAlign(context),
+          style: GoogleFonts.roboto(
             fontSize: bodyFont,
             fontWeight: FontWeight.w500,
             color: const Color(0xFF9CA3AF),
@@ -270,31 +273,21 @@ class _ReasonCard extends StatelessWidget {
     required this.body,
     required this.bodyFont,
     required this.isMobile,
-    required this.reverseGradient,
   });
+
+  static const double _kBlur = 20;
 
   final IconData icon;
   final String title;
   final String body;
   final double bodyFont;
   final bool isMobile;
-  final bool reverseGradient;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(isMobile ? 14 : 18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: reverseGradient ? Alignment.topRight : Alignment.topLeft,
-          end: reverseGradient ? Alignment.bottomLeft : Alignment.bottomRight,
-          colors: [
-            Color(0xFF0F3079),
-            Color(0xFF040F2D),
-          ],
-        ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.28),
@@ -303,31 +296,95 @@ class _ReasonCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: const Color(0xFFE5E7EB), size: isMobile ? 26 : 28),
-          SizedBox(height: isMobile ? 8 : 10),
-          Text(
-            title,
-            style: GoogleFonts.albertSans(
-              fontSize: bodyFont + 1,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              height: 1.25,
-            ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: _kBlur, sigmaY: _kBlur),
+          child: Stack(
+            children: <Widget>[
+              // Same frosted blue tint for all four cards
+              const Positioned.fill(
+                child: _ReasonCardFrostedTint(),
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
+                    gradient: LinearGradient(
+                      begin: const Alignment(-1, -1),
+                      end: const Alignment(0.45, 0.5),
+                      colors: [
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.white.withValues(alpha: 0.04),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.28, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 14 : 18),
+                child: Column(
+                  crossAxisAlignment: Responsive.isDesktop(context)
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(icon,
+                        color: const Color(0xFFE5E7EB),
+                        size: isMobile ? 26 : 28),
+                    SizedBox(height: isMobile ? 8 : 10),
+                    Text(
+                      title,
+                      textAlign: _homeTextAlign(context),
+                      style: GoogleFonts.roboto(
+                        fontSize: bodyFont + 1,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      body,
+                      textAlign: _homeTextAlign(context),
+                      style: GoogleFonts.roboto(
+                        fontSize: bodyFont,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFD1D5DB),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 8),
-          Text(
-            body,
-            style: GoogleFonts.albertSans(
-              fontSize: bodyFont,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFFD1D5DB),
-              height: 1.5,
-            ),
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReasonCardFrostedTint extends StatelessWidget {
+  const _ReasonCardFrostedTint();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF0F3079).withValues(alpha: 0.42),
+            const Color(0xFF040F2D).withValues(alpha: 0.5),
+          ],
+        ),
       ),
     );
   }
@@ -377,7 +434,9 @@ class _MyProcessBlock extends StatelessWidget {
             border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: Responsive.isDesktop(context)
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
               ShaderMask(
                 shaderCallback: (bounds) => const LinearGradient(
@@ -385,7 +444,8 @@ class _MyProcessBlock extends StatelessWidget {
                 ).createShader(bounds),
                 child: Text(
                   'Studio process',
-                  style: GoogleFonts.albertSans(
+                  textAlign: _homeTextAlign(context),
+                  style: GoogleFonts.roboto(
                     fontSize: titleFont,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -395,7 +455,8 @@ class _MyProcessBlock extends StatelessWidget {
               SizedBox(height: 8),
               Text(
                 'Simple, repeatable, and easy to communicate to stakeholders.',
-                style: GoogleFonts.albertSans(
+                textAlign: _homeTextAlign(context),
+                style: GoogleFonts.roboto(
                   fontSize: bodyFont,
                   fontWeight: FontWeight.w500,
                   color: const Color(0xFFD1D5DB),
@@ -409,6 +470,9 @@ class _MyProcessBlock extends StatelessWidget {
                 return Padding(
                   padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
                   child: Row(
+                    mainAxisAlignment: Responsive.isDesktop(context)
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
@@ -423,7 +487,7 @@ class _MyProcessBlock extends StatelessWidget {
                         ),
                         child: Text(
                           '${i + 1}',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: const Color(0xFF1F2937),
@@ -431,13 +495,16 @@ class _MyProcessBlock extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      Flexible(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: Responsive.isDesktop(context)
+                              ? CrossAxisAlignment.start
+                              : CrossAxisAlignment.center,
                           children: [
                             Text(
                               s.$1,
-                              style: GoogleFonts.albertSans(
+                              textAlign: _homeTextAlign(context),
+                              style: GoogleFonts.roboto(
                                 fontSize: bodyFont + 0.5,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -446,7 +513,8 @@ class _MyProcessBlock extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               s.$2,
-                              style: GoogleFonts.albertSans(
+                              textAlign: _homeTextAlign(context),
+                              style: GoogleFonts.roboto(
                                 fontSize: bodyFont,
                                 fontWeight: FontWeight.w500,
                                 color: const Color(0xFFD1D5DB),
@@ -490,8 +558,8 @@ class _ProofCredibilityBlock extends StatelessWidget {
       children: [
         Text(
           'Proof and authority',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.albertSans(
+          textAlign: _homeTextAlign(context),
+          style: GoogleFonts.roboto(
             fontSize: titleFont,
             fontWeight: FontWeight.w800,
             color: Colors.white,
@@ -500,8 +568,8 @@ class _ProofCredibilityBlock extends StatelessWidget {
         SizedBox(height: isMobile ? 8 : 10),
         Text(
           'Shipped work, public artifacts, and depth you can verify before we talk.',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.albertSans(
+          textAlign: _homeTextAlign(context),
+          style: GoogleFonts.roboto(
             fontSize: bodyFont,
             fontWeight: FontWeight.w500,
             color: const Color(0xFFD1D5DB),
@@ -609,6 +677,7 @@ class _ProofLinkTile extends StatelessWidget {
                       Border.all(color: Colors.white.withValues(alpha: 0.16)),
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
@@ -619,11 +688,14 @@ class _ProofLinkTile extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: Responsive.isDesktop(context)
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.center,
                         children: [
                           Text(
                             label,
-                            style: GoogleFonts.albertSans(
+                            textAlign: _homeTextAlign(context),
+                            style: GoogleFonts.roboto(
                               fontSize: bodyFont,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
@@ -632,7 +704,8 @@ class _ProofLinkTile extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             subtitle,
-                            style: GoogleFonts.albertSans(
+                            textAlign: _homeTextAlign(context),
+                            style: GoogleFonts.roboto(
                               fontSize: bodyFont - 1,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFFD1D5DB),
@@ -703,8 +776,8 @@ class _FaqBlock extends StatelessWidget {
       children: [
         Text(
           'Common questions',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.albertSans(
+          textAlign: _homeTextAlign(context),
+          style: GoogleFonts.roboto(
             fontSize: titleFont,
             fontWeight: FontWeight.w800,
             color: Colors.white,
@@ -744,7 +817,8 @@ class _FaqBlock extends StatelessWidget {
                       ),
                       title: Text(
                         item.$1,
-                        style: GoogleFonts.albertSans(
+                        textAlign: _homeTextAlign(context),
+                        style: GoogleFonts.roboto(
                           fontSize: bodyFont,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -755,10 +829,13 @@ class _FaqBlock extends StatelessWidget {
                       collapsedIconColor: const Color(0xFFD1D5DB),
                       children: [
                         Align(
-                          alignment: Alignment.centerLeft,
+                          alignment: Responsive.isDesktop(context)
+                              ? Alignment.topLeft
+                              : Alignment.center,
                           child: Text(
                             item.$2,
-                            style: GoogleFonts.albertSans(
+                            textAlign: _homeTextAlign(context),
+                            style: GoogleFonts.roboto(
                               fontSize: bodyFont - 0.5,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFFD1D5DB),
@@ -829,7 +906,7 @@ class _FinalCtaBlock extends StatelessWidget {
       onPressed: onContact,
       child: Text(
         'Discuss your project',
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           fontSize: bodyFont,
           fontWeight: FontWeight.w700,
         ),
@@ -849,7 +926,7 @@ class _FinalCtaBlock extends StatelessWidget {
       onPressed: onServices,
       child: Text(
         'Explore services',
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           fontSize: bodyFont,
           fontWeight: FontWeight.w700,
         ),
@@ -868,8 +945,8 @@ class _FinalCtaBlock extends StatelessWidget {
         children: [
           Text(
             'Ready to discuss your product?',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.albertSans(
+            textAlign: _homeTextAlign(context),
+            style: GoogleFonts.roboto(
               fontSize: titleFont - 1,
               fontWeight: FontWeight.w800,
               color: Colors.white,
@@ -879,8 +956,8 @@ class _FinalCtaBlock extends StatelessWidget {
           SizedBox(height: isMobile ? 10 : 12),
           Text(
             'Tell me about your users, timeline, and budget range. I will reply with honest next steps—even if we are not a fit.',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.albertSans(
+            textAlign: _homeTextAlign(context),
+            style: GoogleFonts.roboto(
               fontSize: bodyFont,
               fontWeight: FontWeight.w500,
               color: const Color(0xFFD1D5DB),
@@ -913,8 +990,8 @@ class _FinalCtaBlock extends StatelessWidget {
             onPressed: onBrief,
             child: Text(
               'Prefer a structured brief? Submit the project form',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.albertSans(
+              textAlign: _homeTextAlign(context),
+              style: GoogleFonts.roboto(
                 color: HomeWarmColors.sectionAccent,
                 fontWeight: FontWeight.w600,
                 fontSize: bodyFont - 1,
@@ -963,45 +1040,47 @@ class _RichmondVaLocalPromo extends StatelessWidget {
               ],
             ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: Responsive.isDesktop(context)
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
-              Icon(Icons.map_outlined,
-                  color: const Color(0xFFE5E7EB), size: isMobile ? 26 : 28),
-              SizedBox(width: isMobile ? 12 : 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'App development in Richmond & Virginia',
-                      style: GoogleFonts.albertSans(
-                        fontSize: bodyFont + 1,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.25,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Flutter, product design, and US‑friendly engagements—read the local overview.',
-                      style: GoogleFonts.albertSans(
-                        fontSize: bodyFont,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFFD1D5DB),
-                        height: 1.45,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'View page →',
-                      style: GoogleFonts.albertSans(
-                        fontSize: bodyFont - 0.5,
-                        fontWeight: FontWeight.w700,
-                        color: HomeWarmColors.sectionAccent,
-                      ),
-                    ),
-                  ],
+              Icon(
+                Icons.map_outlined,
+                color: const Color(0xFFE5E7EB),
+                size: isMobile ? 26 : 28,
+              ),
+              SizedBox(height: isMobile ? 10 : 12),
+              Text(
+                'App development in Richmond & Virginia',
+                textAlign: _homeTextAlign(context),
+                style: GoogleFonts.roboto(
+                  fontSize: bodyFont + 1,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1.25,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Flutter, product design, and US‑friendly engagements—read the local overview.',
+                textAlign: _homeTextAlign(context),
+                style: GoogleFonts.roboto(
+                  fontSize: bodyFont,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFD1D5DB),
+                  height: 1.45,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'View page →',
+                textAlign: _homeTextAlign(context),
+                style: GoogleFonts.roboto(
+                  fontSize: bodyFont - 0.5,
+                  fontWeight: FontWeight.w700,
+                  color: HomeWarmColors.sectionAccent,
                 ),
               ),
             ],

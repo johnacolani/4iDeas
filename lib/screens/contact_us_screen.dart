@@ -55,7 +55,7 @@ class ContactUsScreen extends StatelessWidget {
         ),
         title: Text(
           'Contact',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -84,7 +84,7 @@ class ContactUsScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Start a project conversation',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -95,7 +95,7 @@ class ContactUsScreen extends StatelessWidget {
                           Text(
                             'If you are a startup or business exploring Flutter, product design, or Firebase, you are in the right place. '
                             'Share a few details below and I will respond with thoughtful next steps—whether that is a rough estimate, a short call, or an honest “not a fit.”',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               fontSize: bodySize,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
@@ -105,7 +105,7 @@ class ContactUsScreen extends StatelessWidget {
                           SizedBox(height: isMobile ? 8 : 10),
                           Text(
                             'Typical reply time: one to two business days.',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               fontSize: bodySize - 0.5,
                               fontWeight: FontWeight.w600,
                               color: Colors.white.withValues(alpha: 0.85),
@@ -119,7 +119,7 @@ class ContactUsScreen extends StatelessWidget {
                                   color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Schedule a short intro call',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   fontSize: bodySize,
                                   color: HomeWarmColors.sectionAccent,
@@ -141,7 +141,7 @@ class ContactUsScreen extends StatelessWidget {
                             const SizedBox(height: 6),
                             Text(
                               'Optional—use this if you would rather pick a time than wait on email.',
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 fontSize: 13,
                                 color: ColorManager.textMuted,
                                 height: 1.35,
@@ -161,7 +161,7 @@ class ContactUsScreen extends StatelessWidget {
                                     const EdgeInsets.symmetric(horizontal: 12),
                                 child: Text(
                                   'Or reach me directly',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.4,

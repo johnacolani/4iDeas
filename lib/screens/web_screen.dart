@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:go_router/go_router.dart';
 
-import '../app_router.dart';
+import '../core/design_system/responsive.dart';
 import '../core/design_system/theme.dart';
 import '../core/home_warm_colors.dart';
 import '../core/widgets/aws_backend_section.dart';
@@ -33,10 +32,13 @@ class _WebScreenState extends State<WebScreen> {
 
     // Home body: narrow vs mid vs wide (used for padding and type scale).
     final bool isMobile = wi < 600;
-    final bool showBodyMenuButton = wi < 800;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Keep hero as close as possible to app bar.
-    final double heroTopSpacing = 0;
+    // Aligns with [ModernHeroSection] / [Responsive] (under 800: centered body).
+    final bool isNarrowView = Responsive.isMobile(context);
+    // Desktop: left-aligned home content; phone + tablet: centered (see [Responsive]).
+    final bool isBodyDesktop = Responsive.isDesktop(context);
+    // Nudge the whole home column down a bit from the app bar.
+    final double contentTopNudge = isNarrowView ? 12.0 : 20.0;
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -49,88 +51,101 @@ class _WebScreenState extends State<WebScreen> {
             controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: heroTopSpacing),
-                    if (showBodyMenuButton)
-                      const _MobileBodyMenuButton(),
-                    Transform.translate(
-                      offset: Offset.zero,
-                      child: const ModernHeroSection(),
-                    ),
-                    SizedBox(height: isMobile ? 20 : 28),
-                    Container(
-                      width: double.infinity,
-                      color: Colors.transparent,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 12 : 70,
-                        vertical: isMobile ? 10 : 12,
+                child: Padding(
+                  // Web / tablet: extra left gutter; narrow phones keep full width + center.
+                  padding: EdgeInsets.only(
+                    left: isNarrowView ? 0.0 : AppBreakpoints.homeContentGutter,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: isNarrowView
+                        ? CrossAxisAlignment.center
+                        : (isBodyDesktop
+                            ? CrossAxisAlignment.stretch
+                            : CrossAxisAlignment.center),
+                    children: [
+                      SizedBox(height: contentTopNudge),
+                      Transform.translate(
+                        offset: Offset.zero,
+                        child: const ModernHeroSection(),
                       ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: _PlatformProofChips(
-                          isMobile: isMobile,
-                          isTablet: isTablet,
+                      SizedBox(height: isMobile ? 12 : 20),
+                      Container(
+                        width: double.infinity,
+                        color: Colors.transparent,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 8 : 56,
+                          vertical: isMobile ? 6 : 10,
+                        ),
+                        child: Align(
+                          alignment: isBodyDesktop
+                              ? Alignment.topLeft
+                              : Alignment.center,
+                          child: _PlatformProofChips(
+                            isMobile: isMobile,
+                            isTablet: isTablet,
+                            leftAlign: isBodyDesktop,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: isMobile ? 12 : 16),
-                    TrustBuildingHomeSections(
-                      wi: wi,
-                      isMobile: isMobile,
-                      isTablet: isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 28 : 36),
-                    // Title before backend sections
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile
-                            ? wi * 0.05
-                            : (isTablet ? wi * 0.08 : wi * 0.1),
+                      SizedBox(height: isMobile ? 8 : 12),
+                      TrustBuildingHomeSections(
+                        wi: wi,
+                        isMobile: isMobile,
+                        isTablet: isTablet,
                       ),
-                      child: SelectableText(
-                        'Your backend could be',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.albertSans(
-                          fontSize: isMobile
-                              ? (wi < 400 ? 18 : 20)
-                              : (isTablet ? wi * 0.028 : wi * 0.032),
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGold,
+                      SizedBox(height: isMobile ? 28 : 36),
+                      // Title before backend sections
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile
+                              ? wi * 0.04
+                              : (isTablet ? wi * 0.08 : wi * 0.1),
+                        ),
+                        child: SelectableText(
+                          'Your backend could be',
+                          textAlign: isBodyDesktop
+                              ? TextAlign.start
+                              : TextAlign.center,
+                          style: GoogleFonts.roboto(
+                            fontSize: isMobile
+                                ? (wi < 400 ? 18 : 20)
+                                : (isTablet ? wi * 0.028 : wi * 0.032),
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGold,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile
-                            ? wi * 0.12
-                            : (isTablet ? wi * 0.2 : wi * 0.25),
-                        vertical: isMobile ? 12 : 12,
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile
+                              ? wi * 0.12
+                              : (isTablet ? wi * 0.2 : wi * 0.25),
+                          vertical: isMobile ? 12 : 12,
+                        ),
+                        child: Divider(
+                          color: HomeWarmColors.dividerLine,
+                          thickness: 1,
+                        ),
                       ),
-                      child: Divider(
-                        color: HomeWarmColors.dividerLine,
-                        thickness: 1,
+                      SizedBox(height: isMobile ? 20 : 32),
+                      // Firebase Backend Section
+                      FirebaseBackendSection(
+                        wi: wi,
+                        isMobile: isMobile,
                       ),
-                    ),
-                    SizedBox(height: isMobile ? 20 : 32),
-                    // Firebase Backend Section
-                    FirebaseBackendSection(
-                      wi: wi,
-                      isMobile: isMobile,
-                    ),
-                    // AWS Backend Section
-                    AWSBackendSection(
-                      wi: wi,
-                      isMobile: isMobile,
-                    ),
-                    // SEO Optimization Section
-                    SEOOptimizationSection(
-                      wi: wi,
-                      isMobile: isMobile,
-                    ),
-                  ],
+                      // AWS Backend Section
+                      AWSBackendSection(
+                        wi: wi,
+                        isMobile: isMobile,
+                      ),
+                      // SEO Optimization Section
+                      SEOOptimizationSection(
+                        wi: wi,
+                        isMobile: isMobile,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -145,10 +160,14 @@ class _PlatformProofChips extends StatelessWidget {
   const _PlatformProofChips({
     required this.isMobile,
     required this.isTablet,
+    this.leftAlign = false,
   });
 
   final bool isMobile;
   final bool isTablet;
+
+  /// [true] when [Responsive] desktop: wrap rows from the left.
+  final bool leftAlign;
 
   static const List<({String label, String subtitle, String asset})> _items =
       <({String label, String subtitle, String asset})>[
@@ -189,7 +208,7 @@ class _PlatformProofChips extends StatelessWidget {
     final double titleSize = isMobile ? 12.5 : (isTablet ? 13.0 : 13.5);
     final double subtitleSize = isMobile ? 9.8 : 10.5;
     return Wrap(
-      alignment: WrapAlignment.center,
+      alignment: leftAlign ? WrapAlignment.start : WrapAlignment.center,
       spacing: isMobile ? 8 : 10,
       runSpacing: isMobile ? 8 : 10,
       children: _items
@@ -243,7 +262,7 @@ class _PlatformProofChips extends StatelessWidget {
                           item.label,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: titleSize,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -254,7 +273,7 @@ class _PlatformProofChips extends StatelessWidget {
                           item.subtitle,
                           maxLines: 2,
                           overflow: TextOverflow.fade,
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: subtitleSize,
                             fontWeight: FontWeight.w500,
                             color: Colors.white.withValues(alpha: 0.7),
@@ -269,71 +288,6 @@ class _PlatformProofChips extends StatelessWidget {
             ),
           )
           .toList(),
-    );
-  }
-}
-
-class _MobileBodyMenuButton extends StatelessWidget {
-  const _MobileBodyMenuButton();
-
-  static const List<(String label, String route)> _items = [
-    ('Home', AppRoutes.home),
-    ('Services', AppRoutes.services),
-    ('Work', AppRoutes.portfolio),
-    ('Process', AppRoutes.designPhilosophy),
-    ('About', AppRoutes.about),
-    ('Contact Us', AppRoutes.contact),
-    ('Blog', AppRoutes.insights),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: PopupMenuButton<String>(
-          color: const Color(0xFF111827),
-          tooltip: 'Menu',
-          onSelected: (route) => context.go(route),
-          itemBuilder: (context) => _items
-              .map(
-                (item) => PopupMenuItem<String>(
-                  value: item.$2,
-                  child: Text(
-                    item.$1,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              )
-              .toList(),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-                width: 1,
-              ),
-              color: Colors.black.withValues(alpha: 0.18),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.menu, color: AppColors.primaryGold, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Menu',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

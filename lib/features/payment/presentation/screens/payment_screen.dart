@@ -124,7 +124,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         iconTheme: const IconThemeData(color: Colors.amber),
         title: Text(
           'Down Payment',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -168,7 +168,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           Expanded(
                             child: Text(
                               appName,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: isMobile ? 20 : 22,
                                 fontWeight: FontWeight.bold,
@@ -229,7 +229,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           SizedBox(width: 12),
                           Text(
                             'Down Payment',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: Colors.white,
                               fontSize: isMobile ? 20 : 22,
                               fontWeight: FontWeight.bold,
@@ -386,7 +386,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           icon: Icon(Icons.payment, size: 24),
                           label: Text(
                             'Process Payment',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               fontSize: isMobile ? 18 : 20,
                               fontWeight: FontWeight.bold,
                             ),

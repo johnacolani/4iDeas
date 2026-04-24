@@ -592,7 +592,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
               SizedBox(width: 2.w),
               Text(
                 'Order Submitted!',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
@@ -601,7 +601,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           ),
           content: Text(
             'Thank you for your order. We have received your request and will contact you soon.',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: ColorManager.textSecondary,
             ),
           ),
@@ -633,7 +633,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
               },
               child: Text(
                 'OK',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: _orderAccent,
                   fontWeight: FontWeight.w600,
                 ),
@@ -658,7 +658,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
               SizedBox(width: 2.w),
               Text(
                 'Error',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
@@ -671,7 +671,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
             children: [
               Text(
                 message,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.textSecondary,
                 ),
               ),
@@ -684,7 +684,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                   Expanded(
                     child: Text(
                       'Your form data has been saved. You can try again without retyping.',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.primaryTeal,
                         fontSize: isMobile ? 9.sp : 13,
                       ),
@@ -701,7 +701,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
               },
               child: Text(
                 'OK',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: _orderAccent,
                   fontWeight: FontWeight.w600,
                 ),
@@ -743,24 +743,24 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         controller: controller,
         maxLines: maxLines,
         cursorColor: _orderAccent,
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           color: ColorManager.textPrimary,
           fontSize: fieldFontSize,
         ),
         decoration: InputDecoration(
           labelText: label.isNotEmpty ? label : null,
           hintText: hint,
-          labelStyle: GoogleFonts.albertSans(
+          labelStyle: GoogleFonts.roboto(
             color: _orderAccent,
             fontSize: fieldFontSize - 1,
             fontWeight: FontWeight.w600,
           ),
-          floatingLabelStyle: GoogleFonts.albertSans(
+          floatingLabelStyle: GoogleFonts.roboto(
             color: _orderAccent,
             fontSize: fieldFontSize - 1,
             fontWeight: FontWeight.w600,
           ),
-          hintStyle: GoogleFonts.albertSans(
+          hintStyle: GoogleFonts.roboto(
             color: ColorManager.textMuted,
             fontSize: fieldFontSize - 1,
           ),
@@ -816,12 +816,12 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         initialValue: value,
         decoration: InputDecoration(
           labelText: label.isNotEmpty ? label : null,
-          labelStyle: GoogleFonts.albertSans(
+          labelStyle: GoogleFonts.roboto(
             color: _orderAccent,
             fontSize: fieldFontSize - 1,
             fontWeight: FontWeight.w600,
           ),
-          floatingLabelStyle: GoogleFonts.albertSans(
+          floatingLabelStyle: GoogleFonts.roboto(
             color: _orderAccent,
             fontSize: fieldFontSize - 1,
             fontWeight: FontWeight.w600,
@@ -844,7 +844,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         iconEnabledColor: _orderAccent,
         iconDisabledColor: ColorManager.textMuted,
         dropdownColor: ColorManager.containerSurface,
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           color: ColorManager.textPrimary,
           fontSize: fieldFontSize,
         ),
@@ -853,7 +853,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
             value: item,
             child: Text(
               item,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: ColorManager.textPrimary,
               ),
             ),
@@ -901,7 +901,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         children: [
           Text(
             'Target Platforms *',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: ColorManager.textPrimary,
               fontSize: _webPlatformsHeadingFs(isMobile),
               fontWeight: FontWeight.bold,
@@ -927,7 +927,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                     SizedBox(width: isMobile ? 0.4.w : 0.25.w),
                     Text(
                       platform['name'] as String,
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: isSelected
                             ? ColorManager.backgroundDark
                             : ColorManager.textPrimary,
@@ -1000,7 +1000,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
               ],
               Text(
                 title,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: _orderAccent,
                   fontSize: _webSectionTitleFs(isMobile),
                   fontWeight: FontWeight.bold,
@@ -1034,7 +1034,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 SizedBox(width: 1.5.w),
                 Text(
                   'Design Requirements',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.textPrimary,
                     fontSize: _webCardHeaderTitleFs(isMobile),
                     fontWeight: FontWeight.bold,
@@ -1065,7 +1065,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       SizedBox(width: 0.8.w),
                       Text(
                         'Design Style Preference',
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           color: ColorManager.textPrimary,
                           fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
@@ -1119,7 +1119,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       SizedBox(width: 0.8.w),
                       Text(
                         'Design Complexity Level',
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           color: ColorManager.textPrimary,
                           fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
@@ -1172,7 +1172,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       SizedBox(width: 0.8.w),
                       Text(
                         'Color Scheme / Brand Colors',
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           color: ColorManager.textPrimary,
                           fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
@@ -1217,7 +1217,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       SizedBox(width: 0.8.w),
                       Text(
                         'Design Inspiration / References',
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           color: ColorManager.textPrimary,
                           fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
@@ -1262,7 +1262,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                       SizedBox(width: 0.8.w),
                       Text(
                         'Brand Guidelines / Assets',
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           color: ColorManager.textPrimary,
                           fontSize: _webSubsectionTitleFs(isMobile),
                           fontWeight: FontWeight.bold,
@@ -1314,7 +1314,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
         ),
         title: Text(
           'Order Here',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 18,
             fontWeight: FontWeight.bold,
@@ -1380,7 +1380,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                             Expanded(
                                               child: Text(
                                                 'Sign in to submit your order. You can fill out the form first; submission requires an account.',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   color: Colors.white,
                                                   fontSize: isMobile ? 13 : 14,
                                                   fontWeight: FontWeight.w600,
@@ -1400,7 +1400,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                                   context.push(AppRoutes.login),
                                               child: Text(
                                                 'Log in',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,
                                                 ),
@@ -1417,7 +1417,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                               ),
                                               child: Text(
                                                 'Sign up',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -1615,7 +1615,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                           SizedBox(width: 2.w),
                                           Text(
                                             'Submitting...',
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               color: Colors.white,
                                               fontSize:
                                                   _webPrimaryButtonLabelFs(
@@ -1637,7 +1637,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                           SizedBox(width: 1.w),
                                           Text(
                                             'Submit Order',
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               color: Colors.white,
                                               fontSize:
                                                   _webPrimaryButtonLabelFs(
@@ -1773,7 +1773,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                         SizedBox(height: isMobile ? 16 : 18),
                         Text(
                           'Account required',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             color: HomeWarmColors.textInk,
                             fontSize: isMobile ? 20 : 22,
                             fontWeight: FontWeight.w700,
@@ -1784,7 +1784,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                         SizedBox(height: isMobile ? 8 : 10),
                         Text(
                           'Sign in or create an account to submit your order.',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             color: HomeWarmColors.bodyEmphasis,
                             fontSize: isMobile ? 14 : 15,
                             height: 1.45,
@@ -1821,7 +1821,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                 ),
                                 child: Text(
                                   'Log in',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700,
                                     fontSize: isMobile ? 14 : 15,
                                   ),
@@ -1848,7 +1848,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                                 ),
                                 child: Text(
                                   'Sign up',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700,
                                     fontSize: isMobile ? 14 : 15,
                                   ),
@@ -1862,7 +1862,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                           onPressed: () => Navigator.of(dialogContext).pop(),
                           child: Text(
                             'Not now',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.iconLocation,
                               fontSize: isMobile ? 13 : 14,
                               fontWeight: FontWeight.w500,

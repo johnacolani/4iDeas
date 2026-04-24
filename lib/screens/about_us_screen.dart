@@ -52,7 +52,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         ),
         title: Text(
           'About 4iDeas',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                       header: true,
                                       child: Text(
                                         '4iDeas',
-                                        style: GoogleFonts.albertSans(
+                                        style: GoogleFonts.roboto(
                                           color: Colors.white,
                                           fontSize: titleFontSize,
                                           fontWeight: FontWeight.bold,
@@ -201,7 +201,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                                     children: [
                                       SelectableText(
                                         'Let\'s Connect',
-                                        style: GoogleFonts.albertSans(
+                                        style: GoogleFonts.roboto(
                                           color: Colors.white,
                                           fontSize: sectionTitleSize,
                                           fontWeight: FontWeight.bold,
@@ -285,7 +285,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         children: [
           SelectableText(
             title,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: Colors.white,
               fontSize: sectionTitleSize,
               fontWeight: FontWeight.bold,
@@ -370,7 +370,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
         children: [
           Text(
             title,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: Colors.white,
               fontSize: sectionTitleSize,
               fontWeight: FontWeight.bold,
@@ -395,7 +395,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                           children: [
                             SelectableText(
                               exp['company'] as String,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: bodyFontSize + 2,
                                 fontWeight: FontWeight.bold,

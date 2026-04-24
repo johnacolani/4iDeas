@@ -48,7 +48,7 @@ class CaseStudyCard extends StatelessWidget {
               children: [
                 SelectableText(
                   caseStudy.title,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.portfolioTextTitle,
                     fontSize: titleSize,
                     fontWeight: FontWeight.bold,
@@ -57,7 +57,7 @@ class CaseStudyCard extends StatelessWidget {
                 SizedBox(height: 6),
                 SelectableText(
                   caseStudy.subtitle,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.portfolioTextBody,
                     fontSize: subtitleSize,
                     fontWeight: FontWeight.w600,
@@ -67,7 +67,7 @@ class CaseStudyCard extends StatelessWidget {
                 SelectableText(
                   caseStudy.overview,
                   maxLines: 3,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.portfolioTextBody,
                     fontSize: isMobile ? 14 : 15,
                     height: 1.5,
@@ -78,7 +78,7 @@ class CaseStudyCard extends StatelessWidget {
                   children: [
                     SelectableText(
                       'View Case Study',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.portfolioTextBody,
                         fontSize: isMobile ? 14 : 15,
                         fontWeight: FontWeight.w600,

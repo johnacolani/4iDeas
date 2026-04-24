@@ -256,7 +256,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       children: [
         SelectableText(
           app.name,
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextTitle,
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
@@ -265,7 +265,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         SizedBox(height: 4),
         Text(
           app.description,
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextBody,
             fontSize: bodySize,
             height: 1.3,
@@ -289,7 +289,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       children: [
         SelectableText(
           app.name,
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextTitle,
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
@@ -311,7 +311,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       children: [
         Text(
           label.toUpperCase(),
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextBody.withValues(alpha: 0.75),
             fontSize: fontSize - 2,
             fontWeight: FontWeight.w800,
@@ -321,7 +321,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         const SizedBox(height: 4),
         Text(
           text,
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextBody,
             fontSize: fontSize,
             height: 1.45,
@@ -364,7 +364,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                   fontWeight: FontWeight.w700, fontSize: bodySize),
             ),
           )
@@ -384,7 +384,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                       fontWeight: FontWeight.w700, fontSize: bodySize),
                 ),
               )
@@ -406,7 +406,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                   fontWeight: FontWeight.w700, fontSize: bodySize - 1),
             ),
           )
@@ -432,7 +432,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               onPressed: openProduct,
               child: Text(
                 'Open live product',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontWeight: FontWeight.w700,
                   fontSize: bodySize - 1,
                   color: ColorManager.portfolioTextTitle,
@@ -476,7 +476,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               onPressed: openProduct,
               child: Text(
                 'Open live product',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontWeight: FontWeight.w700,
                   fontSize: bodySize - 1,
                   color: ColorManager.portfolioTextTitle,
@@ -603,7 +603,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: ColorManager.portfolioTextBody,
                 fontWeight: FontWeight.w700,
                 fontSize: bodySize - 1,
@@ -625,7 +625,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             alignment: Alignment.center,
             child: SelectableText(
               'Coming Soon',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: ColorManager.portfolioTextBody,
                 fontSize: isMobile ? 14 : 16,
                 fontWeight: FontWeight.bold,
@@ -665,7 +665,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                           child: Center(
                             child: Text(
                               'Coming Soon',
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: ColorManager.backgroundDark,
                                 fontSize: isMobile ? 12 : 14,
                                 fontWeight: FontWeight.bold,
@@ -753,7 +753,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   const SizedBox(width: 4),
                   Text(
                     'Flutter',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: _kFlutterBrandBlue,
                       fontSize: fontSize,
                       fontWeight: FontWeight.w800,
@@ -843,7 +843,7 @@ class _LinkChipState extends State<_LinkChip> {
                     SizedBox(width: 4),
                     SelectableText(
                       widget.label,
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: buttonTitleColor,
                         fontSize: widget.isMobile ? 10 : 11,
                         fontWeight: FontWeight.w600,

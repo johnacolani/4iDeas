@@ -58,7 +58,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         centerTitle: true,
         title: Text(
           'Sign Up',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -148,7 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       blendMode: BlendMode.srcIn,
                                       child: Text(
                                       'Create Account',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontSize: isMobile ? 28 : 32,
                                         fontWeight: FontWeight.bold,
@@ -301,7 +301,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               )
                                             : Text(
                                                 'Sign Up',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   fontSize: isMobile ? 16 : 18,
                                                   fontWeight: FontWeight.bold,
                                                 ),

@@ -83,7 +83,7 @@ class HomeHeroSection extends StatelessWidget {
                     '4iDeas studio · Founder-led Flutter consultancy',
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       fontSize: _eyebrowSize + 3,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.35,
@@ -103,7 +103,7 @@ class HomeHeroSection extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '4iDeas helps startups and businesses\n',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       fontSize: isMobile ? _titleSize * 0.72 : (isTablet ? 24 : 26),
                       fontWeight: FontWeight.w700,
                       height: 1.0,
@@ -117,7 +117,7 @@ class HomeHeroSection extends StatelessWidget {
                       child: Text(
                         'Design & Ship',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           fontSize: _titleSize * 2,
                           fontWeight: FontWeight.w800,
                           height: 1.0,
@@ -143,7 +143,7 @@ class HomeHeroSection extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
               textDirection: TextDirection.ltr,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 fontSize: _titleSize,
                 fontWeight: FontWeight.w700,
                 height: 1.06,
@@ -177,7 +177,7 @@ class HomeHeroSection extends StatelessWidget {
             'You get studio-level rigor with founder-level accountability.',
             textAlign: TextAlign.center,
             textDirection: TextDirection.ltr,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: _bodySize,
               fontWeight: FontWeight.w500,
               height: 1.5,
@@ -228,7 +228,7 @@ class _CredibilityStrip extends StatelessWidget {
           if (i > 0)
             Text(
               '·',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 fontSize: fontSize,
                 fontWeight: FontWeight.w600,
                 color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.45),
@@ -237,7 +237,7 @@ class _CredibilityStrip extends StatelessWidget {
           SelectableText(
             _items[i],
             textAlign: TextAlign.center,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: fontSize,
               fontWeight: FontWeight.w600,
               height: 1.3,
@@ -280,7 +280,7 @@ class _ServiceThemesRow extends StatelessWidget {
           ),
           child: Text(
             t,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile ? 12.5 : 13,
               fontWeight: FontWeight.w600,
               color: HomeWarmColors.eyebrowMuted,
@@ -300,7 +300,7 @@ class _SeoTopicLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final linkStyle = GoogleFonts.albertSans(
+    final linkStyle = GoogleFonts.roboto(
       fontSize: isMobile ? 12.5 : 13,
       fontWeight: FontWeight.w600,
       color: HomeWarmColors.eyebrowMuted,
@@ -320,7 +320,7 @@ class _SeoTopicLinks extends StatelessWidget {
       );
     }
 
-    final dotStyle = GoogleFonts.albertSans(
+    final dotStyle = GoogleFonts.roboto(
       fontSize: 12,
       color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.4),
     );
@@ -388,7 +388,7 @@ class _HeroCtas extends StatelessWidget {
       onPressed: goContact,
       child: Text(
         'Discuss your project',
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           fontSize: isMobile ? 15 : 16,
           fontWeight: FontWeight.w700,
         ),
@@ -400,7 +400,7 @@ class _HeroCtas extends StatelessWidget {
       onPressed: goServices,
       child: Text(
         'Explore services',
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           fontSize: isMobile ? 15 : 16,
           fontWeight: FontWeight.w700,
         ),

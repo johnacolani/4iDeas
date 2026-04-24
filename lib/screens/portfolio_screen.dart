@@ -263,22 +263,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
         title: Text('Delete "${app.name}"?',
-            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+            style: GoogleFonts.roboto(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the app from the portfolio. You can add it again later.',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
               color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: GoogleFonts.albertSans(color: ColorManager.orange)),
+                style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete',
-                style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete', style: GoogleFonts.roboto(color: Colors.red)),
           ),
         ],
       ),
@@ -341,22 +340,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
         title: Text('Delete "${p.title}"?',
-            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+            style: GoogleFonts.roboto(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the publication from the list.',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
               color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: GoogleFonts.albertSans(color: ColorManager.orange)),
+                style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete',
-                style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete', style: GoogleFonts.roboto(color: Colors.red)),
           ),
         ],
       ),
@@ -407,22 +405,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
         title: Text('Delete "${item.title}"?',
-            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+            style: GoogleFonts.roboto(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the item from the list.',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
               color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: GoogleFonts.albertSans(color: ColorManager.orange)),
+                style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete',
-                style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete', style: GoogleFonts.roboto(color: Colors.red)),
           ),
         ],
       ),
@@ -488,19 +485,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
         title: Text('Edit adaptive & responsive images',
-            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+            style: GoogleFonts.roboto(color: ColorManager.accentGoldDark)),
         content: SingleChildScrollView(
           child: SizedBox(
             width: MediaQuery.of(ctx).size.width * 0.8,
             child: TextField(
               controller: controller,
               maxLines: 14,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                   color: ColorManager.accentGoldDark, fontSize: 14),
               decoration: InputDecoration(
                 hintText:
                     'One asset path per line\ne.g. assets/images/asd_app_adaptive/asd-001.jpg',
-                hintStyle: GoogleFonts.albertSans(
+                hintStyle: GoogleFonts.roboto(
                     color: ColorManager.accentGoldDark.withValues(alpha: 0.38)),
                 alignLabelWithHint: true,
                 border:
@@ -522,12 +519,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: GoogleFonts.albertSans(color: ColorManager.orange)),
+                style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text('Save',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                     color: ColorManager.orange, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -591,22 +588,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
         title: Text('Delete "${cs.title}"?',
-            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+            style: GoogleFonts.roboto(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the case study from the list.',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
               color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: GoogleFonts.albertSans(color: ColorManager.orange)),
+                style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete',
-                style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete', style: GoogleFonts.roboto(color: Colors.red)),
           ),
         ],
       ),
@@ -672,7 +668,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         title: Text(
           'Portfolio',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextTitle,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.w600,
@@ -740,7 +736,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               Center(
                                 child: SelectableText(
                                   'End-to-end product design from research to cross-platform delivery',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     color: ColorManager.portfolioTextTitle,
                                     fontSize:
                                         isMobile ? bodySize + 4 : bodySize + 6,
@@ -779,7 +775,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                         context.go(AppRoutes.services),
                                     child: Text(
                                       'Explore services behind this work',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: ColorManager.portfolioTextBody,
                                         fontSize: bodySize - 1,
                                         fontWeight: FontWeight.w700,
@@ -795,7 +791,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                         context.go(AppRoutes.contact),
                                     child: Text(
                                       'Discuss a similar product',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: ColorManager.portfolioTextBody,
                                         fontSize: bodySize - 1,
                                         fontWeight: FontWeight.w700,
@@ -827,7 +823,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       color: ColorManager.portfolioTextBody),
                                   label: Text(
                                     'Add case study',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                         color: ColorManager.portfolioTextBody,
                                         fontWeight: FontWeight.w600),
                                   ),
@@ -883,7 +879,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       icon: Icon(Icons.add,
                                           size: 18, color: Colors.white),
                                       label: Text('Add app',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w600)),
                                       style: ElevatedButton.styleFrom(
@@ -970,7 +966,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       color: ColorManager.portfolioTextBody),
                                   label: Text(
                                     'Add publication',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                         color: ColorManager.portfolioTextBody,
                                         fontWeight: FontWeight.w600),
                                   ),
@@ -1015,7 +1011,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   ),
                                   label: SelectableText(
                                     'View all on Medium',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: ColorManager.portfolioTextBody,
                                       fontSize: bodySize,
                                       fontWeight: FontWeight.w600,
@@ -1042,7 +1038,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       color: ColorManager.portfolioTextBody),
                                   label: Text(
                                     'Add open source item',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                         color: ColorManager.portfolioTextBody,
                                         fontWeight: FontWeight.w600),
                                   ),
@@ -1080,7 +1076,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                         ),
                                         child: SelectableText(
                                           "John Colani's GitHub repository",
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color:
                                                 ColorManager.portfolioTextTitle,
                                             fontSize: bodySize + 1,
@@ -1131,7 +1127,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   ),
                                   label: SelectableText(
                                     'GitHub Profile',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: ColorManager.portfolioTextBody,
                                       fontSize: bodySize,
                                       fontWeight: FontWeight.w600,
@@ -1165,7 +1161,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       ),
                                       child: Text(
                                         'Start a project conversation',
-                                        style: GoogleFonts.albertSans(
+                                        style: GoogleFonts.roboto(
                                             fontWeight: FontWeight.w700),
                                       ),
                                     ),
@@ -1182,7 +1178,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       ),
                                       child: Text(
                                         'See service options',
-                                        style: GoogleFonts.albertSans(
+                                        style: GoogleFonts.roboto(
                                             fontWeight: FontWeight.w700),
                                       ),
                                     ),
@@ -1191,7 +1187,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                           context.go(AppRoutes.insights),
                                       child: Text(
                                         'Read implementation insights',
-                                        style: GoogleFonts.albertSans(
+                                        style: GoogleFonts.roboto(
                                           color: ColorManager.portfolioTextBody,
                                           fontWeight: FontWeight.w700,
                                           decoration: TextDecoration.underline,
@@ -1290,7 +1286,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               children: [
                                 TextSpan(
                                   text: 'Product design',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w900,
                                     foreground: Paint()
                                       ..shader = const LinearGradient(
@@ -1306,7 +1302,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 const TextSpan(text: '\n&\n'),
                                 TextSpan(
                                   text: 'Flutter',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w900,
                                     foreground: Paint()
                                       ..shader = const LinearGradient(
@@ -1322,7 +1318,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 TextSpan(
                                   text:
                                       ' Cross platform development for mobile web and desktop.',
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     fontSize: (titleSize - 7).clamp(14.0, 26.0),
                                     fontWeight: FontWeight.w600,
                                     height: 1.2,
@@ -1332,7 +1328,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               ],
                             ),
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: ColorManager.portfolioTextTitle,
                               fontSize: titleSize,
                               fontWeight: FontWeight.w700,
@@ -1343,7 +1339,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           SelectableText(
                             'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: const Color(0xFFD1D5DB),
                               fontSize: (bodySize - 1).clamp(13.0, 18.0),
                               fontWeight: FontWeight.w700,
@@ -1471,84 +1467,84 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                         ),
                       ),
                       child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (!widget.isMobile) ...[
-                  Icon(
-                    Icons.palette_outlined,
-                    size: 48,
-                    color: ColorManager.portfolioTextBody,
-                  ),
-                  SizedBox(width: 24),
-                ],
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SelectableText(
-                        'My Own Design System',
-                        style: GoogleFonts.playfairDisplay(
-                          color: ColorManager.portfolioTextTitle,
-                          fontSize: widget.designSystemTitleSize,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          height: 1.2,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      SelectableText(
-                        'developed by: John Colani',
-                        style: GoogleFonts.cormorantGaramond(
-                          color: ColorManager.portfolioTextBody,
-                          fontSize: widget.designSystemSubSize + 2,
-                          fontWeight: FontWeight.w600,
-                          fontStyle: FontStyle.italic,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      SelectableText(
-                        'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
-                        style: GoogleFonts.albertSans(
-                          color: ColorManager.portfolioTextBody,
-                          fontSize: widget.bodySize - 1,
-                          height: 1.4,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      SizedBox(height: 14),
-                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.open_in_new,
-                            size: 18,
-                            color: ColorManager.portfolioTextBody,
-                          ),
-                          SizedBox(width: 8),
-                          SelectableText(
-                            'Open Design System →',
-                            style: GoogleFonts.albertSans(
+                          if (!widget.isMobile) ...[
+                            Icon(
+                              Icons.palette_outlined,
+                              size: 48,
                               color: ColorManager.portfolioTextBody,
-                              fontSize: widget.bodySize,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
+                            ),
+                            SizedBox(width: 24),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SelectableText(
+                                  'My Own Design System',
+                                  style: GoogleFonts.roboto(
+                                    color: ColorManager.portfolioTextTitle,
+                                    fontSize: widget.designSystemTitleSize,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                SelectableText(
+                                  'developed by: John Colani',
+                                  style: GoogleFonts.roboto(
+                                    color: ColorManager.portfolioTextBody,
+                                    fontSize: widget.designSystemSubSize + 2,
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.italic,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                SelectableText(
+                                  'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
+                                  style: GoogleFonts.roboto(
+                                    color: ColorManager.portfolioTextBody,
+                                    fontSize: widget.bodySize - 1,
+                                    height: 1.4,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                SizedBox(height: 14),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.open_in_new,
+                                      size: 18,
+                                      color: ColorManager.portfolioTextBody,
+                                    ),
+                                    SizedBox(width: 8),
+                                    SelectableText(
+                                      'Open Design System →',
+                                      style: GoogleFonts.roboto(
+                                        color: ColorManager.portfolioTextBody,
+                                        fontSize: widget.bodySize,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
+                          if (widget.isMobile) ...[
+                            SizedBox(width: 12),
+                            Icon(
+                              Icons.palette_outlined,
+                              size: 36,
+                              color: ColorManager.portfolioTextBody,
+                            ),
+                          ],
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                if (widget.isMobile) ...[
-                  SizedBox(width: 12),
-                  Icon(
-                    Icons.palette_outlined,
-                    size: 36,
-                    color: ColorManager.portfolioTextBody,
-                  ),
-                ],
-              ],
-            ),
                     ),
                   ),
                 ),
@@ -1617,6 +1613,97 @@ class _NeonBorderOrbitPainter extends CustomPainter {
   }
 }
 
+class _PortfolioFrostedBlueTint extends StatelessWidget {
+  const _PortfolioFrostedBlueTint({required this.borderRadius});
+
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF0F3079).withValues(alpha: 0.42),
+            const Color(0xFF040F2D).withValues(alpha: 0.5),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Dark blue frosted glass — shared by Design Philosophy and Featured Case Studies panels.
+class _PortfolioFrostedGlassPanel extends StatelessWidget {
+  const _PortfolioFrostedGlassPanel({
+    required this.child,
+    this.padding = EdgeInsets.zero,
+    this.borderRadius = 20,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double borderRadius;
+  static const double _kBlur = 20.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: _kBlur, sigmaY: _kBlur),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: _PortfolioFrostedBlueTint(borderRadius: borderRadius),
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
+                    gradient: LinearGradient(
+                      begin: const Alignment(-1, -1),
+                      end: const Alignment(0.45, 0.5),
+                      colors: [
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.white.withValues(alpha: 0.04),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.28, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: padding,
+                child: child,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _DesignPhilosophyCard extends StatelessWidget {
   final double bodySize;
   final bool isMobile;
@@ -1626,45 +1713,45 @@ class _DesignPhilosophyCard extends StatelessWidget {
     required this.isMobile,
   });
 
+  static const double _kRadius = 20.0;
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => context.push(AppRoutes.designPhilosophy),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 28,
-            vertical: isMobile ? 20 : 24,
-          ),
-          decoration:
-              ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
+    return _PortfolioFrostedGlassPanel(
+      borderRadius: _kRadius,
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 20 : 28,
+        vertical: isMobile ? 20 : 24,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.designPhilosophy),
+          borderRadius: BorderRadius.circular(_kRadius),
           child: Row(
             children: [
               Icon(
                 Icons.auto_awesome,
-                color: ColorManager.portfolioTextBody,
+                color: const Color(0xFFE5E7EB),
                 size: isMobile ? 32 : 36,
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SelectableText(
                       'Design Philosophy & Principles',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.portfolioTextTitle,
                         fontSize: bodySize + 2,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     SelectableText(
                       'How I approach product design: empathy, process, and principles.',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.portfolioTextBody,
                         fontSize: bodySize,
                         height: 1.3,
@@ -1675,7 +1762,7 @@ class _DesignPhilosophyCard extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: ColorManager.portfolioTextBody,
+                color: const Color(0xFFE5E7EB),
                 size: 18,
               ),
             ],
@@ -1727,7 +1814,7 @@ class _PortfolioSectionNav extends StatelessWidget {
               ),
               child: Text(
                 item.$1,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.portfolioTextBody,
                   fontSize: bodySize - 1,
                   fontWeight: FontWeight.w600,
@@ -1802,27 +1889,33 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
   Widget build(BuildContext context) {
     if (caseStudies.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (var i = 0; i < caseStudies.length; i++) ...[
-          _FeaturedCaseStudyRow(
-            caseStudy: caseStudies[i],
-            isMobile: isMobile,
-            bodySize: bodySize,
-            tags: _featuredTagsById[caseStudies[i].id] ?? const <String>[],
-            onOpen: () => onOpenCaseStudy(caseStudies[i].id),
-            onDiscussSimilar: onDiscussSimilar,
-            showAdminActions: showAdminActions,
-            onEdit: onEdit,
-            onDelete: onDelete,
-            canDelete: canDeleteCaseStudy(caseStudies[i].id),
-            onEditAdaptiveSection:
-                caseStudies[i].id == 'asd' ? onEditAdaptiveSection : null,
-          ),
-          if (i < caseStudies.length - 1) SizedBox(height: gapBetweenCards),
+    return _PortfolioFrostedGlassPanel(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : 20,
+        vertical: isMobile ? 18 : 24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < caseStudies.length; i++) ...[
+            _FeaturedCaseStudyRow(
+              caseStudy: caseStudies[i],
+              isMobile: isMobile,
+              bodySize: bodySize,
+              tags: _featuredTagsById[caseStudies[i].id] ?? const <String>[],
+              onOpen: () => onOpenCaseStudy(caseStudies[i].id),
+              onDiscussSimilar: onDiscussSimilar,
+              showAdminActions: showAdminActions,
+              onEdit: onEdit,
+              onDelete: onDelete,
+              canDelete: canDeleteCaseStudy(caseStudies[i].id),
+              onEditAdaptiveSection:
+                  caseStudies[i].id == 'asd' ? onEditAdaptiveSection : null,
+            ),
+            if (i < caseStudies.length - 1) SizedBox(height: gapBetweenCards),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -2325,7 +2418,7 @@ class _FeaturedCaseStudyHeroStripState
                                     _imageLabelFromPath(paths[index]),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12,
@@ -2396,7 +2489,7 @@ class _FeaturedCaseStudyHeroStripState
           alignment: Alignment.center,
           child: Text(
             'Hero image placeholder',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
               fontWeight: FontWeight.w600,
             ),
@@ -2485,7 +2578,7 @@ class _FeaturedCaseStudyHeroStripState
       alignment: Alignment.center,
       child: Text(
         'Hero image failed to load',
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
           fontWeight: FontWeight.w600,
         ),
@@ -2547,7 +2640,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 caseStudy.title,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.portfolioTextTitle,
                   fontSize: bodySize + 8,
                   fontWeight: FontWeight.w800,
@@ -2556,7 +2649,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 caseStudy.subtitle,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.portfolioTextBody,
                   fontSize: bodySize,
                   fontWeight: FontWeight.w600,
@@ -2567,7 +2660,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
                 caseStudy.overview,
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: ColorManager.portfolioTextBody,
                   fontSize: bodySize - 0.5,
                   height: 1.45,
@@ -2591,7 +2684,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
                           ),
                           child: Text(
                             tag,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: ColorManager.portfolioTextBody,
                               fontSize: bodySize - 2,
                               fontWeight: FontWeight.w600,
@@ -2630,7 +2723,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
                             ),
                             child: Text(
                               'View case study',
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   fontSize: bodySize),
                             ),
@@ -2652,7 +2745,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
                           ),
                           child: Text(
                             'Discuss a similar project',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                                 fontWeight: FontWeight.w700,
                                 fontSize: bodySize - 1),
                           ),
@@ -2686,7 +2779,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
                               ),
                               child: Text(
                                 'View case study',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w700,
                                     fontSize: bodySize),
                               ),
@@ -2710,7 +2803,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
                             ),
                             child: Text(
                               'Discuss a similar project',
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   fontSize: bodySize - 1),
                             ),
@@ -2739,7 +2832,7 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return SelectableText(
       title,
-      style: GoogleFonts.albertSans(
+      style: GoogleFonts.roboto(
         color: ColorManager.portfolioTextTitle,
         fontSize: sectionTitleSize,
         fontWeight: FontWeight.bold,
@@ -2811,7 +2904,7 @@ class _OpenSourceCard extends StatelessWidget {
                   children: [
                     SelectableText(
                       item.title,
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.portfolioTextTitle,
                         fontSize: bodySize + 2,
                         fontWeight: FontWeight.w600,
@@ -2820,7 +2913,7 @@ class _OpenSourceCard extends StatelessWidget {
                     SizedBox(height: 4),
                     SelectableText(
                       item.subtitle,
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.portfolioTextBody,
                         fontSize: bodySize - 1,
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/core/design_system/responsive.dart';
 import 'package:sizer/sizer.dart';
 import '../ColorManager.dart';
 
@@ -15,6 +16,11 @@ class SEOOptimizationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final bodyAlign = isDesktop ? TextAlign.start : TextAlign.center;
+    final colCross = isDesktop
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.center;
     final List<Map<String, dynamic>> steps = [
       {
         'step': '1',
@@ -103,12 +109,14 @@ class SEOOptimizationSection extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: colCross,
         mainAxisSize: MainAxisSize.min,
         children: [
           // SEO Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: isDesktop
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -127,7 +135,7 @@ class SEOOptimizationSection extends StatelessWidget {
               SizedBox(width: isMobile ? 12 : 16),
               SelectableText(
                 'SEO Optimization',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontSize: isMobile
                       ? (wi < 400
                           ? 24.sp * 1.3 * 0.7 * 0.7
@@ -142,7 +150,7 @@ class SEOOptimizationSection extends StatelessWidget {
           SizedBox(height: isMobile ? 16 : 24),
           SelectableText(
             'Step-by-Step Guide to High Rankings',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile
                   ? (wi < 400
                       ? 16.sp * 1.3 * 0.7 * 0.7
@@ -151,7 +159,7 @@ class SEOOptimizationSection extends StatelessWidget {
               color: const Color(0xFFD1D5DB),
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
+            textAlign: bodyAlign,
           ),
           SizedBox(height: isMobile ? 24 : 32),
           // Steps List
@@ -168,69 +176,67 @@ class SEOOptimizationSection extends StatelessWidget {
                   width: 1.5,
                 ),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: colCross,
                 children: [
-                  // Step Number
-                  Container(
-                    width: isMobile ? 40 : 50,
-                    height: isMobile ? 40 : 50,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [ColorManager.blue, ColorManager.orange],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: SelectableText(
-                        step['step'],
-                        style: GoogleFonts.albertSans(
-                          fontSize:
-                              isMobile ? 18.sp * 1.3 * 0.7 * 0.7 : wi * 0.017,
-                          fontWeight: FontWeight.bold,
-                          color: ColorManager.accentGoldDark,
+                  Row(
+                    mainAxisAlignment: isDesktop
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: isMobile ? 40 : 50,
+                        height: isMobile ? 40 : 50,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [ColorManager.blue, ColorManager.orange],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: isMobile ? 12 : 16),
-                  // Step Content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              step['icon'],
-                              color: ColorManager.accentCoralPressed,
-                              size: isMobile ? 28 : wi * 0.028,
+                        child: Center(
+                          child: SelectableText(
+                            step['step'],
+                            style: GoogleFonts.roboto(
+                              fontSize: isMobile
+                                  ? 18.sp * 1.3 * 0.7 * 0.7
+                                  : wi * 0.017,
+                              fontWeight: FontWeight.bold,
+                              color: ColorManager.accentGoldDark,
                             ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: SelectableText(
-                                step['title'],
-                                style: GoogleFonts.albertSans(
-                                  fontSize: isMobile
-                                      ? 16.sp * 1.3 * 0.7 * 0.7
-                                      : wi * 0.015,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: isMobile ? 8 : 12),
-                        SelectableText(
-                          step['description'],
-                          style: GoogleFonts.albertSans(
-                            fontSize:
-                                isMobile ? 13.sp * 1.3 * 0.7 * 0.7 : wi * 0.012,
-                            color: const Color(0xFFD1D5DB),
                           ),
                         ),
-                      ],
+                      ),
+                      SizedBox(width: isMobile ? 10 : 12),
+                      Icon(
+                        step['icon'],
+                        color: ColorManager.accentCoralPressed,
+                        size: isMobile ? 28 : wi * 0.028,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: isMobile ? 10 : 12),
+                  SelectableText(
+                    step['title'],
+                    textAlign: bodyAlign,
+                    style: GoogleFonts.roboto(
+                      fontSize: isMobile
+                          ? 16.sp * 1.3 * 0.7 * 0.7
+                          : wi * 0.015,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: isMobile ? 8 : 12),
+                  SelectableText(
+                    step['description'],
+                    textAlign: bodyAlign,
+                    style: GoogleFonts.roboto(
+                      fontSize: isMobile
+                          ? 13.sp * 1.3 * 0.7 * 0.7
+                          : wi * 0.012,
+                      color: const Color(0xFFD1D5DB),
                     ),
                   ),
                 ],

@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
         centerTitle: true,
         title: Text(
           'Sign In',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       blendMode: BlendMode.srcIn,
                                       child: Text(
                                       'Welcome Back',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontSize: isMobile ? 28 : 32,
                                         fontWeight: FontWeight.bold,
@@ -275,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               )
                                             : Text(
                                                 'Login',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   fontSize: isMobile ? 16 : 18,
                                                   fontWeight: FontWeight.bold,
                                                 ),

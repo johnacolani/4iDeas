@@ -74,19 +74,19 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${app.name}"?', style: GoogleFonts.albertSans(color: Colors.white)),
+        title: Text('Delete "${app.name}"?', style: GoogleFonts.roboto(color: Colors.white)),
         content: Text(
           'This will remove the app from the portfolio. You can add it again later.',
-          style: GoogleFonts.albertSans(color: Colors.white70),
+          style: GoogleFonts.roboto(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel', style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete', style: GoogleFonts.roboto(color: Colors.red)),
           ),
         ],
       ),
@@ -152,7 +152,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
         centerTitle: true,
         title: Text(
           'Admin - Portfolio & Info',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.bold,
@@ -184,7 +184,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                               const SizedBox(height: 16),
                               Text(
                                 _error!,
-                                style: GoogleFonts.albertSans(color: Colors.white, fontSize: 14),
+                                style: GoogleFonts.roboto(color: Colors.white, fontSize: 14),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 16),
@@ -209,7 +209,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                                   children: [
                                     Text(
                                       'Portfolio Apps',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: ColorManager.orange,
                                         fontSize: isMobile ? 20 : 22,
                                         fontWeight: FontWeight.bold,
@@ -220,7 +220,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                                       _useFirestore
                                           ? 'Managing ${_apps.length} app(s) from Firestore. Add, edit, or remove below.'
                                           : 'No Firestore apps yet. Add one to manage portfolio from here (otherwise the app uses built-in data).',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white.withValues(alpha: 0.8),
                                         fontSize: isMobile ? 14 : 15,
                                       ),
@@ -235,7 +235,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                                 child: Center(
                                   child: Text(
                                     'No apps in Firestore. Tap + to add.',
-                                    style: GoogleFonts.albertSans(color: Colors.white70, fontSize: 16),
+                                    style: GoogleFonts.roboto(color: Colors.white70, fontSize: 16),
                                   ),
                                 ),
                               )
@@ -286,7 +286,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                 children: [
                   Text(
                     app.name,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: isMobile ? 16 : 18,
                       fontWeight: FontWeight.w600,
@@ -295,7 +295,7 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
                   const SizedBox(height: 4),
                   Text(
                     app.description,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: Colors.white70,
                       fontSize: isMobile ? 13 : 14,
                     ),

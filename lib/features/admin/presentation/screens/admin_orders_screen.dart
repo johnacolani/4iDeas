@@ -84,7 +84,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           leadingWidth: 56,
           title: Text(
             'Access Denied',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
@@ -133,7 +133,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         ),
         title: Text(
           'Admin - Client Orders',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -259,7 +259,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         children: [
                           Text(
                             appName,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: ColorManager.textPrimary,
                               fontSize: isMobile ? 18 : 20,
                               fontWeight: FontWeight.bold,

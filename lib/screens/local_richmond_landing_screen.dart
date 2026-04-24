@@ -39,7 +39,7 @@ class LocalRichmondLandingScreen extends StatelessWidget {
         ),
         title: Text(
           'Richmond · Virginia · US',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 17 : 19,
             fontWeight: FontWeight.w700,
@@ -180,7 +180,7 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                   color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Portfolio & case studies',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   color: HomeWarmColors.headlinePrimary,
                                 ),
@@ -199,7 +199,7 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                   color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Full services list',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   color: HomeWarmColors.headlinePrimary,
                                 ),
@@ -219,7 +219,7 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                   color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Virginia Flutter page',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   color: HomeWarmColors.headlinePrimary,
                                 ),
@@ -239,7 +239,7 @@ class LocalRichmondLandingScreen extends StatelessWidget {
                                   color: HomeWarmColors.sectionAccent),
                               label: Text(
                                 'Firebase services page',
-                                style: GoogleFonts.albertSans(
+                                style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w700,
                                   color: HomeWarmColors.headlinePrimary,
                                 ),
@@ -294,7 +294,7 @@ class _HeroIntro extends StatelessWidget {
           ),
           child: Text(
             'Flutter development · App strategy · Virginia & US',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile ? 11.5 : 12.5,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.4,
@@ -313,7 +313,7 @@ class _HeroIntro extends StatelessWidget {
           ),
           child: Text(
             'Target keyword: flutter developer in richmond va',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile ? 12.5 : 13,
               fontWeight: FontWeight.w700,
               color: HomeWarmColors.eyebrowMuted,
@@ -325,7 +325,7 @@ class _HeroIntro extends StatelessWidget {
           header: true,
           child: SelectableText(
             'Flutter development for Richmond, Virginia—and app help for businesses across the US',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: HomeWarmColors.headlinePrimary,
               fontSize: h1Size,
               fontWeight: FontWeight.w800,
@@ -338,7 +338,7 @@ class _HeroIntro extends StatelessWidget {
           'If you are looking for a Flutter developer who can also own product design, scope, and delivery, you are in the right place. '
           'I help teams ship credible software: iOS, Android, and web from one codebase, often backed by Firebase, with communication '
           'that respects how US businesses actually decide and buy.',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: HomeWarmColors.bodyEmphasis,
             fontSize: body,
             height: 1.55,
@@ -365,7 +365,7 @@ class _SectionTitle extends StatelessWidget {
       header: true,
       child: Text(
         text,
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           color: HomeWarmColors.headlinePrimary,
           fontSize: fontSize,
           fontWeight: FontWeight.w800,
@@ -389,7 +389,7 @@ class _BodyParagraph extends StatelessWidget {
   Widget build(BuildContext context) {
     return SelectableText(
       text,
-      style: GoogleFonts.albertSans(
+      style: GoogleFonts.roboto(
         color: HomeWarmColors.bodyEmphasis,
         fontSize: body,
         height: 1.55,
@@ -442,7 +442,7 @@ class _ValueCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: bodyFont + 1,
                     fontWeight: FontWeight.w700,
                     color: HomeWarmColors.headlinePrimary,
@@ -452,7 +452,7 @@ class _ValueCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   body,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: bodyFont,
                     fontWeight: FontWeight.w500,
                     color: HomeWarmColors.bodyEmphasis,
@@ -500,7 +500,7 @@ class _ServiceRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: bodyFont + 0.5,
                     fontWeight: FontWeight.w700,
                     color: HomeWarmColors.headlinePrimary,
@@ -509,7 +509,7 @@ class _ServiceRow extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   detail,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: bodyFont,
                     fontWeight: FontWeight.w500,
                     color: HomeWarmColors.bodyEmphasis,
@@ -563,7 +563,7 @@ class _FinalCtaPanel extends StatelessWidget {
           Text(
             'Tell me what you are building',
             textAlign: TextAlign.center,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile ? 22 : 24,
               fontWeight: FontWeight.w800,
               color: HomeWarmColors.headlinePrimary,
@@ -574,7 +574,7 @@ class _FinalCtaPanel extends StatelessWidget {
             'Share your timeline, platforms, and where you need the most help—product, design, Flutter, or Firebase. '
             'I will reply with candid next steps, whether we are a fit or not.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: body,
               fontWeight: FontWeight.w500,
               color: HomeWarmColors.bodyEmphasis,
@@ -593,7 +593,7 @@ class _FinalCtaPanel extends StatelessWidget {
             ),
             child: Text(
               'Discuss your project',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                   fontSize: body, fontWeight: FontWeight.w700),
             ),
           ),
@@ -607,7 +607,7 @@ class _FinalCtaPanel extends StatelessWidget {
             ),
             child: Text(
               'Start with a brief or scope request',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                   fontSize: body - 0.5, fontWeight: FontWeight.w700),
             ),
           ),

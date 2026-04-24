@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         title: Text(
           'Profile',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -186,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(
                       user.displayName ?? 'User',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.textPrimary,
                         fontSize: isMobile ? 22 : 24,
                         fontWeight: FontWeight.bold,
@@ -243,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: ColorManager.containerSurface,
                     title: Text(
                       'Logout',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
@@ -292,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 8),
                   Text(
                     'Logout',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       fontSize: isMobile ? 16 : 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -325,7 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: Text(
                   'My Orders',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.textPrimary,
                     fontSize: isMobile ? 22 : 24,
                     fontWeight: FontWeight.bold,
@@ -458,7 +458,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: Text(
                   appName,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.textPrimary,
                     fontSize: isMobile ? 18 : 20,
                     fontWeight: FontWeight.bold,
@@ -888,7 +888,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 8),
                   Text(
                     'Reply to Admin',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: ColorManager.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1044,7 +1044,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: Text(
                       'Sign Contract',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),

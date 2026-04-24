@@ -52,7 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         centerTitle: true,
         title: Text(
           'Forgot Password',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -139,7 +139,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                       blendMode: BlendMode.srcIn,
                                       child: Text(
                                       'Reset Password',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontSize: isMobile ? 28 : 32,
                                         fontWeight: FontWeight.bold,
@@ -269,7 +269,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                               )
                                             : Text(
                                                 'Send Reset Link',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   fontSize: isMobile ? 16 : 18,
                                                   fontWeight: FontWeight.bold,
                                                 ),

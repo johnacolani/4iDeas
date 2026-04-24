@@ -74,22 +74,22 @@ class _ServicesScreenState extends State<ServicesScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
         title: Text('Delete "${item.title}"?',
-            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+            style: GoogleFonts.roboto(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the service from the list.',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
               color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: GoogleFonts.albertSans(color: ColorManager.orange)),
+                style: GoogleFonts.roboto(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text('Delete',
-                style: GoogleFonts.albertSans(color: Colors.red)),
+                style: GoogleFonts.roboto(color: Colors.red)),
           ),
         ],
       ),
@@ -214,7 +214,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         ),
         title: Text(
           'Services',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -264,7 +264,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                         child: Text(
                                           'How 4iDeas helps teams ship',
                                           textAlign: TextAlign.center,
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: Colors.white,
                                             fontSize: titleFontSize,
                                             fontWeight: FontWeight.w800,
@@ -277,7 +277,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                     SelectableText(
                                       'Founder-led studio services for startups and businesses—MVP delivery, product design with engineering, practical AI features, and ongoing improvement for products already in market.',
                                       textAlign: TextAlign.center,
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: const Color(0xFFD1D5DB),
                                         fontSize: bodyFontSize,
                                         fontWeight: FontWeight.w500,
@@ -295,7 +295,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                               '${AppRoutes.portfolio}?section=featured'),
                                           child: Text(
                                             'See featured case studies',
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w700,
                                               decoration:
@@ -311,7 +311,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                               context.go(AppRoutes.insights),
                                           child: Text(
                                             'Read implementation insights',
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w700,
                                               decoration:
@@ -335,7 +335,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                       color: AppColors.primaryGold),
                                   label: Text(
                                     'Add service',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: AppColors.primaryGold,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -394,7 +394,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                           child: Text(
                                             'Ready to discuss your product?',
                                             textAlign: TextAlign.center,
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               color: Colors.white,
                                               fontSize: sectionTitleSize + 1,
                                               fontWeight: FontWeight.w800,
@@ -405,7 +405,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                         SelectableText(
                                           'Send a short note about your product, timeline, and budget band. I respond with candid next steps—whether we are a fit or not.',
                                           textAlign: TextAlign.center,
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: const Color(0xFFD1D5DB),
                                             fontSize: bodyFontSize - 1,
                                             height: 1.5,
@@ -431,7 +431,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                                 _goContact(context),
                                             child: Text(
                                               'Discuss your project',
-                                              style: GoogleFonts.albertSans(
+                                              style: GoogleFonts.roboto(
                                                 fontSize: bodyFontSize,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -445,7 +445,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                           child: Text(
                                             'Prefer a structured brief? Submit a project form',
                                             textAlign: TextAlign.center,
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w600,
                                               fontSize: bodyFontSize - 2,
@@ -468,7 +468,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                                   .go(AppRoutes.portfolio),
                                               child: Text(
                                                 'Review portfolio proof',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   color: AppColors.primaryGold,
                                                   fontWeight: FontWeight.w700,
                                                   decoration:
@@ -486,7 +486,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                                   .go(AppRoutes.insights),
                                               child: Text(
                                                 'Read delivery insights',
-                                                style: GoogleFonts.albertSans(
+                                                style: GoogleFonts.roboto(
                                                   color: AppColors.primaryGold,
                                                   fontWeight: FontWeight.w700,
                                                   decoration:

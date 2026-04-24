@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app_router.dart';
+import '../../helper/lets_talk.dart';
 import '../design_system/responsive.dart';
 import '../design_system/theme.dart';
 import '../design_system/widgets/primary_button.dart';
@@ -14,75 +15,107 @@ class ModernHeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isDesktop = Responsive.isDesktop(context);
     final bool isMobile = Responsive.isMobile(context);
+    /// Web/desktop: left-aligned body; phone + tablet: centered.
+    final bool centerBody = !isDesktop;
     final titleStyle = Theme.of(context).textTheme.displayLarge?.copyWith(
           fontSize: Responsive.heroTitleSize(context),
+          fontWeight: FontWeight.w500,
         );
 
-    final double horizontalPadding = isMobile ? 16 : (Responsive.isTablet(context) ? 24 : 40);
+    final double horizontalPadding = isMobile
+        ? 10
+        : (Responsive.isTablet(context) ? 18 : 32);
     return Padding(
       padding: EdgeInsets.only(
         left: horizontalPadding,
         right: horizontalPadding,
         top: 0,
-        bottom: isMobile ? AppSpacing.lg : AppSpacing.xl,
+        bottom: isMobile ? AppSpacing.md : AppSpacing.xl,
       ),
       child: Align(
-        alignment: Alignment.topLeft,
-        child: Transform.translate(
-          offset: const Offset(30, 0),
-          child: isDesktop
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
-                      child: _HeroContent(titleStyle: titleStyle),
+        alignment: centerBody ? Alignment.topCenter : Alignment.topLeft,
+        child: isDesktop
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: _HeroContent(
+                        titleStyle: titleStyle,
+                        center: centerBody,
+                        showLetsTalkInColumn: false,
+                      ),
                     ),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _HeroContent(titleStyle: titleStyle),
-                  ],
-                ),
-        ),
+                  ),
+                  const SizedBox(width: 20),
+                  // Top-right: outline CTA on web desktop only.
+                  const _DesktopTopRightLetsTalk(
+                    ctaWidth: 278.0,
+                  ),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  _HeroContent(
+                    titleStyle: titleStyle,
+                    center: centerBody,
+                    showLetsTalkInColumn: true,
+                  ),
+                ],
+              ),
       ),
     );
   }
 }
 
+class _DesktopTopRightLetsTalk extends StatelessWidget {
+  const _DesktopTopRightLetsTalk({required this.ctaWidth});
+
+  final double ctaWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final double w = (ctaWidth * 0.3).clamp(108.0, 200.0);
+    return _LetsTalkPillButton(width: w, alignToStart: false);
+  }
+}
+
 class _HeroContent extends StatelessWidget {
-  const _HeroContent({required this.titleStyle});
+  const _HeroContent({
+    required this.titleStyle,
+    required this.center,
+    this.showLetsTalkInColumn = true,
+  });
 
   final TextStyle? titleStyle;
+  /// [true] = mobile + tablet: centered; [false] = desktop: left.
+  final bool center;
+  /// [false] on web desktop: button is in the [ModernHeroSection] row, top right.
+  final bool showLetsTalkInColumn;
 
   @override
   Widget build(BuildContext context) {
     final bool isMobile = Responsive.isMobile(context);
     final double screenWidth = MediaQuery.sizeOf(context).width;
+    final TextAlign ta = center ? TextAlign.center : TextAlign.start;
     final double ctaWidth =
         isMobile ? (screenWidth - 72).clamp(240.0, 340.0) : 278.0;
+    // On wide viewports the founder line appears in the app bar; do not repeat it here.
+    // Reserve the same vertical space the pill + gap used so the headline/CTAs stay put.
+    // Height ≈ old pill (padding 8*2 + text) + (AppSpacing.lg + 32 + 24).
+    const double removedPillAndGap = 36.0 + AppSpacing.lg + 32 + 24;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: <Widget>[
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: AppColors.borderColor),
-            color: AppColors.bgCard.withValues(alpha: 0.45),
-          ),
-          child: Text(
-            'FOUNDER-LED • RICHMOND, VA',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.primaryGold,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg + 32 + 24),
+        if (!isMobile) ...<Widget>[
+          const SizedBox(height: removedPillAndGap),
+        ] else
+          const SizedBox(height: AppSpacing.sm),
         RichText(
+          textAlign: ta,
           text: TextSpan(
             style: titleStyle,
             children: const <TextSpan>[
@@ -100,33 +133,104 @@ class _HeroContent extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Digital products that drive real business.',
+          textAlign: ta,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: const Color(0xFF9CA3AF),
-                fontSize: 36,
+                fontSize: Responsive.heroSubtitleSize(context),
               ),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
           'Product Design + Flutter + Firebase + AI.\nFrom idea to App Store - we build scalable products.',
+          textAlign: ta,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Colors.white,
               ),
         ),
-        const SizedBox(height: AppSpacing.md),
-        Wrap(
-          spacing: AppSpacing.sm,
-          runSpacing: AppSpacing.sm,
+        if (showLetsTalkInColumn) ...<Widget>[
+          const SizedBox(height: AppSpacing.lg),
+          LayoutBuilder(
+            builder: (context, c) {
+              // Narrower than Discuss / Explore so the outline CTA does not read as a full bar.
+              final double w = (ctaWidth * 0.3).clamp(108.0, c.maxWidth);
+              if (w <= 0) return const SizedBox.shrink();
+              return _LetsTalkPillButton(
+                width: w,
+                alignToStart: !center,
+              );
+            },
+          ),
+        ] else
+          const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: 32),
+        if (isMobile) ...<Widget>[
+          SizedBox(
+            width: ctaWidth,
+            height: 56,
+            child: PrimaryButton(
+              label: 'Discuss Your Project',
+              onPressed: () => context.go(AppRoutes.contact),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(
+            width: ctaWidth,
+            height: 56,
+            child: SecondaryButton(
+              label: 'Explore Work',
+              onPressed: () => context.go(AppRoutes.portfolio),
+            ),
+          ),
+        ] else ...<Widget>[
+          if (center)
+            Center(
+              child: _HeroCtaRow(
+                ctaWidth: ctaWidth,
+              ),
+            )
+          else
+            _HeroCtaRow(
+              ctaWidth: ctaWidth,
+            ),
+        ],
+      ],
+    );
+  }
+}
+
+/// "Discuss" + "Explore" side by side (web / tablet); width split from [ctaWidth].
+class _HeroCtaRow extends StatelessWidget {
+  const _HeroCtaRow({required this.ctaWidth});
+
+  final double ctaWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Two equal buttons + gap, capped to available width on narrow web/tablet.
+        final maxPair = ctaWidth * 2 + AppSpacing.md;
+        final double w = constraints.hasBoundedWidth
+            ? (constraints.maxWidth < maxPair
+                ? constraints.maxWidth
+                : maxPair)
+            : maxPair;
+        final double each = (w - AppSpacing.md) / 2;
+        if (each <= 0) return const SizedBox.shrink();
+        return Row(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             SizedBox(
-              width: ctaWidth,
+              width: each,
               height: 56,
               child: PrimaryButton(
                 label: 'Discuss Your Project',
                 onPressed: () => context.go(AppRoutes.contact),
               ),
             ),
+            const SizedBox(width: AppSpacing.md),
             SizedBox(
-              width: ctaWidth,
+              width: each,
               height: 56,
               child: SecondaryButton(
                 label: 'Explore Work',
@@ -134,8 +238,54 @@ class _HeroContent extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
+  }
+}
+
+class _LetsTalkPillButton extends StatelessWidget {
+  const _LetsTalkPillButton({
+    required this.width,
+    this.alignToStart = false,
+  });
+
+  final double width;
+  final bool alignToStart;
+
+  @override
+  Widget build(BuildContext context) {
+    const double btnH = 40;
+    final btn = SizedBox(
+      width: width,
+      height: btnH,
+      child: OutlinedButton(
+        onPressed: () => showLetsTalkDialog(context),
+        style: OutlinedButton.styleFrom(
+          minimumSize: Size(width, btnH),
+          maximumSize: Size(width, btnH),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          side: const BorderSide(
+            color: AppColors.primaryGold,
+            width: 1.0,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+        ),
+        child: Text(
+          "Let's Talk",
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppColors.primaryGold,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                height: 1.15,
+              ),
+        ),
+      ),
+    );
+    if (!alignToStart) return btn;
+    return Align(alignment: Alignment.centerLeft, child: btn);
   }
 }

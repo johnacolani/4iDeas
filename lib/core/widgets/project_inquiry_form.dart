@@ -67,12 +67,12 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      labelStyle: GoogleFonts.albertSans(
+      labelStyle: GoogleFonts.roboto(
         color: HomeWarmColors.bodyEmphasis,
         fontWeight: FontWeight.w600,
         fontSize: 14,
       ),
-      hintStyle: GoogleFonts.albertSans(
+      hintStyle: GoogleFonts.roboto(
         color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.45),
         fontSize: 15,
       ),
@@ -101,7 +101,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
         SnackBar(
           content: Text(
             'Please select project type, budget, and timeline.',
-            style: GoogleFonts.albertSans(),
+            style: GoogleFonts.roboto(),
           ),
           backgroundColor: Colors.red.shade700,
         ),
@@ -146,7 +146,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
           SnackBar(
             content: Text(
               'Thanks—your note was sent. I will get back to you shortly.',
-              style: GoogleFonts.albertSans(fontWeight: FontWeight.w600),
+              style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
             ),
             backgroundColor: const Color(0xFF166534),
           ),
@@ -156,7 +156,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
           SnackBar(
             content: Text(
               'Something went wrong. Please email info@4ideasapp.com directly.',
-              style: GoogleFonts.albertSans(),
+              style: GoogleFonts.roboto(),
             ),
             backgroundColor: Colors.red.shade800,
           ),
@@ -169,7 +169,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
         SnackBar(
           content: Text(
             'Network error. Try again or email info@4ideasapp.com.',
-            style: GoogleFonts.albertSans(),
+            style: GoogleFonts.roboto(),
           ),
           backgroundColor: Colors.red.shade800,
         ),
@@ -202,7 +202,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
           children: [
             Text(
               'Project inquiry',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 fontSize: isMobile ? 20 : 22,
                 fontWeight: FontWeight.w800,
                 color: HomeWarmColors.headlinePrimary,
@@ -211,7 +211,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             const SizedBox(height: 6),
             Text(
               'Takes about two minutes. All fields help me respond with something useful—not a generic reply.',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 fontSize: isMobile ? 14 : 15,
                 fontWeight: FontWeight.w500,
                 color: HomeWarmColors.bodyEmphasis,
@@ -251,10 +251,10 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
               value: _projectType,
               decoration: _fieldDecoration('Project type'),
               items: _projectTypes
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.albertSans(fontSize: 14))))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.roboto(fontSize: 14))))
                   .toList(),
               onChanged: (v) => setState(() => _projectType = v),
-              hint: Text('Select…', style: GoogleFonts.albertSans(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
+              hint: Text('Select…', style: GoogleFonts.roboto(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             DropdownButtonFormField<String>(
@@ -262,10 +262,10 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
               value: _budgetRange,
               decoration: _fieldDecoration('Budget range'),
               items: _budgetRanges
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.albertSans(fontSize: 14))))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.roboto(fontSize: 14))))
                   .toList(),
               onChanged: (v) => setState(() => _budgetRange = v),
-              hint: Text('Select…', style: GoogleFonts.albertSans(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
+              hint: Text('Select…', style: GoogleFonts.roboto(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             DropdownButtonFormField<String>(
@@ -273,10 +273,10 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
               value: _timeline,
               decoration: _fieldDecoration('Timeline'),
               items: _timelines
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.albertSans(fontSize: 14))))
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.roboto(fontSize: 14))))
                   .toList(),
               onChanged: (v) => setState(() => _timeline = v),
-              hint: Text('Select…', style: GoogleFonts.albertSans(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
+              hint: Text('Select…', style: GoogleFonts.roboto(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             TextFormField(
@@ -307,7 +307,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
                     )
                   : Text(
                       'Send inquiry',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -317,7 +317,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             Text(
               'By sending this, you agree I may reply using your email. No spam, no lists—just project conversation.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 fontSize: 12.5,
                 color: ColorManager.textMuted,
                 height: 1.35,

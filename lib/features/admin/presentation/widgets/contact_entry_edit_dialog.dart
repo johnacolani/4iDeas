@@ -68,7 +68,7 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
       backgroundColor: const Color(0xff1a1a2e),
       title: Text(
         widget.initial == null ? 'Add contact' : 'Edit contact',
-        style: GoogleFonts.albertSans(color: Colors.white),
+        style: GoogleFonts.roboto(color: Colors.white),
       ),
       content: SingleChildScrollView(
         child: ConstrainedBox(
@@ -79,13 +79,13 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
             children: [
               Text(
                 'Type',
-                style: GoogleFonts.albertSans(color: Colors.white70, fontSize: 14),
+                style: GoogleFonts.roboto(color: Colors.white70, fontSize: 14),
               ),
               const SizedBox(height: 6),
               DropdownButtonFormField<String>(
                 initialValue: _type,
                 dropdownColor: const Color(0xff2d3748),
-                style: GoogleFonts.albertSans(color: Colors.white),
+                style: GoogleFonts.roboto(color: Colors.white),
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
@@ -107,10 +107,10 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _labelController,
-                style: GoogleFonts.albertSans(color: Colors.white),
+                style: GoogleFonts.roboto(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Label',
-                  labelStyle: GoogleFonts.albertSans(color: Colors.white70),
+                  labelStyle: GoogleFonts.roboto(color: Colors.white70),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(8),
@@ -124,10 +124,10 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _valueController,
-                style: GoogleFonts.albertSans(color: Colors.white),
+                style: GoogleFonts.roboto(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: _type == 'phone' ? 'Phone number' : _type == 'email' ? 'Email' : 'Display text',
-                  labelStyle: GoogleFonts.albertSans(color: Colors.white70),
+                  labelStyle: GoogleFonts.roboto(color: Colors.white70),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                     borderRadius: BorderRadius.circular(8),
@@ -142,10 +142,10 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _urlOrRouteController,
-                  style: GoogleFonts.albertSans(color: Colors.white),
+                  style: GoogleFonts.roboto(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: _type == 'navigate' ? 'Route (e.g. /portfolio)' : 'URL',
-                    labelStyle: GoogleFonts.albertSans(color: Colors.white70),
+                    labelStyle: GoogleFonts.roboto(color: Colors.white70),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                       borderRadius: BorderRadius.circular(8),
@@ -164,7 +164,7 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+          child: Text('Cancel', style: GoogleFonts.roboto(color: ColorManager.orange)),
         ),
         ElevatedButton(
           onPressed: () {
@@ -173,7 +173,7 @@ class _ContactEntryEditDialogState extends State<_ContactEntryEditDialog> {
             Navigator.of(context).pop(_buildEntry());
           },
           style: ElevatedButton.styleFrom(backgroundColor: ColorManager.orange, foregroundColor: Colors.white),
-          child: Text(widget.initial == null ? 'Add' : 'Save', style: GoogleFonts.albertSans(fontWeight: FontWeight.w600)),
+          child: Text(widget.initial == null ? 'Add' : 'Save', style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
         ),
       ],
     );

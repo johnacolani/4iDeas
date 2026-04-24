@@ -32,7 +32,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
           ),
           title: Text(
             'Design system',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -50,7 +50,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
                   child: Text(
                     'Design system not found for this case study.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: ColorManager.textSecondary,
                       fontSize: 16,
                     ),
@@ -87,7 +87,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
         centerTitle: true,
         title: Text(
           'Design system',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,

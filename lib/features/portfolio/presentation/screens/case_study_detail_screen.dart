@@ -145,7 +145,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
         centerTitle: true,
         title: SelectableText(
           caseStudy.title,
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -184,7 +184,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                 blendMode: BlendMode.srcIn,
                                 child: Text(
                                   caseStudy.title,
-                                  style: GoogleFonts.albertSans(
+                                  style: GoogleFonts.roboto(
                                     color: _textPrimary,
                                     fontSize: isMobile
                                         ? sectionTitleSize + 4
@@ -198,7 +198,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             SizedBox(height: he * 0.014),
                             SelectableText(
                               caseStudy.subtitle,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: _textSecondary,
                                 fontSize: sectionTitleSize,
                                 fontWeight: FontWeight.w600,
@@ -215,7 +215,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             SizedBox(height: he * 0.022),
                             SelectableText(
                               caseStudy.overview,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: _textSecondary,
                                 fontSize: bodySize,
                                 height: 1.6,
@@ -291,7 +291,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                     blendMode: BlendMode.srcIn,
                                     child: Text(
                                       'Next steps',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: _textPrimary,
                                         fontSize: bodySize + 1,
                                         fontWeight: FontWeight.w800,
@@ -301,7 +301,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                   SizedBox(height: 8),
                                   Text(
                                     'Explore related service options, review more proof, or start a project conversation.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: _textSecondary,
                                       fontSize: bodySize - 1,
                                       height: 1.45,
@@ -321,7 +321,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'Discuss a similar project',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                               fontWeight: FontWeight.w700),
                                         ),
                                       ),
@@ -337,7 +337,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'View services',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                               fontWeight: FontWeight.w700),
                                         ),
                                       ),
@@ -353,7 +353,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'Back to featured case studies',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                               fontWeight: FontWeight.w700),
                                         ),
                                       ),
@@ -417,7 +417,7 @@ class _AsdCaseStudyAtAGlance extends StatelessWidget {
               ),
               child: Text(
                 t,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: _textSecondary,
@@ -478,7 +478,7 @@ class _AsdCaseStudyOutline extends StatelessWidget {
             blendMode: BlendMode.srcIn,
             child: Text(
               'In this case study',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: _textPrimary,
                 fontSize: bodySize + 1,
                 fontWeight: FontWeight.w800,
@@ -496,7 +496,7 @@ class _AsdCaseStudyOutline extends StatelessWidget {
                     width: 28,
                     child: Text(
                       '${i + 1}.',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: _textMuted,
                         fontSize: bodySize - 1,
                         fontWeight: FontWeight.w700,
@@ -506,7 +506,7 @@ class _AsdCaseStudyOutline extends StatelessWidget {
                   Expanded(
                     child: Text(
                       _items[i],
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: _textSecondary,
                         fontSize: bodySize - 1,
                         height: 1.4,
@@ -562,7 +562,7 @@ class _DesignApproachBlock extends StatelessWidget {
                 blendMode: BlendMode.srcIn,
                 child: Text(
                   'Design approach & principles',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: _textPrimary,
                     fontSize: bodySize + 2,
                     fontWeight: FontWeight.bold,
@@ -572,7 +572,7 @@ class _DesignApproachBlock extends StatelessWidget {
               SizedBox(height: he * 0.012),
               SelectableText(
                 content,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: _textSecondary,
                   fontSize: bodySize,
                   height: 1.55,
@@ -630,7 +630,7 @@ class _ClickableImage extends StatelessWidget {
           SizedBox(height: 8),
           SelectableText(
             'Image not found',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: _textMuted,
               fontSize: 12,
             ),
@@ -819,7 +819,7 @@ class _ImageWithCaption extends StatelessWidget {
             children: [
               SelectableText(
                 displayDescription,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: _textSecondary,
                   fontSize: bodySize * 0.9,
                   height: 1.35,
@@ -882,7 +882,7 @@ class _FullScreenImage extends StatelessWidget {
                             SizedBox(height: 16),
                             SelectableText(
                               'Image not found',
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: _textSecondary,
                                 fontSize: 16,
                               ),
@@ -986,7 +986,7 @@ class _SectionBlock extends StatelessWidget {
                   blendMode: BlendMode.srcIn,
                   child: Text(
                     title,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: _textPrimary,
                       fontSize: bodySize + 4,
                       fontWeight: FontWeight.bold,
@@ -997,7 +997,7 @@ class _SectionBlock extends StatelessWidget {
               SizedBox(height: he * 0.015),
               SelectableText(
                 content,
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: _textSecondary,
                   fontSize: bodySize,
                   height: 1.6,
@@ -1021,7 +1021,7 @@ class _SectionBlock extends StatelessWidget {
                   icon: const Icon(Icons.auto_stories_outlined),
                   label: Text(
                     'Open design system (full document)',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       fontWeight: FontWeight.w600,
                       fontSize: bodySize,
                     ),
@@ -1232,7 +1232,7 @@ class _CaseStudyIntentLinks extends StatelessWidget {
           style: TextButton.styleFrom(foregroundColor: AppColors.primaryGold),
           child: Text(
             'Related Flutter and product design services',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: AppColors.primaryGold,
               fontSize: bodySize - 2,
               fontWeight: FontWeight.w700,
@@ -1245,7 +1245,7 @@ class _CaseStudyIntentLinks extends StatelessWidget {
           style: TextButton.styleFrom(foregroundColor: AppColors.primaryGold),
           child: Text(
             'More featured case studies',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: AppColors.primaryGold,
               fontSize: bodySize - 2,
               fontWeight: FontWeight.w700,
@@ -1258,7 +1258,7 @@ class _CaseStudyIntentLinks extends StatelessWidget {
           style: TextButton.styleFrom(foregroundColor: AppColors.primaryGold),
           child: Text(
             'Discuss a similar project scope',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: AppColors.primaryGold,
               fontSize: bodySize - 2,
               fontWeight: FontWeight.w700,

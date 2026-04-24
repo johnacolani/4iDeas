@@ -35,7 +35,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         centerTitle: true,
         title: Text(
           'Verify Email',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -114,7 +114,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             SizedBox(height: he * 0.03),
                             Text(
                               'Verify Your Email',
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: Colors.white,
                                 fontSize: isMobile ? 28 : 32,
                                 fontWeight: FontWeight.bold,
@@ -193,7 +193,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                           SizedBox(width: 8),
                                           Text(
                                             'I\'ve Verified My Email',
-                                            style: GoogleFonts.albertSans(
+                                            style: GoogleFonts.roboto(
                                               fontSize: isMobile ? 16 : 18,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -231,7 +231,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                     SizedBox(width: 8),
                                     Text(
                                       'Resend Verification Email',
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         fontSize: isMobile ? 16 : 18,
                                         fontWeight: FontWeight.bold,
                                       ),

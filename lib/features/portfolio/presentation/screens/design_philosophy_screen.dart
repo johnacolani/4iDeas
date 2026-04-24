@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
@@ -41,7 +39,7 @@ TextStyle _philosophyGradientStyle({
   double height = 1.3,
   double letterSpacing = 0.2,
 }) {
-  return GoogleFonts.albertSans(
+  return GoogleFonts.roboto(
     fontSize: fontSize,
     fontWeight: fontWeight,
     height: height,
@@ -58,7 +56,7 @@ Widget _principleItem(double bodySize, String text) {
     padding: const EdgeInsets.only(bottom: 6),
     child: SelectableText(
       '• $text',
-      style: GoogleFonts.albertSans(
+      style: GoogleFonts.roboto(
         color: Colors.white,
         fontSize: bodySize,
         height: 1.45,
@@ -91,7 +89,7 @@ Widget _frameworkItem(
         else
           SelectableText(
             description,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: Colors.white,
               fontSize: bodySize,
               height: 1.5,
@@ -105,7 +103,7 @@ Widget _frameworkItem(
 const double _circleMethodIndent = 32; // 2 tabs
 
 Widget _circleMethodDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(
+  final baseStyle = GoogleFonts.roboto(
     color: Colors.white,
     fontSize: bodySize,
     height: 1.5,
@@ -176,7 +174,7 @@ Widget _circleMethodDescription(double bodySize) {
 }
 
 Widget _starDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(
+  final baseStyle = GoogleFonts.roboto(
       color: Colors.white, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
@@ -213,7 +211,7 @@ Widget _starDescription(double bodySize) {
 }
 
 Widget _userTypesDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(
+  final baseStyle = GoogleFonts.roboto(
       color: Colors.white, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
@@ -243,7 +241,7 @@ Widget _userTypesDescription(double bodySize) {
 }
 
 Widget _wcagDescription(double bodySize) {
-  final baseStyle = GoogleFonts.albertSans(
+  final baseStyle = GoogleFonts.roboto(
       color: Colors.white, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
@@ -308,7 +306,7 @@ Widget _processStep(
     children: [
       SelectableText.rich(
         TextSpan(
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: bodySize,
             height: 1.55,
@@ -316,7 +314,7 @@ Widget _processStep(
           children: [
             TextSpan(
               text: '$number. ',
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: ColorManager.accentGoldDark,
                 fontSize: bodySize,
                 fontWeight: FontWeight.bold,
@@ -324,7 +322,7 @@ Widget _processStep(
             ),
             TextSpan(
               text: stageName,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: ColorManager.orange,
                 fontSize: bodySize,
                 fontWeight: FontWeight.bold,
@@ -339,7 +337,7 @@ Widget _processStep(
               padding: const EdgeInsets.only(left: 16, bottom: 2),
               child: SelectableText(
                 '• $b',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   color: Colors.white,
                   fontSize: bodySize - 1,
                   height: 1.45,
@@ -383,7 +381,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
         centerTitle: true,
         title: SelectableText(
           'Design Philosophy & Principles',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 16 : 18,
             fontWeight: FontWeight.w600,
@@ -393,18 +391,6 @@ class DesignPhilosophyScreen extends StatelessWidget {
       body: Stack(
         children: [
           const AppBackground(),
-          Positioned.fill(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8F96A3).withValues(alpha: 0.14),
-                  ),
-                ),
-              ),
-            ),
-          ),
           Padding(
             padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
@@ -451,7 +437,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 children: [
                                   SelectableText(
                                     'Design does not begin with screens or tools',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: ColorManager.accentGoldDark,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -460,7 +446,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   ),
                                   SelectableText(
                                     'It begins with understanding people.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -469,7 +455,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: he * 0.01),
                                   SelectableText(
                                     'In digital products:',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -478,7 +464,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: 4),
                                   SelectableText(
                                     'visual clutter is a cognitive sharp edge;',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -486,7 +472,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   ),
                                   SelectableText(
                                     'poor hierarchy creates fatigue;',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -494,7 +480,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   ),
                                   SelectableText(
                                     'ignoring privacy can harm users.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -503,7 +489,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: he * 0.01),
                                   SelectableText.rich(
                                     TextSpan(
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontSize: bodySize,
                                         height: 1.55,
@@ -514,7 +500,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                                 'A designer\'s role is to protect '),
                                         TextSpan(
                                           text: 'users',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: ColorManager.orange,
                                             fontSize: bodySize,
                                             fontWeight: FontWeight.bold,
@@ -523,7 +509,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                         const TextSpan(text: ', not '),
                                         TextSpan(
                                           text: 'overwhelm them',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: ColorManager.orange,
                                             fontSize: bodySize,
                                             fontWeight: FontWeight.bold,
@@ -547,7 +533,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 children: [
                                   SelectableText.rich(
                                     TextSpan(
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontSize: bodySize,
                                         height: 1.55,
@@ -556,7 +542,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                         TextSpan(
                                           text:
                                               'Empathy is not a step in the process',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: ColorManager.accentGoldDark,
                                             fontSize: bodySize,
                                             fontWeight: FontWeight.bold,
@@ -568,7 +554,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   ),
                                   SelectableText(
                                     'it is the foundation of every decision.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -577,7 +563,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: he * 0.01),
                                   SelectableText(
                                     'Users open up only when they feel respected.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -586,7 +572,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: 4),
                                   SelectableText.rich(
                                     TextSpan(
-                                      style: GoogleFonts.albertSans(
+                                      style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontSize: bodySize,
                                         height: 1.55,
@@ -597,7 +583,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                                 'I avoid long surveys; I prefer '),
                                         TextSpan(
                                           text: 'conversations',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: ColorManager.orange,
                                             fontSize: bodySize,
                                             fontWeight: FontWeight.bold,
@@ -606,7 +592,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                         const TextSpan(text: ' and '),
                                         TextSpan(
                                           text: 'observation',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: ColorManager.orange,
                                             fontSize: bodySize,
                                             fontWeight: FontWeight.bold,
@@ -619,7 +605,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: 4),
                                   SelectableText(
                                     'I listen more than I ask.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -628,7 +614,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: he * 0.01),
                                   SelectableText(
                                     'Without empathy, design becomes decoration.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -638,7 +624,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SizedBox(height: he * 0.01),
                                   SelectableText(
                                     'AI can analyze patterns, but it cannot feel frustration, fear, or trust. That responsibility remains human.',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -658,7 +644,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                 children: [
                                   SelectableText(
                                     'Structured thinking in eight stages:',
-                                    style: GoogleFonts.albertSans(
+                                    style: GoogleFonts.roboto(
                                       color: ColorManager.accentGoldDark,
                                       fontSize: bodySize,
                                       height: 1.55,
@@ -966,7 +952,7 @@ class _PhilosophyBlock extends StatelessWidget {
           else
             SelectableText(
               content!,
-              style: GoogleFonts.albertSans(
+              style: GoogleFonts.roboto(
                 color: Colors.white,
                 fontSize: bodySize,
                 height: 1.55,
