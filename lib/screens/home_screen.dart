@@ -512,7 +512,7 @@ class _ModernTopAppBar extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(3),
+                                padding: const EdgeInsets.all(1.5),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(11),
                                   gradient: const LinearGradient(
