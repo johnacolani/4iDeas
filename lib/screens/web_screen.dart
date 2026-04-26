@@ -38,8 +38,8 @@ class _WebScreenState extends State<WebScreen> {
     final bool isNarrowView = Responsive.isMobile(context);
     // Desktop: left-aligned home content; phone + tablet: centered (see [Responsive]).
     final bool isBodyDesktop = Responsive.isDesktop(context);
-    // Nudge the whole home column down a bit from the app bar.
-    final double contentTopNudge = isNarrowView ? 12.0 : 20.0;
+    // Small nudge from app bar; kept tight so the hero reads higher on the page.
+    final double contentTopNudge = isNarrowView ? 4.0 : 8.0;
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -70,11 +70,11 @@ class _WebScreenState extends State<WebScreen> {
                         offset: Offset.zero,
                         child: const ModernHeroSection(),
                       ),
-                      SizedBox(height: isMobile ? 12 : 20),
+                      SizedBox(height: isMobile ? 4 : 6),
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: isMobile ? 8 : 56,
-                          vertical: isMobile ? 6 : 10,
+                          vertical: isMobile ? 2 : 3,
                         ),
                         child: Center(
                           child: PlatformProofChips(

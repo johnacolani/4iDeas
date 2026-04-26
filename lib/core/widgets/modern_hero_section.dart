@@ -30,7 +30,7 @@ class ModernHeroSection extends StatelessWidget {
         left: horizontalPadding,
         right: horizontalPadding,
         top: 0,
-        bottom: isMobile ? AppSpacing.md : AppSpacing.xl,
+        bottom: isMobile ? AppSpacing.sm : AppSpacing.lg,
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -125,8 +125,9 @@ class _HeroContent extends StatelessWidget {
         isMobile ? (screenWidth - 72).clamp(240.0, 340.0) : 278.0;
     // On wide viewports the founder line appears in the app bar; do not repeat it here.
     // Reserve the same vertical space the pill + gap used so the headline/CTAs stay put.
-    // Height ≈ old pill (padding 8*2 + text) + (AppSpacing.lg + 32 + 24).
-    const double removedPillAndGap = 36.0 + AppSpacing.lg + 32 + 24;
+    // Tighter than 50% — keeps headline + CTAs higher under the app bar.
+    const double removedPillAndGap =
+        (36.0 + AppSpacing.lg + 32 + 24) * 0.35;
     return Column(
       crossAxisAlignment: isMobile
           ? CrossAxisAlignment.start
@@ -135,12 +136,25 @@ class _HeroContent extends StatelessWidget {
         if (!isMobile) ...<Widget>[
           const SizedBox(height: removedPillAndGap),
         ] else
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 4),
         SizedBox(
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Product Design, MVP',
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                  style: mobileHeadlineStyle?.copyWith(
+                    color: AppColors.primaryGold,
+                    height: 1.12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -214,7 +228,7 @@ class _HeroContent extends StatelessWidget {
           ),
         ] else
           const SizedBox(height: AppSpacing.lg),
-        const SizedBox(height: 32),
+        const SizedBox(height: 20),
         if (isMobile) ...<Widget>[
           Center(
             child: SizedBox(

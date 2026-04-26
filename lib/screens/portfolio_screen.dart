@@ -1312,6 +1312,27 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 children: [
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
+                                    child: ShaderMask(
+                                      blendMode: BlendMode.srcIn,
+                                      shaderCallback: (bounds) =>
+                                          const LinearGradient(
+                                        colors: [
+                                          AppColors.primaryGold,
+                                          AppColors.primaryGoldDark,
+                                        ],
+                                      ).createShader(bounds),
+                                      child: Text(
+                                        'Product Design, MVP',
+                                        textAlign: TextAlign.center,
+                                        style: headlineStyle.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: isMobile ? 6 : 8),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
                                     child: Text(
                                       'Flutter App Development for',
                                       textAlign: TextAlign.center,
