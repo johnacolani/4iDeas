@@ -13,18 +13,17 @@ class ModernHeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = Responsive.isDesktop(context);
     final bool isMobile = Responsive.isMobile(context);
-    /// Web/desktop: left-aligned body; phone + tablet: centered.
-    final bool centerBody = !isDesktop;
+    final bool isDesktop = Responsive.isDesktop(context);
+    // Keep a distinct phone layout; all non-mobile web sizes stay left-aligned.
+    final bool centerBody = isMobile;
     final titleStyle = Theme.of(context).textTheme.displayLarge?.copyWith(
           fontSize: Responsive.heroTitleSize(context),
           fontWeight: FontWeight.w500,
         );
 
-    final double horizontalPadding = isMobile
-        ? 10
-        : (Responsive.isTablet(context) ? 18 : 32);
+    final double horizontalPadding =
+        isMobile ? 10 : (Responsive.isTablet(context) ? 18 : 32);
     final double w = MediaQuery.sizeOf(context).width;
     return Padding(
       padding: EdgeInsets.only(
@@ -41,30 +40,32 @@ class ModernHeroSection extends StatelessWidget {
           alignment: centerBody ? Alignment.topCenter : Alignment.topLeft,
           child: isDesktop
               ? Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: _HeroContent(
-                        titleStyle: titleStyle,
-                        center: centerBody,
-                        showLetsTalkInColumn: false,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: _HeroContent(
+                          titleStyle: titleStyle,
+                          center: centerBody,
+                          showLetsTalkInColumn: false,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  // Top-right: outline CTA; extra 3% viewport inset on the right.
-                  Padding(
-                    padding: EdgeInsets.only(right: w * 0.03),
-                    child: const _DesktopTopRightLetsTalk(
-                      ctaWidth: 278.0,
+                    const SizedBox(width: 20),
+                    // Top-right: outline CTA; extra 3% viewport inset on the right.
+                    Padding(
+                      padding: EdgeInsets.only(right: w * 0.03),
+                      child: const _DesktopTopRightLetsTalk(
+                        ctaWidth: 278.0,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
                 )
               : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: centerBody
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
                   children: <Widget>[
                     _HeroContent(
                       titleStyle: titleStyle,
@@ -99,8 +100,10 @@ class _HeroContent extends StatelessWidget {
   });
 
   final TextStyle? titleStyle;
+
   /// [true] = mobile + tablet: centered; [false] = desktop: left.
   final bool center;
+
   /// [false] on web desktop: button is in the [ModernHeroSection] row, top right.
   final bool showLetsTalkInColumn;
 
@@ -108,8 +111,9 @@ class _HeroContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isMobile = Responsive.isMobile(context);
     final double screenWidth = MediaQuery.sizeOf(context).width;
-    final TextAlign ta =
-        isMobile ? TextAlign.start : (center ? TextAlign.center : TextAlign.start);
+    final TextAlign ta = isMobile
+        ? TextAlign.start
+        : (center ? TextAlign.center : TextAlign.start);
     final TextStyle? mobileHeadlineStyle = isMobile
         ? titleStyle?.copyWith(
             fontSize: (titleStyle?.fontSize ?? 44) * 0.72,
@@ -124,10 +128,9 @@ class _HeroContent extends StatelessWidget {
     // Height ≈ old pill (padding 8*2 + text) + (AppSpacing.lg + 32 + 24).
     const double removedPillAndGap = 36.0 + AppSpacing.lg + 32 + 24;
     return Column(
-      crossAxisAlignment:
-          isMobile
-              ? CrossAxisAlignment.start
-              : (center ? CrossAxisAlignment.center : CrossAxisAlignment.start),
+      crossAxisAlignment: isMobile
+          ? CrossAxisAlignment.start
+          : (center ? CrossAxisAlignment.center : CrossAxisAlignment.start),
       children: <Widget>[
         if (!isMobile) ...<Widget>[
           const SizedBox(height: removedPillAndGap),
@@ -175,7 +178,8 @@ class _HeroContent extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: const Color(0xFF9CA3AF),
                 fontSize: isMobile
-                    ? (Responsive.heroSubtitleSize(context) - 2).clamp(13.0, 16.0)
+                    ? (Responsive.heroSubtitleSize(context) - 2)
+                        .clamp(13.0, 16.0)
                     : Responsive.heroSubtitleSize(context),
               ),
         ),
@@ -263,9 +267,7 @@ class _HeroCtaRow extends StatelessWidget {
         // Two equal buttons + gap, capped to available width on narrow web/tablet.
         final maxPair = ctaWidth * 2 + AppSpacing.md;
         final double w = constraints.hasBoundedWidth
-            ? (constraints.maxWidth < maxPair
-                ? constraints.maxWidth
-                : maxPair)
+            ? (constraints.maxWidth < maxPair ? constraints.maxWidth : maxPair)
             : maxPair;
         final double each = (w - AppSpacing.md) / 2;
         if (each <= 0) return const SizedBox.shrink();

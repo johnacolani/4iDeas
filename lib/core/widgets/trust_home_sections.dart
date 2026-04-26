@@ -135,14 +135,38 @@ class _WhatICanBuildSection extends StatelessWidget {
   final bool isTablet;
 
   static const _items = [
-    ('Flutter MVP apps for startups', 'Validate faster with a build focused on core user value.'),
-    ('iOS, Android, and Web from one codebase', 'Launch cross-platform with consistent UX and lower maintenance overhead.'),
-    ('Firebase backend and real-time apps', 'Authentication, Firestore, functions, notifications, and analytics-ready flows.'),
-    ('Business workflow apps', 'Map operations to clear steps that teams can follow and manage.'),
-    ('Client portals', 'Give customers one place for status, communication, and next actions.'),
-    ('Admin dashboards', 'Role-aware dashboards for visibility, reporting, and daily operations.'),
-    ('AI chat assistants and AI-assisted workflows', 'Add practical AI support where it reduces repetitive work.'),
-    ('App Store and Google Play launch support', 'Prepare release assets, QA, and deployment paths with confidence.'),
+    (
+      'Flutter MVP apps for startups',
+      'Validate faster with a build focused on core user value.'
+    ),
+    (
+      'iOS, Android, and Web from one codebase',
+      'Launch cross-platform with consistent UX and lower maintenance overhead.'
+    ),
+    (
+      'Firebase backend and real-time apps',
+      'Authentication, Firestore, functions, notifications, and analytics-ready flows.'
+    ),
+    (
+      'Business workflow apps',
+      'Map operations to clear steps that teams can follow and manage.'
+    ),
+    (
+      'Client portals',
+      'Give customers one place for status, communication, and next actions.'
+    ),
+    (
+      'Admin dashboards',
+      'Role-aware dashboards for visibility, reporting, and daily operations.'
+    ),
+    (
+      'AI chat assistants and AI-assisted workflows',
+      'Add practical AI support where it reduces repetitive work.'
+    ),
+    (
+      'App Store and Google Play launch support',
+      'Prepare release assets, QA, and deployment paths with confidence.'
+    ),
   ];
 
   @override
@@ -175,37 +199,40 @@ class _WhatICanBuildSection extends StatelessWidget {
                   .map(
                     (i) => SizedBox(
                       width: itemWidth,
-                      height: cardHeight,
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0B1B3A).withValues(alpha: 0.58),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.16)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              i.$1,
-                              style: GoogleFonts.roboto(
-                                fontSize: bodyFont + 0.5,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: cardHeight),
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color:
+                                const Color(0xFF0B1B3A).withValues(alpha: 0.58),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.16)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                i.$1,
+                                style: GoogleFonts.roboto(
+                                  fontSize: bodyFont + 0.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              i.$2,
-                              style: GoogleFonts.roboto(
-                                fontSize: bodyFont - 0.5,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFFD1D5DB),
-                                height: 1.45,
+                              const SizedBox(height: 6),
+                              Text(
+                                i.$2,
+                                style: GoogleFonts.roboto(
+                                  fontSize: bodyFont - 0.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFFD1D5DB),
+                                  height: 1.45,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -644,7 +671,8 @@ class _ProcessPhaseChips extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.16)),
                   color: Colors.white.withValues(alpha: 0.04),
                 ),
                 child: Text(
@@ -781,8 +809,11 @@ class _ProcessTimelineStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parts = step.$1.split('. ');
-    final n = (parts.isNotEmpty && int.tryParse(parts[0].trim()) != null) ? parts[0].trim() : '${index + 1}';
-    final label = parts.length > 1 ? parts.sublist(1).join('. ').trim() : step.$1;
+    final n = (parts.isNotEmpty && int.tryParse(parts[0].trim()) != null)
+        ? parts[0].trim()
+        : '${index + 1}';
+    final label =
+        parts.length > 1 ? parts.sublist(1).join('. ').trim() : step.$1;
     const railW = 44.0;
     const gap = 12.0;
 
@@ -1007,7 +1038,8 @@ class _ProcessCheckpoint extends StatelessWidget {
                         children: [
                           Text(
                             label,
-                            textAlign: alignStart ? TextAlign.start : TextAlign.center,
+                            textAlign:
+                                alignStart ? TextAlign.start : TextAlign.center,
                             style: GoogleFonts.roboto(
                               fontSize: bodyFont + 0.25,
                               fontWeight: FontWeight.w800,
@@ -1017,7 +1049,8 @@ class _ProcessCheckpoint extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             body,
-                            textAlign: alignStart ? TextAlign.start : TextAlign.center,
+                            textAlign:
+                                alignStart ? TextAlign.start : TextAlign.center,
                             style: GoogleFonts.roboto(
                               fontSize: bodyFont - 0.5,
                               fontWeight: FontWeight.w500,
@@ -1504,7 +1537,8 @@ class _FinalCtaBlock extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 fontSize: bodyFont - 1,
                 decoration: TextDecoration.underline,
-                decorationColor: const Color(0xFFE5E7EB).withValues(alpha: 0.55),
+                decorationColor:
+                    const Color(0xFFE5E7EB).withValues(alpha: 0.55),
               ),
             ),
           ),
@@ -1551,7 +1585,8 @@ class _RichmondVaLocalPromo extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.2)),
                   ),
                 ),
               ),
