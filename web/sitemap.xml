@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://4ideas.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://4ideas.com/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://4ideas.com/portfolio</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://4ideas.com/about</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://4ideas.com/contact</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
-  <url><loc>https://4ideas.com/insights</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
-  <url><loc>https://4ideas.com/insights/flutter-mvp-planning-that-reduces-rework</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://4ideas.com/insights/from-product-design-to-flutter-delivery</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://4ideas.com/insights/firebase-architecture-for-early-stage-products</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://4ideas.com/insights/ai-assisted-features-with-product-governance</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://4ideas.com/insights/flutter-web-for-business-products-what-matters</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://4ideas.com/flutter-developer-virginia</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://4ideas.com/flutter-developer-richmond-va</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://4ideas.com/mvp-app-development</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://4ideas.com/product-design-flutter-engineering</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://4ideas.com/firebase-app-development-services</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://4ideas.com/order-here</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://4ideasapp.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://4ideasapp.com/services</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://4ideasapp.com/portfolio</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://4ideasapp.com/case-studies</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://4ideasapp.com/contact</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://4ideasapp.com/insights</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://4ideasapp.com/flutter-app-development</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://4ideasapp.com/flutter-mvp-development</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://4ideasapp.com/firebase-app-development</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://4ideasapp.com/product-design-ux-mobile-apps</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://4ideasapp.com/ai-chatbot-admin-dashboard-development</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://4ideasapp.com/flutter-web-app-development</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://4ideasapp.com/flutter-developer-virginia</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://4ideasapp.com/flutter-developer-richmond-va</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
 </urlset>

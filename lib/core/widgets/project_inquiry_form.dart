@@ -222,7 +222,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             TextFormField(
               controller: _name,
               textInputAction: TextInputAction.next,
-              decoration: _fieldDecoration('Full name', hint: 'Jane Doe'),
+              decoration: _fieldDecoration('Name', hint: 'Jane Doe'),
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Please enter your name' : null,
             ),
@@ -232,7 +232,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
               keyboardType: TextInputType.emailAddress,
               autofillHints: const [AutofillHints.email],
               textInputAction: TextInputAction.next,
-              decoration: _fieldDecoration('Work email', hint: 'you@company.com'),
+              decoration: _fieldDecoration('Email', hint: 'you@company.com'),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return 'Please enter your email';
                 if (!v.contains('@')) return 'Enter a valid email';
@@ -284,8 +284,8 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
               minLines: 4,
               maxLines: 8,
               decoration: _fieldDecoration(
-                'What are you trying to ship?',
-                hint: 'A few sentences on the product, users, and what “done” looks like.',
+                'What do you want to build?',
+                hint: 'A few sentences on your app idea and desired outcome.',
               ),
               validator: (v) =>
                   (v == null || v.trim().length < 20) ? 'Add at least a short description (20+ characters)' : null,
@@ -306,7 +306,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
                       child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white),
                     )
                   : Text(
-                      'Send inquiry',
+                      'Start a Project',
                       style: GoogleFonts.roboto(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

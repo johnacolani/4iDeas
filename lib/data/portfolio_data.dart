@@ -371,7 +371,7 @@ class PortfolioData {
           name: 'Service Flow',
           description:
               'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
-          imagePath: 'assets/images/4ideas/4ideas-web-app.png',
+          imagePath: serviceFlowFeaturedHeroPaths.first,
           showComingSoonOverlay: true,
           caseStudyId: 'service-flow',
         ),
@@ -880,6 +880,19 @@ class PortfolioData {
         for (final name in _roseSeasonalScreenshotFileNames) '$_roseSeasonalAssetDir/$name',
       ];
 
+  /// Service Flow: iPhone simulator captures (`assets/images/service_flow/`), capture order.
+  static const List<String> serviceFlowFeaturedHeroPaths = <String>[
+    'assets/images/service_flow/service_flow_01.png',
+    'assets/images/service_flow/service_flow_02.png',
+    'assets/images/service_flow/service_flow_03.png',
+    'assets/images/service_flow/service_flow_04.png',
+    'assets/images/service_flow/service_flow_05.png',
+    'assets/images/service_flow/service_flow_06.png',
+    'assets/images/service_flow/service_flow_07.png',
+    'assets/images/service_flow/service_flow_08.png',
+    'assets/images/service_flow/service_flow_09.png',
+  ];
+
   /// Featured case studies are sorted by [PortfolioCaseStudy.order] ascending on the portfolio screen (lower = higher on the page).
   /// New featured study: add near the top here and give it the lowest `order` (e.g. 0); increase `order` on older studies if needed.
   static List<PortfolioCaseStudy> get caseStudies => [
@@ -964,7 +977,8 @@ class PortfolioData {
           designApproach:
               'Systems-first IA, Multi-tenant SaaS constraints (isolation, configuration, role policy), and a single source of truth for UI tokens and components. '
               'The design system is maintained as a living document so specs stay shippable alongside the product.',
-          heroImagePath: 'assets/images/design_system/design-system.png',
+          heroImagePath: serviceFlowFeaturedHeroPaths.first,
+          heroImagePaths: serviceFlowFeaturedHeroPaths,
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -995,7 +1009,13 @@ class PortfolioData {
               content:
                   '**Information architecture** built around jobs and timelines—not feature silos. **Progressive disclosure** so critical actions stay visible while secondary detail stays one tap away.\n\n'
                   '**Design system** as the contract between design and engineering: semantic color, type scale, spacing, radii, and component states documented in one place.\n\n'
-                  'The next section links to the full ServiceFlow design spec (HTML).',
+                  'The next section shows simulator captures; after that, the full ServiceFlow design spec (HTML).',
+            ),
+            CaseStudySection(
+              title: 'Product UI in context',
+              content:
+                  'iPhone simulator captures of the Service Flow experience—navigation, role surfaces, and primary workflows. Order follows the capture sequence. Tap any screen to view full size.',
+              imagePaths: serviceFlowFeaturedHeroPaths,
             ),
             CaseStudySection(
               title: 'Design system',
@@ -1301,6 +1321,26 @@ class PortfolioData {
       }
     }
     if (local == null) return remote;
+
+    // Service Flow hero is shipped in the app bundle; Firestore copy may lag and
+    // would otherwise win whenever both heroPath and heroPaths are set.
+    if (remote.id == 'service-flow' &&
+        local.heroImagePath != null &&
+        local.heroImagePath!.trim().isNotEmpty &&
+        local.heroImagePaths != null &&
+        local.heroImagePaths!.isNotEmpty) {
+      return PortfolioCaseStudy(
+        id: remote.id,
+        title: remote.title,
+        subtitle: remote.subtitle,
+        overview: remote.overview,
+        designApproach: remote.designApproach,
+        heroImagePath: local.heroImagePath,
+        heroImagePaths: List<String>.from(local.heroImagePaths!),
+        sections: remote.sections,
+        order: remote.order,
+      );
+    }
 
     final remoteH = remote.heroImagePath?.trim();
     final hasRemoteHero = remoteH != null && remoteH.isNotEmpty;

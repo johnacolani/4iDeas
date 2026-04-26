@@ -9,6 +9,7 @@ import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import '../../domain/entities/user.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -156,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildUserInfoCard(user, bool isMobile, double he) {
+  Widget _buildUserInfoCard(User user, bool isMobile, double he) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 20 : 24),
       decoration:

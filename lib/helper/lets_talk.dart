@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../app_router.dart';
 import '../core/design_system/theme.dart';
 
 const String kHomePhoneDigits = '8047749008';
@@ -40,7 +38,7 @@ void showLetsTalkDialog(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Tap the number to call, or open the contact page to send a message.',
+              'Tap the number or use the Call now button to place a call.',
               style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 14,
@@ -85,8 +83,8 @@ void showLetsTalkDialog(BuildContext context) {
             child: const Text('Close', style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop('contact'),
-            child: const Text('Contact page',
+            onPressed: () => Navigator.of(dialogContext).pop('call'),
+            child: const Text('Call now',
                 style: TextStyle(color: AppColors.primaryGold, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -95,8 +93,6 @@ void showLetsTalkDialog(BuildContext context) {
   ).then((result) {
     if (result == 'call') {
       launchHomePhone();
-    } else if (result == 'contact' && context.mounted) {
-      context.go(AppRoutes.contact);
     }
   });
 }

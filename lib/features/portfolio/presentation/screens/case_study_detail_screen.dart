@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/design_system/theme.dart';
+import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
@@ -656,8 +657,11 @@ class _ClickableImage extends StatelessWidget {
             fit: BoxFit.contain,
             clipBehavior: Clip.hardEdge,
             alignment: Alignment.center,
-            child: Image.asset(
+            child: AdaptiveAssetImage(
               imagePath,
+              width: imageWidth,
+              height: imageHeight,
+              fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 debugPrint('Failed to load image: $imagePath');
                 debugPrint('Error: $error');
@@ -669,7 +673,7 @@ class _ClickableImage extends StatelessWidget {
               },
             ),
           )
-        : Image.asset(
+        : AdaptiveAssetImage(
             imagePath,
             width: imageWidth,
             height: imageHeight,
@@ -858,7 +862,7 @@ class _FullScreenImage extends StatelessWidget {
                 child: InteractiveViewer(
                   minScale: 0.5,
                   maxScale: 4.0,
-                  child: Image.asset(
+                  child: AdaptiveAssetImage(
                     imagePath,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {

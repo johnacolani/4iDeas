@@ -33,10 +33,14 @@ class ModernHeroSection extends StatelessWidget {
         top: 0,
         bottom: isMobile ? AppSpacing.md : AppSpacing.xl,
       ),
-      child: Align(
-        alignment: centerBody ? Alignment.topCenter : Alignment.topLeft,
-        child: isDesktop
-            ? Row(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: isMobile ? 560 : 0,
+        ),
+        child: Align(
+          alignment: centerBody ? Alignment.topCenter : Alignment.topLeft,
+          child: isDesktop
+              ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Expanded(
@@ -58,17 +62,18 @@ class ModernHeroSection extends StatelessWidget {
                     ),
                   ),
                 ],
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  _HeroContent(
-                    titleStyle: titleStyle,
-                    center: centerBody,
-                    showLetsTalkInColumn: true,
-                  ),
-                ],
-              ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _HeroContent(
+                      titleStyle: titleStyle,
+                      center: centerBody,
+                      showLetsTalkInColumn: true,
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -103,7 +108,15 @@ class _HeroContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isMobile = Responsive.isMobile(context);
     final double screenWidth = MediaQuery.sizeOf(context).width;
-    final TextAlign ta = center ? TextAlign.center : TextAlign.start;
+    final TextAlign ta =
+        isMobile ? TextAlign.start : (center ? TextAlign.center : TextAlign.start);
+    final TextStyle? mobileHeadlineStyle = isMobile
+        ? titleStyle?.copyWith(
+            fontSize: (titleStyle?.fontSize ?? 44) * 0.72,
+            fontWeight: FontWeight.w700,
+            height: 1.1,
+          )
+        : titleStyle;
     final double ctaWidth =
         isMobile ? (screenWidth - 72).clamp(240.0, 340.0) : 278.0;
     // On wide viewports the founder line appears in the app bar; do not repeat it here.
@@ -112,43 +125,70 @@ class _HeroContent extends StatelessWidget {
     const double removedPillAndGap = 36.0 + AppSpacing.lg + 32 + 24;
     return Column(
       crossAxisAlignment:
-          center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          isMobile
+              ? CrossAxisAlignment.start
+              : (center ? CrossAxisAlignment.center : CrossAxisAlignment.start),
       children: <Widget>[
         if (!isMobile) ...<Widget>[
           const SizedBox(height: removedPillAndGap),
         ] else
           const SizedBox(height: AppSpacing.sm),
-        RichText(
-          textAlign: ta,
-          text: TextSpan(
-            style: titleStyle,
-            children: const <TextSpan>[
-              TextSpan(
-                text: 'Design. Build. ',
-                style: TextStyle(color: Colors.white),
+        SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Flutter App Development for',
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                  style: mobileHeadlineStyle?.copyWith(
+                    color: Colors.white,
+                    height: 1.12,
+                  ),
+                ),
               ),
-              TextSpan(
-                text: 'Ship.',
-                style: TextStyle(color: AppColors.primaryGold),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Startups & Businesses',
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                  style: mobileHeadlineStyle?.copyWith(
+                    color: AppColors.primaryGold,
+                    height: 1.12,
+                  ),
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          'Digital products that drive real business.',
+          isMobile
+              ? 'We design and build production-ready\nFlutter apps for iOS, Android, and Web,\nfrom MVP ideas to App Store launch.'
+              : 'We design and build production-ready Flutter apps\nfor iOS, Android, and Web, from MVP idea to App Store launch.',
           textAlign: ta,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: const Color(0xFF9CA3AF),
-                fontSize: Responsive.heroSubtitleSize(context),
+                fontSize: isMobile
+                    ? (Responsive.heroSubtitleSize(context) - 2).clamp(13.0, 16.0)
+                    : Responsive.heroSubtitleSize(context),
               ),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'Product Design + Flutter + Firebase + AI.\nFrom idea to App Store - we build scalable products.',
+          isMobile
+              ? 'Flutter, Firebase, Product Design,\nAI features, admin dashboards,\nrole-based apps, and full\nProduct delivery'
+              : 'Flutter, Firebase, Product Design, AI features, admin dashboards,\nrole-based apps, and full product delivery.',
           textAlign: ta,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Colors.white,
+                fontSize: isMobile ? 14 : null,
+                height: isMobile ? 1.35 : null,
               ),
         ),
         if (showLetsTalkInColumn) ...<Widget>[
@@ -172,21 +212,25 @@ class _HeroContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
         const SizedBox(height: 32),
         if (isMobile) ...<Widget>[
-          SizedBox(
-            width: ctaWidth,
-            height: 56,
-            child: PrimaryButton(
-              label: 'Discuss Your Project',
-              onPressed: () => context.go(AppRoutes.contact),
+          Center(
+            child: SizedBox(
+              width: ctaWidth,
+              height: 56,
+              child: PrimaryButton(
+                label: 'Start a Project',
+                onPressed: () => context.go(AppRoutes.contact),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          SizedBox(
-            width: ctaWidth,
-            height: 56,
-            child: SecondaryButton(
-              label: 'Explore Work',
-              onPressed: () => context.go(AppRoutes.portfolio),
+          Center(
+            child: SizedBox(
+              width: ctaWidth,
+              height: 56,
+              child: SecondaryButton(
+                label: 'View Case Studies',
+                onPressed: () => context.go(AppRoutes.caseStudies),
+              ),
             ),
           ),
         ] else ...<Widget>[
@@ -232,7 +276,7 @@ class _HeroCtaRow extends StatelessWidget {
               width: each,
               height: 56,
               child: PrimaryButton(
-                label: 'Discuss Your Project',
+                label: 'Start a Project',
                 onPressed: () => context.go(AppRoutes.contact),
               ),
             ),
@@ -241,8 +285,8 @@ class _HeroCtaRow extends StatelessWidget {
               width: each,
               height: 56,
               child: SecondaryButton(
-                label: 'Explore Work',
-                onPressed: () => context.go(AppRoutes.portfolio),
+                label: 'View Case Studies',
+                onPressed: () => context.go(AppRoutes.caseStudies),
               ),
             ),
           ],

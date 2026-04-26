@@ -5,8 +5,8 @@ import 'dart:html' as html;
 import 'package:four_ideas/seo/seo_metadata.dart';
 
 /// Public site origin — keep in sync with [web/index.html] Open Graph URLs.
-const String kSiteOrigin = 'https://4ideas.com';
-const String kDefaultSocialImage = 'https://4ideas.com/icons/icon-512.png';
+const String kSiteOrigin = 'https://4ideasapp.com';
+const String kDefaultSocialImage = 'https://4ideasapp.com/icons/icon-512.png';
 
 void applySeoDocument(SeoMetadata meta, {required String canonicalPath}) {
   final path = canonicalPath.startsWith('/') ? canonicalPath : '/$canonicalPath';

@@ -34,7 +34,7 @@ class TrustBuildingHomeSections extends StatelessWidget {
     return 32;
   }
 
-  double get _maxContentWidth => (wi - _horizontalPad * 2).clamp(320.0, 920.0);
+  double get _maxContentWidth => (wi - _horizontalPad * 2).clamp(320.0, 1320.0);
 
   double get _sectionGap => isMobile ? 40 : 48;
 
@@ -60,6 +60,13 @@ class TrustBuildingHomeSections extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _WhatICanBuildSection(
+            titleFont: _titleFont,
+            bodyFont: _bodyFont,
+            isMobile: isMobile,
+            isTablet: isTablet,
+          ),
+          SizedBox(height: _sectionGap),
           _WhyWorkWithMe(
             titleFont: _titleFont,
             bodyFont: _bodyFont,
@@ -100,7 +107,7 @@ class TrustBuildingHomeSections extends StatelessWidget {
             isMobile: isMobile,
             isNarrow: wi < 440,
             onContact: () => _go(context, AppRoutes.contact),
-            onServices: () => _go(context, AppRoutes.services),
+            onServices: () => _go(context, AppRoutes.caseStudies),
             onBrief: () => _go(context, AppRoutes.orderHere),
           ),
           SizedBox(height: isMobile ? 28 : 36),
@@ -109,9 +116,105 @@ class TrustBuildingHomeSections extends StatelessWidget {
     );
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: _horizontalPad),
-      child: Responsive.isDesktop(context)
-          ? Align(alignment: Alignment.topLeft, child: box)
-          : Center(child: box),
+      child: Center(child: box),
+    );
+  }
+}
+
+class _WhatICanBuildSection extends StatelessWidget {
+  const _WhatICanBuildSection({
+    required this.titleFont,
+    required this.bodyFont,
+    required this.isMobile,
+    required this.isTablet,
+  });
+
+  final double titleFont;
+  final double bodyFont;
+  final bool isMobile;
+  final bool isTablet;
+
+  static const _items = [
+    ('Flutter MVP apps for startups', 'Validate faster with a build focused on core user value.'),
+    ('iOS, Android, and Web from one codebase', 'Launch cross-platform with consistent UX and lower maintenance overhead.'),
+    ('Firebase backend and real-time apps', 'Authentication, Firestore, functions, notifications, and analytics-ready flows.'),
+    ('Business workflow apps', 'Map operations to clear steps that teams can follow and manage.'),
+    ('Client portals', 'Give customers one place for status, communication, and next actions.'),
+    ('Admin dashboards', 'Role-aware dashboards for visibility, reporting, and daily operations.'),
+    ('AI chat assistants and AI-assisted workflows', 'Add practical AI support where it reduces repetitive work.'),
+    ('App Store and Google Play launch support', 'Prepare release assets, QA, and deployment paths with confidence.'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'What We Can Build For You',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.roboto(
+            fontSize: titleFont,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 10),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const spacing = 12.0;
+            final columns = isMobile ? 1 : (isTablet ? 2 : 4);
+            final itemWidth =
+                (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+            final double cardHeight = isMobile ? 136 : (isTablet ? 168 : 150);
+            return Wrap(
+              alignment: WrapAlignment.center,
+              spacing: spacing,
+              runSpacing: spacing,
+              children: _items
+                  .map(
+                    (i) => SizedBox(
+                      width: itemWidth,
+                      height: cardHeight,
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0B1B3A).withValues(alpha: 0.58),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.16)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              i.$1,
+                              style: GoogleFonts.roboto(
+                                fontSize: bodyFont + 0.5,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              i.$2,
+                              style: GoogleFonts.roboto(
+                                fontSize: bodyFont - 0.5,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFFD1D5DB),
+                                height: 1.45,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -145,19 +248,19 @@ class _WhyWorkWithMe extends StatelessWidget {
     (
       Icons.cloud_done_rounded,
       'Production Flutter and Firebase experience',
-      'Auth, Firestore, Cloud Functions, hosting, messaging—backends sized for real traffic, not toy demos. I integrate what fits your product, not buzzwords.',
+      'Auth, Firestore, Cloud Functions, hosting, messaging—backends sized for real traffic, not toy demos. We integrate what fits your product, not buzzwords.',
     ),
     (
       Icons.account_balance_rounded,
       'Business-aware problem solving',
-      'Clear discovery, honest tradeoffs, and scope you can fund. I work the way US startups and operators expect: direct communication, written alignment, and outcomes you can measure without vanity metrics.',
+      'Clear discovery, honest tradeoffs, and scope you can fund. We work the way US startups and operators expect: direct communication, written alignment, and outcomes you can measure without vanity metrics.',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final bool useUniformDesktopCardHeight = !isMobile && wi >= 720;
-    final double uniformCardHeight = isTablet ? 278 : 250;
+    final double uniformCardHeight = isTablet ? 236 : 208;
     final baseCards = _points.map((p) {
       return _ReasonCard(
         icon: p.$1,
@@ -228,28 +331,13 @@ class _WhyWorkWithMe extends StatelessWidget {
               height: 1.2,
             ),
             children: [
-              const TextSpan(text: 'Why teams hire '),
-              TextSpan(
-                text: '4i',
-                style: TextStyle(
-                  foreground: Paint()
-                    ..shader = const LinearGradient(
-                      colors: [
-                        Color(0xFFF5B32F),
-                        Color(0xFFD89A1C),
-                      ],
-                    ).createShader(
-                      const Rect.fromLTWH(0, 0, 46, 20),
-                    ),
-                ),
-              ),
-              const TextSpan(text: 'Deas'),
+              const TextSpan(text: 'Why Work With Us'),
             ],
           ),
         ),
         SizedBox(height: isMobile ? 10 : 12),
         Text(
-          'A founder-led studio model: strategic senior ownership with practical shipping discipline.',
+          'We do not just write code. We help shape the product, simplify the user flow, design the experience, build the app, connect the backend, and prepare it for real users.',
           textAlign: _homeTextAlign(context),
           style: GoogleFonts.roboto(
             fontSize: bodyFont,
@@ -306,13 +394,12 @@ class _ReasonCard extends StatelessWidget {
               const Positioned.fill(
                 child: _ReasonCardFrostedTint(),
               ),
+              // Web: [border] + [borderRadius] in the same BoxDecoration as [gradient] triggers
+              // "uniform colors" in the HTML renderer. Paint gradient and border in separate layers.
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.18),
-                    ),
                     gradient: LinearGradient(
                       begin: const Alignment(-1, -1),
                       end: const Alignment(0.45, 0.5),
@@ -322,6 +409,16 @@ class _ReasonCard extends StatelessWidget {
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.28, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
                     ),
                   ),
                 ),
@@ -403,132 +500,538 @@ class _MyProcessBlock extends StatelessWidget {
 
   static const _steps = [
     (
-      'Discovery',
-      'We align on goals, users, constraints, and timeline—so scope matches what you can fund.'
+      '1. Clarify the opportunity',
+      'Align on goals, constraints, and what success should look like for the business.'
     ),
     (
-      'Scope and UX',
-      'Flows, priorities, and UX decisions documented before heavy build. No mystery backlog.'
+      '2. Map the core user journey',
+      'Define the key flows, roles, and “must ship” path for a credible MVP.'
     ),
     (
-      'Build and iterate',
-      'Flutter implementation with steady demos, tight feedback loops, and clear tradeoffs.'
+      '3. Design the MVP experience',
+      'Shape UX, UI, and information architecture with build-ready specifications.'
     ),
     (
-      'Launch and support',
-      'Release planning, handoff notes, and a path for fixes and follow-on work.'
+      '4. Build the product in Flutter',
+      'Implement production-ready features for iOS, Android, and Web in one codebase.'
+    ),
+    (
+      '5. Connect data, roles, and automations',
+      'Wire Firebase, integrations, and role-based access to match real operations.'
+    ),
+    (
+      '6. Quality, performance, and release',
+      'Harden the app, then ship to App Store, Google Play, and the Web with a post-launch plan.'
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: EdgeInsets.all(isMobile ? 18 : 22),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.black.withValues(alpha: 0.5),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 980;
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: EdgeInsets.all(isMobile ? 18 : 22),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.black.withValues(alpha: 0.5),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+              ),
+              child: Column(
+                crossAxisAlignment: isWide
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
+                children: [
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
+                    ).createShader(bounds),
+                    child: Text(
+                      'From Idea to Launch',
+                      textAlign: isWide ? TextAlign.start : TextAlign.center,
+                      style: GoogleFonts.roboto(
+                        fontSize: titleFont,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'A practical product delivery system for startups and business teams—clear milestones, less wasted build.',
+                    textAlign: isWide ? TextAlign.start : TextAlign.center,
+                    style: GoogleFonts.roboto(
+                      fontSize: bodyFont,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFFD1D5DB),
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _ProcessPhaseChips(
+                    isMobile: isMobile,
+                    bodyFont: bodyFont,
+                    isWide: isWide,
+                  ),
+                  SizedBox(height: isMobile ? 16 : 18),
+                  if (isWide)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: _ProcessRailLegend(bodyFont: bodyFont),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: _ProcessTimelineList(
+                            steps: _steps,
+                            bodyFont: bodyFont,
+                            isMobile: isMobile,
+                            isWide: isWide,
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    _ProcessTimelineList(
+                      steps: _steps,
+                      bodyFont: bodyFont,
+                      isMobile: isMobile,
+                      isWide: isWide,
+                    ),
+                ],
+              ),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: Responsive.isDesktop(context)
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.center,
-            children: [
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
-                ).createShader(bounds),
+        );
+      },
+    );
+  }
+}
+
+class _ProcessPhaseChips extends StatelessWidget {
+  const _ProcessPhaseChips({
+    required this.isMobile,
+    required this.bodyFont,
+    required this.isWide,
+  });
+
+  final bool isMobile;
+  final double bodyFont;
+  final bool isWide;
+
+  static const _phases = ['Plan', 'Design', 'Build', 'Operate'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isWide ? Alignment.centerLeft : Alignment.center,
+      child: Wrap(
+        alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
+        spacing: 8,
+        runSpacing: 8,
+        children: _phases
+            .map(
+              (p) => Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 10 : 12,
+                  vertical: isMobile ? 6 : 7,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                  color: Colors.white.withValues(alpha: 0.04),
+                ),
                 child: Text(
-                  'Studio process',
-                  textAlign: _homeTextAlign(context),
+                  p,
                   style: GoogleFonts.roboto(
-                    fontSize: titleFont,
+                    fontSize: bodyFont - 1.5,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    letterSpacing: 0.35,
+                    color: const Color(0xFFE5E7EB),
                   ),
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
-                'Simple, repeatable, and easy to communicate to stakeholders.',
-                textAlign: _homeTextAlign(context),
-                style: GoogleFonts.roboto(
-                  fontSize: bodyFont,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFD1D5DB),
-                  height: 1.45,
-                ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _ProcessRailLegend extends StatelessWidget {
+  const _ProcessRailLegend({required this.bodyFont});
+
+  final double bodyFont;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Colors.white.withValues(alpha: 0.03),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'How we deliver',
+            style: GoogleFonts.roboto(
+              fontSize: bodyFont + 0.25,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Milestones you can explain to stakeholders—without the buzzwords.',
+            style: GoogleFonts.roboto(
+              fontSize: bodyFont - 1.0,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF9CA3AF),
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProcessTimelineList extends StatelessWidget {
+  const _ProcessTimelineList({
+    required this.steps,
+    required this.bodyFont,
+    required this.isMobile,
+    required this.isWide,
+  });
+
+  final List<(String, String)> steps;
+  final double bodyFont;
+  final bool isMobile;
+  final bool isWide;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (int i = 0; i < steps.length; i++) ...[
+          _ProcessTimelineStep(
+            index: i,
+            step: steps[i],
+            bodyFont: bodyFont,
+            isFirst: i == 0,
+            isLast: i == steps.length - 1,
+            isMobile: isMobile,
+            isWide: isWide,
+          ),
+          if (i == 2)
+            _ProcessCheckpoint(
+              isMobile: isMobile,
+              bodyFont: bodyFont,
+              label: 'Checkpoint: MVP scope lock',
+              body:
+                  'We freeze what ships first, what waits, and what the success criteria are—so the build matches budget and time.',
+              alignStart: isWide,
+              contentInsetLeft: 44.0 + 12.0,
+            ),
+          if (i == 4)
+            _ProcessCheckpoint(
+              isMobile: isMobile,
+              bodyFont: bodyFont,
+              label: 'Checkpoint: launch readiness',
+              body:
+                  'We verify performance, access rules, and release risk before you promote to real users and stores.',
+              alignStart: isWide,
+              contentInsetLeft: 44.0 + 12.0,
+            ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ProcessTimelineStep extends StatelessWidget {
+  const _ProcessTimelineStep({
+    required this.index,
+    required this.step,
+    required this.bodyFont,
+    required this.isFirst,
+    required this.isLast,
+    required this.isMobile,
+    required this.isWide,
+  });
+
+  final int index;
+  final (String, String) step;
+  final double bodyFont;
+  final bool isFirst;
+  final bool isLast;
+  final bool isMobile;
+  final bool isWide;
+
+  @override
+  Widget build(BuildContext context) {
+    final parts = step.$1.split('. ');
+    final n = (parts.isNotEmpty && int.tryParse(parts[0].trim()) != null) ? parts[0].trim() : '${index + 1}';
+    final label = parts.length > 1 ? parts.sublist(1).join('. ').trim() : step.$1;
+    const railW = 44.0;
+    const gap = 12.0;
+
+    final node = Column(
+      children: [
+        SizedBox(
+          height: isFirst ? 10 : 0,
+        ),
+        if (!isFirst)
+          Container(
+            width: 2,
+            height: 10,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withValues(alpha: 0.0),
+                  const Color(0xFFF5B32F).withValues(alpha: 0.55),
+                ],
               ),
-              SizedBox(height: isMobile ? 18 : 22),
-              ...List.generate(_steps.length, (i) {
-                final s = _steps[i];
-                final isLast = i == _steps.length - 1;
-                return Padding(
-                  padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-                  child: Row(
-                    mainAxisAlignment: Responsive.isDesktop(context)
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          ),
+        Container(
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x33F5B32F),
+                blurRadius: 12,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            n,
+            style: GoogleFonts.roboto(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF1F2937),
+            ),
+          ),
+        ),
+        if (!isLast)
+          Container(
+            width: 2,
+            height: 16,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFFF5B32F).withValues(alpha: 0.55),
+                  const Color(0xFFD89A1C).withValues(alpha: 0.2),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+
+    final card = Expanded(
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white.withValues(alpha: 0.04),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.14),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.16),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        // [Expanded] in a sliver scroll gives unbounded max height; [stretch]
+        // is invalid there. [IntrinsicHeight] makes row height match content.
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const ColoredBox(
+                  color: Color(0xFFF5B32F), child: SizedBox(width: 3)),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(isMobile ? 12 : 14),
+                  child: Column(
+                    crossAxisAlignment: isWide
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
-                          ),
-                        ),
-                        child: Text(
-                          '${i + 1}',
-                          style: GoogleFonts.roboto(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF1F2937),
-                          ),
+                      Text(
+                        label,
+                        textAlign: isWide ? TextAlign.start : TextAlign.center,
+                        style: GoogleFonts.roboto(
+                          fontSize: bodyFont + 0.5,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.2,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: Responsive.isDesktop(context)
-                              ? CrossAxisAlignment.start
-                              : CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              s.$1,
-                              textAlign: _homeTextAlign(context),
-                              style: GoogleFonts.roboto(
-                                fontSize: bodyFont + 0.5,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              s.$2,
-                              textAlign: _homeTextAlign(context),
-                              style: GoogleFonts.roboto(
-                                fontSize: bodyFont,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFFD1D5DB),
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 6),
+                      Text(
+                        step.$2,
+                        textAlign: isWide ? TextAlign.start : TextAlign.center,
+                        style: GoogleFonts.roboto(
+                          fontSize: bodyFont,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFFD1D5DB),
+                          height: 1.5,
                         ),
                       ),
                     ],
                   ),
-                );
-              }),
+                ),
+              ),
             ],
+          ),
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: railW,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: node,
+                ),
+              ),
+              SizedBox(width: gap),
+              card,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProcessCheckpoint extends StatelessWidget {
+  const _ProcessCheckpoint({
+    required this.isMobile,
+    required this.bodyFont,
+    required this.label,
+    required this.body,
+    required this.alignStart,
+    this.contentInsetLeft = 0,
+  });
+
+  final bool isMobile;
+  final double bodyFont;
+  final String label;
+  final String body;
+  final bool alignStart;
+  final double contentInsetLeft;
+
+  @override
+  Widget build(BuildContext context) {
+    final maxCardWidth = (900.0 - contentInsetLeft).clamp(220.0, 900.0);
+    return Padding(
+      padding: EdgeInsets.only(bottom: isMobile ? 14 : 16),
+      child: Align(
+        alignment: alignStart ? Alignment.centerLeft : Alignment.center,
+        child: Padding(
+          padding: EdgeInsets.only(left: contentInsetLeft),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxCardWidth),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFF0F3079).withValues(alpha: 0.10),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.10),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      height: 3,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFF5B32F), Color(0xFFD89A1C)],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 12 : 14,
+                        vertical: isMobile ? 10 : 12,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: alignStart
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            label,
+                            textAlign: alignStart ? TextAlign.start : TextAlign.center,
+                            style: GoogleFonts.roboto(
+                              fontSize: bodyFont + 0.25,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFFF5B32F),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            body,
+                            textAlign: alignStart ? TextAlign.start : TextAlign.center,
+                            style: GoogleFonts.roboto(
+                              fontSize: bodyFont - 0.5,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFFD1D5DB),
+                              height: 1.45,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -557,7 +1060,7 @@ class _ProofCredibilityBlock extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Proof and authority',
+          'Trust and Proof',
           textAlign: _homeTextAlign(context),
           style: GoogleFonts.roboto(
             fontSize: titleFont,
@@ -749,7 +1252,7 @@ class _FaqBlock extends StatelessWidget {
     ),
     (
       'Do you work with startups?',
-      'Yes—US startups and small businesses are a core focus. I also work with teams that need a senior IC to plug into an existing product or modernize an app.',
+      'Yes—US startups and small businesses are a core focus. We also work with teams that need senior support to plug into an existing product or modernize an app.',
     ),
     (
       'Can you improve an existing Flutter app?',
@@ -757,11 +1260,11 @@ class _FaqBlock extends StatelessWidget {
     ),
     (
       'Do you build backends?',
-      'I am strongest with Firebase (Firestore, Auth, Cloud Functions, storage, messaging) and integrating third-party APIs. For heavy custom server work, I partner with your stack or recommend what fits.',
+      'We are strongest with Firebase (Firestore, Auth, Cloud Functions, storage, messaging) and integrating third-party APIs. For heavy custom server work, we partner with your stack or recommend what fits.',
     ),
     (
       'Do you work remotely with US clients?',
-      'Yes. I am based in Richmond, VA, and routinely work with US teams remotely. Clear written updates and overlapping hours for calls are part of how I operate.',
+      'Yes. We are based in Richmond, VA, and routinely work with US teams remotely. Clear written updates and overlapping hours for calls are part of how we operate.',
     ),
     (
       'How do projects usually start?',
@@ -905,7 +1408,7 @@ class _FinalCtaBlock extends StatelessWidget {
       ),
       onPressed: onContact,
       child: Text(
-        'Discuss your project',
+        'Start a Project',
         style: GoogleFonts.roboto(
           fontSize: bodyFont,
           fontWeight: FontWeight.w700,
@@ -915,17 +1418,19 @@ class _FinalCtaBlock extends StatelessWidget {
 
     final secondary = OutlinedButton(
       style: OutlinedButton.styleFrom(
-        foregroundColor: HomeWarmColors.sectionAccent,
+        foregroundColor: const Color(0xFFE5E7EB),
+        backgroundColor: Colors.white.withValues(alpha: 0.04),
         padding: EdgeInsets.symmetric(
           vertical: isMobile ? 14 : 16,
           horizontal: 20,
         ),
-        side: const BorderSide(color: HomeWarmColors.sectionAccent, width: 1.5),
+        side:
+            BorderSide(color: Colors.white.withValues(alpha: 0.42), width: 1.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       onPressed: onServices,
       child: Text(
-        'Explore services',
+        'View Case Studies',
         style: GoogleFonts.roboto(
           fontSize: bodyFont,
           fontWeight: FontWeight.w700,
@@ -938,7 +1443,10 @@ class _FinalCtaBlock extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         color: Colors.black.withValues(alpha: 0.32),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.36),
+          width: 2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -955,7 +1463,7 @@ class _FinalCtaBlock extends StatelessWidget {
           ),
           SizedBox(height: isMobile ? 10 : 12),
           Text(
-            'Tell me about your users, timeline, and budget range. I will reply with honest next steps—even if we are not a fit.',
+            'Tell us about your users, timeline, and budget range. We will reply with honest next steps—even if we are not a fit.',
             textAlign: _homeTextAlign(context),
             style: GoogleFonts.roboto(
               fontSize: bodyFont,
@@ -989,15 +1497,14 @@ class _FinalCtaBlock extends StatelessWidget {
           TextButton(
             onPressed: onBrief,
             child: Text(
-              'Prefer a structured brief? Submit the project form',
+              'Discuss Your MVP',
               textAlign: _homeTextAlign(context),
               style: GoogleFonts.roboto(
-                color: HomeWarmColors.sectionAccent,
+                color: const Color(0xFFE5E7EB),
                 fontWeight: FontWeight.w600,
                 fontSize: bodyFont - 1,
                 decoration: TextDecoration.underline,
-                decorationColor:
-                    HomeWarmColors.sectionAccent.withValues(alpha: 0.45),
+                decorationColor: const Color(0xFFE5E7EB).withValues(alpha: 0.55),
               ),
             ),
           ),
@@ -1027,10 +1534,8 @@ class _RichmondVaLocalPromo extends StatelessWidget {
         onTap: onOpen,
         borderRadius: BorderRadius.circular(14),
         child: Ink(
-          padding: EdgeInsets.all(isMobile ? 14 : 18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -1040,47 +1545,62 @@ class _RichmondVaLocalPromo extends StatelessWidget {
               ],
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: Responsive.isDesktop(context)
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.center,
+          child: Stack(
             children: [
-              Icon(
-                Icons.map_outlined,
-                color: const Color(0xFFE5E7EB),
-                size: isMobile ? 26 : 28,
-              ),
-              SizedBox(height: isMobile ? 10 : 12),
-              Text(
-                'App development in Richmond & Virginia',
-                textAlign: _homeTextAlign(context),
-                style: GoogleFonts.roboto(
-                  fontSize: bodyFont + 1,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.25,
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  ),
                 ),
               ),
-              SizedBox(height: 6),
-              Text(
-                'Flutter, product design, and US‑friendly engagements—read the local overview.',
-                textAlign: _homeTextAlign(context),
-                style: GoogleFonts.roboto(
-                  fontSize: bodyFont,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFD1D5DB),
-                  height: 1.45,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'View page →',
-                textAlign: _homeTextAlign(context),
-                style: GoogleFonts.roboto(
-                  fontSize: bodyFont - 0.5,
-                  fontWeight: FontWeight.w700,
-                  color: HomeWarmColors.sectionAccent,
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 14 : 18),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: Responsive.isDesktop(context)
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.map_outlined,
+                      color: const Color(0xFFE5E7EB),
+                      size: isMobile ? 26 : 28,
+                    ),
+                    SizedBox(height: isMobile ? 10 : 12),
+                    Text(
+                      'App development in Richmond & Virginia',
+                      textAlign: _homeTextAlign(context),
+                      style: GoogleFonts.roboto(
+                        fontSize: bodyFont + 1,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.25,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Flutter, product design, and US‑friendly engagements—read the local overview.',
+                      textAlign: _homeTextAlign(context),
+                      style: GoogleFonts.roboto(
+                        fontSize: bodyFont,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFD1D5DB),
+                        height: 1.45,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'View page →',
+                      textAlign: _homeTextAlign(context),
+                      style: GoogleFonts.roboto(
+                        fontSize: bodyFont - 0.5,
+                        fontWeight: FontWeight.w700,
+                        color: HomeWarmColors.sectionAccent,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

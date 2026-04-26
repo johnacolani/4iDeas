@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AppBackground extends StatelessWidget {
@@ -6,16 +7,18 @@ class AppBackground extends StatelessWidget {
 
   /// Shared SVG background across breakpoints.
   static const String _kBackgroundAsset = 'assets/images/web_background.svg';
+  static const String _kBackgroundRaster = 'assets/images/background_image_final.png';
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final h = MediaQuery.sizeOf(context).height;
+    final bool isMobile = width < 600;
     // Keep a single background treatment across all breakpoints.
     final double downNudge = h * 0.04;
     final double verticalOffset = downNudge - h * 0.09;
     final double horizontalNudge = width * 0.09;
-    final double imageScale = 0.9;
+    final double imageScale = isMobile ? 1.12 : 0.9;
     final Alignment imageFocal = const Alignment(0.52, 0.5);
 
     return Stack(
@@ -30,11 +33,21 @@ class AppBackground extends StatelessWidget {
               child: Transform.scale(
                 scale: imageScale,
                 alignment: Alignment.center,
-                child: SvgPicture.asset(
-                  _kBackgroundAsset,
-                  key: const ValueKey<String>(_kBackgroundAsset),
-                  fit: BoxFit.cover,
-                  alignment: imageFocal,
+                child: RepaintBoundary(
+                  child: kIsWeb
+                      ? Image.asset(
+                          _kBackgroundRaster,
+                          key: const ValueKey<String>(_kBackgroundRaster),
+                          fit: BoxFit.cover,
+                          alignment: imageFocal,
+                          filterQuality: FilterQuality.low,
+                        )
+                      : SvgPicture.asset(
+                          _kBackgroundAsset,
+                          key: const ValueKey<String>(_kBackgroundAsset),
+                          fit: BoxFit.cover,
+                          alignment: imageFocal,
+                        ),
                 ),
               ),
             ),

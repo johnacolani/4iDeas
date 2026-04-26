@@ -9,6 +9,12 @@ import 'package:go_router/go_router.dart';
 /// Search-intent landing pages with crawlable text and internal links.
 /// See [docs/SEO.md] for positioning notes and Flutter Web SEO limits.
 enum SeoLandingTopic {
+  flutterAppDevelopment,
+  flutterMvpDevelopment,
+  firebaseAppDevelopment,
+  productDesignUxMobileApps,
+  aiChatbotAdminDashboardDevelopment,
+  flutterWebAppDevelopment,
   flutterDeveloperVirginia,
   mvpAppDevelopment,
   productDesignFlutterEngineering,
@@ -249,6 +255,108 @@ class SeoTopicLandingScreen extends StatelessWidget {
 
   _LandingCopy _contentFor(SeoLandingTopic t) {
     switch (t) {
+      case SeoLandingTopic.flutterAppDevelopment:
+        return _LandingCopy(
+          appBarTitle: 'Flutter App Development',
+          targetKeyword: 'flutter app development services',
+          h1: 'Flutter App Development Services for iOS, Android, and Web',
+          paragraphs: const [
+            'If you need to hire a Flutter developer for a real product, I provide end-to-end Flutter app development services for startups and businesses. You get product design thinking, engineering execution, and production-ready architecture in one workflow.',
+            'As a product designer and Flutter developer, I help you build iOS and Android apps plus Flutter web from one codebase. Typical projects include client portals, admin dashboards, custom business app development, and AI-assisted user flows.',
+          ],
+          processBlurb:
+              'Who this is for: founders, operators, and product teams that need fast delivery without sacrificing code quality, UX quality, and long-term maintainability.',
+          relatedLinks: const [
+            _LandingLink(label: 'Flutter MVP development', route: AppRoutes.flutterMvpDevelopment),
+            _LandingLink(label: 'Firebase app development', route: AppRoutes.firebaseAppDevelopment),
+            _LandingLink(label: 'Case studies', route: AppRoutes.caseStudies),
+          ],
+        );
+      case SeoLandingTopic.flutterMvpDevelopment:
+        return _LandingCopy(
+          appBarTitle: 'Flutter MVP Development',
+          targetKeyword: 'flutter mvp developer',
+          h1: 'Flutter MVP Development for Startups',
+          paragraphs: const [
+            'Build an MVP app with a focused scope, clear UX flow, and production-ready Flutter code. I help startup founders define what matters for launch, remove non-essential complexity, and ship an MVP that can evolve.',
+            'This is ideal when you want to validate demand, secure traction, or prepare for investor conversations. You get a practical roadmap from concept to release across iOS, Android, and Web.',
+          ],
+          processBlurb:
+              'What I can build: onboarding and auth, core workflows, admin dashboard app development, Firebase mobile app development, and analytics-ready release flows.',
+          relatedLinks: const [
+            _LandingLink(label: 'Flutter app development', route: AppRoutes.flutterAppDevelopment),
+            _LandingLink(label: 'Product design and UX', route: AppRoutes.productDesignUxMobileApps),
+            _LandingLink(label: 'Contact 4iDeas', route: AppRoutes.contact),
+          ],
+        );
+      case SeoLandingTopic.firebaseAppDevelopment:
+        return _LandingCopy(
+          appBarTitle: 'Firebase App Development',
+          targetKeyword: 'flutter firebase developer',
+          h1: 'Firebase App Development for Flutter Apps',
+          paragraphs: const [
+            'I provide Firebase app development for Flutter products, including authentication, Firestore data modeling, Cloud Functions, push notifications, real-time data, and analytics instrumentation.',
+            'If you need a Flutter Firebase developer for a startup MVP or a growing business product, I design backend flows that are practical, secure, and easy to maintain.',
+          ],
+          processBlurb:
+              'Why 4iDeas: product-first backend decisions, clear role-based data design, and delivery focused on business workflows instead of generic templates.',
+          relatedLinks: const [
+            _LandingLink(label: 'AI chatbot and dashboards', route: AppRoutes.aiChatbotAdminDashboardDevelopment),
+            _LandingLink(label: 'Flutter web app development', route: AppRoutes.flutterWebAppDevelopment),
+            _LandingLink(label: 'View case studies', route: AppRoutes.caseStudies),
+          ],
+        );
+      case SeoLandingTopic.productDesignUxMobileApps:
+        return _LandingCopy(
+          appBarTitle: 'Product Design and UX',
+          targetKeyword: 'product designer and flutter developer',
+          h1: 'Product Design and UX for Mobile Apps',
+          paragraphs: const [
+            'I do not just write code. I help shape the product, simplify user flow, design the experience, build the app, connect the backend, and prepare it for real users.',
+            'This hybrid model combines product design background, Flutter engineering, Firebase backend experience, AI-assisted feature planning, design system thinking, and cross-platform delivery.',
+          ],
+          processBlurb:
+              'Who this is for: startups and small businesses that need one accountable partner for design decisions and implementation quality.',
+          relatedLinks: const [
+            _LandingLink(label: 'Flutter app development services', route: AppRoutes.flutterAppDevelopment),
+            _LandingLink(label: 'Flutter MVP development', route: AppRoutes.flutterMvpDevelopment),
+            _LandingLink(label: 'Discuss your MVP', route: AppRoutes.contact),
+          ],
+        );
+      case SeoLandingTopic.aiChatbotAdminDashboardDevelopment:
+        return _LandingCopy(
+          appBarTitle: 'AI Chatbot and Dashboards',
+          targetKeyword: 'ai chatbot for business app',
+          h1: 'AI Chatbot and Admin Dashboard Development',
+          paragraphs: const [
+            'I design and build AI-assisted chat features, admin dashboards, business workflow tools, and role-based management systems for Flutter and Firebase apps.',
+            'Common use cases include support assistants, internal ops copilots, reporting dashboards, and role-aware workflow automation for service teams.',
+          ],
+          processBlurb:
+              'What I can build: AI chat assistants, custom business app development, admin dashboard workflows, and role-based visibility controls that match real operations.',
+          relatedLinks: const [
+            _LandingLink(label: 'Firebase app development', route: AppRoutes.firebaseAppDevelopment),
+            _LandingLink(label: 'Flutter app development', route: AppRoutes.flutterAppDevelopment),
+            _LandingLink(label: 'See ASD USA case study', route: '/portfolio/case-study/asd'),
+          ],
+        );
+      case SeoLandingTopic.flutterWebAppDevelopment:
+        return _LandingCopy(
+          appBarTitle: 'Flutter Web App Development',
+          targetKeyword: 'flutter web app development',
+          h1: 'Flutter Web App Development',
+          paragraphs: const [
+            'Build responsive Flutter web apps and cross-platform products with clean UX, shared architecture, and Firebase integration. I help teams ship production-ready web experiences that align with mobile apps.',
+            'For customer portals, internal business tools, or SaaS dashboards, Flutter web can accelerate delivery when product design and engineering are aligned from the start.',
+          ],
+          processBlurb:
+              'Why 4iDeas: one partner for UX, frontend implementation, Firebase integration, and multi-platform consistency.',
+          relatedLinks: const [
+            _LandingLink(label: 'Flutter app development services', route: AppRoutes.flutterAppDevelopment),
+            _LandingLink(label: 'Case studies', route: AppRoutes.caseStudies),
+            _LandingLink(label: 'Start a project', route: AppRoutes.contact),
+          ],
+        );
       case SeoLandingTopic.flutterDeveloperVirginia:
         return _LandingCopy(
           appBarTitle: 'Flutter developer in Virginia',

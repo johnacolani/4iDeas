@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../core/design_system/responsive.dart';
 import '../core/design_system/theme.dart';
 import '../core/home_warm_colors.dart';
+import '../core/widgets/platform_proof_chips.dart';
 import '../core/widgets/aws_backend_section.dart';
 import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/modern_hero_section.dart';
@@ -70,21 +71,15 @@ class _WebScreenState extends State<WebScreen> {
                         child: const ModernHeroSection(),
                       ),
                       SizedBox(height: isMobile ? 12 : 20),
-                      Container(
-                        width: double.infinity,
-                        color: Colors.transparent,
+                      Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: isMobile ? 8 : 56,
                           vertical: isMobile ? 6 : 10,
                         ),
-                        child: Align(
-                          alignment: isBodyDesktop
-                              ? Alignment.topLeft
-                              : Alignment.center,
-                          child: _PlatformProofChips(
+                        child: Center(
+                          child: PlatformProofChips(
                             isMobile: isMobile,
                             isTablet: isTablet,
-                            leftAlign: isBodyDesktop,
                           ),
                         ),
                       ),
@@ -152,142 +147,6 @@ class _WebScreenState extends State<WebScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _PlatformProofChips extends StatelessWidget {
-  const _PlatformProofChips({
-    required this.isMobile,
-    required this.isTablet,
-    this.leftAlign = false,
-  });
-
-  final bool isMobile;
-  final bool isTablet;
-
-  /// [true] when [Responsive] desktop: wrap rows from the left.
-  final bool leftAlign;
-
-  static const List<({String label, String subtitle, String asset})> _items =
-      <({String label, String subtitle, String asset})>[
-    (
-      label: 'iOS',
-      subtitle: 'Native-quality experience',
-      asset: 'assets/platforms/ios.png'
-    ),
-    (
-      label: 'Android',
-      subtitle: 'One codebase, broad reach',
-      asset: 'assets/platforms/android.png'
-    ),
-    (
-      label: 'Web',
-      subtitle: 'Fast and responsive web apps',
-      asset: 'assets/platforms/web.png'
-    ),
-    (
-      label: 'macOS',
-      subtitle: 'Desktop apps for modern teams',
-      asset: 'assets/platforms/macos.png'
-    ),
-    (
-      label: 'Windows',
-      subtitle: 'Cross-platform productivity',
-      asset: 'assets/platforms/windows.png'
-    ),
-    (
-      label: 'Linux',
-      subtitle: 'Stable apps for power users',
-      asset: 'assets/platforms/linux.png'
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final double titleSize = isMobile ? 12.5 : (isTablet ? 13.0 : 13.5);
-    final double subtitleSize = isMobile ? 9.8 : 10.5;
-    return Wrap(
-      alignment: leftAlign ? WrapAlignment.start : WrapAlignment.center,
-      spacing: isMobile ? 8 : 10,
-      runSpacing: isMobile ? 8 : 10,
-      children: _items
-          .map(
-            (item) => Container(
-              width: isMobile ? 206 : 236,
-              height: isMobile ? 76 : 84,
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 12 : 14,
-                vertical: isMobile ? 9 : 10,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: isMobile ? 42 : 46,
-                    height: isMobile ? 42 : 46,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.transparent,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.32),
-                        width: 1,
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: Image.asset(
-                      item.asset,
-                      fit: BoxFit.contain,
-                      gaplessPlayback: true,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.image_not_supported_outlined,
-                        size: isMobile ? 20 : 22,
-                        color:
-                            HomeWarmColors.eyebrowMuted.withValues(alpha: 0.75),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: isMobile ? 10 : 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          item.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.roboto(
-                            fontSize: titleSize,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          item.subtitle,
-                          maxLines: 2,
-                          overflow: TextOverflow.fade,
-                          style: GoogleFonts.roboto(
-                            fontSize: subtitleSize,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.7),
-                            height: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-          .toList(),
     );
   }
 }

@@ -83,7 +83,7 @@ class ContactUsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Start a project conversation',
+                            'Have an app idea?',
                             style: GoogleFonts.roboto(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w800,
@@ -93,8 +93,7 @@ class ContactUsScreen extends StatelessWidget {
                           ),
                           SizedBox(height: isMobile ? 10 : 12),
                           Text(
-                            'If you are a startup or business exploring Flutter, product design, or Firebase, you are in the right place. '
-                            'Share a few details below and I will respond with thoughtful next steps—whether that is a rough estimate, a short call, or an honest “not a fit.”',
+                            'Tell me what you want to build, and I will help you understand the best MVP path, estimated scope, and technology approach.',
                             style: GoogleFonts.roboto(
                               fontSize: bodySize,
                               fontWeight: FontWeight.w500,
@@ -176,6 +175,16 @@ class ContactUsScreen extends StatelessWidget {
                             ],
                           ),
                           SizedBox(height: isMobile ? 20 : 24),
+                          Text(
+                            '4iDeas\nFlutter App Development, Product Design, Firebase, AI Features',
+                            style: GoogleFonts.roboto(
+                              fontSize: bodySize - 0.5,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white.withValues(alpha: 0.9),
+                              height: 1.45,
+                            ),
+                          ),
+                          SizedBox(height: isMobile ? 12 : 16),
                           const ContactUsContent(
                             embeddedInDialog: false,
                             paddingOverride: EdgeInsets.zero,

@@ -11,6 +11,17 @@ import 'package:four_ideas/helper/app_background.dart';
 class InsightsScreen extends StatelessWidget {
   const InsightsScreen({super.key});
 
+  static const List<String> _plannedArticleTitles = [
+    'How Much Does It Cost to Build a Flutter MVP in 2026?',
+    'Flutter vs Native iOS and Android for Startups',
+    'Why Flutter and Firebase Are Great for MVP Development',
+    'How to Build a Role-Based Business App with Flutter',
+    'What Every Founder Should Know Before Building a Mobile App',
+    'How AI Chatbots Can Improve Business Workflow Apps',
+    'Flutter Web SEO: What You Need to Know',
+    'From Product Design to App Store Launch: My Full Process',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final wi = MediaQuery.sizeOf(context).width;
@@ -94,6 +105,35 @@ class InsightsScreen extends StatelessWidget {
                               onOpen: () => context.go(AppRoutes.insightsArticlePath(article.slug)),
                               onDiscuss: () => context.go(AppRoutes.contact),
                               bodySize: bodySize,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Planned Articles',
+                          style: GoogleFonts.roboto(
+                            fontSize: bodySize + 4,
+                            fontWeight: FontWeight.w800,
+                            color: HomeWarmColors.headlinePrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ..._plannedArticleTitles.map(
+                          (title) => Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: HomeWarmColors.dividerLine),
+                            ),
+                            child: Text(
+                              '$title (TODO: publish full article page)',
+                              style: GoogleFonts.roboto(
+                                fontSize: bodySize - 0.5,
+                                fontWeight: FontWeight.w600,
+                                color: HomeWarmColors.bodyEmphasis,
+                              ),
                             ),
                           ),
                         ),

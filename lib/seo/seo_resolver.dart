@@ -69,12 +69,81 @@ import 'package:four_ideas/seo/seo_metadata.dart';
   if (normalized == '/') {
     return (
       const SeoMetadata(
-        title: 'Flutter Developer & Product Designer | MVP & Firebase | 4iDeas',
+        title: 'Flutter App Developer for iOS, Android & Web | 4iDeas',
         description:
-            'US‑focused Flutter developer and product designer: MVP app development, Flutter + Firebase, '
-            'and end‑to‑end delivery from Richmond, VA. iOS, Android, and web from one codebase.',
+            'I design and build production-ready Flutter apps, Firebase backends, AI features, dashboards, and MVPs for startups and businesses.',
       ),
       '/',
+    );
+  }
+  if (normalized == AppRoutes.flutterAppDevelopment) {
+    return (
+      const SeoMetadata(
+        title: 'Flutter App Development Services | iOS, Android & Web | 4iDeas',
+        description:
+            'Hire a Flutter developer to design and build cross-platform apps for iOS, Android, and Web using Flutter, Firebase, and production-ready architecture.',
+      ),
+      AppRoutes.flutterAppDevelopment,
+    );
+  }
+  if (normalized == AppRoutes.flutterMvpDevelopment) {
+    return (
+      const SeoMetadata(
+        title: 'Flutter MVP Development for Startups | 4iDeas',
+        description:
+            'Build and launch your startup MVP with Flutter, Firebase, product design, and cross-platform development for iOS, Android, and Web.',
+      ),
+      AppRoutes.flutterMvpDevelopment,
+    );
+  }
+  if (normalized == AppRoutes.firebaseAppDevelopment) {
+    return (
+      const SeoMetadata(
+        title: 'Firebase App Development for Flutter Apps | 4iDeas',
+        description:
+            'Firebase development for Flutter apps, including authentication, Firestore, Cloud Functions, push notifications, real-time data, and analytics.',
+      ),
+      AppRoutes.firebaseAppDevelopment,
+    );
+  }
+  if (normalized == AppRoutes.productDesignUxMobileApps) {
+    return (
+      const SeoMetadata(
+        title: 'Product Design and UX for Mobile Apps | 4iDeas',
+        description:
+            'Product design, UX flows, UI systems, and mobile app design for startups and businesses building real digital products.',
+      ),
+      AppRoutes.productDesignUxMobileApps,
+    );
+  }
+  if (normalized == AppRoutes.aiChatbotAdminDashboardDevelopment) {
+    return (
+      const SeoMetadata(
+        title: 'AI Chatbot and Admin Dashboard Development | 4iDeas',
+        description:
+            'Design and build AI-assisted chat features, admin dashboards, business workflow tools, and role-based management systems.',
+      ),
+      AppRoutes.aiChatbotAdminDashboardDevelopment,
+    );
+  }
+  if (normalized == AppRoutes.flutterWebAppDevelopment) {
+    return (
+      const SeoMetadata(
+        title: 'Flutter Web App Development | 4iDeas',
+        description:
+            'Build responsive Flutter web apps and cross-platform digital products with clean UI, Firebase integration, and scalable architecture.',
+      ),
+      AppRoutes.flutterWebAppDevelopment,
+    );
+  }
+  if (normalized == AppRoutes.caseStudies) {
+    return (
+      const SeoMetadata(
+        title: 'Flutter and Product Design Case Studies | 4iDeas',
+        description:
+            'Explore 4iDeas case studies across Flutter apps, Firebase platforms, product design, AI assistants, dashboards, and cross-platform development.',
+      ),
+      AppRoutes.caseStudies,
     );
   }
   if (normalized == '/portfolio') {
@@ -113,10 +182,9 @@ import 'package:four_ideas/seo/seo_metadata.dart';
   if (normalized == '/contact') {
     return (
       const SeoMetadata(
-        title: 'Contact — Start a Flutter or MVP Project | 4iDeas',
+        title: 'Start a Flutter App Project | Contact 4iDeas',
         description:
-            'Tell us about your app idea, timeline, and stack. Flutter + Firebase projects, MVP builds, '
-            'and product design engagements for US clients—response with candid next steps.',
+            'Contact 4iDeas to discuss your Flutter app, MVP, Firebase backend, AI feature, dashboard, or product design project.',
       ),
       '/contact',
     );

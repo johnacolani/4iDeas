@@ -12,6 +12,7 @@ import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
+import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/portfolio_content_service.dart';
 import 'package:four_ideas/services/publication_content_service.dart';
@@ -753,17 +754,28 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 isMobile: isMobile,
                               ),
                               SizedBox(height: gapAfterDesignPhilosophy),
-                              _PortfolioSectionNav(
-                                bodySize: bodySize,
-                                isMobile: isMobile,
-                                onTapFeatured: () =>
-                                    _scrollToSection(_featuredCaseStudiesKey),
-                                onTapApps: () =>
-                                    _scrollToSection(_appShowcaseKey),
-                                onTapPublications: () =>
-                                    _scrollToSection(_publicationsKey),
-                                onTapOpenSource: () =>
-                                    _scrollToSection(_openSourceKey),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isMobile ? 12 : 200,
+                                ),
+                                child: Center(
+                                  child: FractionallySizedBox(
+                                    widthFactor: isMobile ? 1.0 : 0.5,
+                                    child: _PortfolioSectionNav(
+                                      bodySize: bodySize,
+                                      isMobile: isMobile,
+                                      onTapFeatured: () =>
+                                          _scrollToSection(
+                                              _featuredCaseStudiesKey),
+                                      onTapApps: () =>
+                                          _scrollToSection(_appShowcaseKey),
+                                      onTapPublications: () =>
+                                          _scrollToSection(_publicationsKey),
+                                      onTapOpenSource: () =>
+                                          _scrollToSection(_openSourceKey),
+                                    ),
+                                  ),
+                                ),
                               ),
                               SizedBox(height: 14),
                               Wrap(
@@ -1281,61 +1293,59 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SelectableText.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Product design',
-                                  style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w900,
-                                    foreground: Paint()
-                                      ..shader = const LinearGradient(
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final double headlineSize = isMobile
+                                  ? (constraints.maxWidth * 0.078)
+                                      .clamp(28.0, 44.0)
+                                  : (constraints.maxWidth * 0.05)
+                                      .clamp(34.0, 66.0);
+                              final TextStyle headlineStyle = GoogleFonts.roboto(
+                                fontSize: headlineSize,
+                                fontWeight: FontWeight.w900,
+                                height: 1.1,
+                                letterSpacing: 0.2,
+                              );
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Flutter App Development for',
+                                      textAlign: TextAlign.center,
+                                      style: headlineStyle.copyWith(
+                                        color: ColorManager.portfolioTextTitle,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: isMobile ? 6 : 8),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: ShaderMask(
+                                      blendMode: BlendMode.srcIn,
+                                      shaderCallback: (bounds) =>
+                                          const LinearGradient(
                                         colors: [
                                           AppColors.primaryGold,
                                           AppColors.primaryGoldDark,
                                         ],
-                                      ).createShader(
-                                        const Rect.fromLTWH(0, 0, 280, 40),
+                                      ).createShader(bounds),
+                                      child: Text(
+                                        'Startups and Bussiness',
+                                        textAlign: TextAlign.center,
+                                        style: headlineStyle.copyWith(
+                                          color: Colors.white,
+                                        ),
                                       ),
+                                    ),
                                   ),
-                                ),
-                                const TextSpan(text: '\n&\n'),
-                                TextSpan(
-                                  text: 'Flutter',
-                                  style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w900,
-                                    foreground: Paint()
-                                      ..shader = const LinearGradient(
-                                        colors: [
-                                          AppColors.primaryGold,
-                                          AppColors.primaryGoldDark,
-                                        ],
-                                      ).createShader(
-                                        const Rect.fromLTWH(0, 0, 280, 40),
-                                      ),
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      ' Cross platform development for mobile web and desktop.',
-                                  style: GoogleFonts.roboto(
-                                    fontSize: (titleSize - 7).clamp(14.0, 26.0),
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.2,
-                                    color: ColorManager.portfolioTextTitle,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.roboto(
-                              color: ColorManager.portfolioTextTitle,
-                              fontSize: titleSize,
-                              fontWeight: FontWeight.w700,
-                              height: 1.25,
-                            ),
+                                ],
+                              );
+                            },
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 16),
                           SelectableText(
                             'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
                             textAlign: TextAlign.center,
@@ -1444,29 +1454,49 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                   child: BackdropFilter(
                     filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: widget.isMobile ? 20 : 28,
-                        vertical: widget.isMobile ? 20 : 24,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(18.4)),
                       ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0B1B3A).withValues(alpha: 0.38),
-                        borderRadius: BorderRadius.circular(18.4),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.24),
-                          width: 1.0,
-                        ),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.14),
-                            Colors.white.withValues(alpha: 0.06),
-                            Colors.transparent,
-                          ],
-                          stops: const [0.0, 0.38, 1.0],
-                        ),
-                      ),
-                      child: Row(
+                      child: Stack(
+                        // Default fit: parent Column can be vertically unbounded (sliver).
+                        children: [
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0B1B3A)
+                                    .withValues(alpha: 0.38),
+                                borderRadius: BorderRadius.circular(18.4),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.14),
+                                    Colors.white.withValues(alpha: 0.06),
+                                    Colors.transparent,
+                                  ],
+                                  stops: const [0.0, 0.38, 1.0],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18.4),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.24),
+                                  width: 1.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: widget.isMobile ? 20 : 28,
+                              vertical: widget.isMobile ? 20 : 24,
+                            ),
+                            child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           if (!widget.isMobile) ...[
@@ -1479,6 +1509,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                           ],
                           Expanded(
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SelectableText(
@@ -1543,6 +1574,9 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                               color: ColorManager.portfolioTextBody,
                             ),
                           ],
+                        ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1676,9 +1710,6 @@ class _PortfolioFrostedGlassPanel extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(borderRadius),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.18),
-                    ),
                     gradient: LinearGradient(
                       begin: const Alignment(-1, -1),
                       end: const Alignment(0.45, 0.5),
@@ -1688,6 +1719,16 @@ class _PortfolioFrostedGlassPanel extends StatelessWidget {
                         Colors.transparent,
                       ],
                       stops: const [0.0, 0.28, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
                     ),
                   ),
                 ),
@@ -2030,6 +2071,7 @@ class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
   /// Case studies that use Twin-style multi-hero: contain + narrow tiles + gap.
   static const Set<String> _portraitMultiHeroCaseStudyIds = {
     'twin-scriptures',
+    'service-flow',
     'asd',
     'rose-chat-seasonal-campaign-engine',
   };
@@ -2062,6 +2104,12 @@ class _FeaturedCaseStudyHeroStripState
   static const Duration _autoScrollTick = Duration(milliseconds: 1700);
   static const Duration _autoScrollAnimDuration = Duration(milliseconds: 560);
   static const double _autoScrollStep = 170.0;
+
+  /// [ScrollPosition.maxScrollExtent] is unsafe until the viewport has laid out.
+  bool get _multiHeroScrollLaidOut {
+    if (!_multiHeroScrollController.hasClients) return false;
+    return _multiHeroScrollController.position.hasContentDimensions;
+  }
 
   @override
   void initState() {
@@ -2181,7 +2229,7 @@ class _FeaturedCaseStudyHeroStripState
                                 fit: BoxFit.contain,
                                 errorBuilder: (_, __, ___) => _placeholder(420),
                               )
-                            : Image.asset(
+                            : AdaptiveAssetImage(
                                 path,
                                 fit: BoxFit.contain,
                                 errorBuilder: (_, __, ___) => _placeholder(420),
@@ -2221,7 +2269,7 @@ class _FeaturedCaseStudyHeroStripState
 
   void _autoScrollOnce() {
     if (_autoScrollPaused || _middleMouseScrolling) return;
-    if (!_multiHeroScrollController.hasClients) return;
+    if (!_multiHeroScrollLaidOut) return;
     final pos = _multiHeroScrollController.position;
     if (pos.maxScrollExtent < 20) return;
 
@@ -2261,7 +2309,7 @@ class _FeaturedCaseStudyHeroStripState
   void _scrollMultiHeroBy(double delta) {
     _pauseAutoScroll();
     _scheduleAutoScrollResume();
-    if (!_multiHeroScrollController.hasClients) return;
+    if (!_multiHeroScrollLaidOut) return;
     final pos = _multiHeroScrollController.position;
     final target = (pos.pixels + delta).clamp(0.0, pos.maxScrollExtent);
     _multiHeroScrollController.animateTo(
@@ -2274,7 +2322,7 @@ class _FeaturedCaseStudyHeroStripState
   void _onMiddleMouseDown(PointerDownEvent event) {
     _pauseAutoScroll();
     if (event.buttons != kMiddleMouseButton) return;
-    if (!_multiHeroScrollController.hasClients) return;
+    if (!_multiHeroScrollLaidOut) return;
     _middleMouseScrolling = true;
     _middleMouseStartDy = event.position.dy;
     _middleMouseStartOffset = _multiHeroScrollController.position.pixels;
@@ -2284,7 +2332,7 @@ class _FeaturedCaseStudyHeroStripState
 
   void _onMiddleMouseMove(PointerMoveEvent event) {
     if (!_middleMouseScrolling) return;
-    if (!_multiHeroScrollController.hasClients) return;
+    if (!_multiHeroScrollLaidOut) return;
     final deltaY = event.position.dy - _middleMouseStartDy;
     final pos = _multiHeroScrollController.position;
     final target = (_middleMouseStartOffset + (deltaY * 1.1))
@@ -2553,7 +2601,7 @@ class _FeaturedCaseStudyHeroStripState
               );
             },
           )
-        : Image.asset(
+        : AdaptiveAssetImage(
             path,
             fit: _imageFit,
             width: w,
@@ -2628,13 +2676,18 @@ class _PremiumFeaturedCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: _FeaturedCaseStudyHeroStrip(
-                  heroImagePath: caseStudy.heroImagePath,
-                  heroImagePaths: caseStudy.heroImagePaths,
-                  isMobile: isMobile,
-                  caseStudyId: caseStudy.id,
+              Center(
+                child: FractionallySizedBox(
+                  widthFactor: isMobile ? 1.0 : 0.5,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: _FeaturedCaseStudyHeroStrip(
+                      heroImagePath: caseStudy.heroImagePath,
+                      heroImagePaths: caseStudy.heroImagePaths,
+                      isMobile: isMobile,
+                      caseStudyId: caseStudy.id,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 14),

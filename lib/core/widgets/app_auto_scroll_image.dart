@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 
 /// Horizontal auto-scrolling strip of real mobile screenshots.
 ///
@@ -39,8 +40,8 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
   /// Image tiles: baseline (56–80) × this scale. 0.392 = 30% smaller than 0.56.
   static const double _imageSizeScale = 0.392;
 
-  /// Horizontal inset per tile (gap between images = 2 × this).
-  static const double _tileHorizontalPadding = 14.0;
+  /// Horizontal inset per tile (visual gap where two tiles meet ≈ 2× this).
+  static const double _tileHorizontalPadding = 36.0;
 
   static const Duration _autoScrollDuration = Duration(milliseconds: 900);
   static const Duration _timerInterval = Duration(milliseconds: 1200);
@@ -121,13 +122,20 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
     return (base * _imageSizeScale).clamp(22.0, 120.0);
   }
 
-  double _stripHeightForItemWidth(double itemWidth) {
-    return (itemWidth + 20 * _imageSizeScale).clamp(52.0, 94.0);
+  /// Rounded square chip around each platform icon (matches prior platform-chips look).
+  double _iconBoxSide(double itemWidth) {
+    final imageSide = (itemWidth * 1.16).clamp(24.0, 100.0);
+    return imageSide + 8.0; // 4px insets for [Image] on each side
   }
 
-  /// Each tile’s laid-out width including horizontal padding (must match item [Padding]).
+  double _stripHeightForItemWidth(double itemWidth) {
+    // Vertical padding 4+4 plus small slack for web subpixel / border layout.
+    return _iconBoxSide(itemWidth) + 8.0 + 4.0;
+  }
+
+  /// Wider of chip + list tile horizontal padding.
   double _tileStride(double itemWidth) {
-    return itemWidth + _tileHorizontalPadding * 2;
+    return _iconBoxSide(itemWidth) + _tileHorizontalPadding * 2;
   }
 
   int _tileCountForWidth(double viewportWidth, double itemWidth) {
@@ -149,14 +157,15 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
         final height = _stripHeightForItemWidth(itemWidth);
         final tileCount = _tileCountForWidth(maxW, itemWidth);
 
+        final double iconS = _iconBoxSide(itemWidth);
+        final double imageSide = iconS - 8.0;
         return SizedBox(
           height: height,
           width: double.infinity,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
+              color: Colors.white.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
             ),
             child: ListView.builder(
               controller: _scrollController,
@@ -173,19 +182,34 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
                     vertical: 4,
                   ),
                   child: Center(
-                    child: Image.asset(
-                      assetPath,
-                      width: itemWidth * 1.22,
-                      height: itemWidth * 1.22,
-                      fit: BoxFit.contain,
-                      gaplessPlayback: true,
-                      errorBuilder: (_, __, ___) => SizedBox(
-                        width: itemWidth * 1.22,
-                        height: itemWidth * 1.22,
-                        child: const Icon(
-                          Icons.broken_image_outlined,
-                          color: Colors.redAccent,
-                          size: 20,
+                    child: Container(
+                      width: iconS,
+                      height: iconS,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.32),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: Center(
+                        child: AdaptiveAssetImage(
+                          assetPath,
+                          width: imageSide,
+                          height: imageSide,
+                          fit: BoxFit.contain,
+                          gaplessPlayback: true,
+                          errorBuilder: (_, __, ___) => SizedBox(
+                            width: imageSide,
+                            height: imageSide,
+                            child: const Icon(
+                              Icons.broken_image_outlined,
+                              color: Colors.redAccent,
+                              size: 20,
+                            ),
+                          ),
                         ),
                       ),
                     ),

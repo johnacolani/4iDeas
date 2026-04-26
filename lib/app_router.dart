@@ -24,6 +24,7 @@ import 'package:four_ideas/screens/insight_article_screen.dart';
 import 'package:four_ideas/screens/insights_screen.dart';
 import 'package:four_ideas/screens/local_richmond_landing_screen.dart';
 import 'package:four_ideas/screens/seo_topic_landing_screen.dart';
+import 'package:four_ideas/screens/case_studies_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -45,8 +46,16 @@ abstract class AppRoutes {
   static const String contact = '/contact';
   static const String insights = '/insights';
   static String insightsArticlePath(String slug) => '$insights/$slug';
+  static const String caseStudies = '/case-studies';
 
   /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
+  static const String flutterAppDevelopment = '/flutter-app-development';
+  static const String flutterMvpDevelopment = '/flutter-mvp-development';
+  static const String firebaseAppDevelopment = '/firebase-app-development';
+  static const String productDesignUxMobileApps = '/product-design-ux-mobile-apps';
+  static const String aiChatbotAdminDashboardDevelopment =
+      '/ai-chatbot-admin-dashboard-development';
+  static const String flutterWebAppDevelopment = '/flutter-web-app-development';
   static const String flutterDeveloperVirginia = '/flutter-developer-virginia';
   static const String flutterDeveloperRichmondVa = '/flutter-developer-richmond-va';
   static const String mvpAppDevelopment = '/mvp-app-development';
@@ -146,6 +155,10 @@ GoRouter createAppRouter() {
         builder: (context, state) => const InsightsScreen(),
       ),
       GoRoute(
+        path: AppRoutes.caseStudies,
+        builder: (context, state) => const CaseStudiesScreen(),
+      ),
+      GoRoute(
         path: '${AppRoutes.insights}/:slug',
         builder: (context, state) {
           final slug = state.pathParameters['slug'] ?? '';
@@ -159,6 +172,42 @@ GoRouter createAppRouter() {
           }
           return InsightArticleScreen(article: article);
         },
+      ),
+      GoRoute(
+        path: AppRoutes.flutterAppDevelopment,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.flutterAppDevelopment,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.flutterMvpDevelopment,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.flutterMvpDevelopment,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.firebaseAppDevelopment,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.firebaseAppDevelopment,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.productDesignUxMobileApps,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.productDesignUxMobileApps,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.aiChatbotAdminDashboardDevelopment,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.aiChatbotAdminDashboardDevelopment,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.flutterWebAppDevelopment,
+        builder: (context, state) => const SeoTopicLandingScreen(
+          topic: SeoLandingTopic.flutterWebAppDevelopment,
+        ),
       ),
       GoRoute(
         path: AppRoutes.flutterDeveloperVirginia,

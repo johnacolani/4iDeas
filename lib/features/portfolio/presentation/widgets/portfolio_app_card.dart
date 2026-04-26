@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/data/portfolio_conversion_copy.dart';
 import 'package:four_ideas/app_router.dart';
@@ -90,30 +91,49 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: cardPaddingH,
-                vertical: cardPaddingV,
+              clipBehavior: Clip.antiAlias,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6B7280).withValues(alpha: 0.20),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.26),
-                  width: 1.0,
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.14),
-                    const Color(0xFF9CA3AF).withValues(alpha: 0.10),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.42, 1.0],
-                ),
-              ),
-              child: isMobile
-                  ? Column(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6B7280).withValues(alpha: 0.20),
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.14),
+                            const Color(0xFF9CA3AF).withValues(alpha: 0.10),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.42, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.26),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: cardPaddingH,
+                      vertical: cardPaddingV,
+                    ),
+                    child: isMobile
+                        ? Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(
@@ -181,6 +201,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                     ),
                     const SizedBox(height: 10),
                     _buildOpenDesignSystemButton(context, bodySize),
+                  ],
+                ),
+                    ),
                   ],
                 ),
             ),
@@ -640,7 +663,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       Container(
                         color: ColorManager.blue.withValues(alpha: 0.12),
                         child: Center(
-                          child: Image.asset(
+                          child: AdaptiveAssetImage(
                             app.imagePath!,
                             fit: BoxFit.contain,
                             errorBuilder: (_, __, ___) => _buildPlaceholder(),
@@ -676,7 +699,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       ),
                     ],
                   )
-                : Image.asset(
+                : AdaptiveAssetImage(
                     app.imagePath!,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => _buildPlaceholder(),
@@ -740,8 +763,10 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   SizedBox(
                     height: iconSize,
                     width: iconSize * 1.15,
-                    child: Image.asset(
-                      'assets/image_10.png',
+                    child: AdaptiveAssetImage(
+                      'assets/images/flutter.png',
+                      width: iconSize * 1.15,
+                      height: iconSize,
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) => Icon(
                         Icons.flutter_dash,
