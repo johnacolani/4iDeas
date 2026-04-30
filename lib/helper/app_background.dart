@@ -1,105 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:four_ideas/core/home_warm_colors.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AppBackground extends StatelessWidget {
   const AppBackground({super.key});
 
-  static Widget _shiftOnMobile(bool mobile, Offset translation, Widget child) {
-    if (!mobile) return child;
-    return FractionalTranslation(translation: translation, child: child);
-  }
+  /// Shared SVG background across breakpoints.
+  static const String _kBackgroundAsset = 'assets/images/web_background.svg';
+  static const String _kBackgroundRaster = 'assets/images/background_image_final.png';
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobileHome = MediaQuery.sizeOf(context).width < 600;
+    final width = MediaQuery.sizeOf(context).width;
+    final h = MediaQuery.sizeOf(context).height;
+    final bool isMobile = width < 600;
+    // Keep a single background treatment across all breakpoints.
+    final double downNudge = h * 0.04;
+    final double verticalOffset = downNudge - h * 0.09;
+    final double horizontalNudge = width * 0.09;
+    final double imageScale = isMobile ? 1.12 : 0.9;
+    final Alignment imageFocal = const Alignment(0.52, 0.5);
 
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        // Same shell gradient as [SlidingMenu] frosted panel (full-opacity base under the grid).
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            HomeWarmColors.shellTop,
-            HomeWarmColors.shellBottom,
-          ],
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const ColoredBox(color: Color(0xFF01040E)),
+        Positioned.fill(
+          child: Transform.translate(
+            offset: Offset(horizontalNudge, verticalOffset),
+            child: Align(
+              alignment: Alignment.center,
+              child: Transform.scale(
+                scale: imageScale,
+                alignment: Alignment.center,
+                child: RepaintBoundary(
+                  child: kIsWeb
+                      ? Image.asset(
+                          _kBackgroundRaster,
+                          key: const ValueKey<String>(_kBackgroundRaster),
+                          fit: BoxFit.cover,
+                          alignment: imageFocal,
+                          filterQuality: FilterQuality.low,
+                        )
+                      : SvgPicture.asset(
+                          _kBackgroundAsset,
+                          key: const ValueKey<String>(_kBackgroundAsset),
+                          fit: BoxFit.cover,
+                          alignment: imageFocal,
+                        ),
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _StudioGridPainter(),
-            ),
-          ),
-          Align(
-            alignment: const Alignment(-0.92, -0.96),
-            child: _shiftOnMobile(
-              isMobileHome,
-              const Offset(-0.5, 0),
-              Container(
-                width: 360,
-                height: 360,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      HomeWarmColors.bloomNorth.withValues(alpha: 0.5),
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: const Alignment(1.0, 0.92),
-            child: _shiftOnMobile(
-              isMobileHome,
-              const Offset(0.5, 0),
-              Container(
-                width: 420,
-                height: 420,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: HomeWarmColors.bloomSouthEast
-                      .withValues(alpha: 0.5),
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: const Alignment(0.1, -0.24),
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color:
-                    HomeWarmColors.bloomCenter.withValues(alpha: 0.5),
-              ),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
-}
-
-class _StudioGridPainter extends CustomPainter {
-  const _StudioGridPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = HomeWarmColors.gridLine
-      ..strokeWidth = 1;
-    const step = 48.0;
-    for (double x = 0; x <= size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y <= size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

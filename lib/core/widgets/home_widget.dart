@@ -3,10 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../home_warm_colors.dart';
 import 'firebase_backend_section.dart';
-import 'home_hero_headline.dart';
+import 'hero_platforms_gif.dart';
+import 'home_hero_section.dart';
 import 'aws_backend_section.dart';
 import 'seo_optimization_section.dart';
-import 'app_auto_scroll_image.dart';
+import 'trust_home_sections.dart';
 
 class HomeWidget extends StatelessWidget {
   const HomeWidget({
@@ -23,20 +24,13 @@ class HomeWidget extends StatelessWidget {
     // Responsive breakpoints (HomeWidget is only used from MobileScreen, width under 600.)
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
-    // Space below the overlaid frosted header only (SafeArea already clears the notch).
-    // ~90–124px matches one- to two-row bar height; wider buffers on very narrow widths.
-    final double heroTopSpacing = () {
-      if (wi < 360) return 124.0;
-      if (wi < 400) return 116.0;
-      if (wi < 480) return 108.0;
-      if (wi < 600) return 100.0;
-      if (wi < 1024) return 248.0;
-      return 270.0;
-    }();
+    // Home route: chrome is above scroll in [HomeScreen]; only a small breath under the CTA row.
+    final double heroTopSpacing = 0.0;
 
     return Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
+          top: false,
           child: Scrollbar(
             thumbVisibility: true,
             child: CustomScrollView(
@@ -48,280 +42,21 @@ class HomeWidget extends StatelessWidget {
                     SizedBox(height: heroTopSpacing),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: wi < 400 ? 12 : 16),
-                      child: HomeHeroHeadline(
-                        titleSize: isMobile
-                            ? (wi < 400 ? 28 : (wi < 500 ? 35 : 42))
-                            : (isTablet ? 56 : 84),
-                      ),
-                    ),
-
-                    SizedBox(height: 24),
-                    // On very small mobile screens, stack vertically; otherwise horizontal
-                    wi < 400
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SelectableText(
-                                    'Custom iOS apps',
-                                    style: GoogleFonts.albertSans(
-                                      fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: HomeWarmColors.platformIos,
-                                      shadows: const [
-                                        Shadow(
-                                          color: HomeWarmColors.labelShadow,
-                                          blurRadius: 6,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SelectableText(
-                                    'Custom Android apps',
-                                    style: GoogleFonts.albertSans(
-                                      fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: HomeWarmColors.platformAndroid,
-                                      shadows: const [
-                                        Shadow(
-                                          color: HomeWarmColors.labelShadow,
-                                          blurRadius: 6,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SelectableText(
-                                    'Custom macOS apps',
-                                    style: GoogleFonts.albertSans(
-                                      fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: HomeWarmColors.platformMac,
-                                      shadows: const [
-                                        Shadow(
-                                          color: HomeWarmColors.labelShadow,
-                                          blurRadius: 6,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SelectableText(
-                                    'Custom web apps',
-                                    style: GoogleFonts.albertSans(
-                                      fontSize: wi < 400 ? 14 : 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: HomeWarmColors.platformWeb,
-                                      shadows: const [
-                                        Shadow(
-                                          color: HomeWarmColors.labelShadow,
-                                          blurRadius: 6,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  SelectableText(
-                                    'Windows & Linux',
-                                    style: GoogleFonts.albertSans(
-                                      fontSize: wi < 400 ? 13 : 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: HomeWarmColors.platformDesktop,
-                                      shadows: const [
-                                        Shadow(
-                                          color: HomeWarmColors.labelShadow,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )
-                        : Padding(
-                            padding:
-                                EdgeInsets.symmetric(horizontal: wi * 0.02),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SelectableText(
-                                        'Custom iOS apps',
-                                        style: GoogleFonts.albertSans(
-                                          fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.w500,
-                                          color: HomeWarmColors.platformIos,
-                                          shadows: const [
-                                            Shadow(
-                                              color: HomeWarmColors.labelShadow,
-                                              blurRadius: 6,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SelectableText(
-                                        'Custom Android apps',
-                                        style: GoogleFonts.albertSans(
-                                          fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.w500,
-                                          color: HomeWarmColors.platformAndroid,
-                                          shadows: const [
-                                            Shadow(
-                                              color: HomeWarmColors.labelShadow,
-                                              blurRadius: 6,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SelectableText(
-                                        'Custom macOS apps',
-                                        style: GoogleFonts.albertSans(
-                                          fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.w500,
-                                          color: HomeWarmColors.platformMac,
-                                          shadows: const [
-                                            Shadow(
-                                              color: HomeWarmColors.labelShadow,
-                                              blurRadius: 6,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SelectableText(
-                                        'Custom web apps',
-                                        style: GoogleFonts.albertSans(
-                                          fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 18 : 20),
-                                          fontWeight: FontWeight.w500,
-                                          color: HomeWarmColors.platformWeb,
-                                          shadows: const [
-                                            Shadow(
-                                              color: HomeWarmColors.labelShadow,
-                                              blurRadius: 6,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: isMobile ? 10 : 12),
-                                      SelectableText(
-                                        'Windows & Linux',
-                                        style: GoogleFonts.albertSans(
-                                          fontSize: isMobile ? (wi < 400 ? 13 : 15) : (isTablet ? 17 : 19),
-                                          fontWeight: FontWeight.w500,
-                                          color: HomeWarmColors.platformDesktop,
-                                          shadows: const [
-                                            Shadow(
-                                              color: HomeWarmColors.labelShadow,
-                                              blurRadius: 4,
-                                              offset: Offset(0, 1),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                    SizedBox(height: 24),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: wi < 400 ? 12 : 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: SelectableText(
-                          'Just with single Codebase',
-                          textAlign: TextAlign.center,
-                          textDirection: TextDirection.ltr,
-                          style: GoogleFonts.albertSans(
-                            fontSize: isMobile ? (wi < 400 ? 16 : 18) : (isTablet ? 22 : 26),
-                            fontWeight: FontWeight.bold,
-                            color: HomeWarmColors.sectionAccent,
-                          ),
+                      child: Center(
+                        child: HomeHeroSection(
+                          wi: wi,
+                          isMobile: isMobile,
+                          isTablet: isTablet,
+                          imageBelowPlatforms: HeroPlatformsGif(screenWidth: wi),
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: he * 0.01,
+                    TrustBuildingHomeSections(
+                      wi: wi,
+                      isMobile: isMobile,
+                      isTablet: isTablet,
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile
-                            ? wi * 0.05
-                            : (isTablet ? wi * 0.08 : wi * 0.1),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: SelectableText(
-                          'that give you and your customers the best experience possible',
-                          textAlign: TextAlign.center,
-                          textDirection: TextDirection.ltr,
-                          style: GoogleFonts.albertSans(
-                            fontSize: isMobile ? (wi < 400 ? 14 : 16) : (isTablet ? 16 : 20),
-                            fontWeight: FontWeight.bold,
-                            color: HomeWarmColors.bodyEmphasis,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Center(
-                      child: SizedBox(
-                        width: wi * 0.5,
-                        child: const AppAutoScrollImage(),
-                      ),
-                    ),
-
-                    Transform.translate(
-                      offset: Offset(0, isMobile ? -12 : -18),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: SizedBox(
-                          width: wi * 0.5,
-                          height: wi * 0.5,
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            alignment: Alignment.center,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Opacity(
-                                  opacity: 0.8,
-                                  child: Image.asset(
-                                    'assets/images/my-gif.gif',
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: isMobile ? 16 : 24,
-                    ),
+                    SizedBox(height: isMobile ? 18 : 26),
                     // Title before backend sections
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -332,7 +67,7 @@ class HomeWidget extends StatelessWidget {
                       child: Center(
                         child: SelectableText(
                           'Your backend could be',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             fontSize: isMobile
                                 ? (wi < 400 ? 18 : 20)
                                 : (isTablet ? wi * 0.028 : wi * 0.032),

@@ -1,5 +1,27 @@
 import 'package:flutter/material.dart';
 
+/// Which of [ColorManager]’s gradient + border cards to paint.
+///
+/// On Flutter **web (HTML)**, a single [BoxDecoration] must not combine [gradient]
+/// and a rounded [border] in one pass. Use [ColorManager.gradientCardWithBorder]
+/// instead of putting both in one [BoxDecoration].
+enum GradientCardKind {
+  /// Portfolio / case-study / publication card chrome.
+  portfolioHighlight,
+
+  /// Login, profile, and dialog cards with teal-leaning border.
+  loginAuth,
+
+  /// Order / delivery form and related.
+  orderForm,
+
+  /// Sign-up and some admin sign-up style tiles.
+  signUpAuth,
+
+  /// Admin list/detail panels.
+  adminPanel,
+}
+
 class ColorManager {
   // Dark-first professional palette (tetradic anchors)
   static const backgroundDark = Color(0xFF1A1917);
@@ -20,18 +42,135 @@ class ColorManager {
   static const textSecondary = Color(0xFF4A4640);
   static const textMuted = Color(0xFF6E6860);
 
-  /// Portfolio screen (`portfolio_screen.dart`) typography on light shell.
-  static const portfolioTextBody = Color(0xFF4E3D1D);
-  static const portfolioTextTitle = Color(0xFF335551);
+  /// Portfolio screen (`portfolio_screen.dart`) typography on dark shell.
+  static const portfolioTextBody = Color(0xFFD1D5DB);
+  static const portfolioTextTitle = Colors.white;
 
   /// Light gray surfaces (cards, case study blocks on light backgrounds).
   static const containerSurface = Color(0xFFE8E6E3);
   static const containerSurfaceMuted = Color(0xFFDDDAD6);
   static const containerBorder = Color(0xFFC4BFBA);
 
-  /// Portfolio cards (design system highlight, case studies, apps, etc.): light gold wash, gold border, flat (no shadow).
-  static BoxDecoration portfolioHighlightCardDecoration({double borderRadius = 20}) {
+  /// Web-safe: gradient fill and border stroke in **separate** [DecoratedBox] layers
+  /// (replaces a single [BoxDecoration] with both [gradient] and [border]).
+  static Widget gradientCardWithBorder({
+    required GradientCardKind kind,
+    required double borderRadius,
+    required Widget child,
+    EdgeInsetsGeometry? padding,
+    double? width,
+  }) {
+    final br = BorderRadius.circular(borderRadius);
+    final LinearGradient gradient;
+    final Color borderColor;
+    switch (kind) {
+      case GradientCardKind.portfolioHighlight:
+        gradient = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accentGold.withValues(alpha: 0.12),
+            accentGold.withValues(alpha: 0.06),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.04),
+          ],
+        );
+        borderColor = accentGold.withValues(alpha: 0.5);
+        break;
+      case GradientCardKind.loginAuth:
+        gradient = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accentGold.withValues(alpha: 0.11),
+            primaryTeal.withValues(alpha: 0.12),
+            accentGold.withValues(alpha: 0.05),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+          ],
+        );
+        borderColor = primaryTeal.withValues(alpha: 0.48);
+        break;
+      case GradientCardKind.orderForm:
+        gradient = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accentGold.withValues(alpha: 0.11),
+            accentCoral.withValues(alpha: 0.11),
+            accentGold.withValues(alpha: 0.05),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+          ],
+        );
+        borderColor = accentCoral.withValues(alpha: 0.42);
+        break;
+      case GradientCardKind.signUpAuth:
+        gradient = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accentGold.withValues(alpha: 0.11),
+            secondaryPurple.withValues(alpha: 0.13),
+            accentGold.withValues(alpha: 0.05),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.05),
+          ],
+        );
+        borderColor = secondaryPurple.withValues(alpha: 0.45);
+        break;
+      case GradientCardKind.adminPanel:
+        gradient = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accentGold.withValues(alpha: 0.10),
+            secondaryPurple.withValues(alpha: 0.11),
+            accentGold.withValues(alpha: 0.06),
+            const Color(0xFFFFFFFF).withValues(alpha: 0.04),
+          ],
+        );
+        borderColor = secondaryPurple.withValues(alpha: 0.42);
+        break;
+    }
+    const double bw = 1.5;
+    return SizedBox(
+      width: width,
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(borderRadius: br),
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: br,
+                  gradient: gradient,
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: br,
+                  border: Border.all(color: borderColor, width: bw),
+                ),
+              ),
+            ),
+            if (padding != null) Padding(padding: padding, child: child) else child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Text on dark surfaces (drawer, overlays) — do not use [textPrimary] there.
+  static const onDarkPrimary = Color(0xFFF5F2EB);
+  static const onDarkSecondary = Color(0xFFC9C4BC);
+
+  // Backward-compatible decoration helpers used by existing screens.
+  static BoxDecoration portfolioHighlightCardDecoration({
+    double borderRadius = 16,
+  }) {
     return BoxDecoration(
+      borderRadius: BorderRadius.circular(borderRadius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -41,17 +180,15 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.04),
         ],
       ),
-      borderRadius: BorderRadius.circular(borderRadius),
-      border: Border.all(
-        color: accentGold.withValues(alpha: 0.5),
-        width: 1.5,
-      ),
+      border: Border.all(color: accentGold.withValues(alpha: 0.5), width: 1.5),
     );
   }
 
-  /// Login screen: gold + subtle **teal** wash; teal-leaning border (pairs with [primaryTeal] accents).
-  static BoxDecoration loginAuthCardDecoration({double borderRadius = 20}) {
+  static BoxDecoration loginAuthCardDecoration({
+    double borderRadius = 16,
+  }) {
     return BoxDecoration(
+      borderRadius: BorderRadius.circular(borderRadius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -62,17 +199,15 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.05),
         ],
       ),
-      borderRadius: BorderRadius.circular(borderRadius),
-      border: Border.all(
-        color: primaryTeal.withValues(alpha: 0.48),
-        width: 1.5,
-      ),
+      border: Border.all(color: primaryTeal.withValues(alpha: 0.48), width: 1.5),
     );
   }
 
-  /// Order Here form: gold + subtle **coral** wash; coral-leaning border (distinct from login/signup tints).
-  static BoxDecoration orderFormCardDecoration({double borderRadius = 20}) {
+  static BoxDecoration orderFormCardDecoration({
+    double borderRadius = 16,
+  }) {
     return BoxDecoration(
+      borderRadius: BorderRadius.circular(borderRadius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -83,17 +218,15 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.05),
         ],
       ),
-      borderRadius: BorderRadius.circular(borderRadius),
-      border: Border.all(
-        color: accentCoral.withValues(alpha: 0.42),
-        width: 1.5,
-      ),
+      border: Border.all(color: accentCoral.withValues(alpha: 0.42), width: 1.5),
     );
   }
 
-  /// Sign-up screen: gold + subtle **purple** wash; purple-leaning border (pairs with [secondaryPurple] accents).
-  static BoxDecoration signUpAuthCardDecoration({double borderRadius = 20}) {
+  static BoxDecoration signUpAuthCardDecoration({
+    double borderRadius = 16,
+  }) {
     return BoxDecoration(
+      borderRadius: BorderRadius.circular(borderRadius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -104,7 +237,6 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.05),
         ],
       ),
-      borderRadius: BorderRadius.circular(borderRadius),
       border: Border.all(
         color: secondaryPurple.withValues(alpha: 0.45),
         width: 1.5,
@@ -112,9 +244,11 @@ class ColorManager {
     );
   }
 
-  /// Admin panel (orders list/detail): gold + **purple** wash; distinct from auth/order forms.
-  static BoxDecoration adminPanelCardDecoration({double borderRadius = 20}) {
+  static BoxDecoration adminPanelCardDecoration({
+    double borderRadius = 16,
+  }) {
     return BoxDecoration(
+      borderRadius: BorderRadius.circular(borderRadius),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -125,17 +259,12 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.04),
         ],
       ),
-      borderRadius: BorderRadius.circular(borderRadius),
       border: Border.all(
         color: secondaryPurple.withValues(alpha: 0.42),
         width: 1.5,
       ),
     );
   }
-
-  /// Text on dark surfaces (drawer, overlays) — do not use [textPrimary] there.
-  static const onDarkPrimary = Color(0xFFF5F2EB);
-  static const onDarkSecondary = Color(0xFFC9C4BC);
 
   // Legacy aliases to avoid broad breakage in existing screens.
   static const white = textSecondary;

@@ -364,14 +364,14 @@ class PortfolioData {
       'https://sites.google.com/view/senior-interaction-product-d/home';
   static const String githubProfile = 'https://github.com/johnhcolani';
 
-  /// App grid order matches list order. Featured App Showcase order (first five): Service Flow → ASD USA → 4iDeas Portfolio Website → My Own Design System → Twin Scriptures; then the rest.
+  /// App grid order matches list order. Showcase order (first five): ASD USA → Service Flow → Twin Scriptures → My Own Design System → 4iDeas Portfolio Website; then the rest.
   static List<PortfolioApp> get apps => [
         PortfolioApp(
           id: 'service-flow',
           name: 'Service Flow',
           description:
               'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
-          imagePath: 'assets/images/4ideas/4ideas-web-app.png',
+          imagePath: serviceFlowFeaturedHeroPaths.first,
           showComingSoonOverlay: true,
           caseStudyId: 'service-flow',
         ),
@@ -379,7 +379,7 @@ class PortfolioData {
           id: 'asdusa',
           name: 'ASD USA',
           description:
-              'Multi-role operations platform for stone fabrication. Supports Admins, Sales Reps, Installers, Schedulers, and Clients. Features AI assistant Amy, role-based dashboards, and live project tracking. Owned end-to-end: strategy, UX/UI, design system, AI governance.',
+              'Enterprise multi-role Flutter + Firebase operations app (admin, sales, scheduler, installer, client): workflows, dashboards, governed AI, and adaptive UI across iOS, Android, and web. Full case study covers product thinking, architecture tradeoffs, and shipped work—not a screenshot gallery.',
           imagePath: 'assets/images/app_store/asd-app.png',
           appStoreUrl:
               'https://apps.apple.com/us/app/asdusa/id1588331742?platform=iphone',
@@ -393,7 +393,7 @@ class PortfolioData {
           name: '4iDeas - Portfolio Website',
           description:
               'Portfolio site: Flutter apps, backend services, product design. Responsive showcase, order form, modern UI. Flutter Web on Firebase.',
-          imagePath: 'assets/images/4ideas.png',
+          imagePath: 'assets/images/4ideas-avatar.png',
           appStoreUrl: null,
           playStoreUrl: null,
           webUrl: 'https://my-web-page-ef286.web.app/',
@@ -582,23 +582,25 @@ class PortfolioData {
     );
   }
 
-  /// App Showcase: Service Flow → ASD USA → 4iDeas Portfolio Website → My Own Design System → Twin Scriptures; then remaining apps in their original order.
+  /// App Showcase order (first five slots): **ASD** (enterprise proof) → **Service Flow** (B2B SaaS)
+  /// → **Twin Scriptures** (consumer / i18n depth) → **My Own Design System** (systems craft)
+  /// → **4iDeas portfolio site** (meta); then remaining apps.
   static List<PortfolioApp> orderAppsForShowcase(List<PortfolioApp> apps) {
     int? showcaseSlot(PortfolioApp a) {
       final id = a.id.toLowerCase();
       final name = a.name.toLowerCase();
-      if (id == 'service-flow' || name.contains('service flow')) return 0;
-      if (id == 'asdusa' || name.contains('asd usa')) return 1;
-      if (id == 'my-web-site' ||
-          (name.contains('4ideas') && name.contains('portfolio website'))) {
-        return 2;
-      }
+      if (id == 'asdusa' || name.contains('asd usa')) return 0;
+      if (id == 'service-flow' || name.contains('service flow')) return 1;
+      if (id == 'twin-scriptures') return 2;
       if (id == '4ideas-design-system' ||
           id == 'design_system' ||
           (name.contains('my own design system'))) {
         return 3;
       }
-      if (id == 'twin-scriptures') return 4;
+      if (id == 'my-web-site' ||
+          (name.contains('4ideas') && name.contains('portfolio website'))) {
+        return 4;
+      }
       return null;
     }
 
@@ -878,6 +880,19 @@ class PortfolioData {
         for (final name in _roseSeasonalScreenshotFileNames) '$_roseSeasonalAssetDir/$name',
       ];
 
+  /// Service Flow: iPhone simulator captures (`assets/images/service_flow/`), capture order.
+  static const List<String> serviceFlowFeaturedHeroPaths = <String>[
+    'assets/images/service_flow/service_flow_01.png',
+    'assets/images/service_flow/service_flow_02.png',
+    'assets/images/service_flow/service_flow_03.png',
+    'assets/images/service_flow/service_flow_04.png',
+    'assets/images/service_flow/service_flow_05.png',
+    'assets/images/service_flow/service_flow_06.png',
+    'assets/images/service_flow/service_flow_07.png',
+    'assets/images/service_flow/service_flow_08.png',
+    'assets/images/service_flow/service_flow_09.png',
+  ];
+
   /// Featured case studies are sorted by [PortfolioCaseStudy.order] ascending on the portfolio screen (lower = higher on the page).
   /// New featured study: add near the top here and give it the lowest `order` (e.g. 0); increase `order` on older studies if needed.
   static List<PortfolioCaseStudy> get caseStudies => [
@@ -894,14 +909,14 @@ class PortfolioData {
           heroImagePaths: roseChatSeasonalFeaturedHeroPaths,
           sections: [
             CaseStudySection(
-              title: 'Problem',
+              title: 'Business Problem and Search Intent',
               content:
                   '**Origin.** I conceived and designed the Rose Chat Seasonal Campaign Engine myself as one of my first major product initiatives in the United States—built to give users a **clearer, more attractive path** through the app and a **distinct seasonal flow** they could feel every time they opened chat. The goal was simple: move beyond a generic assistant and deliver something **purpose-built for engagement**—timed to moments that matter, visually alive, and easy to trust.\n\n'
                   '**Why it mattered.** The conversational AI layer had been **static and expensive to change**. Seasonal beats, campaign messaging, and onboarding that should feel fresh were trapped behind **release cycles**—slow for the business, invisible to users who deserved a product that felt cared for. Operations needed speed; users needed **continuity and delight** without sacrificing safety.\n\n'
                   '**The gap.** There was no governed way to ship **usable, on-brand seasonal experiences** on demand—only brittle one-offs or code drops. Closing that gap meant designing a system where **special flows** for users and **controlled rollout** for the team could finally live in the same product.',
             ),
             CaseStudySection(
-              title: 'Solution',
+              title: 'Solution and Product Direction',
               content:
                   'Designed and shipped a backend-driven campaign engine for Rose Chat where admins can configure seasonal messaging, greetings, visual themes, dynamic assets, and rollout timing from backend controls.\n\n'
                   'The system supports preview mode, fallback behavior, and kill-switch patterns so campaign changes can be tested and released safely without app redeploys.',
@@ -913,13 +928,13 @@ class PortfolioData {
               imagePaths: List<String>.from(roseChatSeasonalFeaturedHeroPaths),
             ),
             CaseStudySection(
-              title: 'My Role',
+              title: 'My Role and Responsibilities',
               content:
                   'Led product and UX strategy end-to-end: problem framing, information architecture, campaign UX flows, control-surface design for admins, and delivery alignment with engineering.\n\n'
                   'Defined design requirements for safe operations (preview, rollback, fallback), clear campaign states, and consistent conversational tone across contexts.',
             ),
             CaseStudySection(
-              title: 'System Architecture',
+              title: 'System Architecture and Delivery Stack',
               content:
                   'Architected a configurable backend model using Firebase services to drive campaign behavior at runtime.\n\n'
                   '• Firestore stores campaign definitions and metadata.\n'
@@ -935,7 +950,7 @@ class PortfolioData {
                   'Interaction states were intentionally designed for first-run moments, returning users, and campaign expiration so the AI experience feels intentional rather than cosmetic.',
             ),
             CaseStudySection(
-              title: 'Outcome',
+              title: 'Outcome and Business Impact',
               content:
                   'Rose Chat became a configurable AI surface instead of a hardcoded feature. Product and operations teams can launch seasonal experiences faster, reduce engineering dependency for campaign updates, and maintain safer releases through preview and fallback controls.\n\n'
                   'The result is a stronger AI product narrative: conversational UX as a governed, scalable system.',
@@ -953,8 +968,8 @@ class PortfolioData {
         ),
         PortfolioCaseStudy(
           id: 'service-flow',
-          title: 'Service Flow',
-          subtitle: 'Multi-tenant SaaS for field service workflows',
+          title: 'Service Flow (Multi-tenant SaaS UX Case Study)',
+          subtitle: 'Multi-tenant SaaS Product Design and Flutter Workflow Architecture',
           overview:
               'Service Flow is a Multi-tenant SaaS case study for structuring complex operational work across field teams and office teams. '
               'The focus is clarity under pressure: predictable navigation, legible hierarchy, tenant-safe data boundaries, and a design system that keeps product and engineering aligned. '
@@ -962,7 +977,8 @@ class PortfolioData {
           designApproach:
               'Systems-first IA, Multi-tenant SaaS constraints (isolation, configuration, role policy), and a single source of truth for UI tokens and components. '
               'The design system is maintained as a living document so specs stay shippable alongside the product.',
-          heroImagePath: 'assets/images/design_system/design-system.png',
+          heroImagePath: serviceFlowFeaturedHeroPaths.first,
+          heroImagePaths: serviceFlowFeaturedHeroPaths,
           sections: [
             CaseStudySection(
               title: 'Problem',
@@ -993,7 +1009,13 @@ class PortfolioData {
               content:
                   '**Information architecture** built around jobs and timelines—not feature silos. **Progressive disclosure** so critical actions stay visible while secondary detail stays one tap away.\n\n'
                   '**Design system** as the contract between design and engineering: semantic color, type scale, spacing, radii, and component states documented in one place.\n\n'
-                  'The next section links to the full ServiceFlow design spec (HTML).',
+                  'The next section shows simulator captures; after that, the full ServiceFlow design spec (HTML).',
+            ),
+            CaseStudySection(
+              title: 'Product UI in context',
+              content:
+                  'iPhone simulator captures of the Service Flow experience—navigation, role surfaces, and primary workflows. Order follows the capture sequence. Tap any screen to view full size.',
+              imagePaths: serviceFlowFeaturedHeroPaths,
             ),
             CaseStudySection(
               title: 'Design system',
@@ -1007,60 +1029,70 @@ class PortfolioData {
         ),
         PortfolioCaseStudy(
           id: 'asd',
-          title: 'Absolute Stone Design (ASD)',
-          subtitle: 'Multi‑Role Operations Platform',
+          title: 'Absolute Stone Design (ASD) — Enterprise Flutter Operations Case Study',
+          subtitle: 'Enterprise Multi-role Product Design, Flutter Engineering, and Firebase Delivery',
           overview:
-              'One system replaced phone, text, and spreadsheets: visible state, less coordination, scalable onboarding, human-governed AI. '
-              'Operations platform for stone fabrication and installation. End-to-end ownership: product strategy, UX/UI, design system, AI governance, data architecture, cross-platform (iOS, Android, Web). '
-              'Single data model, role-based permissions, visible workflows—config and integrations co-specified with engineering for scale.',
+              'ASD is a production Flutter and Firebase platform for stone fabrication and installation: multiple internal roles, external clients, live job state, admin governance, and an AI assistant scoped for real support load—not a demo. '
+              'This case study is written for hiring managers: how the problem was framed, what I owned, where UX and architecture meet, and what shipped. Screens illustrate breadth and craft; they are evidence, not decoration.',
           designApproach:
-              'Structured narrative: Problem → Context → System Complexity → Solution → Constraints & Trade-offs → Outcome & Impact. '
-              'Design strategy: systems thinking, role-based IA, explicit governance (audit, human-in-the-loop AI). Partnership with engineering on data model, workflow logic, and config-driven behavior. WCAG 2.2 AA for core flows.',
+              'Read in order: overview of the product, business context, explicit ownership, constraints, shipped work (with representative UI), then outcomes and stack. '
+              'I do not quote revenue or fabricated KPIs; impact is described in operational terms—visibility, coordination load, governance, and release behavior—that you can validate in conversation or reference checks.',
           order: 10,
           heroImagePath: asdRoleSpecificHeroPaths.first,
           heroImagePaths: asdRoleSpecificHeroPaths,
           sections: [
             CaseStudySection(
-              title: 'Problem',
+              title: 'Project overview',
               content:
-                  'Handoffs, not a system. Phone, text, spreadsheets, ad-hoc tools. Status in people\'s heads; clients blind; installers manual; sales and scheduling decoupled from field; admins without central control.\n\n'
-                  '**What was broken:** No single place for "where is my job?" or ownership. Coordination consumed hours; duplicate data, version conflicts. Adding users or changing content = manual, opaque steps; scaling added process, not capability. No structured data or governance for AI.\n\n'
-                  '**Goal:** One system—unified operations, visible handoffs and state, AI with human oversight—without new process or IT overhead.',
+                  '**Product:** A single cross-platform application (iOS, Android, web) backing day-to-day operations for a stone fabrication and installation business.\n\n'
+                  '**Who uses it:** Internal roles include **admin**, **sales**, **scheduler**, and **installer**; **clients** use a dedicated experience for status, materials, appointments, billing context, and guided assistance. Each role has a different mental model and device reality; the product is one system with strict permission boundaries—not five disconnected tools.\n\n'
+                  '**What “done” meant:** Role-specific workflows, operational truth in the product (not in chat threads), configuration and content that ops could change without redeploying app binaries, governed AI assistance with human oversight, and a design system that kept implementation aligned as the surface area grew.',
             ),
             CaseStudySection(
-              title: 'Context',
+              title: 'Business and problem context',
               content:
-                  '**Domain:** Stone fabrication and installation—measure → fabricate → install → maintain. Work flows through stages and roles; the system models that pipeline, not just screens.\n\n'
-                  '**Five roles, five surfaces:** Admin, Sales, Scheduler, Installer, Client. Different permissions, data needs, devices (desktop → mobile, often offline). Same entities serve all five; UI and backend enforce what each role sees and can do.\n\n'
-                  '**Pre-system:** No source of truth. "Where is my job?" landed on people. Scope: front-end, operational logic, ownership of config and integrations.',
+                  '**The real cost:** Coordination work lived in phone calls, texts, and spreadsheets. Job status lived in people’s heads; customers lacked a durable place to answer “where are we?” Sales, scheduling, and the field were often out of sync; repeating data and slow handoffs were normal. Scaling the team scaled coordination overhead— not throughput.\n\n'
+                  '**What the business needed:** A **shared operational picture**: predictable workflows, visible state transitions, and permissions that match how power and responsibility actually work in the org. AI was attractive only if it reduced repetitive inquiry **without** inventing policy or bypassing accountability.\n\n'
+                  '**Why a single platform mattered:** Separate apps or ad-hoc tools would have fractured the data model and multiplied handoff failures. The bet was upfront product discipline—modeling entities, states, and roles clearly—for long-term maintainability.',
             ),
             CaseStudySection(
-              title: 'System Complexity',
+              title: 'My role and responsibilities',
               content:
-                  '**One platform, one data model, many surfaces.**\n\n'
-                  'Flow: Sales creates project → Scheduler assigns Installer → Installer updates status → Client sees it live → Admin has full audit trail. Front-end maps to backend rules (read/write, notification triggers, state propagation). Flows and permission boundaries defined first; UI exposes the right slice per role.\n\n'
-                  '**Shared entities:** Users, Projects, Events, Materials, Contracts, AI conversations. Permissions govern visibility and actions. Stateful workflows—status changes trigger notifications and audit. Governance (roles, content, AI) Admin-controlled, no code deploys.\n\n'
-                  '**Integrations & backend:** Payments, email, GPS, hardware, offline sync. Design respected what each integration provides and where logic lives. Partnership with engineering kept workflow logic feasible and scalable.\n\n'
-                  '**Cross-platform:** One codebase (iOS, Android, Web). Layout adapts by device and viewport; front-end matches backend capabilities.',
+                  '**Ownership:** End-to-end product design and engineering on the client-facing experience: discovery and synthesis with stakeholders, information architecture and workflows per role, UX/UI execution, design-system structure, Flutter implementation aligned to those decisions, and collaboration on Firebase-backed behavior (data boundaries, auth, operational features, and AI-adjacent flows).\n\n'
+                  '**How I worked:** Treated the product as a system—permissions, notifications, auditability, and config propagation—not as a set of screens. Partnered closely on what belonged in client code vs. backend rules, what had to be config-driven for ops, and where the assistant was allowed to act.\n\n'
+                  '**Explicit non-claims:** This was not “design only” handoff. It was iterative build with architectural consequence: role routing, dashboard logic, field constraints, and clarity under time pressure for installers and staff.',
             ),
             CaseStudySection(
-              title: 'Solution',
+              title: 'UX and technical challenges',
               content:
-                  '**One product, one source of truth.** Single product, not separate apps—cross-role visibility, permissions, and workflows consistent. Trade-off: more upfront design for long-term clarity and scale.\n\n'
-                  '**How it works:** Post-login, role-based routing and permission checks define what each user sees and can do. Backend enforces read/write; UI reflects it. Config is central: Admin promotes users, manages content and materials, configures Amy, reviews and corrects answers—no code deploys. Partnership with engineering: config-driven vs. fixed in code so the product scales without dev dependency.\n\n'
-                  '**AI:** Governed assistant—first-line for common questions, escalation and human fallback. Knowledge base and responses admin-owned, versioned, auditable.\n\n'
-                  '**Workflow logic:** Status → notifications and audit. Config → propagation to all surfaces. Offline sync → same data model. Built for feasibility and maintainability.\n\n'
-                  '**By role:** Sales—leads, contracts, invoices, tracking. Scheduler—calendar, events, allocation. Installer—one-tap start/status, auto notifications, live GPS; mobile-first, offline-capable. Client—status, materials, appointments, invoices, Amy. Shared design system; same journeys from phone to desktop.',
+                  '**Multi-role truth:** The same jobs, people, and materials appear differently by role; the UX had to prevent “wrong action” errors (e.g., field actions visible where unsafe) while staying fast for experts.\n\n'
+                  '**Field reality:** Installers work with partial connectivity, interruption, and glare; flows had to stay short, legible, and forgiving. Schedulers and sales often work from desktops with dense calendars and documents—different density, same underlying entities.\n\n'
+                  '**Governed AI:** The assistant had to offload routine questions without becoming an opaque decision-maker. That required clear escalation paths, admin-controlled knowledge and tone, and instrumentation-friendly conversation patterns—not a chat bolt-on.\n\n'
+                  '**Configuration at scale:** Training and promoting roles, updating merchandised materials, and adjusting AI-facing content needed to land without engineering gatekeeping every change—while still being safe and traceable.\n\n'
+                  '**Accessibility target:** Core flows aimed at **WCAG 2.2 AA**-level discipline where it mattered most for real users (contrast, focus, structure, error clarity)—especially mixed environments (office vs. field).',
             ),
             CaseStudySection(
-              title: 'Adaptive Platform for Fully Responsive Screens',
+              title: 'What I designed and built',
               content:
-                  '**Platform and viewport as two lenses.** One codebase, many surfaces. Adaptive = where the app runs. Responsive = how much room we have. Both shape hierarchy, density, and interaction.\n\n'
-                  '• **Responsive**: Breakpoints aren’t decorative—they reorder information so the same task stays coherent on a narrow phone, a tablet in the field, or a wide admin desktop. Primary actions stay thumb-reachable on small screens; data-heavy views breathe on large ones. Typography and spacing scale with tokens so nothing feels “shrunk” or “stretched”—just appropriate for the context.\n\n'
-                  '• **iOS & Android**: Native-feel navigation, touch-first targets, and platform idioms only where they reduce friction—not novelty for its own sake.\n\n'
-                  '• **Web**: Keyboard paths, hover affordances where useful, and dashboards tuned for sustained desktop use (admin, sales) without abandoning mobile web where clients check status.\n\n'
-                  '• **Shared foundation**: One design system and data layer; layout and affordances shift. No duplicate flows—just deliberate adaptation.\n\n'
-                  'The screens below show the same journeys across form factors: one source of truth, intentionally responsive and platform-aware.',
+                  '**Role-native surfaces:** Dashboards and flows for admin, sales, scheduler, and installer—each optimized for the decisions that role makes daily, grounded in a single permission model.\n\n'
+                  '**Client visibility:** A path for customers to see project-related status and take next steps appropriate to their relationship with the business—without exposing internal operations inappropriately.\n\n'
+                  '**Design system:** Token-driven foundations (color roles, type, spacing, radii) and repeatable patterns so new work did not invent one-off UI—critical when multiple platforms and densities ship together.\n\n'
+                  'Screens below are **representative**—they show breadth (operations, sales, scheduling, field) and system craft, not every edge case in the backlog.',
+              imagePaths: [
+                'assets/images/admin/admin_dashboard.jpeg',
+                'assets/images/sales_rep/salesRep_dashboard.png',
+                'assets/images/scheduler/Scheduler dashboard.png',
+                'assets/images/installer/installer dashboard.png',
+                'assets/images/design_system/design_system_colors.png',
+                'assets/images/design_system/design_system_typography.png',
+              ],
+            ),
+            CaseStudySection(
+              title: 'Adaptive Platform',
+              content:
+                  '**One codebase, multiple form factors.** “Adaptive” here means the same product meets users where they are: pocket phones, tablets in the field, and desktop dashboards for sustained work. “Responsive” means density and hierarchy change with viewport—breakpoints support real tasks, not decorative reflows.\n\n'
+                  '**Shared foundation:** One design language and data model; layouts and affordances shift. Primary actions stay reachable on small screens; data-heavy views get room on large ones. Platform idioms appear where they reduce friction—not for novelty.\n\n'
+                  'The captures below are landscape-oriented execution slices that show cross-form behavior without pretending the phone experience is identical to a full-width admin console.',
               imagePaths: [
                 'assets/images/asd_app_adaptive/asd-001.jpg',
                 'assets/images/asd_app_adaptive/asd-002.jpg',
@@ -1068,177 +1100,41 @@ class PortfolioData {
                 'assets/images/asd_app_adaptive/asd-004.jpg',
                 'assets/images/asd_app_adaptive/asd-005.jpg',
                 'assets/images/asd_app_adaptive/asd-006.jpg',
-                'assets/images/asd_app_adaptive/asd-007.jpg',
-                'assets/images/asd_app_adaptive/asd-008.jpg',
-                'assets/images/asd_app_adaptive/asd-009.jpg',
-                'assets/images/asd_app_adaptive/asd-010.jpg',
-                'assets/images/asd_app_adaptive/asd-011.jpg',
-                'assets/images/asd_app_adaptive/asd-012.jpg',
               ],
             ),
             CaseStudySection(
-              title: 'Design System (v3.0.11)',
+              title: 'Product decisions, workflows, and AI governance',
               content:
-                  '**Token-based design system** across mobile and web: dark-first UI, semantic color (role-specific palettes), typography and spacing, grid, component library. Consistent patterns across platforms.\n\n'
-                  '**Impact:** Faster delivery, fewer inconsistencies, less rework, single source for UI.',
-              imagePaths: [
-                'assets/images/design_system/design_system_colors.png',
-                'assets/images/design_system/design_system_typography.png',
-                'assets/images/design_system/design_system_spacing.png',
-                'assets/images/design_system/design_system_borderRadius.png',
-                'assets/images/design_system/design_system_icon_grid.png',
-              ],
-            ),
-            CaseStudySection(
-              title: 'Admin Dashboard',
-              content:
-                  '**Control layer for config and governance.**\n\n'
-                  'Admins promote users, control home content and materials, configure chat and AI—no dev involvement. Config flows surfaced and guarded: what takes effect where, dependencies, failure modes. Engineering: config stored and propagated, permissions enforced.\n\n'
-                  '**Outcome:** Faster onboarding, fewer support requests, safe scaling.',
-              imagePaths: [
-                'assets/images/admin/admin_dashboard.jpeg',
-                'assets/images/admin/admin_home_screen.jpeg',
-                'assets/images/admin/admin_user_management.jpeg',
-                'assets/images/admin/admin_promote_to_salesRep.jpeg',
-                'assets/images/admin/admin_setting.jpeg',
-              ],
-            ),
-            CaseStudySection(
-              title: 'Role‑Specific Dashboards',
-              content:
-                  '**One role, one dashboard.** Responsibilities and permissions drive what each sees.\n\n'
-                  'Sales — Leads, contracts. Scheduler — Coordination, planning. Installer — Job execution, live tracking.',
-              imagePaths: [
-                'assets/images/sales_rep/salesRep_dashboard.png',
-                'assets/images/sales_rep/salesRep_home.png',
-                'assets/images/installer/installer dashboard.png',
-                'assets/images/installer/installer home screen.png',
-                'assets/images/scheduler/Scheduler dashboard.png',
-                'assets/images/scheduler/Scheduler dashboard 01.png',
-              ],
-            ),
-            CaseStudySection(
-              title: 'Sales Representative Experience',
-              content:
-                  '**Leads, contracts, client relationships** in one place. Lead management, contracts, invoices, payment tracking, project and performance analytics.',
-              imagePaths: [
-                'assets/images/sales_rep/salesRep_dashboard.png',
-                'assets/images/sales_rep/salesRep_home.png',
-                'assets/images/sales_rep/salesRep_client.png',
-                'assets/images/sales_rep/salesRep_project.png',
-                'assets/images/sales_rep/create_invoice_01.png',
-                'assets/images/sales_rep/performance analytics.png',
-              ],
-            ),
-            CaseStudySection(
-              title: 'Scheduler Experience',
-              content:
-                  '**Jobs and team schedules** in one view. Calendar scheduling, event creation, team and resource allocation, date and time pickers.',
-              imagePaths: [
-                'assets/images/scheduler/Scheduler dashboard.png',
-                'assets/images/scheduler/Scheduler dashboard 01.png',
-                'assets/images/scheduler/Create Event.png',
-                'assets/images/scheduler/Date Picker.png',
-                'assets/images/scheduler/Time Picker.png',
-              ],
-            ),
-            CaseStudySection(
-              title: 'Client Experience',
-              content:
-                  '**Full visibility** into projects, orders, and communication. Project tracking, materials, appointments, invoices, payment, direct contact with sales, Amy for quick questions.',
-              // imagePaths: [
-              //   'assets/images/Clients/Home/Bottom Nav/Home03.png',
-              //   'assets/images/Clients/Home/Bottom Nav/Home04.png',
-              //   'assets/images/Clients/CategoryButtons/My Project.png',
-              //   'assets/images/Clients/CategoryButtons/Project Tracker.png',
-              //   'assets/images/Clients/CategoryButtons/Book Appointment.png',
-              //   'assets/images/Clients/CategoryButtons/invoice.png',
-              //   'assets/images/Clients/CategoryButtons/Chat with SalesRep.png',
-              // ],
-            ),
-            CaseStudySection(
-              title: 'Installer Experience',
-              content:
-                  '**Field-first:** Variable environments, limited attention and connectivity. One-tap start/status, auto client notifications, live GPS. Mobile-first flows for speed and clarity.\n\n'
-                  '**Result:** Fewer "where is my installer?" calls; accurate status; higher task completion.',
-              imagePaths: [
-                'assets/images/installer/installer dashboard.png',
-                'assets/images/installer/installer home screen.png',
-                'assets/images/installer/installer on the map.png',
-                'assets/images/installer/job history.png',
-                'assets/images/installer/installer profile.png',
-              ],
-            ),
-            CaseStudySection(
-              title: 'AI Workflow & Governance',
-              content:
-                  '**Governed assistant, not autonomous agent.** First-line responder with human oversight.\n\n'
-                  '**Why:** Client questions overloaded sales. Constraint: AI cannot decide or misinform. Solution: AI handles common questions; complex or sensitive escalates.\n\n'
-                  '**Architecture:** Knowledge base—Admin-controlled, versioned, test before prod, structured Q&A, confidence scoring. Conversation flow—common questions (materials, services, pricing), escalation triggers, human fallback when confidence low. Audit & correction—all logged, Admin flags errors, knowledge base updated.\n\n'
-                  '**Governance:** Admin controls what AI says, when it responds (test vs. prod), and corrects. Zero autonomous business-critical decisions.\n\n'
-                  '**Outcome:** Routine inquiries deflected to AI; repetitive sales questions down; oversight keeps the system correctable and improvable.',
+                  '**Workflow as product:** State changes (assignment, progress, completion) tie to notifications and history so coordination is visible—not memorized. That design choice has backend implications; UI and rules were developed together.\n\n'
+                  '**AI product thinking:** The assistant is positioned as **first-line support** with human oversight: structured knowledge, administrative review, and a safe path when the model should not guess. Product design included failure states, escalation, and what “success” means for both the client and the business.\n\n'
+                  '**Operational configuration:** Materials and merchandising flows are intentionally admin-driven so marketing and ops iteration does not depend on an app release for every tweak—within guardrails.\n\n'
+                  'Supporting screens cover **AI administration** and **content surfaces** that illustrate how governance and iteration were meant to work in practice.',
               imagePaths: [
                 'assets/images/admin/admin_amy_manager.jpeg',
                 'assets/images/admin/admin_chat_with_amy.jpeg',
                 'assets/images/admin/admin_Ai_knowledge_base.jpeg',
-              ],
-            ),
-            CaseStudySection(
-              title: 'Content & Material Management',
-              content:
-                  '**Config, not code.** Admins manage trending, new, and recommended materials. Content flows from Admin to all clients—no redeploy. Storage and delivery designed so content refreshes without releases.',
-              imagePaths: [
                 'assets/images/admin/admin_trending_material.jpeg',
-                'assets/images/admin/admin_new_material.jpeg',
-                'assets/images/admin/admin_popular_material.jpeg',
-                'assets/images/admin/admin_recommended_image.jpeg',
               ],
             ),
             CaseStudySection(
-              title: 'Accessibility & Usability',
+              title: 'Outcome, impact, and technologies',
               content:
-                  '**WCAG 2.2 AA** for core flows: contrast, focus states, typography, predictable navigation and errors. Critical for field and low-attention contexts.',
-            ),
-            CaseStudySection(
-              title: 'Shipping & Platforms',
-              content:
-                  '**One codebase** — iOS, Android, Web. Shared design system. QR distribution for fast onboarding. Single data layer so new features and config don\'t fragment the product. Lower maintenance; consistent behavior across roles and devices.',
-            ),
-            CaseStudySection(
-              title: 'Constraints & Trade-offs',
-              content:
-                  '• **Unified vs. separate apps** — One platform, consistent data and permissions. Higher upfront complexity for long-term clarity.\n'
-                  '• **AI** — Routine only; complex or sensitive escalates. Governance explicit; audit and permissions block autonomous decisions.\n'
-                  '• **Offline & field** — Data model and sync support offline; UI and backend agree on offline behavior and reconciliation.\n'
-                  '• **Accessibility** — WCAG 2.2 AA for field and office.\n'
-                  '• **Single codebase** — One design system and data layer; layout adapts by platform. One source of truth for behavior and styling.',
-            ),
-            CaseStudySection(
-              title: 'Outcome & Impact',
-              content:
-                  '**Before → After**\n\n'
-                  '**Visibility** — Was: status in heads and spreadsheets, clients blind. Now: one source of truth, real-time job state, "where is my job?" in the product.\n'
-                  '**Coordination** — Was: hours on phone and text. Now: workflows visible and automated, handoffs and permissions consistent.\n'
-                  '**Scalability** — Was: manual, opaque steps. Now: self-service role promotion, config-driven content, onboarding from days to minutes.\n'
-                  '**Trust** — Was: no record. Now: actions and AI conversations logged and reviewable.\n'
-                  '**AI** — Was: no structured data or governance. Now: Amy handles routine with oversight; conversations correctable.\n\n'
-                  '**Shipped:** iOS, Android, Web. One design system and data layer. QR onboarding. Integrations (payments, notifications, GPS, offline) with specified behavior and failure modes. Front-end, backend, and config co-specified from the start—single source of truth, fewer handoff failures, scalable without proportional process growth.\n\n'
-                  '**Next:** Deeper analytics, installer workflows (QA, signatures, checklists), stronger scheduling automation—same system.',
-            ),
-            CaseStudySection(
-              title: 'Next Steps',
-              content:
-                  '• Advanced analytics dashboards\n'
-                  '• Expanded installer workflows (QA, signatures, checklists)\n'
-                  '• AI feedback loops tied to performance metrics\n'
-                  '• Further automation in scheduling and operations',
+                  '**Outcome and impact (honest framing):**\n'
+                  'Where instrumented “before/after metrics” were not run as an engagement KPI, the impact story is best stated in **operational terms** you can diligence: job state became **legible in the product** instead of distributed across channels; client and internal visibility improved relative to the prior patchwork; onboarding and role changes could move through **admin flows** rather than bespoke requests; AI-assisted interactions were designed to be **reviewable and correctable** rather than a black box.\n\n'
+                  'Quantified business outcomes vary by how the org measures (ticket volume, cycle time, CS inquiry mix). What I can stand behind is **shipping behavior**: a coherent multi-role system, a governable AI surface, and a codebase structure intended to keep cost of change manageable as requirements evolve.\n\n'
+                  '**Technologies used:**\n'
+                  '• **Flutter** — cross-platform client; shared UI and navigation with platform-appropriate adaptation.\n'
+                  '• **Firebase** — authentication, Firestore-backed operational data, functions where server-side behavior was required, storage and hosting as appropriate to the deployment, messaging where push was part of the solution.\n'
+                  '• **Product / UX** — workflow mapping, role IA, dashboard and field flows, design system foundations.\n'
+                  '• **AI product integration** — assistant UX, admin governance and knowledge workflows tied to real operational policy.\n\n'
+                  '**Forward-looking:** Deeper analytics, richer installer checklists and QA capture, and stronger scheduling automation are natural extensions—the architecture was meant to absorb that kind of growth without rewriting from scratch.',
             ),
           ],
         ),
         PortfolioCaseStudy(
           id: 'twin-scriptures',
-          title: 'Twin Scriptures',
-          subtitle: 'Consumer Spiritual App',
+          title: 'Twin Scriptures (Personalized Spiritual App Case Study)',
+          subtitle: 'Consumer Product Design with Flutter, Personalization, and RTL UX',
           overview:
               'Scripture reading that feels personal and culturally respectful. Replaced long forms with visual preference selection—themes, fonts, seasons, emotions—so users shape the UI. '
               'Persian–English and Turkish–English, RTL support, multi-platform. "Show, Don\'t Ask" design strategy; high onboarding completion and strong user feedback on personalization.',
@@ -1425,6 +1321,26 @@ class PortfolioData {
       }
     }
     if (local == null) return remote;
+
+    // Service Flow hero is shipped in the app bundle; Firestore copy may lag and
+    // would otherwise win whenever both heroPath and heroPaths are set.
+    if (remote.id == 'service-flow' &&
+        local.heroImagePath != null &&
+        local.heroImagePath!.trim().isNotEmpty &&
+        local.heroImagePaths != null &&
+        local.heroImagePaths!.isNotEmpty) {
+      return PortfolioCaseStudy(
+        id: remote.id,
+        title: remote.title,
+        subtitle: remote.subtitle,
+        overview: remote.overview,
+        designApproach: remote.designApproach,
+        heroImagePath: local.heroImagePath,
+        heroImagePaths: List<String>.from(local.heroImagePaths!),
+        sections: remote.sections,
+        order: remote.order,
+      );
+    }
 
     final remoteH = remote.heroImagePath?.trim();
     final hasRemoteHero = remoteH != null && remoteH.isNotEmpty;

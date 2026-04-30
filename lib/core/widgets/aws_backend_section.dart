@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/core/design_system/responsive.dart';
 import 'package:sizer/sizer.dart';
-import '../ColorManager.dart';
 
 class AWSBackendSection extends StatelessWidget {
   final double wi;
@@ -15,46 +15,59 @@ class AWSBackendSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final bodyAlign = isDesktop ? TextAlign.start : TextAlign.center;
+    final colCross = isDesktop
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.center;
     final List<Map<String, String>> services = [
       {
         'name': 'EC2',
         'iconPath': 'assets/icons/ec2.png',
-        'description': 'Scalable virtual servers in the cloud with flexible compute capacity'
+        'description':
+            'Scalable virtual servers in the cloud with flexible compute capacity'
       },
       {
         'name': 'Lambda',
         'iconPath': 'assets/icons/lambda.png',
-        'description': 'Run code without managing servers - pay only for compute time used'
+        'description':
+            'Run code without managing servers - pay only for compute time used'
       },
       {
         'name': 'S3 Storage',
         'iconPath': 'assets/icons/s3.png',
-        'description': 'Object storage service with industry-leading scalability and durability'
+        'description':
+            'Object storage service with industry-leading scalability and durability'
       },
       {
         'name': 'RDS Database',
         'iconPath': 'assets/icons/rds.png',
-        'description': 'Managed relational database service (MySQL, PostgreSQL, etc.)'
+        'description':
+            'Managed relational database service (MySQL, PostgreSQL, etc.)'
       },
       {
         'name': 'API Gateway',
         'iconPath': 'assets/icons/api-gateway.png',
-        'description': 'Create, publish, and manage REST and WebSocket APIs at scale'
+        'description':
+            'Create, publish, and manage REST and WebSocket APIs at scale'
       },
       {
         'name': 'DynamoDB',
         'iconPath': 'assets/icons/dynamodb.png',
-        'description': 'Fast NoSQL database with single-digit millisecond performance'
+        'description':
+            'Fast NoSQL database with single-digit millisecond performance'
       },
       {
         'name': 'CloudFront',
         'iconPath': 'assets/icons/cloudfront.png',
-        'description': 'Global content delivery network for fast, secure content delivery'
+        'description':
+            'Global content delivery network for fast, secure content delivery'
       },
       {
         'name': 'SNS/SQS',
         'iconPath': 'assets/icons/sns.png',
-        'description': 'Message queuing and notification services for decoupled applications'
+        'description':
+            'Message queuing and notification services for decoupled applications'
       },
     ];
 
@@ -69,30 +82,32 @@ class AWSBackendSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ColorManager.primaryTeal.withValues(alpha: 0.14),
-            ColorManager.secondaryPurple.withValues(alpha: 0.16),
+            const Color(0xFF111827),
+            const Color(0xFF232F3E),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ColorManager.primaryTeal.withValues(alpha: 0.35),
+          color: const Color(0xFFFF9900).withValues(alpha: 0.55),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: ColorManager.primaryTeal.withValues(alpha: 0.22),
+            color: const Color(0xFFFF9900).withValues(alpha: 0.18),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: colCross,
         mainAxisSize: MainAxisSize.min,
         children: [
           // AWS Logo/Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: isDesktop
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -107,6 +122,7 @@ class AWSBackendSection extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/aws.png',
                     fit: BoxFit.contain,
+                    semanticLabel: 'Amazon Web Services logo',
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
                         Icons.cloud,
@@ -120,10 +136,12 @@ class AWSBackendSection extends StatelessWidget {
               SizedBox(width: isMobile ? 12 : 16),
               SelectableText(
                 'AWS',
-                style: GoogleFonts.albertSans(
-                  fontSize: isMobile ? (wi < 400 ? 24.sp * 1.3 : 28.sp * 1.3) : wi * 0.028,
+                style: GoogleFonts.roboto(
+                  fontSize: isMobile
+                      ? (wi < 400 ? 24.sp * 1.3 : 28.sp * 1.3)
+                      : wi * 0.028,
                   fontWeight: FontWeight.bold,
-                  color: ColorManager.textPrimary,
+                  color: const Color(0xFFFF9900),
                 ),
               ),
             ],
@@ -131,12 +149,16 @@ class AWSBackendSection extends StatelessWidget {
           SizedBox(height: isMobile ? 16 : 24),
           SelectableText(
             'Enterprise Cloud Infrastructure',
-            style: GoogleFonts.albertSans(
-              fontSize: isMobile ? (wi < 400 ? 16.sp * 1.3 * 0.7 * 0.7 * 0.8 : 18.sp * 1.3 * 0.7 * 0.7 * 0.8) : wi * 0.018,
-              color: ColorManager.textSecondary,
+            style: GoogleFonts.roboto(
+              fontSize: isMobile
+                  ? (wi < 400
+                      ? 16.sp * 1.3 * 0.7 * 0.7 * 0.8
+                      : 18.sp * 1.3 * 0.7 * 0.7 * 0.8)
+                  : wi * 0.018,
+              color: const Color(0xFFE5E7EB),
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
+            textAlign: bodyAlign,
           ),
           SizedBox(height: isMobile ? 20 : 28),
           // Services List
@@ -159,7 +181,8 @@ class AWSBackendSection extends StatelessWidget {
                 return Container(
                   width: double.infinity,
                   margin: EdgeInsets.only(
-                    bottom: index < services.length - 1 ? (isMobile ? 8 : 12) : 0,
+                    bottom:
+                        index < services.length - 1 ? (isMobile ? 8 : 12) : 0,
                   ),
                   padding: EdgeInsets.all(isMobile ? (wi < 400 ? 14 : 16) : 20),
                   decoration: BoxDecoration(
@@ -170,8 +193,9 @@ class AWSBackendSection extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: colCross,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: isMobile ? 50 : wi * 0.05,
@@ -184,6 +208,7 @@ class AWSBackendSection extends StatelessWidget {
                         child: Image.asset(
                           service['iconPath']!,
                           fit: BoxFit.contain,
+                          semanticLabel: '${service['name'] ?? 'AWS'} icon',
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
                               Icons.broken_image,
@@ -193,31 +218,33 @@ class AWSBackendSection extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(width: isMobile ? 12 : 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SelectableText(
-                              service['name']!,
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile ? (wi < 400 ? 14.sp * 1.3 * 0.7 * 0.7 : 16.sp * 1.3 * 0.7 * 0.7) : wi * 0.018,
-                                color: ColorManager.textPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: isMobile ? 6 : 8),
-                            SelectableText(
-                              service['description'] ?? '',
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile ? (wi < 400 ? 12.sp * 1.3 * 0.7 : 14.sp * 1.3 * 0.7) : (wi < 1024 ? 11 : 13),
-                                color: ColorManager.textSecondary,
-                                fontWeight: FontWeight.w400,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
+                      SizedBox(height: isMobile ? 10 : 12),
+                      SelectableText(
+                        service['name']!,
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400
+                                  ? 14.sp * 1.3 * 0.7 * 0.7
+                                  : 16.sp * 1.3 * 0.7 * 0.7)
+                              : wi * 0.018,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 6 : 8),
+                      SelectableText(
+                        service['description'] ?? '',
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400
+                                  ? 12.sp * 1.3 * 0.7
+                                  : 14.sp * 1.3 * 0.7)
+                              : (wi < 1024 ? 11 : 13),
+                          color: const Color(0xFFD1D5DB),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
                         ),
                       ),
                     ],

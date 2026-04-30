@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/core/design_system/responsive.dart';
 import 'package:sizer/sizer.dart';
-import '../ColorManager.dart';
 
 class FirebaseBackendSection extends StatelessWidget {
   final double wi;
@@ -15,26 +15,35 @@ class FirebaseBackendSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+    final bodyAlign = isDesktop ? TextAlign.start : TextAlign.center;
+    final colCross = isDesktop
+        ? CrossAxisAlignment.start
+        : CrossAxisAlignment.center;
     final List<Map<String, String>> services = [
       {
         'name': 'Firestore',
         'iconPath': 'assets/icons/firestore.png',
-        'description': 'NoSQL database for real-time data synchronization and offline support'
+        'description':
+            'NoSQL database for real-time data synchronization and offline support'
       },
       {
         'name': 'Authentication',
         'iconPath': 'assets/icons/auth.png',
-        'description': 'Secure user authentication with multiple providers (Email, Google, Facebook, etc.)'
+        'description':
+            'Secure user authentication with multiple providers (Email, Google, Facebook, etc.)'
       },
       {
         'name': 'Cloud Functions',
         'iconPath': 'assets/icons/function.png',
-        'description': 'Serverless backend code that runs in response to events and HTTPS requests'
+        'description':
+            'Serverless backend code that runs in response to events and HTTPS requests'
       },
       {
         'name': 'Cloud Storage',
         'iconPath': 'assets/icons/storage.png',
-        'description': 'Scalable file storage for user-generated content like images, videos, and documents'
+        'description':
+            'Scalable file storage for user-generated content like images, videos, and documents'
       },
       {
         'name': 'Analytics',
@@ -44,17 +53,20 @@ class FirebaseBackendSection extends StatelessWidget {
       {
         'name': 'Cloud Messaging',
         'iconPath': 'assets/icons/messaging.png',
-        'description': 'Push notifications and messaging across iOS, Android, and web platforms'
+        'description':
+            'Push notifications and messaging across iOS, Android, and web platforms'
       },
       {
         'name': 'Hosting',
         'iconPath': 'assets/icons/hosting.png',
-        'description': 'Fast and secure web hosting with global CDN and SSL certificates'
+        'description':
+            'Fast and secure web hosting with global CDN and SSL certificates'
       },
       {
         'name': 'Remote Config',
         'iconPath': 'assets/icons/config.png',
-        'description': 'Change app behavior and appearance without publishing app updates'
+        'description':
+            'Change app behavior and appearance without publishing app updates'
       },
     ];
 
@@ -69,30 +81,32 @@ class FirebaseBackendSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            ColorManager.accentCoral.withValues(alpha: 0.18),
-            ColorManager.accentGold.withValues(alpha: 0.12),
+            const Color(0xFF1A1206),
+            const Color(0xFF3B1F00),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ColorManager.accentCoral.withValues(alpha: 0.36),
+          color: const Color(0xFFFFA000).withValues(alpha: 0.5),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: ColorManager.accentCoral.withValues(alpha: 0.20),
+            color: const Color(0xFFFFA000).withValues(alpha: 0.18),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: colCross,
         mainAxisSize: MainAxisSize.min,
         children: [
           // Firebase Logo/Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: isDesktop
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -107,16 +121,17 @@ class FirebaseBackendSection extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/firebase.png',
                     fit: BoxFit.contain,
+                    semanticLabel: 'Firebase logo',
                   ),
                 ),
               ),
               SizedBox(width: isMobile ? 12 : 16),
               SelectableText(
                 'Firebase',
-                style: GoogleFonts.albertSans(
+                style: GoogleFonts.roboto(
                   fontSize: isMobile ? (wi < 400 ? 24 : 28) : wi * 0.028,
                   fontWeight: FontWeight.bold,
-                  color: ColorManager.textPrimary,
+                  color: const Color(0xFFFFCA28),
                 ),
               ),
             ],
@@ -124,12 +139,12 @@ class FirebaseBackendSection extends StatelessWidget {
           SizedBox(height: isMobile ? 16 : 24),
           SelectableText(
             'Complete Backend Solutions',
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               fontSize: isMobile ? (wi < 400 ? 14 : 16) : wi * 0.018,
-              color: ColorManager.textSecondary,
+              color: const Color(0xFFE5E7EB),
               fontWeight: FontWeight.bold,
             ),
-            textAlign: TextAlign.center,
+            textAlign: bodyAlign,
           ),
           SizedBox(height: isMobile ? 20 : 28),
           // Services List
@@ -152,7 +167,8 @@ class FirebaseBackendSection extends StatelessWidget {
                 return Container(
                   width: double.infinity,
                   margin: EdgeInsets.only(
-                    bottom: index < services.length - 1 ? (isMobile ? 8 : 12) : 0,
+                    bottom:
+                        index < services.length - 1 ? (isMobile ? 8 : 12) : 0,
                   ),
                   padding: EdgeInsets.all(isMobile ? (wi < 400 ? 14 : 16) : 20),
                   decoration: BoxDecoration(
@@ -163,8 +179,9 @@ class FirebaseBackendSection extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: colCross,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: isMobile ? 50 : wi * 0.05,
@@ -177,6 +194,8 @@ class FirebaseBackendSection extends StatelessWidget {
                         child: Image.asset(
                           service['iconPath']!,
                           fit: BoxFit.contain,
+                          semanticLabel:
+                              '${service['name'] ?? 'Firebase'} icon',
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
                               Icons.broken_image,
@@ -186,31 +205,29 @@ class FirebaseBackendSection extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(width: isMobile ? 12 : 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SelectableText(
-                              service['name']!,
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile ? (wi < 400 ? 14 : 16) : wi * 0.018,
-                                color: ColorManager.textPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: isMobile ? 6 : 8),
-                            SelectableText(
-                              service['description'] ?? '',
-                              style: GoogleFonts.albertSans(
-                                fontSize: isMobile ? (wi < 400 ? 12 : 14) : (wi < 1024 ? 11 : 13),
-                                color: ColorManager.textSecondary,
-                                fontWeight: FontWeight.w400,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
+                      SizedBox(height: isMobile ? 10 : 12),
+                      SelectableText(
+                        service['name']!,
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400 ? 14 : 16)
+                              : wi * 0.018,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 6 : 8),
+                      SelectableText(
+                        service['description'] ?? '',
+                        textAlign: bodyAlign,
+                        style: GoogleFonts.roboto(
+                          fontSize: isMobile
+                              ? (wi < 400 ? 12 : 14)
+                              : (wi < 1024 ? 11 : 13),
+                          color: const Color(0xFFD1D5DB),
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
                         ),
                       ),
                     ],

@@ -52,6 +52,7 @@ dependencies:
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^6.1.3
   go_router: ^14.6.2
+  flutter_svg: ^2.0.17
 
 dev_dependencies:
   flutter_test:
@@ -89,7 +90,9 @@ flutter:
     - assets/images/Clients/
     - assets/images/on_boarding_image/
     - assets/images/4ideas/
+    - assets/images/service_flow/
     - assets/images/seasonal UI/
+    - assets/platforms/
     - assets/icons/
     - assets/docs/serviceflow-design-system.html
     - assets/docs/4ideas-design-system.html

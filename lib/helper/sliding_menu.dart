@@ -225,9 +225,13 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           width: 2,
                                         ),
                                       ),
-                                      child: CircleAvatar(
-                                        radius: isMobile ? 35 : 38,
-                                        backgroundImage: const AssetImage('assets/images/logo.png'),
+                                      child: Semantics(
+                                        label: '4iDeas logo',
+                                        image: true,
+                                        child: CircleAvatar(
+                                          radius: isMobile ? 35 : 38,
+                                          backgroundImage: const AssetImage('assets/images/logo.png'),
+                                        ),
                                       ),
                                     ),
                                     SizedBox(height: isMobile ? 12 : 14),
@@ -262,7 +266,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                       child: Column(
                                         children: [
                                           SelectableText(
-                                            "Let's Talk! 🇺🇸",
+                                            "Founder-led studio · US clients",
                                             style: TextStyle(
                                               fontSize: isMobile ? 14 : (isTablet ? 13 : 12),
                                               color: ColorManager.textSecondary,
@@ -314,7 +318,7 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         _buildMenuItem(
                                           index: 1,
                                           icon: Icons.people,
-                                          title: 'About Us',
+                                          title: 'About 4iDeas',
                                           onPressed: () => _closeDrawerAndGo(AppRoutes.about),
                                         ),
                                         _buildMenuItem(
@@ -331,6 +335,13 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         ),
                                         _buildMenuItem(
                                           index: 4,
+                                          icon: Icons.auto_stories_outlined,
+                                          title: 'Insights',
+                                          onPressed: () =>
+                                              _closeDrawerAndGo(AppRoutes.insights),
+                                        ),
+                                        _buildMenuItem(
+                                          index: 5,
                                           icon: Icons.contrast,
                                           title: 'Order Here',
                                           onPressed: () =>
@@ -339,21 +350,32 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         BlocBuilder<AuthBloc, AuthState>(
                                           builder: (context, authState) {
                                             if (authState is Authenticated || authState is EmailNotVerified) {
+                                              final userEmail = authState is Authenticated
+                                                  ? authState.user.email
+                                                  : (authState as EmailNotVerified).user.email;
+                                              final showAdmin = AdminService.isAdmin(email: userEmail);
                                               return Column(
                                                 children: [
                                                   _buildMenuItem(
-                                                    index: 5,
+                                                    index: 6,
                                                     icon: Icons.person,
                                                     title: 'Profile',
                                                     onPressed: () => _closeDrawerAndGo(AppRoutes.profile),
                                                   ),
-                                                  if (AdminService.isAdmin())
+                                                  if (showAdmin) ...[
                                                     _buildMenuItem(
-                                                      index: 6,
+                                                      index: 7,
                                                       icon: Icons.admin_panel_settings,
-                                                      title: 'Admin - Orders',
+                                                      title: 'Admin – Orders',
                                                       onPressed: () => _closeDrawerAndGo(AppRoutes.adminOrders),
                                                     ),
+                                                    _buildMenuItem(
+                                                      index: 9,
+                                                      icon: Icons.mark_chat_unread_outlined,
+                                                      title: 'Admin – Contact inbox',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.contact),
+                                                    ),
+                                                  ],
                                                 ],
                                               );
                                             }
@@ -361,9 +383,9 @@ class _SlidingMenuState extends State<SlidingMenu>
                                           },
                                         ),
                                         _buildMenuItem(
-                                          index: 7,
+                                          index: 8,
                                           icon: Icons.connect_without_contact,
-                                          title: 'Contact Us',
+                                          title: 'Contact',
                                           onPressed: () =>
                                               _closeDrawerAndGo(AppRoutes.contact),
                                         ),

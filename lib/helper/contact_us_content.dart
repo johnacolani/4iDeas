@@ -15,10 +15,14 @@ class ContactUsContent extends StatefulWidget {
   const ContactUsContent({
     super.key,
     required this.embeddedInDialog,
+    this.paddingOverride,
   });
 
   /// When true, shows a Close button and pops the route stack on navigate entries.
   final bool embeddedInDialog;
+
+  /// When null, uses default screen padding. Pass [EdgeInsets.zero] when the parent already pads.
+  final EdgeInsetsGeometry? paddingOverride;
 
   @override
   State<ContactUsContent> createState() => _ContactUsContentState();
@@ -194,7 +198,8 @@ class _ContactUsContentState extends State<ContactUsContent> {
     final entriesFromFirestore = _entriesFromFirestore != null;
 
     return Padding(
-      padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
+      padding: widget.paddingOverride ??
+          EdgeInsets.all(isMobile ? 16.0 : 24.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -242,7 +247,7 @@ class _ContactUsContentState extends State<ContactUsContent> {
                 SizedBox(height: isMobile ? 12 : 16),
                 Text(
                   'John A. Colani',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: isMobile ? 22 : 24,
                     fontWeight: FontWeight.bold,
                     color: ColorManager.textPrimary,
@@ -251,8 +256,9 @@ class _ContactUsContentState extends State<ContactUsContent> {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'Senior Product Designer',
-                  style: GoogleFonts.albertSans(
+                  'Senior Flutter engineer · Product designer',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.roboto(
                     fontSize: isMobile ? 14 : 15,
                     color: ColorManager.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -335,7 +341,7 @@ class _ContactUsContentState extends State<ContactUsContent> {
                 ),
                 child: Text(
                   'Close',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     fontSize: isMobile ? 16 : 17,
                     fontWeight: FontWeight.bold,
                   ),

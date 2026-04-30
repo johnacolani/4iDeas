@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 
-/// Horizontal auto-scrolling strip of [assets/image_0.png] … [assets/image_10.png].
+/// Horizontal auto-scrolling strip of real mobile screenshots.
 ///
 /// Repeats tiles so total width always exceeds the viewport (fixes wide screens /
 /// web where [ScrollPosition.maxScrollExtent] was 0 and no motion occurred).
@@ -11,8 +12,23 @@ import 'package:flutter/material.dart';
 class AppAutoScrollImage extends StatefulWidget {
   const AppAutoScrollImage({super.key});
 
-  /// Number of distinct assets in `assets/image_*.png`.
-  static const int kAssetCount = 11;
+  static const List<String> _platformAssets = <String>[
+    'assets/platforms/android.png',
+    'assets/platforms/appstore.png',
+    'assets/platforms/dart.png',
+    'assets/platforms/firebase.png',
+    'assets/platforms/flutter.png',
+    'assets/platforms/flutterdash.png',
+    'assets/platforms/google.png',
+    'assets/platforms/googlestore.png',
+    'assets/platforms/ios.png',
+    'assets/platforms/kotlin.png',
+    'assets/platforms/linux.png',
+    'assets/platforms/macos.png',
+    'assets/platforms/swift.jpg',
+    'assets/platforms/web.png',
+    'assets/platforms/windows.png',
+  ];
 
   @override
   State<AppAutoScrollImage> createState() => _AppAutoScrollImageState();
@@ -21,11 +37,11 @@ class AppAutoScrollImage extends StatefulWidget {
 class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
   final ScrollController _scrollController = ScrollController();
 
-  /// Image tiles: baseline (56–80) × this scale. 0.56 ≈ 20% smaller than the previous 0.7 scale.
-  static const double _imageSizeScale = 0.56;
+  /// Image tiles: baseline (56–80) × this scale. 0.392 = 30% smaller than 0.56.
+  static const double _imageSizeScale = 0.392;
 
-  /// Horizontal inset per tile (gap between images = 2 × this).
-  static const double _tileHorizontalPadding = 14.0;
+  /// Horizontal inset per tile (visual gap where two tiles meet ≈ 2× this).
+  static const double _tileHorizontalPadding = 36.0;
 
   static const Duration _autoScrollDuration = Duration(milliseconds: 900);
   static const Duration _timerInterval = Duration(milliseconds: 1200);
@@ -106,13 +122,20 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
     return (base * _imageSizeScale).clamp(22.0, 120.0);
   }
 
-  double _stripHeightForItemWidth(double itemWidth) {
-    return (itemWidth + 18 * _imageSizeScale).clamp(46.0, 82.0);
+  /// Rounded square chip around each platform icon (matches prior platform-chips look).
+  double _iconBoxSide(double itemWidth) {
+    final imageSide = (itemWidth * 1.16).clamp(24.0, 100.0);
+    return imageSide + 8.0; // 4px insets for [Image] on each side
   }
 
-  /// Each tile’s laid-out width including horizontal padding (must match item [Padding]).
+  double _stripHeightForItemWidth(double itemWidth) {
+    // Vertical padding 4+4 plus small slack for web subpixel / border layout.
+    return _iconBoxSide(itemWidth) + 8.0 + 4.0;
+  }
+
+  /// Wider of chip + list tile horizontal padding.
   double _tileStride(double itemWidth) {
-    return itemWidth + _tileHorizontalPadding * 2;
+    return _iconBoxSide(itemWidth) + _tileHorizontalPadding * 2;
   }
 
   int _tileCountForWidth(double viewportWidth, double itemWidth) {
@@ -134,37 +157,66 @@ class _AppAutoScrollImageState extends State<AppAutoScrollImage> {
         final height = _stripHeightForItemWidth(itemWidth);
         final tileCount = _tileCountForWidth(maxW, itemWidth);
 
+        final double iconS = _iconBoxSide(itemWidth);
+        final double imageSide = iconS - 8.0;
         return SizedBox(
           height: height,
           width: double.infinity,
-          child: ListView.builder(
-            controller: _scrollController,
-            reverse: true,
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(),
-            itemCount: tileCount,
-            itemBuilder: (context, index) {
-              final assetIndex = index % AppAutoScrollImage.kAssetCount;
-              return Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: _tileHorizontalPadding,
-                  vertical: 4,
-                ),
-                child: Center(
-                  child: Image.asset(
-                    'assets/image_$assetIndex.png',
-                    width: itemWidth,
-                    height: itemWidth,
-                    fit: BoxFit.contain,
-                    gaplessPlayback: true,
-                    errorBuilder: (_, __, ___) => SizedBox(
-                      width: itemWidth,
-                      height: itemWidth,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: ListView.builder(
+              controller: _scrollController,
+              reverse: true,
+              scrollDirection: Axis.horizontal,
+              physics: const ClampingScrollPhysics(),
+              itemCount: tileCount,
+              itemBuilder: (context, index) {
+                final assetPath = AppAutoScrollImage._platformAssets[
+                    index % AppAutoScrollImage._platformAssets.length];
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: _tileHorizontalPadding,
+                    vertical: 4,
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: iconS,
+                      height: iconS,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.transparent,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.32),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: Center(
+                        child: AdaptiveAssetImage(
+                          assetPath,
+                          width: imageSide,
+                          height: imageSide,
+                          fit: BoxFit.contain,
+                          gaplessPlayback: true,
+                          errorBuilder: (_, __, ___) => SizedBox(
+                            width: imageSide,
+                            height: imageSide,
+                            child: const Icon(
+                              Icons.broken_image_outlined,
+                              color: Colors.redAccent,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         );
       },

@@ -188,7 +188,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
         iconTheme: const IconThemeData(color: Colors.amber),
         title: Text(
           isEdit ? 'Edit Case Study' : 'Add Case Study',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -223,7 +223,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                             ),
                             child: Text(
                               _error!,
-                              style: GoogleFonts.albertSans(
+                              style: GoogleFonts.roboto(
                                 color: const Color(0xFF991B1B),
                                 fontSize: 14,
                                 height: 1.35,
@@ -266,7 +266,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'Sections',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             color: HomeWarmColors.textInk,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -294,7 +294,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                       Expanded(
                                         child: Text(
                                           'Section ${i + 1}',
-                                          style: GoogleFonts.albertSans(
+                                          style: GoogleFonts.roboto(
                                             color: HomeWarmColors.textInk,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -336,7 +336,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                           icon: Icon(Icons.add, size: 18, color: HomeWarmColors.sectionAccent),
                           label: Text(
                             'Add section',
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: HomeWarmColors.sectionAccent,
                               fontWeight: FontWeight.w600,
                             ),
@@ -361,7 +361,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                 )
                               : Text(
                                   isEdit ? 'Update' : 'Add',
-                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
                                 ),
                         ),
                       ],
@@ -391,7 +391,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
         maxLines: maxLines,
         validator: validator,
         cursorColor: ColorManager.orange,
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           color: HomeWarmColors.textInk,
           fontSize: 15,
           height: 1.35,
@@ -401,16 +401,16 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
           hintText: hint,
           filled: true,
           fillColor: Colors.white,
-          labelStyle: GoogleFonts.albertSans(
+          labelStyle: GoogleFonts.roboto(
             color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.85),
             fontSize: 14,
           ),
-          floatingLabelStyle: GoogleFonts.albertSans(
+          floatingLabelStyle: GoogleFonts.roboto(
             color: HomeWarmColors.textInk,
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
-          hintStyle: GoogleFonts.albertSans(
+          hintStyle: GoogleFonts.roboto(
             color: HomeWarmColors.eyebrowMuted,
             fontSize: 14,
           ),
@@ -431,7 +431,7 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
             borderSide: const BorderSide(color: Color(0xFFDC2626), width: 2),
             borderRadius: borderRadius,
           ),
-          errorStyle: GoogleFonts.albertSans(
+          errorStyle: GoogleFonts.roboto(
             color: const Color(0xFFB91C1C),
             fontSize: 12,
           ),

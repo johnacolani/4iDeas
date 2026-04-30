@@ -30,7 +30,7 @@ class ContractViewScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.amber),
         title: Text(
           'Service Agreement',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
@@ -66,7 +66,7 @@ class ContractViewScreen extends StatelessWidget {
                       SizedBox(height: 16),
                       Text(
                         'SERVICE AGREEMENT',
-                        style: GoogleFonts.albertSans(
+                        style: GoogleFonts.roboto(
                           color: Colors.white,
                           fontSize: isMobile ? 24 : 28,
                           fontWeight: FontWeight.bold,
@@ -295,7 +295,7 @@ class ContractViewScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.albertSans(
+            style: GoogleFonts.roboto(
               color: Colors.white,
               fontSize: isMobile ? 18 : 20,
               fontWeight: FontWeight.bold,

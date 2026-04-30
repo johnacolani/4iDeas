@@ -26,6 +26,9 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
   final _titleController = TextEditingController();
   final _subtitleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _valuePropositionController = TextEditingController();
+  final _idealClientController = TextEditingController();
+  final _ctaLabelController = TextEditingController();
   final _iconNameController = TextEditingController();
   final List<TextEditingController> _detailControllers = [];
   bool _saving = false;
@@ -41,6 +44,9 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
       _titleController.text = item.title;
       _subtitleController.text = item.subtitle;
       _descriptionController.text = item.description;
+      _valuePropositionController.text = item.valueProposition;
+      _idealClientController.text = item.idealClient;
+      _ctaLabelController.text = item.ctaLabel;
       _iconNameController.text = item.iconName;
       for (final d in item.details) {
         _detailControllers.add(TextEditingController(text: d));
@@ -74,7 +80,10 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
       title: _titleController.text.trim(),
       subtitle: _subtitleController.text.trim(),
       description: _descriptionController.text.trim(),
+      valueProposition: _valuePropositionController.text.trim(),
       details: details,
+      idealClient: _idealClientController.text.trim(),
+      ctaLabel: _ctaLabelController.text.trim().isEmpty ? 'Discuss your project' : _ctaLabelController.text.trim(),
     );
   }
 
@@ -136,7 +145,7 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
         iconTheme: const IconThemeData(color: Colors.amber),
         title: Text(
           isEdit ? 'Edit Service' : 'Add Service',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -193,14 +202,31 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                         ),
                         _buildField(
+                          controller: _valuePropositionController,
+                          label: 'Business value (outcome line)',
+                          hint: 'Why this matters for the buyer—one or two sentences',
+                          maxLines: 3,
+                        ),
+                        _buildField(
+                          controller: _idealClientController,
+                          label: 'Ideal client',
+                          hint: 'Who this engagement is for',
+                          maxLines: 3,
+                        ),
+                        _buildField(
+                          controller: _ctaLabelController,
+                          label: 'CTA button label',
+                          hint: 'e.g. Discuss your MVP (default: Discuss your project)',
+                        ),
+                        _buildField(
                           controller: _iconNameController,
                           label: 'Icon name (optional)',
-                          hint: 'e.g. design_services, palette, extension',
+                          hint: 'rocket_launch, integration_instructions, auto_awesome, autorenew, design_services, …',
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'Details (bullet points)',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             color: ColorManager.orange,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -216,10 +242,10 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
                                 Expanded(
                                   child: TextFormField(
                                     controller: e.value,
-                                    style: GoogleFonts.albertSans(color: Colors.white, fontSize: 15),
+                                    style: GoogleFonts.roboto(color: Colors.white, fontSize: 15),
                                     decoration: InputDecoration(
                                       hintText: 'Detail ${i + 1}',
-                                      hintStyle: GoogleFonts.albertSans(color: Colors.white38),
+                                      hintStyle: GoogleFonts.roboto(color: Colors.white38),
                                       enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                                         borderRadius: BorderRadius.circular(8),
@@ -245,7 +271,7 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
                           icon: Icon(Icons.add, size: 18, color: ColorManager.orange),
                           label: Text(
                             'Add detail',
-                            style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.roboto(color: ColorManager.orange, fontWeight: FontWeight.w600),
                           ),
                           style: OutlinedButton.styleFrom(side: BorderSide(color: ColorManager.orange)),
                         ),
@@ -265,7 +291,7 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
                                 )
                               : Text(
                                   isEdit ? 'Update' : 'Add',
-                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
                                 ),
                         ),
                       ],
@@ -293,12 +319,12 @@ class _AdminServiceEditScreenState extends State<AdminServiceEditScreen> {
         controller: controller,
         maxLines: maxLines,
         validator: validator,
-        style: GoogleFonts.albertSans(color: Colors.white, fontSize: 15),
+        style: GoogleFonts.roboto(color: Colors.white, fontSize: 15),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          labelStyle: GoogleFonts.albertSans(color: Colors.white70),
-          hintStyle: GoogleFonts.albertSans(color: Colors.white38),
+          labelStyle: GoogleFonts.roboto(color: Colors.white70),
+          hintStyle: GoogleFonts.roboto(color: Colors.white38),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(8),

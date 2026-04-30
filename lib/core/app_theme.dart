@@ -19,7 +19,7 @@ class AppTheme {
     );
 
     return base.copyWith(
-      textTheme: GoogleFonts.albertSansTextTheme(base.textTheme).apply(
+      textTheme: GoogleFonts.robotoTextTheme(base.textTheme).apply(
         bodyColor: ColorManager.textPrimary,
         displayColor: ColorManager.textPrimary,
       ),
@@ -27,12 +27,12 @@ class AppTheme {
         backgroundColor: const Color(0xB3C9A96E),
         surfaceTintColor: ColorManager.accentGold,
         foregroundColor: const Color(0xFF484744), // ~20% lighter than backgroundDark
-        titleTextStyle: GoogleFonts.albertSans(
+        titleTextStyle: GoogleFonts.roboto(
           color: const Color(0xFF484744), // app bar title text
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
-        toolbarTextStyle: GoogleFonts.albertSans(
+        toolbarTextStyle: GoogleFonts.roboto(
           color: const Color(0xFF484744),
           fontSize: 18,
           fontWeight: FontWeight.w500,

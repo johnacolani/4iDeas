@@ -1,0 +1,5 @@
+# https://4ideasapp.com — Flutter web app; ensure static files are deployed alongside index.html.
+User-agent: *
+Allow: /
+
+Sitemap: https://4ideasapp.com/sitemap.xml

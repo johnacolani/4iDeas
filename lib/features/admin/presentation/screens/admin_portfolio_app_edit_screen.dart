@@ -141,7 +141,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
         iconTheme: const IconThemeData(color: Colors.amber),
         title: Text(
           isEdit ? 'Edit Portfolio App' : 'Add Portfolio App',
-          style: GoogleFonts.albertSans(
+          style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -176,7 +176,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
                           ),
                           child: Text(
                             _error!,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: const Color(0xFF991B1B),
                               fontSize: 14,
                               height: 1.35,
@@ -245,7 +245,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
                         ),
                         title: Text(
                           'Use "Coming Soon" placeholder (no image)',
-                          style: GoogleFonts.albertSans(
+                          style: GoogleFonts.roboto(
                             color: HomeWarmColors.textInk,
                             fontSize: bodySize,
                           ),
@@ -265,7 +265,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
                                 width: 22,
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
-                            : Text(isEdit ? 'Update' : 'Add', style: GoogleFonts.albertSans(fontWeight: FontWeight.w600)),
+                            : Text(isEdit ? 'Update' : 'Add', style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
                       ),
                     ],
                   ),
@@ -294,7 +294,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
         maxLines: maxLines,
         validator: validator,
         cursorColor: ColorManager.orange,
-        style: GoogleFonts.albertSans(
+        style: GoogleFonts.roboto(
           color: HomeWarmColors.textInk,
           fontSize: 15,
           height: 1.35,
@@ -304,16 +304,16 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
           hintText: hint,
           filled: true,
           fillColor: Colors.white,
-          labelStyle: GoogleFonts.albertSans(
+          labelStyle: GoogleFonts.roboto(
             color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.85),
             fontSize: 14,
           ),
-          floatingLabelStyle: GoogleFonts.albertSans(
+          floatingLabelStyle: GoogleFonts.roboto(
             color: HomeWarmColors.textInk,
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
-          hintStyle: GoogleFonts.albertSans(
+          hintStyle: GoogleFonts.roboto(
             color: HomeWarmColors.eyebrowMuted,
             fontSize: 14,
           ),
@@ -334,7 +334,7 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
             borderSide: const BorderSide(color: Color(0xFFDC2626), width: 2),
             borderRadius: borderRadius,
           ),
-          errorStyle: GoogleFonts.albertSans(
+          errorStyle: GoogleFonts.roboto(
             color: const Color(0xFFB91C1C),
             fontSize: 12,
           ),

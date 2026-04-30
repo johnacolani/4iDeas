@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -63,7 +64,7 @@ abstract final class FrostedAppBar {
       shadowColor: shadowColor,
       surfaceTintColor: surfaceTintColor,
       shape: shape,
-      iconTheme: iconTheme,
+      iconTheme: iconTheme ?? const IconThemeData(color: Colors.white),
       actionsIconTheme: actionsIconTheme,
       titleSpacing: titleSpacing,
       toolbarHeight: toolbarHeight,
@@ -215,48 +216,7 @@ abstract final class FrostedAppBar {
       automaticallyImplyLeading: automaticallyImplyLeading,
       title: title,
       actions: actions,
-      flexibleSpace: flexibleSpace ??
-          ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Color.alphaBlend(
-                        HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
-                        Colors.white.withValues(alpha: 0.025),
-                      ),
-                      border: Border(
-                        top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                        left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                        right: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
-                        bottom: BorderSide(
-                          color: ColorManager.backgroundDark.withValues(alpha: borderBottomAlpha),
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: const Alignment(-1.0, -1.0),
-                        end: const Alignment(0.5, 0.55),
-                        colors: [
-                          Colors.white.withValues(alpha: 0.16),
-                          Colors.white.withValues(alpha: 0.06),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.28, 1.0],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      flexibleSpace: flexibleSpace ?? _buildFrostedLayer(borderBottomAlpha),
       bottom: bottom,
       primary: primary,
       centerTitle: centerTitle,
@@ -274,6 +234,53 @@ abstract final class FrostedAppBar {
       leadingWidth: leadingWidth,
       titleSpacing: titleSpacing,
       systemOverlayStyle: systemOverlayStyle,
+    );
+  }
+
+  static Widget _buildFrostedLayer(double borderBottomAlpha) {
+    final glassStack = Stack(
+      fit: StackFit.expand,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: Color.alphaBlend(
+              HomeWarmColors.drawerNavyTint.withValues(alpha: 0.3),
+              Colors.white.withValues(alpha: 0.025),
+            ),
+            border: Border(
+              top: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+              left: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+              right: BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1),
+              bottom: BorderSide(
+                color: ColorManager.backgroundDark.withValues(alpha: borderBottomAlpha),
+                width: 1,
+              ),
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: const Alignment(-1.0, -1.0),
+              end: const Alignment(0.5, 0.55),
+              colors: [
+                Colors.white.withValues(alpha: 0.16),
+                Colors.white.withValues(alpha: 0.06),
+                Colors.transparent,
+              ],
+              stops: const [0.0, 0.28, 1.0],
+            ),
+          ),
+        ),
+      ],
+    );
+    // Backdrop blur is expensive on web; keep the same visual treatment without blur.
+    if (kIsWeb) return glassStack;
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
+        child: glassStack,
+      ),
     );
   }
 }

@@ -9,6 +9,7 @@ import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import '../../domain/entities/user.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -73,12 +74,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -90,8 +91,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         title: Text(
           'Profile',
-          style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+          style: GoogleFonts.roboto(
+            color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -126,21 +127,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Scrollbar(
                     thumbVisibility: true,
                     child: SingleChildScrollView(
+                      primary: true,
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 16.0 : 24.0,
                         vertical: 20.0,
                       ),
                       child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // User Info Card
-                        _buildUserInfoCard(user, isMobile, he),
-                        SizedBox(height: he * 0.02),
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // User Info Card
+                          _buildUserInfoCard(user, isMobile, he),
+                          SizedBox(height: he * 0.02),
 
-                        // My Orders Section
-                        _buildMyOrdersSection(isMobile, he),
-                      ],
-                    ),
+                          // My Orders Section
+                          _buildMyOrdersSection(isMobile, he),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -156,10 +158,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildUserInfoCard(user, bool isMobile, double he) {
+  Widget _buildUserInfoCard(User user, bool isMobile, double he) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 20 : 24),
-      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+      decoration:
+          ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -174,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Icon(
                   Icons.person,
-                  color: ColorManager.backgroundDark,
+                  color: Colors.white,
                   size: 30,
                 ),
               ),
@@ -185,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(
                       user.displayName ?? 'User',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.textPrimary,
                         fontSize: isMobile ? 22 : 24,
                         fontWeight: FontWeight.bold,
@@ -242,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: ColorManager.containerSurface,
                     title: Text(
                       'Logout',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
@@ -291,7 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 8),
                   Text(
                     'Logout',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       fontSize: isMobile ? 16 : 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -308,7 +311,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildMyOrdersSection(bool isMobile, double he) {
     return Container(
       padding: EdgeInsets.all(isMobile ? 20 : 24),
-      decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+      decoration:
+          ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -323,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: Text(
                   'My Orders',
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.textPrimary,
                     fontSize: isMobile ? 22 : 24,
                     fontWeight: FontWeight.bold,
@@ -456,7 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: Text(
                   appName,
-                  style: GoogleFonts.albertSans(
+                  style: GoogleFonts.roboto(
                     color: ColorManager.textPrimary,
                     fontSize: isMobile ? 18 : 20,
                     fontWeight: FontWeight.bold,
@@ -614,13 +618,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.description,
                         size: 18,
-                        color: contractSigned ? Colors.green.shade700 : ColorManager.secondaryPurple,
+                        color: contractSigned
+                            ? Colors.green.shade700
+                            : ColorManager.secondaryPurple,
                       ),
                       SizedBox(width: 8),
                       Text(
                         'Contract',
                         style: TextStyle(
-                          color: contractSigned ? Colors.green.shade700 : ColorManager.secondaryPurple,
+                          color: contractSigned
+                              ? Colors.green.shade700
+                              : ColorManager.secondaryPurple,
                           fontSize: isMobile ? 14 : 15,
                           fontWeight: FontWeight.bold,
                         ),
@@ -685,7 +693,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: ColorManager.secondaryPurple,
                           side: BorderSide(
-                              color: ColorManager.secondaryPurple.withValues(alpha: 0.5)),
+                              color: ColorManager.secondaryPurple
+                                  .withValues(alpha: 0.5)),
                           padding: EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -832,7 +841,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: ElevatedButton.icon(
                                 onPressed: () => context.push(
                                   AppRoutes.payment,
-                                  extra: {'order': order, 'onSuccess': _loadOrders},
+                                  extra: {
+                                    'order': order,
+                                    'onSuccess': _loadOrders
+                                  },
                                 ),
                                 icon: Icon(Icons.payment, size: 18),
                                 label: Text('Make Down Payment'),
@@ -878,7 +890,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 8),
                   Text(
                     'Reply to Admin',
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: ColorManager.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -904,24 +916,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: TextStyle(color: ColorManager.textPrimary),
                       decoration: InputDecoration(
                         hintText: 'Type your response...',
-                        hintStyle: TextStyle(
-                            color: ColorManager.textMuted),
+                        hintStyle: TextStyle(color: ColorManager.textMuted),
                         filled: true,
                         fillColor: ColorManager.containerSurfaceMuted,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                              color: ColorManager.containerBorder),
+                          borderSide:
+                              BorderSide(color: ColorManager.containerBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                              color: ColorManager.containerBorder),
+                          borderSide:
+                              BorderSide(color: ColorManager.containerBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              BorderSide(color: ColorManager.primaryTeal, width: 2),
+                          borderSide: BorderSide(
+                              color: ColorManager.primaryTeal, width: 2),
                         ),
                       ),
                     ),
@@ -937,8 +948,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                   child: Text(
                     'Cancel',
-                    style:
-                        TextStyle(color: ColorManager.textMuted),
+                    style: TextStyle(color: ColorManager.textMuted),
                   ),
                 ),
                 ElevatedButton(
@@ -1003,8 +1013,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(ColorManager.backgroundDark),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                ColorManager.backgroundDark),
                           ),
                         )
                       : Text('Send'),
@@ -1036,7 +1046,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: Text(
                       'Sign Contract',
-                      style: GoogleFonts.albertSans(
+                      style: GoogleFonts.roboto(
                         color: ColorManager.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1076,8 +1086,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                   child: Text(
                     'Cancel',
-                    style:
-                        TextStyle(color: ColorManager.textMuted),
+                    style: TextStyle(color: ColorManager.textMuted),
                   ),
                 ),
                 ElevatedButton(
@@ -1130,8 +1139,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(ColorManager.onDarkPrimary),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                ColorManager.onDarkPrimary),
                           ),
                         )
                       : Text('Sign Contract'),

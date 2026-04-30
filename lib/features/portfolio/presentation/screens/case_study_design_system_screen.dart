@@ -19,20 +19,21 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final paths = PortfolioData.designSystemDocPathsForCaseStudy(designSystemId);
+    final paths =
+        PortfolioData.designSystemDocPathsForCaseStudy(designSystemId);
     if (paths == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: FrostedAppBar.gold(
-          iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+          iconTheme: const IconThemeData(color: Colors.white),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => context.pop(),
           ),
           title: Text(
             'Design system',
-            style: GoogleFonts.albertSans(
-              color: ColorManager.backgroundDark,
+            style: GoogleFonts.roboto(
+              color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -49,7 +50,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
                   child: Text(
                     'Design system not found for this case study.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.albertSans(
+                    style: GoogleFonts.roboto(
                       color: ColorManager.textSecondary,
                       fontSize: 16,
                     ),
@@ -67,12 +68,13 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
       appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
             } else {
-              final hasCaseStudy = PortfolioData.caseStudies.any((c) => c.id == designSystemId);
+              final hasCaseStudy =
+                  PortfolioData.caseStudies.any((c) => c.id == designSystemId);
               if (hasCaseStudy) {
                 context.go(AppRoutes.portfolioCaseStudyPath(designSystemId));
               } else {
@@ -81,12 +83,12 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
             }
           },
         ),
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         title: Text(
           'Design system',
-          style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+          style: GoogleFonts.roboto(
+            color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -97,9 +99,11 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
           const AppBackground(),
           Positioned.fill(
             child: Padding(
-              padding: FrostedAppBar.contentPaddingUnderAppBar(context).add(const EdgeInsets.all(12)),
+              padding: FrostedAppBar.contentPaddingUnderAppBar(context)
+                  .add(const EdgeInsets.all(12)),
               child: Container(
-                decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+                decoration: ColorManager.portfolioHighlightCardDecoration(
+                    borderRadius: 16),
                 padding: const EdgeInsets.all(6),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),

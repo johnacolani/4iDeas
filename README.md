@@ -16,7 +16,7 @@ A cross-platform Flutter application showcasing product design and development w
 ## 📱 Screenshots
 
 ### Home Screen
-![Home Screen](assets/images/top-web-apps.png)
+![Home Screen](assets/images/top-web-apps.webp)
 
 ### Portfolio
 

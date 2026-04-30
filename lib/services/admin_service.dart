@@ -6,13 +6,18 @@ class AdminService {
     'john.ace.colani@outlook.com',
   ];
 
-  /// Check if the current user is an admin
-  static bool isAdmin() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null || user.email == null) {
+  /// Check if the current user is an admin.
+  ///
+  /// Pass [email] when you already have the signed-in user's email (e.g. from
+  /// [AuthBloc]) so the UI matches Firebase Auth immediately after login; otherwise
+  /// [FirebaseAuth.instance.currentUser] can briefly lag on web.
+  static bool isAdmin({String? email}) {
+    final resolved =
+        email ?? FirebaseAuth.instance.currentUser?.email;
+    if (resolved == null || resolved.isEmpty) {
       return false;
     }
-    return _adminEmails.contains(user.email!.toLowerCase().trim());
+    return _adminEmails.contains(resolved.toLowerCase().trim());
   }
 
   /// Check if a specific email is an admin

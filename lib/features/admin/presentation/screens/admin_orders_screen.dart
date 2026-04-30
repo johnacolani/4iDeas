@@ -84,16 +84,16 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           leadingWidth: 56,
           title: Text(
             'Access Denied',
-            style: GoogleFonts.albertSans(
-              color: ColorManager.backgroundDark,
+            style: GoogleFonts.roboto(
+              color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+          iconTheme: const IconThemeData(color: Colors.white),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+            icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               if (context.canPop()) {
                 context.pop();
@@ -116,12 +116,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
-        iconTheme: IconThemeData(color: ColorManager.backgroundDark),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leadingWidth: 56,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: ColorManager.backgroundDark),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -133,8 +133,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         ),
         title: Text(
           'Admin - Client Orders',
-          style: GoogleFonts.albertSans(
-            color: ColorManager.backgroundDark,
+          style: GoogleFonts.roboto(
+            color: Colors.white,
             fontSize: isMobile ? 20 : 22,
             fontWeight: FontWeight.bold,
           ),
@@ -232,7 +232,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     final clientEmail = order['clientEmail']?.toString() ?? '';
     final status = order['status']?.toString() ?? 'pending';
     final createdAt = order['createdAt']?.toString() ?? '';
-    final hasResponse = order['adminResponse'] != null && order['adminResponse'].toString().isNotEmpty;
+    final hasResponse = order['adminResponse'] != null &&
+        order['adminResponse'].toString().isNotEmpty;
 
     return Container(
       margin: EdgeInsets.only(bottom: isMobile ? 12 : 16),
@@ -258,7 +259,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         children: [
                           Text(
                             appName,
-                            style: GoogleFonts.albertSans(
+                            style: GoogleFonts.roboto(
                               color: ColorManager.textPrimary,
                               fontSize: isMobile ? 18 : 20,
                               fontWeight: FontWeight.bold,
@@ -286,17 +287,21 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: hasResponse
                                 ? Colors.green.withValues(alpha: 0.22)
-                                : ColorManager.accentGold.withValues(alpha: 0.35),
+                                : ColorManager.accentGold
+                                    .withValues(alpha: 0.35),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             hasResponse ? 'Responded' : status.toUpperCase(),
                             style: TextStyle(
-                              color: hasResponse ? Colors.green.shade700 : ColorManager.accentGoldDark,
+                              color: hasResponse
+                                  ? Colors.green.shade700
+                                  : ColorManager.accentGoldDark,
                               fontSize: isMobile ? 11 : 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -305,7 +310,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         if (createdAt.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
-                            createdAt.length > 19 ? createdAt.substring(0, 19) : createdAt,
+                            createdAt.length > 19
+                                ? createdAt.substring(0, 19)
+                                : createdAt,
                             style: TextStyle(
                               color: ColorManager.textMuted,
                               fontSize: isMobile ? 10 : 11,
@@ -316,32 +323,31 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     ),
                   ],
                 ),
-              if (hasResponse) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle,
-                      size: 16,
-                      color: Colors.green.shade700,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Response sent',
-                      style: TextStyle(
+                if (hasResponse) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        size: 16,
                         color: Colors.green.shade700,
-                        fontSize: isMobile ? 12 : 13,
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Response sent',
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontSize: isMobile ? 12 : 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
 }
-
