@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:four_ideas/app_router.dart';
-import 'package:four_ideas/core/home_warm_colors.dart';
+import 'package:four_ideas/core/design_system/theme.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/content_articles_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
@@ -30,13 +30,13 @@ class InsightArticleScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           tooltip: 'Back to insights',
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.go(AppRoutes.insights),
         ),
         title: Text(
           'Insight',
           style: GoogleFonts.roboto(
-            color: HomeWarmColors.textInk,
+            color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: isMobile ? 20 : 22,
           ),
@@ -65,19 +65,18 @@ class InsightArticleScreen extends StatelessWidget {
                           style: GoogleFonts.roboto(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: HomeWarmColors.sectionAccent,
+                            color: AppColors.primaryGold,
                             letterSpacing: 0.8,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Semantics(
                           header: true,
-                          child: Text(
+                          child: _InsightGoldGradientTitle(
                             article.title,
                             style: GoogleFonts.roboto(
                               fontSize: titleSize,
                               fontWeight: FontWeight.w800,
-                              color: HomeWarmColors.headlinePrimary,
                               height: 1.12,
                             ),
                           ),
@@ -88,7 +87,7 @@ class InsightArticleScreen extends StatelessWidget {
                           style: GoogleFonts.roboto(
                             fontSize: bodySize - 2,
                             fontWeight: FontWeight.w600,
-                            color: HomeWarmColors.eyebrowMuted,
+                            color: AppColors.textMuted,
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -97,7 +96,7 @@ class InsightArticleScreen extends StatelessWidget {
                           style: GoogleFonts.roboto(
                             fontSize: bodySize + 1,
                             fontWeight: FontWeight.w500,
-                            color: HomeWarmColors.bodyEmphasis,
+                            color: AppColors.textSecondary,
                             height: 1.5,
                           ),
                         ),
@@ -115,7 +114,7 @@ class InsightArticleScreen extends StatelessWidget {
                                   style: GoogleFonts.roboto(
                                     fontSize: bodySize + 4,
                                     fontWeight: FontWeight.w800,
-                                    color: HomeWarmColors.headlinePrimary,
+                                    color: Colors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -127,7 +126,7 @@ class InsightArticleScreen extends StatelessWidget {
                                       style: GoogleFonts.roboto(
                                         fontSize: bodySize,
                                         fontWeight: FontWeight.w500,
-                                        color: HomeWarmColors.bodyEmphasis,
+                                        color: AppColors.textSecondary,
                                         height: 1.6,
                                       ),
                                     ),
@@ -178,8 +177,8 @@ class _InlineCtaPanel extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: HomeWarmColors.dividerLine),
-        color: Colors.white.withValues(alpha: 0.75),
+        border: Border.all(color: AppColors.borderColor),
+        color: AppColors.bgCard,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +188,7 @@ class _InlineCtaPanel extends StatelessWidget {
             style: GoogleFonts.roboto(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: HomeWarmColors.headlinePrimary,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 6),
@@ -198,15 +197,15 @@ class _InlineCtaPanel extends StatelessWidget {
             style: GoogleFonts.roboto(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: HomeWarmColors.bodyEmphasis,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 10),
           FilledButton(
             onPressed: onContact,
             style: FilledButton.styleFrom(
-              backgroundColor: HomeWarmColors.sectionAccent,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.primaryGold,
+              foregroundColor: const Color(0xFF0B0F19),
             ),
             child: Text(
               'Discuss your project',
@@ -239,7 +238,7 @@ class _RelatedInsights extends StatelessWidget {
           style: GoogleFonts.roboto(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: HomeWarmColors.headlinePrimary,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 10),
@@ -247,8 +246,12 @@ class _RelatedInsights extends StatelessWidget {
           (article) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Material(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              color: AppColors.bgCard,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(color: AppColors.borderColor),
+              ),
+              clipBehavior: Clip.antiAlias,
               child: InkWell(
                 borderRadius: BorderRadius.circular(10),
                 onTap: () => onOpen(article.slug),
@@ -263,11 +266,15 @@ class _RelatedInsights extends StatelessWidget {
                           style: GoogleFonts.roboto(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w700,
-                            color: HomeWarmColors.headlinePrimary,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: AppColors.textMuted,
+                      ),
                     ],
                   ),
                 ),
@@ -297,18 +304,24 @@ class _ArticleFooterActions extends StatelessWidget {
       children: [
         OutlinedButton.icon(
           onPressed: onBack,
-          icon: const Icon(Icons.article_outlined, size: 18),
+          icon: Icon(Icons.article_outlined, size: 18, color: AppColors.textPrimary),
           label: Text(
             'Back to insights',
-            style: GoogleFonts.roboto(fontWeight: FontWeight.w700),
+            style: GoogleFonts.roboto(
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: AppColors.primaryGold.withValues(alpha: 0.55)),
           ),
         ),
         FilledButton.icon(
           onPressed: onContact,
           icon: const Icon(Icons.connect_without_contact, size: 18),
           style: FilledButton.styleFrom(
-            backgroundColor: HomeWarmColors.sectionAccent,
-            foregroundColor: Colors.white,
+            backgroundColor: AppColors.primaryGold,
+            foregroundColor: const Color(0xFF0B0F19),
           ),
           label: Text(
             'Discuss your project',
@@ -316,6 +329,26 @@ class _ArticleFooterActions extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _InsightGoldGradientTitle extends StatelessWidget {
+  const _InsightGoldGradientTitle(this.text, {required this.style});
+
+  final String text;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (bounds) =>
+          AppColors.goldGradient.createShader(bounds),
+      child: Text(
+        text,
+        style: style.copyWith(color: Colors.white),
+      ),
     );
   }
 }

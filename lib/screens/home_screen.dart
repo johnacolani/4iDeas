@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:four_ideas/app_router.dart';
+import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
 import 'package:four_ideas/screens/web_screen.dart';
+import 'package:four_ideas/services/admin_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,18 +24,14 @@ const LinearGradient _kNavIconGoldGradient = LinearGradient(
   ],
 );
 
-/// Reusable 7 entries: hamburger menu and desktop [TabBar].
-class _KNav {
-  _KNav._();
-  static final List<({String label, String route, IconData icon})> items =
+/// Primary bar: Home, Services (hub), About, Contact. [servicesHubItems] is the Services submenu.
+class _NavConfig {
+  _NavConfig._();
+
+  static final List<({String label, String route, IconData icon})> servicesHubItems =
       <({String label, String route, IconData icon})>[
     (
-      label: 'Home',
-      route: AppRoutes.home,
-      icon: Icons.home_rounded,
-    ),
-    (
-      label: 'Services',
+      label: 'Services overview',
       route: AppRoutes.services,
       icon: Icons.layers_outlined,
     ),
@@ -47,14 +46,9 @@ class _KNav {
       icon: Icons.account_tree_outlined,
     ),
     (
-      label: 'About',
-      route: AppRoutes.about,
-      icon: Icons.info_outlined,
-    ),
-    (
-      label: 'Contact Us',
-      route: AppRoutes.contact,
-      icon: Icons.mail_outlined,
+      label: 'How 4iDeas helps',
+      route: AppRoutes.caseStudies,
+      icon: Icons.auto_awesome_outlined,
     ),
     (
       label: 'Blog',
@@ -64,202 +58,40 @@ class _KNav {
   ];
 }
 
-class _NavRoutePreview {
-  const _NavRoutePreview({
-    required this.title,
-    required this.subtitle,
-    required this.bullets,
-  });
-
-  final String title;
-  final String subtitle;
-  final List<String> bullets;
+bool _pathIsServicesHub(String path) {
+  if (path == AppRoutes.services) return true;
+  if (path.startsWith(AppRoutes.portfolio)) return true;
+  if (path == AppRoutes.designPhilosophy) return true;
+  if (path.startsWith(AppRoutes.insights)) return true;
+  if (path == AppRoutes.caseStudies) return true;
+  return false;
 }
 
-_NavRoutePreview _previewForRoute(String route) {
-  switch (route) {
-    case AppRoutes.home:
-      return const _NavRoutePreview(
-        title: 'Home',
-        subtitle:
-            'Service positioning, proof, and clear next steps for a Flutter engagement.',
-        bullets: [
-          'What we build: MVPs, dashboards, AI-assisted workflows, cross-platform delivery',
-          'Trust: shipped products, case studies, and a transparent process',
-          'CTA: start a project and move from idea to a scoped plan',
-        ],
-      );
-    case AppRoutes.services:
-      return const _NavRoutePreview(
-        title: 'Services',
-        subtitle:
-            'Scope-friendly offerings across design, Flutter engineering, and Firebase delivery.',
-        bullets: [
-          'MVP and production builds, role-based business apps, portals',
-          'Product UX/UI + implementation that stays aligned',
-        ],
-      );
-    case AppRoutes.portfolio:
-      return const _NavRoutePreview(
-        title: 'Work',
-        subtitle:
-            'Interactive portfolio: shipped apps, deep case studies, and real constraints.',
-        bullets: [
-          'Case studies: problem, solution, outcomes, stack',
-          'Platform proof: iOS, Android, Web, Firebase',
-        ],
-      );
-    case AppRoutes.designPhilosophy:
-      return const _NavRoutePreview(
-        title: 'Process',
-        subtitle:
-            'The thinking behind delivery: clarity, tradeoffs, and buildable decisions.',
-        bullets: [
-          'What “good” looks like before code decisions harden',
-          'How we communicate scope, risk, and iteration',
-        ],
-      );
-    case AppRoutes.about:
-      return const _NavRoutePreview(
-        title: 'About',
-        subtitle: 'Background, values, and how we collaborate with US teams.',
-        bullets: [
-          'Senior product + Flutter ownership in one path',
-        ],
-      );
-    case AppRoutes.contact:
-      return const _NavRoutePreview(
-        title: 'Contact',
-        subtitle:
-            'Tell us what you want to build—timeline, budget, and success criteria.',
-        bullets: [
-          'Project intake form (email capture via existing endpoint)',
-          'Optional intro call (if configured)',
-        ],
-      );
-    case AppRoutes.insights:
-      return const _NavRoutePreview(
-        title: 'Blog / Insights',
-        subtitle:
-            'Practical articles: Flutter, MVPs, Firebase, and AI in real products.',
-        bullets: [
-          'Founder-friendly explanations with actionable framing',
-        ],
-      );
-    default:
-      return const _NavRoutePreview(
-        title: 'Page preview',
-        subtitle: 'A quick description of this destination in the 4iDeas site.',
-        bullets: [
-          'Open the page to see full content',
-        ],
-      );
-  }
+/// Which primary slot (0–3) shows the gold underline: Home, Services, About, Contact.
+int _primaryHighlightIndex(String path) {
+  final p = path.isEmpty ? '/' : path;
+  if (p == AppRoutes.home) return 0;
+  if (_pathIsServicesHub(p)) return 1;
+  if (p == AppRoutes.about) return 2;
+  if (p == AppRoutes.contact) return 3;
+  return -1;
 }
 
-class _NavHoverPreviewCard extends StatelessWidget {
-  const _NavHoverPreviewCard({
-    required this.route,
-    required this.isMobile,
-    required this.onOpen,
-  });
+/// ~10% narrower than prior desktop widths (274 ≈ 304×0.9, 241 ≈ 268×0.9).
+const double _kServicesMenuMinWidth = 274;
+const double _kAdminMenuMinWidth = 241;
+/// Mobile hamburger menu: 240×0.9.
+const double _kHamburgerMenuMinWidth = 216;
 
-  final String route;
-  final bool isMobile;
-  final VoidCallback onOpen;
+/// Dividers between dropdown rows (Services, Admin, hamburger).
+const Color _kPopupMenuDividerColor = Color(0xFF3F3F46);
 
-  @override
-  Widget build(BuildContext context) {
-    final p = _previewForRoute(route);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          width: isMobile ? double.infinity : 360,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.42),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
-                blurRadius: 18,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                p.title,
-                style: GoogleFonts.roboto(
-                  color: Colors.white,
-                  fontSize: isMobile ? 16 : 17,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                p.subtitle,
-                style: GoogleFonts.roboto(
-                  color: const Color(0xFFD1D5DB),
-                  fontSize: isMobile ? 13.5 : 14,
-                  height: 1.4,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 10),
-              for (final b in p.bullets) ...[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '• ',
-                      style: GoogleFonts.roboto(
-                        color: const Color(0xFFF5B32F),
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        b,
-                        style: GoogleFonts.roboto(
-                          color: const Color(0xFFE5E7EB),
-                          fontSize: 13.5,
-                          height: 1.35,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-              ],
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: onOpen,
-                  child: Text(
-                    'Open',
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFFF5B32F),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+/// Lighter hover / splash for menu rows: soft blue tint (replaces flat white 8%).
+const Color _kPopupMenuHoverColor = Color(0x1A7AB6F5);
+
+/// Desktop nav dropdown rows: roomier tap targets, labels shifted further left.
+const EdgeInsets _kDesktopPopupMenuItemPadding =
+    EdgeInsets.symmetric(horizontal: 22, vertical: 14);
 
 class _NavGoldIcon extends StatelessWidget {
   const _NavGoldIcon(this.icon, {this.size = 20});
@@ -285,82 +117,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String? _hoveredRoute;
-  int? _hoveredTabIndex;
-  Timer? _hideTimer;
-  late final List<LayerLink> _navTabLayerLinks;
-
-  bool get _navHoverPreviewsEnabled => kIsWeb;
-
-  @override
-  void initState() {
-    super.initState();
-    _navTabLayerLinks = List<LayerLink>.generate(
-      _KNav.items.length,
-      (_) => LayerLink(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _hideTimer?.cancel();
-    super.dispose();
-  }
-
-  void _cancelHideTimer() {
-    _hideTimer?.cancel();
-    _hideTimer = null;
-  }
-
-  void _queueHideIfStillHovering(String route) {
-    _cancelHideTimer();
-    _hideTimer = Timer(const Duration(milliseconds: 200), () {
-      if (!mounted) return;
-      if (_hoveredRoute != route) return;
-      setState(() {
-        _hoveredRoute = null;
-        _hoveredTabIndex = null;
-      });
-    });
-  }
-
-  void _queueHidePreview() {
-    final route = _hoveredRoute;
-    if (route == null) return;
-    _queueHideIfStillHovering(route);
-  }
+  /// Desktop only: which primary slot (0–3) shows the gold underline while hovering.
+  int? _hoveredPrimaryIndex;
 
   void _onNavTabHoverStart(String route, int tabIndex) {
-    if (!_navHoverPreviewsEnabled) return;
-    _cancelHideTimer();
-    if (_hoveredRoute == route && _hoveredTabIndex == tabIndex) return;
-    setState(() {
-      _hoveredRoute = route;
-      _hoveredTabIndex = tabIndex;
-    });
+    setState(() => _hoveredPrimaryIndex = tabIndex);
   }
 
   void _onNavTabHoverEnd(String route) {
-    if (!_navHoverPreviewsEnabled) return;
-    _queueHideIfStillHovering(route);
-  }
-
-  void _onPreviewPointerEnter() {
-    if (!_navHoverPreviewsEnabled) return;
-    _cancelHideTimer();
-  }
-
-  void _onPreviewPointerExit() {
-    if (!_navHoverPreviewsEnabled) return;
-    _queueHidePreview();
+    setState(() => _hoveredPrimaryIndex = null);
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isMobile = MediaQuery.of(context).size.width < 800;
-    final bool showNavHoverPreview = _navHoverPreviewsEnabled && !isMobile;
-    final String? previewRoute = showNavHoverPreview ? _hoveredRoute : null;
-    final int? previewTabIndex = showNavHoverPreview ? _hoveredTabIndex : null;
+    final bool desktopNavHover = !isMobile;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -379,13 +150,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       _ModernTopAppBar(
                         isMobile: isMobile,
-                        navTabLayerLinks: _navTabLayerLinks,
-                        tabHoverIndicatorIndex:
-                            showNavHoverPreview ? _hoveredTabIndex : null,
+                        tabHoverIndicatorIndex: desktopNavHover
+                            ? _hoveredPrimaryIndex
+                            : null,
                         onNavTabHover:
-                            showNavHoverPreview ? _onNavTabHoverStart : null,
+                            desktopNavHover ? _onNavTabHoverStart : null,
                         onNavTabHoverEnd:
-                            showNavHoverPreview ? _onNavTabHoverEnd : null,
+                            desktopNavHover ? _onNavTabHoverEnd : null,
                       ),
                       SizedBox(height: isMobile ? 0 : 6),
                     ],
@@ -394,39 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: SafeArea(
                     top: false,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // Same home content on phone, tablet, and desktop (see [WebScreen]).
-                        const WebScreen(),
-                        if (previewRoute != null &&
-                            previewTabIndex != null) ...[
-                          CompositedTransformFollower(
-                            link: _navTabLayerLinks[previewTabIndex],
-                            showWhenUnlinked: false,
-                            targetAnchor: Alignment.bottomCenter,
-                            followerAnchor: Alignment.topCenter,
-                            offset: const Offset(0, 28),
-                            child: MouseRegion(
-                              onEnter: (_) => _onPreviewPointerEnter(),
-                              onExit: (_) => _onPreviewPointerExit(),
-                              child: _NavHoverPreviewCard(
-                                route: previewRoute,
-                                isMobile: false,
-                                onOpen: () {
-                                  _cancelHideTimer();
-                                  setState(() {
-                                    _hoveredRoute = null;
-                                    _hoveredTabIndex = null;
-                                  });
-                                  context.go(previewRoute);
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                    // Same home content on phone, tablet, and desktop (see [WebScreen]).
+                    child: const WebScreen(),
                   ),
                 ),
               ],
@@ -441,14 +181,12 @@ class _HomeScreenState extends State<HomeScreen> {
 class _ModernTopAppBar extends StatelessWidget {
   const _ModernTopAppBar({
     required this.isMobile,
-    required this.navTabLayerLinks,
     this.tabHoverIndicatorIndex,
     this.onNavTabHover,
     this.onNavTabHoverEnd,
   });
 
   final bool isMobile;
-  final List<LayerLink> navTabLayerLinks;
   final int? tabHoverIndicatorIndex;
   final void Function(String route, int tabIndex)? onNavTabHover;
   final void Function(String route)? onNavTabHoverEnd;
@@ -623,18 +361,17 @@ class _ModernTopAppBar extends StatelessWidget {
                         ),
                       ),
                     if (!isMobile) ...[
-                      const Spacer(),
+                      const SizedBox(width: 12),
                       Expanded(
-                        child: _TopNavTabs(
+                        child: _PrimaryDesktopNav(
                           currentPath: currentPath,
                           style: navStyle,
-                          tabLayerLinks: navTabLayerLinks,
                           tabHoverIndicatorIndex: tabHoverIndicatorIndex,
                           onNavTabHover: onNavTabHover,
                           onNavTabHoverEnd: onNavTabHoverEnd,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 44),
                       const _AccountMetaBlock(mobile: false),
                     ] else ...[
                       const Spacer(),
@@ -659,48 +396,198 @@ class _AppBarHamburgerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: PopupMenuButton<String>(
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          highlightColor: _kPopupMenuHoverColor,
+          hoverColor: _kPopupMenuHoverColor,
+          dividerTheme: const DividerThemeData(
+            color: _kPopupMenuDividerColor,
+            thickness: 1,
+          ),
+        ),
+        child: PopupMenuButton<String>(
         color: const Color(0xFF111827),
-        constraints: const BoxConstraints(minWidth: 240),
+        constraints: const BoxConstraints(minWidth: _kHamburgerMenuMinWidth),
         position: PopupMenuPosition.under,
         offset: const Offset(0, 8),
         padding: EdgeInsets.zero,
-        tooltip: 'Menu',
+        tooltip: '',
         onSelected: (route) => context.go(route),
         itemBuilder: (context) {
-          final entries = _KNav.items.asMap().entries;
-          return [
-            for (final entry in entries) ...[
+          final authState = context.read<AuthBloc>().state;
+          final userEmail = authState is Authenticated
+              ? authState.user.email
+              : authState is EmailNotVerified
+                  ? authState.user.email
+                  : null;
+          final showAdmin =
+              userEmail != null && AdminService.isAdmin(email: userEmail);
+          const labelStyle = TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          );
+          const sectionLabelStyle = TextStyle(
+            color: Color(0xFF9CA3AF),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+          );
+
+          final items = <PopupMenuEntry<String>>[
+            PopupMenuItem<String>(
+              value: AppRoutes.home,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Home', style: labelStyle),
+                  _NavGoldIcon(Icons.home_rounded, size: 22),
+                ],
+              ),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem<String>(
+              enabled: false,
+              height: 32,
+              padding: EdgeInsets.only(left: 16, right: 16, bottom: 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('SERVICES', style: sectionLabelStyle),
+              ),
+            ),
+            for (var i = 0; i < _NavConfig.servicesHubItems.length; i++) ...[
+              if (i > 0) const PopupMenuDivider(),
               PopupMenuItem<String>(
-                value: entry.value.route,
+                value: _NavConfig.servicesHubItems[i].route,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(_NavConfig.servicesHubItems[i].label, style: labelStyle),
+                    _NavGoldIcon(_NavConfig.servicesHubItems[i].icon, size: 22),
+                  ],
+                ),
+              ),
+            ],
+            const PopupMenuDivider(),
+            PopupMenuItem<String>(
+              value: AppRoutes.about,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('About', style: labelStyle),
+                  _NavGoldIcon(Icons.info_outlined, size: 22),
+                ],
+              ),
+            ),
+            PopupMenuItem<String>(
+              value: AppRoutes.contact,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Contact Us', style: labelStyle),
+                  _NavGoldIcon(Icons.mail_outlined, size: 22),
+                ],
+              ),
+            ),
+          ];
+
+          if (authState is Authenticated || authState is EmailNotVerified) {
+            items.add(const PopupMenuDivider());
+            items.add(
+              PopupMenuItem<String>(
+                value: AppRoutes.profile,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      entry.value.label,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      'Profile',
+                      style: GoogleFonts.roboto(
+                        color: AppColors.primaryGold,
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    _NavGoldIcon(entry.value.icon, size: 22),
+                    const Icon(
+                      Icons.person_outline,
+                      color: AppColors.primaryGold,
+                      size: 22,
+                    ),
                   ],
                 ),
               ),
-              if (entry.key < _KNav.items.length - 1)
+            );
+            items.add(const PopupMenuDivider());
+            items.add(
+              PopupMenuItem<String>(
+                value: AppRoutes.profile,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'My orders',
+                      style: GoogleFonts.roboto(
+                        color: AppColors.primaryGold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.receipt_long_outlined,
+                      color: AppColors.primaryGold,
+                      size: 22,
+                    ),
+                  ],
+                ),
+              ),
+            );
+            if (showAdmin) {
+              items.add(const PopupMenuDivider());
+              items.add(
                 const PopupMenuItem<String>(
                   enabled: false,
-                  height: 10,
-                  padding: EdgeInsets.symmetric(horizontal: 18),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Color(0x4DFFFFFF),
+                  height: 32,
+                  padding: EdgeInsets.only(left: 16, right: 16, bottom: 4),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('ADMIN', style: sectionLabelStyle),
                   ),
                 ),
-            ],
-          ];
+              );
+              items.add(
+                PopupMenuItem<String>(
+                  value: AppRoutes.adminOrders,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Admin orders', style: labelStyle),
+                      _NavGoldIcon(
+                        Icons.admin_panel_settings_outlined,
+                        size: 22,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+              items.add(const PopupMenuDivider());
+              items.add(
+                PopupMenuItem<String>(
+                  value: AppRoutes.contact,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Contact inbox', style: labelStyle),
+                      _NavGoldIcon(
+                        Icons.mark_chat_unread_outlined,
+                        size: 22,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+
+          return items;
         },
         child: const Padding(
           padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -710,6 +597,7 @@ class _AppBarHamburgerButton extends StatelessWidget {
             size: 28,
           ),
         ),
+      ),
       ),
     );
   }
@@ -753,11 +641,214 @@ class _FounderLedLocationChip extends StatelessWidget {
   }
 }
 
-class _TopNavTabs extends StatefulWidget {
-  const _TopNavTabs({
+class _NavUnderlineLink extends StatelessWidget {
+  const _NavUnderlineLink({
+    required this.label,
+    required this.route,
+    required this.layerIndex,
+    required this.selected,
+    required this.textStyle,
+    this.onNavTabHover,
+    this.onNavTabHoverEnd,
+  });
+
+  final String label;
+  final String route;
+  final int layerIndex;
+  final bool selected;
+  final TextStyle textStyle;
+  final void Function(String route, int tabIndex)? onNavTabHover;
+  final void Function(String route)? onNavTabHoverEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: onNavTabHover != null
+          ? (_) => onNavTabHover!(route, layerIndex)
+          : null,
+      onExit: onNavTabHoverEnd != null
+          ? (_) => onNavTabHoverEnd!(route)
+          : null,
+      child: TextButton(
+        onPressed: () => context.go(route),
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: textStyle.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                height: 2.4,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.primaryGold
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+typedef _HoverNavMenuPanelBuilder =
+    Widget Function(BuildContext context, VoidCallback closeMenu);
+
+/// Desktop only: opens below the trigger on hover (no click required).
+class _DesktopHoverNavDropdown extends StatefulWidget {
+  const _DesktopHoverNavDropdown({
+    required this.trigger,
+    required this.menuMinWidth,
+    required this.menuBuilder,
+  });
+
+  final Widget trigger;
+  final double menuMinWidth;
+  final _HoverNavMenuPanelBuilder menuBuilder;
+
+  @override
+  State<_DesktopHoverNavDropdown> createState() =>
+      _DesktopHoverNavDropdownState();
+}
+
+class _DesktopHoverNavDropdownState extends State<_DesktopHoverNavDropdown> {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  Timer? _closeTimer;
+
+  static const Duration _closeDelay = Duration(milliseconds: 240);
+
+  void _cancelCloseTimer() {
+    _closeTimer?.cancel();
+    _closeTimer = null;
+  }
+
+  void _scheduleClose() {
+    _cancelCloseTimer();
+    _closeTimer = Timer(_closeDelay, () {
+      if (!mounted) return;
+      _removeOverlay();
+    });
+  }
+
+  void _removeOverlay() {
+    _cancelCloseTimer();
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  void _closeMenu() {
+    _removeOverlay();
+  }
+
+  void _insertOverlay() {
+    if (_overlayEntry != null || !mounted) return;
+    final overlayState = Overlay.maybeOf(context);
+    if (overlayState == null) return;
+
+    _overlayEntry = OverlayEntry(
+      builder: (overlayContext) {
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: _closeMenu,
+              ),
+            ),
+            CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              targetAnchor: Alignment.bottomCenter,
+              followerAnchor: Alignment.topCenter,
+              offset: const Offset(0, 6),
+              child: MouseRegion(
+                onEnter: (_) => _cancelCloseTimer(),
+                onExit: (_) => _scheduleClose(),
+                child: Material(
+                  elevation: 12,
+                  shadowColor: Colors.black54,
+                  color: const Color(0xFF111827),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: widget.menuMinWidth,
+                    ),
+                    child: IntrinsicWidth(
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          highlightColor: _kPopupMenuHoverColor,
+                          hoverColor: _kPopupMenuHoverColor,
+                          dividerTheme: const DividerThemeData(
+                            color: _kPopupMenuDividerColor,
+                            thickness: 1,
+                          ),
+                        ),
+                        child: widget.menuBuilder(
+                          overlayContext,
+                          _closeMenu,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    overlayState.insert(_overlayEntry!);
+  }
+
+  @override
+  void dispose() {
+    _cancelCloseTimer();
+    _overlayEntry?.remove();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: MouseRegion(
+        onEnter: (_) {
+          _cancelCloseTimer();
+          _insertOverlay();
+        },
+        onExit: (_) => _scheduleClose(),
+        child: widget.trigger,
+      ),
+    );
+  }
+}
+
+class _PrimaryDesktopNav extends StatelessWidget {
+  const _PrimaryDesktopNav({
     required this.currentPath,
     required this.style,
-    required this.tabLayerLinks,
     this.tabHoverIndicatorIndex,
     this.onNavTabHover,
     this.onNavTabHoverEnd,
@@ -765,122 +856,285 @@ class _TopNavTabs extends StatefulWidget {
 
   final String currentPath;
   final TextStyle? style;
-  final List<LayerLink> tabLayerLinks;
   final int? tabHoverIndicatorIndex;
   final void Function(String route, int tabIndex)? onNavTabHover;
   final void Function(String route)? onNavTabHoverEnd;
 
-  @override
-  State<_TopNavTabs> createState() => _TopNavTabsState();
-}
-
-class _TopNavTabsState extends State<_TopNavTabs>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  int _indexForPath(String path) {
-    if (path == AppRoutes.home) return 0;
-    if (path == AppRoutes.services) return 1;
-    if (path.startsWith(AppRoutes.portfolio)) return 2;
-    if (path == AppRoutes.designPhilosophy) return 3;
-    if (path == AppRoutes.about) return 4;
-    if (path == AppRoutes.contact) return 5;
-    if (path.startsWith(AppRoutes.insights)) return 6;
-    return 0;
-  }
-
-  int get _targetIndex =>
-      widget.tabHoverIndicatorIndex ?? _indexForPath(widget.currentPath);
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: _KNav.items.length,
-      vsync: this,
-      initialIndex: _targetIndex,
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant _TopNavTabs oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentPath != widget.currentPath ||
-        oldWidget.tabHoverIndicatorIndex != widget.tabHoverIndicatorIndex) {
-      if (_tabController.index != _targetIndex) {
-        _tabController.index = _targetIndex;
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  Widget _navTab({
-    required ({String label, String route, IconData icon}) item,
-    required int index,
-    required TextStyle? textStyle,
-  }) {
-    final child = Text(
-      item.label,
-      style: textStyle?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ) ??
-          const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-    );
-    if (widget.onNavTabHover == null) {
-      return Tab(child: child);
-    }
-    return Tab(
-      child: CompositedTransformTarget(
-        link: widget.tabLayerLinks[index],
-        child: MouseRegion(
-          onEnter: (_) => widget.onNavTabHover?.call(item.route, index),
-          onExit: (_) => widget.onNavTabHoverEnd?.call(item.route),
-          child: child,
-        ),
-      ),
-    );
+  static bool _adminTabSelected(String path) {
+    return path == AppRoutes.adminOrders ||
+        path.startsWith('${AppRoutes.adminOrders}/');
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = _KNav.items;
-    final textStyle = widget.style;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        tabAlignment: TabAlignment.start,
-        indicatorSize: TabBarIndicatorSize.label,
-        dividerColor: Colors.transparent,
-        indicatorColor: AppColors.primaryGold,
-        indicatorWeight: 2.4,
-        labelPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white,
-        labelStyle: textStyle,
-        unselectedLabelStyle: textStyle,
-        onTap: (index) => context.go(items[index].route),
-        // Text-only on web + tablet; mobile nav uses the hamburger menu (icons kept there).
-        tabs: <Widget>[
-          for (var i = 0; i < items.length; i++)
-            _navTab(
-              item: items[i],
-              index: i,
-              textStyle: textStyle,
+    final path = currentPath.isEmpty ? AppRoutes.home : currentPath;
+    final baseHi = _primaryHighlightIndex(path);
+    final hi = tabHoverIndicatorIndex ?? baseHi;
+
+    final textStyle = style ??
+        const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        );
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        final userEmail = authState is Authenticated
+            ? authState.user.email
+            : authState is EmailNotVerified
+                ? authState.user.email
+                : null;
+        final showAdmin =
+            userEmail != null && AdminService.isAdmin(email: userEmail);
+        final adminSel = _adminTabSelected(path);
+
+        return Center(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _NavUnderlineLink(
+                  label: 'Home',
+                  route: AppRoutes.home,
+                  layerIndex: 0,
+                  selected: hi == 0,
+                  textStyle: textStyle,
+                  onNavTabHover: onNavTabHover,
+                  onNavTabHoverEnd: onNavTabHoverEnd,
+                ),
+                MouseRegion(
+                  onEnter: onNavTabHover != null
+                      ? (_) => onNavTabHover!(AppRoutes.services, 1)
+                      : null,
+                  onExit: onNavTabHoverEnd != null
+                      ? (_) => onNavTabHoverEnd!(AppRoutes.services)
+                      : null,
+                  child: _DesktopHoverNavDropdown(
+                    menuMinWidth: _kServicesMenuMinWidth,
+                    menuBuilder: (ctx, close) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (var i = 0;
+                              i < _NavConfig.servicesHubItems.length;
+                              i++) ...[
+                            if (i > 0)
+                              const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: _kPopupMenuDividerColor,
+                              ),
+                            InkWell(
+                              onTap: () {
+                                close();
+                                ctx.go(_NavConfig.servicesHubItems[i].route);
+                              },
+                              child: Padding(
+                                padding: _kDesktopPopupMenuItemPadding,
+                                child: Row(
+                                  children: [
+                                    _NavGoldIcon(
+                                      _NavConfig.servicesHubItems[i].icon,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        _NavConfig.servicesHubItems[i].label,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      );
+                    },
+                    trigger: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      child: IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Services',
+                                  style: textStyle.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              height: 2.4,
+                              decoration: BoxDecoration(
+                                color: hi == 1
+                                    ? AppColors.primaryGold
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                _NavUnderlineLink(
+                  label: 'About',
+                  route: AppRoutes.about,
+                  layerIndex: 2,
+                  selected: hi == 2,
+                  textStyle: textStyle,
+                  onNavTabHover: onNavTabHover,
+                  onNavTabHoverEnd: onNavTabHoverEnd,
+                ),
+                _NavUnderlineLink(
+                  label: 'Contact Us',
+                  route: AppRoutes.contact,
+                  layerIndex: 3,
+                  selected: hi == 3,
+                  textStyle: textStyle,
+                  onNavTabHover: onNavTabHover,
+                  onNavTabHoverEnd: onNavTabHoverEnd,
+                ),
+                if (showAdmin) ...[
+                  const SizedBox(width: 8),
+                  _DesktopHoverNavDropdown(
+                    menuMinWidth: _kAdminMenuMinWidth,
+                    menuBuilder: (ctx, close) {
+                      Widget row({
+                        required String route,
+                        required String label,
+                        required IconData icon,
+                      }) {
+                        return InkWell(
+                          onTap: () {
+                            close();
+                            ctx.go(route);
+                          },
+                          child: Padding(
+                            padding: _kDesktopPopupMenuItemPadding,
+                            child: Row(
+                              children: [
+                                _NavGoldIcon(icon, size: 22),
+                                const SizedBox(width: 12),
+                                Text(
+                                  label,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          row(
+                            route: AppRoutes.profile,
+                            label: 'Profile',
+                            icon: Icons.person_outline,
+                          ),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: _kPopupMenuDividerColor,
+                          ),
+                          row(
+                            route: AppRoutes.adminOrders,
+                            label: 'Admin orders',
+                            icon: Icons.admin_panel_settings_outlined,
+                          ),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: _kPopupMenuDividerColor,
+                          ),
+                          row(
+                            route: AppRoutes.contact,
+                            label: 'Contact inbox',
+                            icon: Icons.mark_chat_unread_outlined,
+                          ),
+                        ],
+                      );
+                    },
+                    trigger: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      child: IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Admin',
+                                  style: textStyle.copyWith(
+                                    color: AppColors.primaryGold,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_drop_down,
+                                  color: AppColors.primaryGold,
+                                  size: 22,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              height: 2.4,
+                              decoration: BoxDecoration(
+                                color: adminSel
+                                    ? AppColors.primaryGold
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -911,42 +1165,116 @@ class _AccountMetaBlock extends StatelessWidget {
             mobile ? CrossAxisAlignment.end : CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment:
-                mobile ? MainAxisAlignment.end : MainAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: () => context.go(AppRoutes.login),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: mobile ? 4 : 10,
-                    vertical: mobile ? 0 : 4,
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              if (authState is Authenticated ||
+                  authState is EmailNotVerified) {
+                final userEmail = authState is Authenticated
+                    ? authState.user.email
+                    : (authState as EmailNotVerified).user.email;
+                final sepStyle =
+                    textStyle?.copyWith(color: AppColors.primaryGold);
+                final emailStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.78),
+                      fontSize: mobile ? 10.5 : 11.5,
+                      fontWeight: FontWeight.w500,
+                    );
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: mobile
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.center,
+                  children: [
+                    Wrap(
+                      alignment: mobile
+                          ? WrapAlignment.end
+                          : WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 2,
+                      runSpacing: 4,
+                      children: [
+                        TextButton(
+                          onPressed: () => context.go(AppRoutes.profile),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primaryGold,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: mobile ? 4 : 10,
+                              vertical: mobile ? 0 : 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text('Profile', style: textStyle),
+                        ),
+                        Text('·', style: sepStyle),
+                        TextButton(
+                          onPressed: () => context.go(AppRoutes.profile),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primaryGold,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: mobile ? 4 : 10,
+                              vertical: mobile ? 0 : 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text('My orders', style: textStyle),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: mobile ? 3 : 4),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 220),
+                      child: Text(
+                        userEmail ?? '',
+                        textAlign:
+                            mobile ? TextAlign.end : TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: emailStyle,
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment:
+                    mobile ? MainAxisAlignment.end : MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () => context.go(AppRoutes.login),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: mobile ? 4 : 10,
+                        vertical: mobile ? 0 : 4,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text('Sign in', style: textStyle),
                   ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text('Sign in', style: textStyle),
-              ),
-              Text(
-                ' / ',
-                style: textStyle?.copyWith(color: AppColors.primaryGold),
-              ),
-              TextButton(
-                onPressed: () => context.go(AppRoutes.signUp),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: mobile ? 4 : 10,
-                    vertical: mobile ? 0 : 4,
+                  Text(
+                    ' / ',
+                    style: textStyle?.copyWith(color: AppColors.primaryGold),
                   ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text('Sign Up', style: textStyle),
-              ),
-            ],
+                  TextButton(
+                    onPressed: () => context.go(AppRoutes.signUp),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: mobile ? 4 : 10,
+                        vertical: mobile ? 0 : 4,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text('Sign Up', style: textStyle),
+                  ),
+                ],
+              );
+            },
           ),
           SizedBox(height: betweenRows),
           Align(

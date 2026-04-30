@@ -24,11 +24,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _scrollController = ScrollController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -81,8 +83,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   extra: state.user.email ?? _emailController.text.trim(),
                 );
               } else if (state is Authenticated) {
-                context.pop();
-                ScaffoldMessenger.of(context).showSnackBar(
+                final messenger = ScaffoldMessenger.of(context);
+                context.go(AppRoutes.home);
+                messenger.showSnackBar(
                   SnackBar(
                     content: Text(
                         'Account created successfully! Welcome, ${state.user.email ?? "User"}!'),
@@ -103,8 +106,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 padding: FrostedAppBar.contentPaddingUnderAppBar(context),
                 child: Center(
                   child: Scrollbar(
+                    controller: _scrollController,
                     thumbVisibility: true,
                     child: SingleChildScrollView(
+                      controller: _scrollController,
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 24.0 : 32.0,
                         vertical: 20.0,

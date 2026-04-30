@@ -23,10 +23,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _scrollController = ScrollController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -73,8 +75,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   extra: state.user.email ?? _emailController.text.trim(),
                 );
               } else if (state is Authenticated) {
-                context.pop();
-                ScaffoldMessenger.of(context).showSnackBar(
+                // Always replace route — GoRouter canPop/pop is unreliable on web.
+                final messenger = ScaffoldMessenger.of(context);
+                context.go(AppRoutes.home);
+                messenger.showSnackBar(
                   SnackBar(
                     content:
                         Text('Welcome back, ${state.user.email ?? "User"}!'),
@@ -95,8 +99,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: FrostedAppBar.contentPaddingUnderAppBar(context),
                 child: Center(
                   child: Scrollbar(
+                    controller: _scrollController,
                     thumbVisibility: true,
                     child: SingleChildScrollView(
+                      controller: _scrollController,
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 24.0 : 32.0,
                         vertical: 20.0,
@@ -329,7 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       );
                                                 },
                                           child: Image.asset(
-                                            'assets/google.png',
+                                            'assets/platforms/google.png',
                                             width: isMobile ? 50 : 60,
                                             height: isMobile ? 50 : 60,
                                             fit: BoxFit.contain,
@@ -354,7 +360,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                       );
                                                 },
                                           child: Image.asset(
-                                            'assets/apple.png',
+                                            'assets/platforms/apple.png',
                                             width: isMobile ? 50 : 60,
                                             height: isMobile ? 50 : 60,
                                             fit: BoxFit.contain,
@@ -362,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 (context, error, stackTrace) {
                                               return Icon(
                                                 Icons.apple,
-                                                size: 32,
+                                                size: isMobile ? 50 : 60,
                                                 color: Colors.white,
                                               );
                                             },

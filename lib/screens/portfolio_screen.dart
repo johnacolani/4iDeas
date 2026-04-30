@@ -635,8 +635,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
 
-    final double titleSize = isMobile ? 24 : (isTablet ? 28 : 32);
-    final double sectionTitleSize = isMobile ? 20 : (isTablet ? 22 : 24);
+    final double titleSize = isMobile ? 20 : (isTablet ? 24 : 28);
+    final double sectionTitleSize = isMobile ? 17 : (isTablet ? 19 : 21);
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     // ---------- CONTROLLABLE GAPS (adjust these to control distance between sections) ----------
@@ -671,7 +671,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           'Portfolio',
           style: GoogleFonts.roboto(
             color: ColorManager.portfolioTextTitle,
-            fontSize: isMobile ? 20 : 22,
+            fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -724,7 +724,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               // 2. My Own Design System card
                               _DesignSystemHighlight(
                                 designSystemTitleSize:
-                                    isMobile ? 24 : (sectionTitleSize + 6),
+                                    isMobile ? 20 : (sectionTitleSize + 4),
                                 designSystemSubSize:
                                     isMobile ? 14 : (bodySize - 1),
                                 bodySize: bodySize,
@@ -1296,10 +1296,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           LayoutBuilder(
                             builder: (context, constraints) {
                               final double headlineSize = isMobile
-                                  ? (constraints.maxWidth * 0.078)
-                                      .clamp(28.0, 44.0)
-                                  : (constraints.maxWidth * 0.05)
-                                      .clamp(34.0, 66.0);
+                                  ? (constraints.maxWidth * 0.068)
+                                      .clamp(22.0, 36.0)
+                                  : 46.0;
                               final TextStyle headlineStyle = GoogleFonts.roboto(
                                 fontSize: headlineSize,
                                 fontWeight: FontWeight.w900,
@@ -1367,15 +1366,25 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             },
                           ),
                           const SizedBox(height: 16),
-                          SelectableText(
-                            'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.roboto(
-                              color: const Color(0xFFD1D5DB),
-                              fontSize: (bodySize - 1).clamp(13.0, 18.0),
-                              fontWeight: FontWeight.w700,
-                              height: 1.35,
-                            ),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final baseStyle = GoogleFonts.roboto(
+                                color: const Color(0xFFD1D5DB),
+                                fontSize: (bodySize - 1).clamp(13.0, 18.0),
+                                fontWeight: FontWeight.w700,
+                                height: 1.2,
+                              );
+                              return FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.center,
+                                child: SelectableText(
+                                  'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami\u00A0Studio',
+                                  maxLines: 1,
+                                  textAlign: TextAlign.center,
+                                  style: baseStyle,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

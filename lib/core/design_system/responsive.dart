@@ -29,7 +29,7 @@ class Responsive {
     final width = MediaQuery.sizeOf(context).width;
     if (width < 800) return 42;
     if (width <= 1200) return 52;
-    return 64;
+    return 56;
   }
 
   /// Subline under the main hero title ("Digital products…").

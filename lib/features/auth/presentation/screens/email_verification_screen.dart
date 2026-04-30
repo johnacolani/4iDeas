@@ -78,6 +78,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   child: Scrollbar(
                       thumbVisibility: true,
                       child: SingleChildScrollView(
+                        primary: true,
                         padding: EdgeInsets.symmetric(
                           horizontal: isMobile ? 24.0 : 32.0,
                           vertical: 20.0,

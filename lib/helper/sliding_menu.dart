@@ -350,6 +350,10 @@ class _SlidingMenuState extends State<SlidingMenu>
                                         BlocBuilder<AuthBloc, AuthState>(
                                           builder: (context, authState) {
                                             if (authState is Authenticated || authState is EmailNotVerified) {
+                                              final userEmail = authState is Authenticated
+                                                  ? authState.user.email
+                                                  : (authState as EmailNotVerified).user.email;
+                                              final showAdmin = AdminService.isAdmin(email: userEmail);
                                               return Column(
                                                 children: [
                                                   _buildMenuItem(
@@ -358,13 +362,20 @@ class _SlidingMenuState extends State<SlidingMenu>
                                                     title: 'Profile',
                                                     onPressed: () => _closeDrawerAndGo(AppRoutes.profile),
                                                   ),
-                                                  if (AdminService.isAdmin())
+                                                  if (showAdmin) ...[
                                                     _buildMenuItem(
                                                       index: 7,
                                                       icon: Icons.admin_panel_settings,
-                                                      title: 'Admin - Orders',
+                                                      title: 'Admin – Orders',
                                                       onPressed: () => _closeDrawerAndGo(AppRoutes.adminOrders),
                                                     ),
+                                                    _buildMenuItem(
+                                                      index: 9,
+                                                      icon: Icons.mark_chat_unread_outlined,
+                                                      title: 'Admin – Contact inbox',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.contact),
+                                                    ),
+                                                  ],
                                                 ],
                                               );
                                             }

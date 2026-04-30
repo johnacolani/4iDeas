@@ -127,6 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Scrollbar(
                     thumbVisibility: true,
                     child: SingleChildScrollView(
+                      primary: true,
                       padding: EdgeInsets.symmetric(
                         horizontal: isMobile ? 16.0 : 24.0,
                         vertical: 20.0,
