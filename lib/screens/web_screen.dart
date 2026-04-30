@@ -10,6 +10,7 @@ import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/modern_hero_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 import '../core/widgets/trust_home_sections.dart';
+import '../widgets/home_mobile_nav_menu_button.dart';
 
 class WebScreen extends StatefulWidget {
   const WebScreen({super.key});
@@ -66,6 +67,14 @@ class _WebScreenState extends State<WebScreen> {
                             : CrossAxisAlignment.center),
                     children: [
                       SizedBox(height: contentTopNudge),
+                      if (isNarrowView)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: HomeMobileNavMenuButton(),
+                          ),
+                        ),
                       Transform.translate(
                         offset: Offset.zero,
                         child: const ModernHeroSection(),

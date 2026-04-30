@@ -9,11 +9,11 @@ import 'package:four_ideas/features/auth/presentation/bloc/auth_state.dart';
 import 'package:four_ideas/screens/web_screen.dart';
 import 'package:four_ideas/services/admin_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../helper/app_background.dart';
 import '../core/design_system/responsive.dart';
 import '../core/design_system/theme.dart';
+import '../widgets/home_mobile_nav_menu_button.dart';
 
 const LinearGradient _kNavIconGoldGradient = LinearGradient(
   begin: Alignment.topLeft,
@@ -23,40 +23,6 @@ const LinearGradient _kNavIconGoldGradient = LinearGradient(
     AppColors.primaryGoldDark,
   ],
 );
-
-/// Primary bar: Home, Services (hub), About, Contact. [servicesHubItems] is the Services submenu.
-class _NavConfig {
-  _NavConfig._();
-
-  static final List<({String label, String route, IconData icon})> servicesHubItems =
-      <({String label, String route, IconData icon})>[
-    (
-      label: 'Services overview',
-      route: AppRoutes.services,
-      icon: Icons.layers_outlined,
-    ),
-    (
-      label: 'Work',
-      route: AppRoutes.portfolio,
-      icon: Icons.cases_outlined,
-    ),
-    (
-      label: 'Process',
-      route: AppRoutes.designPhilosophy,
-      icon: Icons.account_tree_outlined,
-    ),
-    (
-      label: 'How 4iDeas helps',
-      route: AppRoutes.caseStudies,
-      icon: Icons.auto_awesome_outlined,
-    ),
-    (
-      label: 'Blog',
-      route: AppRoutes.insights,
-      icon: Icons.article_outlined,
-    ),
-  ];
-}
 
 bool _pathIsServicesHub(String path) {
   if (path == AppRoutes.services) return true;
@@ -80,9 +46,6 @@ int _primaryHighlightIndex(String path) {
 /// ~10% narrower than prior desktop widths (274 ≈ 304×0.9, 241 ≈ 268×0.9).
 const double _kServicesMenuMinWidth = 274;
 const double _kAdminMenuMinWidth = 241;
-/// Mobile hamburger menu: 240×0.9.
-const double _kHamburgerMenuMinWidth = 216;
-
 /// Dividers between dropdown rows (Services, Admin, hamburger).
 const Color _kPopupMenuDividerColor = Color(0xFF3F3F46);
 
@@ -197,7 +160,7 @@ class _ModernTopAppBar extends StatelessWidget {
     final topInset = MediaQuery.paddingOf(context).top;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     // Vertical space for logo / tabs / account; mobile = logo + menu column.
-    const double baseBarContentHeight = 90;
+    const double baseBarContentHeight = 76;
     // Web / tablet: taller bar for nav + logo (was 78).
     const double baseBarContentHeightDesktop = 96;
     // Space below the app bar row (logo, nav, account) before the border ends.
@@ -242,64 +205,60 @@ class _ModernTopAppBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (isMobile)
-                      Column(
+                      Row(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(1.5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(11),
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      AppColors.primaryGold,
-                                      AppColors.primaryGoldDark,
-                                    ],
+                          Container(
+                            padding: const EdgeInsets.all(1.5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(11),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primaryGold,
+                                  AppColors.primaryGoldDark,
+                                ],
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                width: 44,
+                                height: 44,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          RichText(
+                            text: TextSpan(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    fontSize: 22,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                              children: [
+                                TextSpan(
+                                  text: '4i',
+                                  style: TextStyle(
+                                    foreground: Paint()
+                                      ..shader = const LinearGradient(
+                                        colors: [
+                                          Color(0xFFF5B32F),
+                                          Color(0xFFD89A1C),
+                                        ],
+                                      ).createShader(
+                                        const Rect.fromLTWH(0, 0, 56, 24),
+                                      ),
                                   ),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.asset('assets/images/logo.png',
-                                      width: 44, height: 44),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              RichText(
-                                text: TextSpan(
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        fontSize: 22,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                  children: [
-                                    TextSpan(
-                                      text: '4i',
-                                      style: TextStyle(
-                                        foreground: Paint()
-                                          ..shader = const LinearGradient(
-                                            colors: [
-                                              Color(0xFFF5B32F),
-                                              Color(0xFFD89A1C),
-                                            ],
-                                          ).createShader(
-                                            const Rect.fromLTWH(0, 0, 56, 24),
-                                          ),
-                                      ),
-                                    ),
-                                    const TextSpan(text: 'Deas'),
-                                  ],
-                                ),
-                              ),
-                            ],
+                                const TextSpan(text: 'Deas'),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          _AppBarHamburgerButton(),
                         ],
                       )
                     else
@@ -383,221 +342,6 @@ class _ModernTopAppBar extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Mobile app bar: menu below the logo in a [Column] (leading, LTR).
-class _AppBarHamburgerButton extends StatelessWidget {
-  const _AppBarHamburgerButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          highlightColor: _kPopupMenuHoverColor,
-          hoverColor: _kPopupMenuHoverColor,
-          dividerTheme: const DividerThemeData(
-            color: _kPopupMenuDividerColor,
-            thickness: 1,
-          ),
-        ),
-        child: PopupMenuButton<String>(
-        color: const Color(0xFF111827),
-        constraints: const BoxConstraints(minWidth: _kHamburgerMenuMinWidth),
-        position: PopupMenuPosition.under,
-        offset: const Offset(0, 8),
-        padding: EdgeInsets.zero,
-        tooltip: '',
-        onSelected: (route) => context.go(route),
-        itemBuilder: (context) {
-          final authState = context.read<AuthBloc>().state;
-          final userEmail = authState is Authenticated
-              ? authState.user.email
-              : authState is EmailNotVerified
-                  ? authState.user.email
-                  : null;
-          final showAdmin =
-              userEmail != null && AdminService.isAdmin(email: userEmail);
-          const labelStyle = TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          );
-          const sectionLabelStyle = TextStyle(
-            color: Color(0xFF9CA3AF),
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.6,
-          );
-
-          final items = <PopupMenuEntry<String>>[
-            PopupMenuItem<String>(
-              value: AppRoutes.home,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Home', style: labelStyle),
-                  _NavGoldIcon(Icons.home_rounded, size: 22),
-                ],
-              ),
-            ),
-            const PopupMenuDivider(),
-            const PopupMenuItem<String>(
-              enabled: false,
-              height: 32,
-              padding: EdgeInsets.only(left: 16, right: 16, bottom: 4),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('SERVICES', style: sectionLabelStyle),
-              ),
-            ),
-            for (var i = 0; i < _NavConfig.servicesHubItems.length; i++) ...[
-              if (i > 0) const PopupMenuDivider(),
-              PopupMenuItem<String>(
-                value: _NavConfig.servicesHubItems[i].route,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(_NavConfig.servicesHubItems[i].label, style: labelStyle),
-                    _NavGoldIcon(_NavConfig.servicesHubItems[i].icon, size: 22),
-                  ],
-                ),
-              ),
-            ],
-            const PopupMenuDivider(),
-            PopupMenuItem<String>(
-              value: AppRoutes.about,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('About', style: labelStyle),
-                  _NavGoldIcon(Icons.info_outlined, size: 22),
-                ],
-              ),
-            ),
-            PopupMenuItem<String>(
-              value: AppRoutes.contact,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Contact Us', style: labelStyle),
-                  _NavGoldIcon(Icons.mail_outlined, size: 22),
-                ],
-              ),
-            ),
-          ];
-
-          if (authState is Authenticated || authState is EmailNotVerified) {
-            items.add(const PopupMenuDivider());
-            items.add(
-              PopupMenuItem<String>(
-                value: AppRoutes.profile,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Profile',
-                      style: GoogleFonts.roboto(
-                        color: AppColors.primaryGold,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.person_outline,
-                      color: AppColors.primaryGold,
-                      size: 22,
-                    ),
-                  ],
-                ),
-              ),
-            );
-            items.add(const PopupMenuDivider());
-            items.add(
-              PopupMenuItem<String>(
-                value: AppRoutes.profile,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'My orders',
-                      style: GoogleFonts.roboto(
-                        color: AppColors.primaryGold,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.receipt_long_outlined,
-                      color: AppColors.primaryGold,
-                      size: 22,
-                    ),
-                  ],
-                ),
-              ),
-            );
-            if (showAdmin) {
-              items.add(const PopupMenuDivider());
-              items.add(
-                const PopupMenuItem<String>(
-                  enabled: false,
-                  height: 32,
-                  padding: EdgeInsets.only(left: 16, right: 16, bottom: 4),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('ADMIN', style: sectionLabelStyle),
-                  ),
-                ),
-              );
-              items.add(
-                PopupMenuItem<String>(
-                  value: AppRoutes.adminOrders,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Admin orders', style: labelStyle),
-                      _NavGoldIcon(
-                        Icons.admin_panel_settings_outlined,
-                        size: 22,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-              items.add(const PopupMenuDivider());
-              items.add(
-                PopupMenuItem<String>(
-                  value: AppRoutes.contact,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Contact inbox', style: labelStyle),
-                      _NavGoldIcon(
-                        Icons.mark_chat_unread_outlined,
-                        size: 22,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-          }
-
-          return items;
-        },
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-          child: Icon(
-            Icons.menu,
-            color: AppColors.primaryGold,
-            size: 28,
-          ),
-        ),
-      ),
       ),
     );
   }
@@ -919,7 +663,7 @@ class _PrimaryDesktopNav extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           for (var i = 0;
-                              i < _NavConfig.servicesHubItems.length;
+                              i < HomeNavMenuItems.servicesHubItems.length;
                               i++) ...[
                             if (i > 0)
                               const Divider(
@@ -930,20 +674,22 @@ class _PrimaryDesktopNav extends StatelessWidget {
                             InkWell(
                               onTap: () {
                                 close();
-                                ctx.go(_NavConfig.servicesHubItems[i].route);
+                                ctx.go(
+                                  HomeNavMenuItems.servicesHubItems[i].route,
+                                );
                               },
                               child: Padding(
                                 padding: _kDesktopPopupMenuItemPadding,
                                 child: Row(
                                   children: [
                                     _NavGoldIcon(
-                                      _NavConfig.servicesHubItems[i].icon,
+                                      HomeNavMenuItems.servicesHubItems[i].icon,
                                       size: 22,
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        _NavConfig.servicesHubItems[i].label,
+                                        HomeNavMenuItems.servicesHubItems[i].label,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 15.5,

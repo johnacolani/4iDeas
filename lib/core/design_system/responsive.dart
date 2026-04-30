@@ -27,16 +27,16 @@ class Responsive {
 
   static double heroTitleSize(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    if (width < 800) return 42;
-    if (width <= 1200) return 52;
-    return 56;
+    if (width < 800) return 40;
+    if (width <= 1200) return 46;
+    return 48;
   }
 
   /// Subline under the main hero title ("Digital products…").
   static double heroSubtitleSize(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    if (width < 800) return 20;
-    if (width <= 1200) return 24;
-    return 28;
+    if (width < 800) return 19;
+    if (width <= 1200) return 22;
+    return 26;
   }
 }
