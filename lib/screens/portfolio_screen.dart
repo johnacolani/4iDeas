@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/design_system/theme.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
@@ -24,6 +25,15 @@ import 'package:four_ideas/services/case_study_content_service.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+Widget _portfolioGoldGradientTitle(Widget child) {
+  return ShaderMask(
+    blendMode: BlendMode.srcIn,
+    shaderCallback: (Rect bounds) =>
+        AppColors.goldGradient.createShader(bounds),
+    child: child,
+  );
+}
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({super.key});
@@ -102,7 +112,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         setState(() {
           _appsFromFirestore = withIds.map((t) => t.$2).toList();
           _portfolioFirestoreDocByAppId = {
-            for (final (docId, app) in withIds) app.id: docId,
+            for (final (docId, app) in withIds)
+              PortfolioData.mergePortfolioAppCaseStudyFromCatalog(app).id: docId,
           };
         });
       }
@@ -706,6 +717,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           child: _SectionTitle(
                             title: 'Featured Case Studies',
                             sectionTitleSize: sectionTitleSize,
+                            goldGradient: true,
                           ),
                         ),
                         if (AdminService.isAdmin()) ...[
@@ -1030,25 +1042,28 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 child: Center(
                   child: Transform.translate(
                     offset: Offset(0, -he * 0.08),
-                    child: Lottie.asset(
-                      'assets/waveloop.json',
-                      fit: BoxFit.fitHeight,
-                      delegates: LottieDelegates(
-                        values: [
-                          // Apply a teal tint to the full composition.
-                          ValueDelegate.colorFilter(
-                            ['**'],
-                            value: const ColorFilter.mode(
-                              Color(0xFF8FD3CB),
-                              BlendMode.srcATop,
+                    child: Opacity(
+                      opacity: 0.3,
+                      child: Lottie.asset(
+                        'assets/waveloop.json',
+                        fit: BoxFit.fitHeight,
+                        delegates: LottieDelegates(
+                          values: [
+                            // Light blue tint over the full composition.
+                            ValueDelegate.colorFilter(
+                              ['**'],
+                              value: const ColorFilter.mode(
+                                Color(0xFF93C5FD),
+                                BlendMode.srcATop,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.palette_outlined,
-                        size: titleSize,
-                        color: ColorManager.portfolioTextBody.withValues(alpha: 0.4),
+                          ],
+                        ),
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.palette_outlined,
+                          size: titleSize,
+                          color: ColorManager.portfolioTextBody.withValues(alpha: 0.4),
+                        ),
                       ),
                     ),
                   ),
@@ -1065,10 +1080,27 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         children: [
                           SelectableText.rich(
                             TextSpan(
+                              style: GoogleFonts.albertSans(
+                                color: ColorManager.portfolioTextTitle,
+                                fontSize: titleSize,
+                                fontWeight: FontWeight.w700,
+                                height: 1.25,
+                              ),
                               children: [
-                                TextSpan(
-                                  text: 'Product design',
-                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w900),
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.baseline,
+                                  baseline: TextBaseline.alphabetic,
+                                  child: _portfolioGoldGradientTitle(
+                                    Text(
+                                      'Product Design',
+                                      style: GoogleFonts.albertSans(
+                                        color: Colors.white,
+                                        fontSize: titleSize,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1.25,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 const TextSpan(text: '\n&\n'),
                                 TextSpan(
@@ -1081,22 +1113,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               ],
                             ),
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.albertSans(
-                              color: ColorManager.portfolioTextTitle,
-                              fontSize: titleSize,
-                              fontWeight: FontWeight.w700,
-                              height: 1.25,
-                            ),
                           ),
                           const SizedBox(height: 18),
-                          SelectableText(
-                            'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.albertSans(
-                              color: ColorManager.accentGoldDark,
-                              fontSize: (bodySize - 1).clamp(13.0, 18.0),
-                              fontWeight: FontWeight.w700,
-                              height: 1.35,
+                          _portfolioGoldGradientTitle(
+                            SelectableText(
+                              'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.albertSans(
+                                color: Colors.white,
+                                fontSize: (bodySize - 1).clamp(13.0, 18.0),
+                                fontWeight: FontWeight.w700,
+                                height: 1.35,
+                              ),
                             ),
                           ),
                         ],
@@ -1111,6 +1139,40 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
     );
   }
+}
+
+/// Frosted glass panel matching [_PremiumFeaturedCard] / featured case studies.
+Widget _portfolioFrostedGlassPanel({
+  required Widget child,
+  required EdgeInsetsGeometry padding,
+  double borderRadius = 22,
+}) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(borderRadius),
+    child: BackdropFilter(
+      filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+      child: Container(
+        width: double.infinity,
+        padding: padding,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withValues(alpha: 0.14),
+              Colors.white.withValues(alpha: 0.05),
+              ColorManager.portfolioTextBody.withValues(alpha: 0.12),
+            ],
+          ),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.28),
+          ),
+        ),
+        child: child,
+      ),
+    ),
+  );
 }
 
 class _DesignSystemHighlight extends StatefulWidget {
@@ -1153,11 +1215,13 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
 
   @override
   Widget build(BuildContext context) {
+    const double radius = 22;
+    final double attributionFontSize = widget.designSystemSubSize + 8;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: widget.onTapLink,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(radius),
         child: AnimatedBuilder(
           animation: _orbitController,
           builder: (context, child) {
@@ -1169,7 +1233,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                     child: CustomPaint(
                       painter: _NeonBorderOrbitPainter(
                         progress: _orbitController.value,
-                        borderRadius: 20,
+                        borderRadius: radius,
                       ),
                     ),
                   ),
@@ -1177,19 +1241,11 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
               ],
             );
           },
-          child: Container(
-            width: double.infinity,
+          child: _portfolioFrostedGlassPanel(
+            borderRadius: radius,
             padding: EdgeInsets.symmetric(
               horizontal: widget.isMobile ? 20 : 28,
               vertical: widget.isMobile ? 20 : 24,
-            ),
-            decoration: ColorManager.portfolioHighlightCardDecoration(
-              borderRadius: 20,
-            ).copyWith(
-              border: Border.all(
-                color: ColorManager.accentGold.withValues(alpha: 0.88),
-                width: 2.6,
-              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -1206,27 +1262,61 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SelectableText(
-                        'My Own Design System',
-                        style: GoogleFonts.playfairDisplay(
-                          color: ColorManager.portfolioTextTitle,
-                          fontSize: widget.designSystemTitleSize,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          height: 1.2,
+                      if (widget.isMobile) ...[
+                        _portfolioGoldGradientTitle(
+                          SelectableText(
+                            'My Own Design System',
+                            style: GoogleFonts.playfairDisplay(
+                              color: Colors.white,
+                              fontSize: widget.designSystemTitleSize,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                              height: 1.2,
+                            ),
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 4),
-                      SelectableText(
-                        'developed by: John Colani',
-                        style: GoogleFonts.cormorantGaramond(
-                          color: ColorManager.portfolioTextBody,
-                          fontSize: widget.designSystemSubSize + 2,
-                          fontWeight: FontWeight.w600,
-                          fontStyle: FontStyle.italic,
-                          letterSpacing: 0.3,
+                        SizedBox(height: 4),
+                        SelectableText(
+                          'Designed and developed by: John Colani',
+                          style: GoogleFonts.cormorantGaramond(
+                            color: ColorManager.portfolioTextBody,
+                            fontSize: attributionFontSize,
+                            fontWeight: FontWeight.w600,
+                            fontStyle: FontStyle.italic,
+                            letterSpacing: 0.3,
+                          ),
                         ),
-                      ),
+                      ] else
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: _portfolioGoldGradientTitle(
+                                SelectableText(
+                                  'My Own Design System',
+                                  style: GoogleFonts.playfairDisplay(
+                                    color: Colors.white,
+                                    fontSize: widget.designSystemTitleSize,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 28),
+                            SelectableText(
+                              'Designed and developed by: John Colani',
+                              style: GoogleFonts.cormorantGaramond(
+                                color: ColorManager.portfolioTextBody,
+                                fontSize: attributionFontSize,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.italic,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
+                        ),
                       SizedBox(height: 10),
                       SelectableText(
                         'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
@@ -1343,19 +1433,21 @@ class _DesignPhilosophyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double radius = 22;
+    final double introSize = bodySize - 0.5;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () => context.push(AppRoutes.designPhilosophy),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: double.infinity,
+        borderRadius: BorderRadius.circular(radius),
+        child: _portfolioFrostedGlassPanel(
+          borderRadius: radius,
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 20 : 28,
             vertical: isMobile ? 20 : 24,
           ),
-          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 20),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(
                 Icons.auto_awesome,
@@ -1367,30 +1459,81 @@ class _DesignPhilosophyCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SelectableText(
-                      'Design Philosophy & Principles',
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.portfolioTextTitle,
-                        fontSize: bodySize + 2,
-                        fontWeight: FontWeight.bold,
+                    _portfolioGoldGradientTitle(
+                      SelectableText(
+                        'Design Philosophy & Principles',
+                        style: GoogleFonts.albertSans(
+                          color: Colors.white,
+                          fontSize: bodySize + 2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    _portfolioGoldGradientTitle(
+                      SelectableText(
+                        'Integrated Product Design',
+                        style: GoogleFonts.albertSans(
+                          color: Colors.white,
+                          fontSize: bodySize + 1,
+                          fontWeight: FontWeight.w800,
+                          height: 1.25,
+                        ),
                       ),
                     ),
                     SizedBox(height: 6),
                     SelectableText(
-                      'How I approach product design: empathy, process, and principles.',
+                      'Understanding humans deeply and solving real problems with care, clarity, and intention.',
                       style: GoogleFonts.albertSans(
                         color: ColorManager.portfolioTextBody,
-                        fontSize: bodySize,
-                        height: 1.3,
+                        fontSize: introSize,
+                        height: 1.45,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Design does not begin with screens or tools—it begins with understanding people. '
+                      'In digital products, visual clutter and weak hierarchy create fatigue; '
+                      'the designer\'s job is to protect users, not overwhelm them.',
+                      style: GoogleFonts.albertSans(
+                        color: ColorManager.portfolioTextBody,
+                        fontSize: bodySize - 1,
+                        height: 1.45,
+                      ),
+                      maxLines: isMobile ? 6 : 5,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 18,
+                          color: ColorManager.portfolioTextBody,
+                        ),
+                        SizedBox(width: 8),
+                        SelectableText(
+                          'Read full philosophy',
+                          style: GoogleFonts.albertSans(
+                            color: ColorManager.portfolioTextBody,
+                            fontSize: bodySize,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: ColorManager.portfolioTextBody,
-                size: 18,
+              SizedBox(width: 8),
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  color: ColorManager.portfolioTextBody,
+                  size: 18,
+                ),
               ),
             ],
           ),
@@ -1616,14 +1759,15 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
 }
 
 /// Featured card hero strip: asset path, `https://` URL, or empty → placeholder.
-/// Fixed strip height 150px. Multi-image portrait strips (Twin, ASD, Rose Chat): narrow
+/// Fixed strip height (logical px). Multi-image portrait strips (Twin, ASD, Rose Chat, Service Flow): narrow
 /// phone-width tiles, [BoxFit.contain], spaced apart (no overlap).
 class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
   final String? heroImagePath;
   final List<String>? heroImagePaths;
   final bool isMobile;
   final String caseStudyId;
-  static const double _height = 150;
+  /// Previously 150; +20% for larger scroll/thumbnail area.
+  static const double _height = 180;
   /// Portrait thumbnail width for multi-image strips (mobile-style screenshots).
   static const double _multiHeroPortraitThumbWidth = 72;
   /// Horizontal gap between portrait thumbnails so frames don’t stack visually.
@@ -1634,6 +1778,7 @@ class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
     'twin-scriptures',
     'asd',
     'rose-chat-seasonal-campaign-engine',
+    'service-flow',
   };
 
   const _FeaturedCaseStudyHeroStrip({
@@ -1929,13 +2074,16 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
               controller: _multiHeroScrollController,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: _enableHoverFx ? 6 : 0),
+              padding: EdgeInsets.zero,
               itemCount: paths.length,
               separatorBuilder: (_, __) => SizedBox(
-                width: usePortrait ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitGap : 10,
+                width: usePortrait
+                    ? _FeaturedCaseStudyHeroStrip._multiHeroPortraitGap
+                    : 10,
               ),
               itemBuilder: (context, index) {
-                final bool isHoveredTile = _hoveredIndex == index && _enableHoverFx;
+                final bool isHoveredTile =
+                    _hoveredIndex == index && _enableHoverFx;
                 return MouseRegion(
                   onEnter: (_) {
                     _pauseAutoScroll();
@@ -1950,7 +2098,9 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                   child: AnimatedSlide(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    offset: isHoveredTile ? const Offset(0, -0.02) : Offset.zero,
+                    offset: isHoveredTile
+                        ? const Offset(0, -0.02)
+                        : Offset.zero,
                     child: AnimatedScale(
                       duration: const Duration(milliseconds: 220),
                       curve: Curves.easeOutCubic,
@@ -1965,7 +2115,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                           boxShadow: isHoveredTile
                               ? [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.35),
+                                    color: Colors.black
+                                        .withValues(alpha: 0.35),
                                     blurRadius: 18,
                                     offset: const Offset(0, 10),
                                   ),
@@ -1997,10 +2148,12 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.55),
+                                    color: Colors.black
+                                        .withValues(alpha: 0.55),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.24),
+                                      color: Colors.white
+                                          .withValues(alpha: 0.24),
                                     ),
                                   ),
                                   child: Text(
@@ -2192,51 +2345,51 @@ class _PremiumFeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double cornerRadius = 22;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onOpen,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          width: double.infinity,
+        borderRadius: BorderRadius.circular(cornerRadius),
+        child: _portfolioFrostedGlassPanel(
+          borderRadius: cornerRadius,
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 20 : 28,
             vertical: isMobile ? 20 : 24,
           ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                ColorManager.portfolioTextBody.withValues(alpha: 0.18),
-                ColorManager.portfolioTextBody.withValues(alpha: 0.08),
-                ColorManager.portfolioTextBody.withValues(alpha: 0.14),
-              ],
-            ),
-            border: Border.all(
-              color: ColorManager.portfolioTextBody.withValues(alpha: 0.40),
-            ),
-          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: _FeaturedCaseStudyHeroStrip(
-                  heroImagePath: caseStudy.heroImagePath,
-                  heroImagePaths: caseStudy.heroImagePaths,
-                  isMobile: isMobile,
-                  caseStudyId: caseStudy.id,
-                ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final w = constraints.maxWidth;
+                  final double heroHorizontalInset =
+                      w.isFinite && w > 0 ? w * 0.15 : 0.0;
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: heroHorizontalInset,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: _FeaturedCaseStudyHeroStrip(
+                        heroImagePath: caseStudy.heroImagePath,
+                        heroImagePaths: caseStudy.heroImagePaths,
+                        isMobile: isMobile,
+                        caseStudyId: caseStudy.id,
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 14),
-              Text(
-                caseStudy.title,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextTitle,
-                  fontSize: bodySize + 8,
-                  fontWeight: FontWeight.w800,
+              _portfolioGoldGradientTitle(
+                Text(
+                  caseStudy.title,
+                  style: GoogleFonts.albertSans(
+                    color: Colors.white,
+                    fontSize: bodySize + 8,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
               const SizedBox(height: 6),
@@ -2267,11 +2420,14 @@ class _PremiumFeaturedCard extends StatelessWidget {
                   children: tags
                       .map(
                         (tag) => Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(999),
                             color: Colors.white.withValues(alpha: 0.08),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.24),
+                            ),
                           ),
                           child: Text(
                             tag,
@@ -2298,7 +2454,8 @@ class _PremiumFeaturedCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, color: ColorManager.portfolioTextBody, size: 18),
+                  Icon(Icons.arrow_forward,
+                      color: ColorManager.portfolioTextBody, size: 18),
                 ],
               ),
             ],
@@ -2312,22 +2469,25 @@ class _PremiumFeaturedCard extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String title;
   final double sectionTitleSize;
+  final bool goldGradient;
 
   const _SectionTitle({
     required this.title,
     required this.sectionTitleSize,
+    this.goldGradient = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SelectableText(
+    final text = SelectableText(
       title,
       style: GoogleFonts.albertSans(
-        color: ColorManager.portfolioTextTitle,
+        color: goldGradient ? Colors.white : ColorManager.portfolioTextTitle,
         fontSize: sectionTitleSize,
         fontWeight: FontWeight.bold,
       ),
     );
+    return goldGradient ? _portfolioGoldGradientTitle(text) : text;
   }
 }
 

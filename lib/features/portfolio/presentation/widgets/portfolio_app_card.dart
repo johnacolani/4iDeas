@@ -10,8 +10,10 @@ import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Flutter brand blue (logo / wordmark).
-const Color _kFlutterBrandBlue = Color(0xFF81D4FA);
+/// Flutter watermark on portfolio cards — very light blue pill, darker blue ink for contrast.
+const Color _kFlutterWatermarkFill = Color(0xFFE1F5FE); // lightBlue 50
+const Color _kFlutterWatermarkBorder = Color(0xFFB3E5FC); // lightBlue 100
+const Color _kFlutterWatermarkInk = Color(0xFF0277BD); // lightBlue 800
 
 class PortfolioAppCard extends StatefulWidget {
   final PortfolioApp app;
@@ -82,6 +84,14 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     final bool useConversion = conversionPitch != null;
     final double mobileImageH = useConversion ? 150 : 180;
 
+    final String? webUrlTrimmed = app.webUrl?.trim();
+    final VoidCallback? showcaseImageWebTap =
+        PortfolioData.showcaseImageOpensWebApp(app) &&
+                webUrlTrimmed != null &&
+                webUrlTrimmed.isNotEmpty
+            ? () => _launch(webUrlTrimmed)
+            : null;
+
     final Widget cardBody = Stack(
       fit: StackFit.expand,
       children: [
@@ -141,6 +151,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       child: _buildImageBlock(
                         mobileVertical: true,
                         accentGold: accentGold,
+                        onImageTap: showcaseImageWebTap,
                       ),
                     ),
                     SizedBox(height: 8),
@@ -185,6 +196,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                             child: _buildImageBlock(
                               mobileVertical: false,
                               accentGold: accentGold,
+                              onImageTap: showcaseImageWebTap,
                             ),
                           ),
                         ],
@@ -598,19 +610,68 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
   }
 
   Widget _buildOpenDesignSystemButton(BuildContext context, double bodySize) {
+    final bool isAsdUsaCard = app.id.toLowerCase() == 'asdusa' ||
+        app.name.toLowerCase().contains('asd usa');
+
+    final baseStyle = OutlinedButton.styleFrom(
+      side: BorderSide(
+        color: ColorManager.portfolioTextBody.withValues(alpha: 0.55),
+      ),
+      backgroundColor: Colors.black.withValues(alpha: 0.18),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+
+    if (isAsdUsaCard) {
+      final muted = ColorManager.portfolioTextBody.withValues(alpha: 0.62);
+      return OutlinedButton(
+        onPressed: null,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: muted,
+          disabledForegroundColor: muted,
+          backgroundColor: Colors.black.withValues(alpha: 0.12),
+          disabledBackgroundColor: Colors.black.withValues(alpha: 0.12),
+          side: BorderSide(
+            color: ColorManager.portfolioTextBody.withValues(alpha: 0.35),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.schedule_outlined,
+              size: isMobile ? 16 : 18,
+              color: muted,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Coming soon',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.roboto(
+                  color: muted,
+                  fontWeight: FontWeight.w700,
+                  fontSize: bodySize - 1,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     final String label = 'Open ${app.name} Design System';
     return OutlinedButton(
       onPressed: () => context.push(AppRoutes.portfolioDesignSystemPath(app.id)),
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(
-          color: ColorManager.portfolioTextBody.withValues(alpha: 0.55),
-        ),
-        backgroundColor: Colors.black.withValues(alpha: 0.18),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+      style: baseStyle,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -638,9 +699,55 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     );
   }
 
+  bool _isNetworkImagePath(String path) =>
+      path.startsWith('http://') || path.startsWith('https://');
+
+  /// Recover showcase tile when Firestore image path is wrong or asset was removed.
+  Widget _portfolioHeroImage(String primaryPath, {required BoxFit fit}) {
+    final fallback = PortfolioData.catalogBundledImagePath(app);
+    final Widget placeholder = _buildPlaceholder();
+
+    if (_isNetworkImagePath(primaryPath)) {
+      return Image.network(
+        primaryPath,
+        fit: fit,
+        errorBuilder: (_, __, ___) {
+          if (fallback != null &&
+              fallback != primaryPath &&
+              !_isNetworkImagePath(fallback)) {
+            return AdaptiveAssetImage(
+              fallback,
+              fit: fit,
+              errorBuilder: (_, __, ___) => placeholder,
+            );
+          }
+          return placeholder;
+        },
+      );
+    }
+
+    return AdaptiveAssetImage(
+      primaryPath,
+      fit: fit,
+      errorBuilder: (_, __, ___) {
+        if (fallback != null &&
+            fallback != primaryPath &&
+            !_isNetworkImagePath(fallback)) {
+          return AdaptiveAssetImage(
+            fallback,
+            fit: fit,
+            errorBuilder: (_, __, ___) => placeholder,
+          );
+        }
+        return placeholder;
+      },
+    );
+  }
+
   Widget _buildImageBlock({
     bool mobileVertical = false,
     required Color accentGold,
+    VoidCallback? onImageTap,
   }) {
     final Widget content = app.useComingSoonPlaceholder
         ? Container(
@@ -663,10 +770,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       Container(
                         color: ColorManager.blue.withValues(alpha: 0.12),
                         child: Center(
-                          child: AdaptiveAssetImage(
+                          child: _portfolioHeroImage(
                             app.imagePath!,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => _buildPlaceholder(),
                           ),
                         ),
                       ),
@@ -699,17 +805,33 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       ),
                     ],
                   )
-                : AdaptiveAssetImage(
+                : _portfolioHeroImage(
                     app.imagePath!,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => _buildPlaceholder(),
                   ))
             : _buildPlaceholder();
+
+    Widget wrapped = content;
+    if (onImageTap != null) {
+      wrapped = Semantics(
+        button: true,
+        label: 'Open web app',
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onImageTap,
+            child: wrapped,
+          ),
+        ),
+      );
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: mobileVertical
-          ? content
-          : AspectRatio(aspectRatio: 1, child: content),
+          ? wrapped
+          : AspectRatio(aspectRatio: 1, child: wrapped),
     );
   }
 
@@ -749,13 +871,15 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       child: Center(
         child: IgnorePointer(
           child: Opacity(
-            opacity: 0.5,
+            opacity: 0.88,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.55),
+                color: _kFlutterWatermarkFill.withValues(alpha: 0.94),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: _kFlutterBrandBlue.withValues(alpha: 0.35)),
+                border: Border.all(
+                  color: _kFlutterWatermarkBorder.withValues(alpha: 0.85),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -771,7 +895,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       errorBuilder: (_, __, ___) => Icon(
                         Icons.flutter_dash,
                         size: iconSize,
-                        color: _kFlutterBrandBlue,
+                        color: _kFlutterWatermarkInk,
                       ),
                     ),
                   ),
@@ -779,7 +903,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   Text(
                     'Flutter',
                     style: GoogleFonts.roboto(
-                      color: _kFlutterBrandBlue,
+                      color: _kFlutterWatermarkInk,
                       fontSize: fontSize,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.25,

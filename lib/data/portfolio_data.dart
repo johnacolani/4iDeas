@@ -364,23 +364,14 @@ class PortfolioData {
       'https://sites.google.com/view/senior-interaction-product-d/home';
   static const String githubProfile = 'https://github.com/johnhcolani';
 
-  /// App grid order matches list order. Showcase order (first five): ASD USA → Service Flow → Twin Scriptures → My Own Design System → 4iDeas Portfolio Website; then the rest.
+  /// App grid order matches list order. Showcase order (first five): ASD USA → 4iDeas Portfolio Website → My Own Design System → Service Flow → Twin Scriptures; then the rest.
   static List<PortfolioApp> get apps => [
-        PortfolioApp(
-          id: 'service-flow',
-          name: 'Service Flow',
-          description:
-              'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
-          imagePath: serviceFlowFeaturedHeroPaths.first,
-          showComingSoonOverlay: true,
-          caseStudyId: 'service-flow',
-        ),
         PortfolioApp(
           id: 'asdusa',
           name: 'ASD USA',
           description:
               'Enterprise multi-role Flutter + Firebase operations app (admin, sales, scheduler, installer, client): workflows, dashboards, governed AI, and adaptive UI across iOS, Android, and web. Full case study covers product thinking, architecture tradeoffs, and shipped work—not a screenshot gallery.',
-          imagePath: 'assets/images/app_store/asd-app.png',
+          imagePath: 'assets/images/asd_app_adaptive/asd-web-app.png',
           appStoreUrl:
               'https://apps.apple.com/us/app/asdusa/id1588331742?platform=iphone',
           playStoreUrl:
@@ -393,7 +384,7 @@ class PortfolioData {
           name: '4iDeas - Portfolio Website',
           description:
               'Portfolio site: Flutter apps, backend services, product design. Responsive showcase, order form, modern UI. Flutter Web on Firebase.',
-          imagePath: 'assets/images/4ideas-avatar.png',
+          imagePath: 'assets/images/4ideas/4ideas.png',
           appStoreUrl: null,
           playStoreUrl: null,
           webUrl: 'https://my-web-page-ef286.web.app/',
@@ -405,6 +396,14 @@ class PortfolioData {
               'A living design system built in Flutter—components, patterns, and UI primitives. Developed by John Colani.',
           imagePath: 'assets/images/design_system/design-system.png',
           webUrl: 'https://my-flutter-apps-f87ea.web.app/',
+        ),
+        PortfolioApp(
+          id: 'service-flow',
+          name: 'Service Flow',
+          description:
+              'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
+          imagePath: serviceFlowFeaturedHeroPaths.first,
+          caseStudyId: 'service-flow',
         ),
         PortfolioApp(
           id: 'twin-scriptures',
@@ -515,6 +514,11 @@ class PortfolioData {
   }
 
   /// Static [apps] row that matches this Firestore (or hybrid) app: same id, same case study, or same name.
+  /// Bundled showcase image from static [apps] when [app] matches the catalog.
+  /// Used when Firestore [PortfolioApp.imagePath] is missing or fails to decode.
+  static String? catalogBundledImagePath(PortfolioApp app) =>
+      _catalogAppMatching(app)?.imagePath;
+
   static PortfolioApp? _catalogAppMatching(PortfolioApp app) {
     for (final a in apps) {
       if (a.id == app.id) return a;
@@ -566,13 +570,18 @@ class PortfolioData {
       return app;
     }
 
+    final bool mergedComingSoonOverlay =
+        (catalog.id == 'service-flow' || app.id == 'service-flow')
+            ? catalog.showComingSoonOverlay
+            : app.showComingSoonOverlay;
+
     return PortfolioApp(
-      id: app.id,
+      id: catalog.id,
       name: app.name,
       description: app.description,
-      imagePath: app.imagePath,
+      imagePath: _mergeUrlField(app.imagePath, catalog.imagePath),
       useComingSoonPlaceholder: app.useComingSoonPlaceholder,
-      showComingSoonOverlay: app.showComingSoonOverlay,
+      showComingSoonOverlay: mergedComingSoonOverlay,
       appStoreUrl: _mergeUrlField(app.appStoreUrl, catalog.appStoreUrl),
       playStoreUrl: _mergeUrlField(app.playStoreUrl, catalog.playStoreUrl),
       webUrl: _mergeUrlField(app.webUrl, catalog.webUrl),
@@ -582,25 +591,36 @@ class PortfolioData {
     );
   }
 
-  /// App Showcase order (first five slots): **ASD** (enterprise proof) → **Service Flow** (B2B SaaS)
-  /// → **Twin Scriptures** (consumer / i18n depth) → **My Own Design System** (systems craft)
-  /// → **4iDeas portfolio site** (meta); then remaining apps.
+  /// Showcase tiles whose hero image opens [PortfolioApp.webUrl] (web app) instead of the default card action (e.g. case study).
+  static bool showcaseImageOpensWebApp(PortfolioApp app) {
+    switch (app.id.toLowerCase()) {
+      case 'asdusa':
+      case 'my-web-site':
+      case '4ideas-design-system':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /// App Showcase order (first five slots): **ASD** → **4iDeas portfolio site** → **My Own Design System**
+  /// → **Service Flow** → **Twin Scriptures**; then remaining apps.
   static List<PortfolioApp> orderAppsForShowcase(List<PortfolioApp> apps) {
     int? showcaseSlot(PortfolioApp a) {
       final id = a.id.toLowerCase();
       final name = a.name.toLowerCase();
       if (id == 'asdusa' || name.contains('asd usa')) return 0;
-      if (id == 'service-flow' || name.contains('service flow')) return 1;
-      if (id == 'twin-scriptures') return 2;
+      if (id == 'my-web-site' ||
+          (name.contains('4ideas') && name.contains('portfolio website'))) {
+        return 1;
+      }
       if (id == '4ideas-design-system' ||
           id == 'design_system' ||
           (name.contains('my own design system'))) {
-        return 3;
+        return 2;
       }
-      if (id == 'my-web-site' ||
-          (name.contains('4ideas') && name.contains('portfolio website'))) {
-        return 4;
-      }
+      if (id == 'service-flow' || name.contains('service flow')) return 3;
+      if (id == 'twin-scriptures') return 4;
       return null;
     }
 
@@ -898,7 +918,7 @@ class PortfolioData {
   static List<PortfolioCaseStudy> get caseStudies => [
         PortfolioCaseStudy(
           id: 'rose-chat-seasonal-campaign-engine',
-          title: 'Rose AI Seasonal Experience Engine',
+          title: 'Rose AI Seasonal and Holiday Celebration Campaign',
           subtitle: 'Designed and Built: Dynamic Campaign UX, Governance, and Rollout at Scale',
           overview:
               'A flagship Rose AI case study showing how I designed and built a backend-driven seasonal experience system at production scale. '

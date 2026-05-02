@@ -51,10 +51,17 @@ class _AdminPortfolioScreenState extends State<AdminPortfolioScreen> {
       final withIds = await _service.getAppsWithDocIds();
       if (mounted) {
         setState(() {
-          _apps = withIds.map((t) => t.$2).toList();
+          _apps = withIds
+              .map((t) =>
+                  PortfolioData.mergePortfolioAppCaseStudyFromCatalog(t.$2))
+              .toList();
           _firestoreDocIdByAppId
             ..clear()
-            ..addEntries(withIds.map((t) => MapEntry(t.$2.id, t.$1)));
+            ..addEntries(withIds.map((t) {
+              final merged =
+                  PortfolioData.mergePortfolioAppCaseStudyFromCatalog(t.$2);
+              return MapEntry(merged.id, t.$1);
+            }));
           _useFirestore = hasAny;
           _loading = false;
         });

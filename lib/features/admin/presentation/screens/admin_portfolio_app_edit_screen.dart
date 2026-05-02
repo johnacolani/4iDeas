@@ -41,7 +41,11 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
   @override
   void initState() {
     super.initState();
-    final app = widget.initialApp;
+    final raw = widget.initialApp;
+    // Merge with static catalog so missing Firestore id/caseStudyId/imagePath match shipped defaults.
+    final app = raw != null
+        ? PortfolioData.mergePortfolioAppCaseStudyFromCatalog(raw)
+        : null;
     if (app != null) {
       _nameController.text = app.name;
       _descriptionController.text = app.description;
@@ -68,29 +72,40 @@ class _AdminPortfolioAppEditScreenState extends State<AdminPortfolioAppEditScree
     super.dispose();
   }
 
-  /// Logical id for [PortfolioApp.id] / merge keys — never the Firestore document id.
+  /// Canonical logical id: catalog slug when this row matches [PortfolioData.apps], else name slug.
   String _logicalPortfolioAppId() {
-    final fromInitial = widget.initialApp?.id.trim();
-    if (fromInitial != null && fromInitial.isNotEmpty) return fromInitial;
-    return _nameController.text.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '-');
+    if (widget.initialApp != null) {
+      return PortfolioData.mergePortfolioAppCaseStudyFromCatalog(
+              widget.initialApp!)
+          .id;
+    }
+    return _nameController.text
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]'), '-');
   }
 
   PortfolioApp _buildApp() {
-    final idRaw = _logicalPortfolioAppId();
-    final id = idRaw.isEmpty ? 'app-${DateTime.now().millisecondsSinceEpoch}' : idRaw;
+    var id = _logicalPortfolioAppId();
+    if (id.isEmpty) {
+      id = 'app-${DateTime.now().millisecondsSinceEpoch}';
+    }
+    final mergedBase = widget.initialApp != null
+        ? PortfolioData.mergePortfolioAppCaseStudyFromCatalog(widget.initialApp!)
+        : null;
     return PortfolioApp(
       id: id,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       imagePath: _imagePathController.text.trim().isEmpty ? null : _imagePathController.text.trim(),
       useComingSoonPlaceholder: _useComingSoonPlaceholder,
-      showComingSoonOverlay: widget.initialApp?.showComingSoonOverlay ?? false,
+      showComingSoonOverlay: mergedBase?.showComingSoonOverlay ?? false,
       appStoreUrl: _appStoreUrlController.text.trim().isEmpty ? null : _appStoreUrlController.text.trim(),
       playStoreUrl: _playStoreUrlController.text.trim().isEmpty ? null : _playStoreUrlController.text.trim(),
       webUrl: _webUrlController.text.trim().isEmpty ? null : _webUrlController.text.trim(),
       macosUrl: _macosUrlController.text.trim().isEmpty ? null : _macosUrlController.text.trim(),
       windowsUrl: _windowsUrlController.text.trim().isEmpty ? null : _windowsUrlController.text.trim(),
-      caseStudyId: widget.initialApp?.caseStudyId,
+      caseStudyId: mergedBase?.caseStudyId,
     );
   }
 

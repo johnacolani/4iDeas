@@ -258,7 +258,7 @@ import 'package:four_ideas/seo/seo_metadata.dart';
                 'Consumer Flutter app case study covering bilingual scripture reading, RTL UX, visual personalization onboarding, and product design decisions that improved completion and engagement.',
           ),
           'rose-chat-seasonal-campaign-engine': const SeoMetadata(
-            title: 'Rose Chat Seasonal Campaign Engine Case Study | Conversational AI Product Design | 4iDeas',
+            title: 'Rose AI Seasonal and Holiday Celebration Campaign Case Study | Conversational AI Product Design | 4iDeas',
             description:
                 'AI product design case study: backend-driven seasonal campaign system with safe rollout controls, dynamic conversational UX, preview modes, and governed operations.',
           ),
