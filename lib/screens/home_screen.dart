@@ -15,6 +15,9 @@ import '../core/design_system/responsive.dart';
 import '../core/design_system/theme.dart';
 import '../widgets/home_mobile_nav_menu_button.dart';
 
+/// Top inset for the floating [HomeMobileNavMenuButton] (matches [WebScreen] narrow top reserve).
+const double _kFloatingMobileNavTop = 4.0;
+
 const LinearGradient _kNavIconGoldGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
@@ -128,8 +131,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: SafeArea(
                     top: false,
-                    // Same home content on phone, tablet, and desktop (see [WebScreen]).
-                    child: const WebScreen(),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.topLeft,
+                      children: [
+                        const WebScreen(),
+                        if (Responsive.isMobile(context))
+                          Positioned(
+                            left: 10,
+                            top: _kFloatingMobileNavTop,
+                            child: const HomeMobileNavMenuButton(),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],

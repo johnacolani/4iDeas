@@ -88,8 +88,8 @@ class _NavGoldIcon extends StatelessWidget {
   }
 }
 
-/// Home-only mobile / narrow navigation menu (shown in page body, not the app bar).
-/// On **web**, opens on pointer hover over the icon; on mobile platforms, opens on tap.
+/// Home-only mobile / narrow navigation menu (pinned below the app bar on home).
+/// On **web**, desktop opens on hover; **tap toggles** everywhere (required for mobile browsers).
 class HomeMobileNavMenuButton extends StatefulWidget {
   const HomeMobileNavMenuButton({super.key});
 
@@ -224,6 +224,8 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
       ),
     );
 
+    // Web: desktop uses hover to open; phones and tablets using mobile browsers
+    // need tap — they report kIsWeb but do not emit hover like a mouse.
     late final Widget trigger;
     if (kIsWeb) {
       trigger = MouseRegion(
@@ -232,7 +234,11 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
           _insertOverlay();
         },
         onExit: (_) => _scheduleClose(),
-        child: icon,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _toggleOverlay,
+          child: icon,
+        ),
       );
     } else {
       trigger = GestureDetector(
@@ -251,8 +257,7 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
 
 /// Narrow-layout nav panel: Services and Admin/Account submenus expand **below**
 /// their headers. Submenus open/close **only on tap** (including web)—hover does
-/// not expand them. The parent [HomeMobileNavMenuButton] still opens the panel
-/// from the icon via hover on web.
+/// not expand them. The parent opens from hover (desktop web) and tap (touch / mobile web).
 class _MobileNavDropdownBody extends StatefulWidget {
   const _MobileNavDropdownBody({required this.onClose});
 

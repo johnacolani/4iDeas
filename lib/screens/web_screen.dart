@@ -10,8 +10,6 @@ import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/modern_hero_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 import '../core/widgets/trust_home_sections.dart';
-import '../widgets/home_mobile_nav_menu_button.dart';
-
 class WebScreen extends StatefulWidget {
   const WebScreen({super.key});
 
@@ -41,6 +39,8 @@ class _WebScreenState extends State<WebScreen> {
     final bool isBodyDesktop = Responsive.isDesktop(context);
     // Small nudge from app bar; kept tight so the hero reads higher on the page.
     final double contentTopNudge = isNarrowView ? 4.0 : 8.0;
+    // Space for [HomeMobileNavMenuButton] pinned in [HomeScreen] (same as former in-flow row).
+    const double narrowMenuReserveHeight = 44.0;
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -66,15 +66,11 @@ class _WebScreenState extends State<WebScreen> {
                             ? CrossAxisAlignment.stretch
                             : CrossAxisAlignment.center),
                     children: [
-                      SizedBox(height: contentTopNudge),
-                      if (isNarrowView)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: HomeMobileNavMenuButton(),
-                          ),
-                        ),
+                      SizedBox(
+                        height: isNarrowView
+                            ? contentTopNudge + narrowMenuReserveHeight
+                            : contentTopNudge,
+                      ),
                       Transform.translate(
                         offset: Offset.zero,
                         child: const ModernHeroSection(),
