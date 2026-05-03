@@ -15,9 +15,6 @@ import '../core/design_system/responsive.dart';
 import '../core/design_system/theme.dart';
 import '../widgets/home_mobile_nav_menu_button.dart';
 
-/// Top inset for the floating [HomeMobileNavMenuButton] (matches [WebScreen] narrow top reserve).
-const double _kFloatingMobileNavTop = 4.0;
-
 const LinearGradient _kNavIconGoldGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
@@ -131,19 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: SafeArea(
                     top: false,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.topLeft,
-                      children: [
-                        const WebScreen(),
-                        if (Responsive.isMobile(context))
-                          Positioned(
-                            left: 10,
-                            top: _kFloatingMobileNavTop,
-                            child: const HomeMobileNavMenuButton(),
-                          ),
-                      ],
-                    ),
+                    child: const WebScreen(),
                   ),
                 ),
               ],
@@ -173,12 +158,12 @@ class _ModernTopAppBar extends StatelessWidget {
     final currentPath = GoRouterState.of(context).uri.path;
     final topInset = MediaQuery.paddingOf(context).top;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    // Vertical space for logo / tabs / account; mobile = logo + menu column.
-    const double baseBarContentHeight = 76;
+    // Vertical space for logo / tabs / account; mobile = logo row + menu under logo + account.
+    const double baseBarContentHeight = 118;
     // Web / tablet: taller bar for nav + logo (was 78).
     const double baseBarContentHeightDesktop = 96;
     // Space below the app bar row (logo, nav, account) before the border ends.
-    const double bottomContentPadding = 6.0;
+    final double bottomContentPadding = isMobile ? 10.0 : 6.0;
     // Inset below the status bar; kept small to keep the bar short.
     const double contentTopNudge = 4.0;
     final double contentHeight =
@@ -208,8 +193,10 @@ class _ModernTopAppBar extends StatelessWidget {
               bottom: bottomContentPadding,
             ),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.14),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+              color: Colors.black.withValues(alpha: isMobile ? 0.52 : 0.14),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: isMobile ? 0.24 : 0.14),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -219,61 +206,92 @@ class _ModernTopAppBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (isMobile)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(1.5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(11),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  AppColors.primaryGold,
-                                  AppColors.primaryGoldDark,
-                                ],
-                              ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                width: 44,
-                                height: 44,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          RichText(
-                            text: TextSpan(
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(
-                                    fontSize: 22,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                TextSpan(
-                                  text: '4i',
-                                  style: TextStyle(
-                                    foreground: Paint()
-                                      ..shader = const LinearGradient(
-                                        colors: [
-                                          Color(0xFFF5B32F),
-                                          Color(0xFFD89A1C),
-                                        ],
-                                      ).createShader(
-                                        const Rect.fromLTWH(0, 0, 56, 24),
-                                      ),
+                                Container(
+                                  padding: const EdgeInsets.all(1.5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(11),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        AppColors.primaryGold,
+                                        AppColors.primaryGoldDark,
+                                      ],
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset(
+                                      'assets/images/logo.png',
+                                      width: 44,
+                                      height: 44,
+                                    ),
                                   ),
                                 ),
-                                const TextSpan(text: 'Deas'),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: RichText(
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    text: TextSpan(
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                            fontSize: 22,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                      children: [
+                                        TextSpan(
+                                          text: '4i',
+                                          style: TextStyle(
+                                            foreground: Paint()
+                                              ..shader = const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFF5B32F),
+                                                  Color(0xFFD89A1C),
+                                                ],
+                                              ).createShader(
+                                                const Rect.fromLTWH(0, 0, 56, 24),
+                                              ),
+                                          ),
+                                        ),
+                                        const TextSpan(text: 'Deas'),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: Material(
+                                color: Colors.white.withValues(alpha: 0.08),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: BorderSide(
+                                    color: AppColors.primaryGold
+                                        .withValues(alpha: 0.55),
+                                  ),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: const Center(
+                                  child: HomeMobileNavMenuButton(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       )
                     else
                       Padding(
@@ -347,7 +365,6 @@ class _ModernTopAppBar extends StatelessWidget {
                       const SizedBox(width: 44),
                       const _AccountMetaBlock(mobile: false),
                     ] else ...[
-                      const Spacer(),
                       const _AccountMetaBlock(mobile: true),
                     ],
                   ],

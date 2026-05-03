@@ -9,7 +9,15 @@ import '../design_system/widgets/primary_button.dart';
 import '../design_system/widgets/secondary_button.dart';
 
 class ModernHeroSection extends StatelessWidget {
-  const ModernHeroSection({super.key});
+  const ModernHeroSection({
+    super.key,
+    /// On narrow home, extra space so the first line of the headline starts to the
+    /// right of the floating menu chip ([HomeScreen]: 10 + 48px + 8 gap − base 10).
+    this.leadingInsetForFloatingNav = 0,
+  });
+
+  /// Pixels added to the narrow-layout left gutter (see [leadingInsetForFloatingNav]).
+  final double leadingInsetForFloatingNav;
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +32,13 @@ class ModernHeroSection extends StatelessWidget {
 
     final double horizontalPadding =
         isMobile ? 10 : (Responsive.isTablet(context) ? 18 : 32);
+    final double leftPadding = isMobile
+        ? horizontalPadding + leadingInsetForFloatingNav
+        : horizontalPadding;
     final double w = MediaQuery.sizeOf(context).width;
     return Padding(
       padding: EdgeInsets.only(
-        left: horizontalPadding,
+        left: leftPadding,
         right: horizontalPadding,
         top: 0,
         bottom: isMobile ? AppSpacing.sm : AppSpacing.lg,

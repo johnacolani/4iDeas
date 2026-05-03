@@ -37,10 +37,10 @@ class _WebScreenState extends State<WebScreen> {
     final bool isNarrowView = Responsive.isMobile(context);
     // Desktop: left-aligned home content; phone + tablet: centered (see [Responsive]).
     final bool isBodyDesktop = Responsive.isDesktop(context);
-    // Small nudge from app bar; kept tight so the hero reads higher on the page.
+    // Small nudge from app bar; narrow gets extra air so the hero title does not crowd the header.
     final double contentTopNudge = isNarrowView ? 4.0 : 8.0;
-    // Space for [HomeMobileNavMenuButton] pinned in [HomeScreen] (same as former in-flow row).
-    const double narrowMenuReserveHeight = 44.0;
+    final double narrowHeroTopBreathing =
+        isNarrowView ? 22.0 : 0.0;
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -67,14 +67,9 @@ class _WebScreenState extends State<WebScreen> {
                             : CrossAxisAlignment.center),
                     children: [
                       SizedBox(
-                        height: isNarrowView
-                            ? contentTopNudge + narrowMenuReserveHeight
-                            : contentTopNudge,
+                        height: contentTopNudge + narrowHeroTopBreathing,
                       ),
-                      Transform.translate(
-                        offset: Offset.zero,
-                        child: const ModernHeroSection(),
-                      ),
+                      const ModernHeroSection(),
                       SizedBox(height: isMobile ? 4 : 6),
                       Padding(
                         padding: EdgeInsets.symmetric(

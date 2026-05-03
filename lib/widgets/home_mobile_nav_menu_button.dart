@@ -90,8 +90,16 @@ class _NavGoldIcon extends StatelessWidget {
 
 /// Home-only mobile / narrow navigation menu (pinned below the app bar on home).
 /// On **web**, desktop opens on hover; **tap toggles** everywhere (required for mobile browsers).
+///
+/// When [overlayAlignToTrailing] is true, the dropdown anchors to the icon’s trailing
+/// edge (use when the chip sits on the right side of the screen).
 class HomeMobileNavMenuButton extends StatefulWidget {
-  const HomeMobileNavMenuButton({super.key});
+  const HomeMobileNavMenuButton({
+    super.key,
+    this.overlayAlignToTrailing = false,
+  });
+
+  final bool overlayAlignToTrailing;
 
   @override
   State<HomeMobileNavMenuButton> createState() =>
@@ -164,8 +172,12 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
             CompositedTransformFollower(
               link: _layerLink,
               showWhenUnlinked: false,
-              targetAnchor: Alignment.bottomLeft,
-              followerAnchor: Alignment.topLeft,
+              targetAnchor: widget.overlayAlignToTrailing
+                  ? Alignment.bottomRight
+                  : Alignment.bottomLeft,
+              followerAnchor: widget.overlayAlignToTrailing
+                  ? Alignment.topRight
+                  : Alignment.topLeft,
               offset: const Offset(0, 6),
               child: _maybeHoverDismissRegion(
                 child: Material(
