@@ -22,6 +22,7 @@ class PortfolioAppCard extends StatefulWidget {
   final bool showAdminActions;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+
   /// When set, card shows business context / role / outcome and conversion CTAs (not gallery-only copy).
   final AppShowcasePitch? conversionPitch;
   final VoidCallback? onDiscussSimilar;
@@ -65,6 +66,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         app.windowsUrl ??
         app.appStoreUrl ??
         app.playStoreUrl;
+
     /// Light portfolio card surface — chips use dark gold on light wash.
     final Color accentGold = ColorManager.accentGold;
     const bool isDarkCardSurface = false;
@@ -144,80 +146,87 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                     ),
                     child: isMobile
                         ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      height: mobileImageH,
-                      child: _buildImageBlock(
-                        mobileVertical: true,
-                        accentGold: accentGold,
-                        onImageTap: showcaseImageWebTap,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: useConversion
-                            ? _buildConversionTextContent(titleSize, bodySize, conversionPitch!)
-                            : _buildTextContent(titleSize, bodySize),
-                      ),
-                    ),
-                    if (useConversion) ...[
-                      SizedBox(height: 12),
-                      _buildConversionActions(context, bodySize, primaryUrl),
-                    ],
-                    SizedBox(height: 10),
-                    _buildButtons(
-                      isDarkSurface: isDarkCardSurface,
-                      accentGold: accentGold,
-                    ),
-                    const SizedBox(height: 10),
-                    _buildOpenDesignSystemButton(context, bodySize),
-                  ],
-                )
-                  : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 5,
-                            child: SingleChildScrollView(
-                              child: useConversion
-                                  ? _buildConversionTextContent(titleSize, bodySize, conversionPitch!)
-                                  : _buildTextContent(titleSize, bodySize),
-                            ),
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(
+                                height: mobileImageH,
+                                child: _buildImageBlock(
+                                  mobileVertical: true,
+                                  accentGold: accentGold,
+                                  onImageTap: showcaseImageWebTap,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: useConversion
+                                      ? _buildConversionTextContent(
+                                          titleSize, bodySize, conversionPitch!)
+                                      : _buildTextContent(titleSize, bodySize),
+                                ),
+                              ),
+                              if (useConversion) ...[
+                                SizedBox(height: 12),
+                                _buildConversionActions(
+                                    context, bodySize, primaryUrl),
+                              ],
+                              SizedBox(height: 10),
+                              _buildButtons(
+                                isDarkSurface: isDarkCardSurface,
+                                accentGold: accentGold,
+                              ),
+                              const SizedBox(height: 10),
+                              _buildOpenDesignSystemButton(context, bodySize),
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 5,
+                                      child: SingleChildScrollView(
+                                        child: useConversion
+                                            ? _buildConversionTextContent(
+                                                titleSize,
+                                                bodySize,
+                                                conversionPitch!)
+                                            : _buildTextContent(
+                                                titleSize, bodySize),
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Expanded(
+                                      flex: 4,
+                                      child: _buildImageBlock(
+                                        mobileVertical: false,
+                                        accentGold: accentGold,
+                                        onImageTap: showcaseImageWebTap,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (useConversion) ...[
+                                SizedBox(height: 12),
+                                _buildConversionActions(
+                                    context, bodySize, primaryUrl),
+                              ],
+                              SizedBox(height: 10),
+                              _buildButtons(
+                                isDarkSurface: isDarkCardSurface,
+                                accentGold: accentGold,
+                              ),
+                              const SizedBox(height: 10),
+                              _buildOpenDesignSystemButton(context, bodySize),
+                            ],
                           ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            flex: 4,
-                            child: _buildImageBlock(
-                              mobileVertical: false,
-                              accentGold: accentGold,
-                              onImageTap: showcaseImageWebTap,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (useConversion) ...[
-                      SizedBox(height: 12),
-                      _buildConversionActions(context, bodySize, primaryUrl),
-                    ],
-                    SizedBox(height: 10),
-                    _buildButtons(
-                      isDarkSurface: isDarkCardSurface,
-                      accentGold: accentGold,
-                    ),
-                    const SizedBox(height: 10),
-                    _buildOpenDesignSystemButton(context, bodySize),
-                  ],
-                ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -259,7 +268,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               children: [
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: isMobile ? 18 : 20, color: ColorManager.portfolioTextBody),
+                    icon: Icon(Icons.edit,
+                        size: isMobile ? 18 : 20,
+                        color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -268,7 +279,8 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   ),
                 if (onDelete != null)
                   IconButton(
-                    icon: Icon(Icons.delete_outline, size: isMobile ? 18 : 20, color: Colors.red[300]),
+                    icon: Icon(Icons.delete_outline,
+                        size: isMobile ? 18 : 20, color: Colors.red[300]),
                     onPressed: onDelete,
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -430,7 +442,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             onPressed: discuss,
             style: OutlinedButton.styleFrom(
               foregroundColor: ColorManager.portfolioTextTitle,
-              side: BorderSide(color: ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
+              side: BorderSide(
+                  color:
+                      ColorManager.portfolioTextTitle.withValues(alpha: 0.55)),
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -459,7 +473,8 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (primaryButton != null) primaryButton,
-          if (primaryButton != null && discussButton != null) const SizedBox(height: 10),
+          if (primaryButton != null && discussButton != null)
+            const SizedBox(height: 10),
           if (discussButton != null) discussButton,
           if (showOpenProductLink) ...[
             const SizedBox(height: 6),
@@ -624,53 +639,12 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
       ),
     );
 
-    if (isAsdUsaCard) {
-      final muted = ColorManager.portfolioTextBody.withValues(alpha: 0.62);
-      return OutlinedButton(
-        onPressed: null,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: muted,
-          disabledForegroundColor: muted,
-          backgroundColor: Colors.black.withValues(alpha: 0.12),
-          disabledBackgroundColor: Colors.black.withValues(alpha: 0.12),
-          side: BorderSide(
-            color: ColorManager.portfolioTextBody.withValues(alpha: 0.35),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.schedule_outlined,
-              size: isMobile ? 16 : 18,
-              color: muted,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Coming soon',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.roboto(
-                  color: muted,
-                  fontWeight: FontWeight.w700,
-                  fontSize: bodySize - 1,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final String label = 'Open ${app.name} Design System';
+    final String label = isAsdUsaCard
+        ? 'ASD App Design System'
+        : 'Open ${app.name} Design System';
     return OutlinedButton(
-      onPressed: () => context.push(AppRoutes.portfolioDesignSystemPath(app.id)),
+      onPressed: () =>
+          context.push(AppRoutes.portfolioDesignSystemPath(app.id)),
       style: baseStyle,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -953,8 +927,10 @@ class _LinkChipState extends State<_LinkChip> {
     final Color hoverTitleColor = ColorManager.portfolioTextTitle;
     final Color hoverBorderColor =
         ColorManager.portfolioTextTitle.withValues(alpha: 0.55);
-    final Color buttonTitleColor = _isHovered ? hoverTitleColor : baseTitleColor;
-    final Color buttonBorderColor = _isHovered ? hoverBorderColor : baseBorderColor;
+    final Color buttonTitleColor =
+        _isHovered ? hoverTitleColor : baseTitleColor;
+    final Color buttonBorderColor =
+        _isHovered ? hoverBorderColor : baseBorderColor;
     final Color chipBackground = _isHovered
         ? widget.accentGold.withValues(alpha: 0.20)
         : widget.accentGold.withValues(alpha: 0.14);
@@ -988,7 +964,9 @@ class _LinkChipState extends State<_LinkChip> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(widget.icon, size: widget.isMobile ? 12 : 14, color: buttonTitleColor),
+                    Icon(widget.icon,
+                        size: widget.isMobile ? 12 : 14,
+                        color: buttonTitleColor),
                     SizedBox(width: 4),
                     SelectableText(
                       widget.label,

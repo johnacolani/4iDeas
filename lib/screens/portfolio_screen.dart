@@ -44,8 +44,10 @@ class PortfolioScreen extends StatefulWidget {
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
   final PortfolioContentService _portfolioService = PortfolioContentService();
-  final PublicationContentService _publicationService = PublicationContentService();
-  final OpenSourceContentService _openSourceService = OpenSourceContentService();
+  final PublicationContentService _publicationService =
+      PublicationContentService();
+  final OpenSourceContentService _openSourceService =
+      OpenSourceContentService();
   final CaseStudyContentService _caseStudyService = CaseStudyContentService();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _featuredCaseStudiesKey = GlobalKey();
@@ -54,6 +56,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final GlobalKey _openSourceKey = GlobalKey();
   bool _handledInitialSectionLink = false;
   List<PortfolioApp>? _appsFromFirestore;
+
   /// Firestore collection document id for each [PortfolioApp.id] (logical slug may differ from doc id).
   Map<String, String>? _portfolioFirestoreDocByAppId;
   List<PortfolioPublication>? _publicationsFromFirestore;
@@ -74,7 +77,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     _handledInitialSectionLink = true;
     final section = GoRouterState.of(context).uri.queryParameters['section'];
     if (section == 'featured') {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSection(_featuredCaseStudiesKey));
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _scrollToSection(_featuredCaseStudiesKey));
     }
   }
 
@@ -113,7 +117,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           _appsFromFirestore = withIds.map((t) => t.$2).toList();
           _portfolioFirestoreDocByAppId = {
             for (final (docId, app) in withIds)
-              PortfolioData.mergePortfolioAppCaseStudyFromCatalog(app).id: docId,
+              PortfolioData.mergePortfolioAppCaseStudyFromCatalog(app).id:
+                  docId,
           };
         });
       }
@@ -132,8 +137,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           .map(PortfolioData.mergePortfolioAppCaseStudyFromCatalog)
           .toList();
       final idsFromCloud = fromCloud.map((a) => a.id).toSet();
-      final staticOnly =
-          PortfolioData.apps.where((a) => !idsFromCloud.contains(a.id)).toList();
+      final staticOnly = PortfolioData.apps
+          .where((a) => !idsFromCloud.contains(a.id))
+          .toList();
       list = [...fromCloud, ...staticOnly];
     } else {
       list = PortfolioData.apps;
@@ -152,7 +158,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   List<PortfolioPublication> get _displayPublications =>
-      (_publicationsFromFirestore != null && _publicationsFromFirestore!.isNotEmpty)
+      (_publicationsFromFirestore != null &&
+              _publicationsFromFirestore!.isNotEmpty)
           ? _publicationsFromFirestore!
           : PortfolioData.publications;
 
@@ -188,9 +195,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       list = List<PortfolioCaseStudy>.from(PortfolioData.caseStudies);
     } else {
       final firestoreIds = fromFirestore.map((e) => e.id).toSet();
-      final staticOnly = PortfolioData.caseStudies.where((s) => !firestoreIds.contains(s.id)).toList();
+      final staticOnly = PortfolioData.caseStudies
+          .where((s) => !firestoreIds.contains(s.id))
+          .toList();
       final mergedFirestore = fromFirestore.map((cs) {
-        if (cs.id == 'asd') return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
+        if (cs.id == 'asd')
+          return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
         return PortfolioData.mergeHeroFromStaticIfMissing(cs);
       }).toList();
       list = [...mergedFirestore, ...staticOnly];
@@ -225,7 +235,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     );
   }
 
-  static const String _designSystemUrl = 'https://my-flutter-apps-f87ea.web.app/';
+  static const String _designSystemUrl =
+      'https://my-flutter-apps-f87ea.web.app/';
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -237,7 +248,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToAddApp() async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminPortfolioAppEditScreen(docId: null, initialApp: null),
+        builder: (context) =>
+            AdminPortfolioAppEditScreen(docId: null, initialApp: null),
       ),
     );
     if (result == true) _loadAllPortfolioData();
@@ -260,19 +272,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${app.name}"?', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+        title: Text('Delete "${app.name}"?',
+            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the app from the portfolio. You can add it again later.',
-          style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
+          style: GoogleFonts.albertSans(
+              color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel',
+                style: GoogleFonts.albertSans(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete',
+                style: GoogleFonts.albertSans(color: Colors.red)),
           ),
         ],
       ),
@@ -283,7 +299,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('This app is only in built-in data. Remove it from code or add a cloud copy first.'),
+            content: Text(
+                'This app is only in built-in data. Remove it from code or add a cloud copy first.'),
             backgroundColor: Colors.orange,
           ),
         );
@@ -294,7 +311,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       await _portfolioService.deleteApp(docId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('App removed'), backgroundColor: Colors.orange),
+          const SnackBar(
+              content: Text('App removed'), backgroundColor: Colors.orange),
         );
         _loadPortfolioApps();
       }
@@ -310,7 +328,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToAddPublication() async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminPublicationEditScreen(docId: null, initialPublication: null),
+        builder: (context) =>
+            AdminPublicationEditScreen(docId: null, initialPublication: null),
       ),
     );
     if (result == true) _loadPublications();
@@ -319,7 +338,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToEditPublication(PortfolioPublication p) async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminPublicationEditScreen(docId: p.id, initialPublication: p),
+        builder: (context) =>
+            AdminPublicationEditScreen(docId: p.id, initialPublication: p),
       ),
     );
     if (result == true) _loadPublications();
@@ -330,19 +350,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${p.title}"?', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+        title: Text('Delete "${p.title}"?',
+            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the publication from the list.',
-          style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
+          style: GoogleFonts.albertSans(
+              color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel',
+                style: GoogleFonts.albertSans(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete',
+                style: GoogleFonts.albertSans(color: Colors.red)),
           ),
         ],
       ),
@@ -352,7 +376,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       await _publicationService.deletePublication(p.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Publication removed'), backgroundColor: Colors.orange),
+          const SnackBar(
+              content: Text('Publication removed'),
+              backgroundColor: Colors.orange),
         );
         _loadPublications();
       }
@@ -368,7 +394,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToAddOpenSource() async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminOpenSourceEditScreen(docId: null, initialItem: null),
+        builder: (context) =>
+            AdminOpenSourceEditScreen(docId: null, initialItem: null),
       ),
     );
     if (result == true) _loadOpenSource();
@@ -377,7 +404,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToEditOpenSource(OpenSourceItem item) async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminOpenSourceEditScreen(docId: item.id, initialItem: item),
+        builder: (context) =>
+            AdminOpenSourceEditScreen(docId: item.id, initialItem: item),
       ),
     );
     if (result == true) _loadOpenSource();
@@ -388,19 +416,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${item.title}"?', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+        title: Text('Delete "${item.title}"?',
+            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the item from the list.',
-          style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
+          style: GoogleFonts.albertSans(
+              color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel',
+                style: GoogleFonts.albertSans(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete',
+                style: GoogleFonts.albertSans(color: Colors.red)),
           ),
         ],
       ),
@@ -410,7 +442,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       await _openSourceService.deleteItem(item.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Open source item removed'), backgroundColor: Colors.orange),
+          const SnackBar(
+              content: Text('Open source item removed'),
+              backgroundColor: Colors.orange),
         );
         _loadOpenSource();
       }
@@ -426,14 +460,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Future<void> _navigateToAddCaseStudy() async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (context) => AdminCaseStudyEditScreen(docId: null, initialCaseStudy: null),
+        builder: (context) =>
+            AdminCaseStudyEditScreen(docId: null, initialCaseStudy: null),
       ),
     );
     if (result == true) _loadCaseStudies();
   }
 
   Future<void> _navigateToEditCaseStudy(PortfolioCaseStudy cs) async {
-    final isFromFirestore = _caseStudiesFromFirestore?.any((f) => f.id == cs.id) ?? false;
+    final isFromFirestore =
+        _caseStudiesFromFirestore?.any((f) => f.id == cs.id) ?? false;
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => AdminCaseStudyEditScreen(
@@ -446,10 +482,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Future<void> _openEditAdaptiveSection(PortfolioCaseStudy cs) async {
-    final adaptiveCandidates = cs.sections.where((s) => s.isAsdAdaptivePlatformSection).toList();
-    final adaptiveSection = adaptiveCandidates.isEmpty ? null : adaptiveCandidates.first;
+    final adaptiveCandidates =
+        cs.sections.where((s) => s.isAsdAdaptivePlatformSection).toList();
+    final adaptiveSection =
+        adaptiveCandidates.isEmpty ? null : adaptiveCandidates.first;
     final initialPaths = adaptiveSection != null
-        ? (adaptiveSection.imagePaths ?? adaptiveSection.displayImages.map((i) => i.path).toList()).join('\n')
+        ? (adaptiveSection.imagePaths ??
+                adaptiveSection.displayImages.map((i) => i.path).toList())
+            .join('\n')
         : '';
 
     final controller = TextEditingController(text: initialPaths);
@@ -457,21 +497,27 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Edit adaptive & responsive images', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+        title: Text('Edit adaptive & responsive images',
+            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: SingleChildScrollView(
           child: SizedBox(
             width: MediaQuery.of(ctx).size.width * 0.8,
             child: TextField(
               controller: controller,
               maxLines: 14,
-              style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark, fontSize: 14),
+              style: GoogleFonts.albertSans(
+                  color: ColorManager.accentGoldDark, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'One asset path per line\ne.g. assets/images/asd_app_adaptive/asd-001.jpg',
-                hintStyle: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.38)),
+                hintText:
+                    'One asset path per line\ne.g. assets/images/asd_app_adaptive/asd-001.jpg',
+                hintStyle: GoogleFonts.albertSans(
+                    color: ColorManager.accentGoldDark.withValues(alpha: 0.38)),
                 alignLabelWithHint: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                  borderSide:
+                      BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -485,11 +531,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel',
+                style: GoogleFonts.albertSans(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Save', style: GoogleFonts.albertSans(color: ColorManager.orange, fontWeight: FontWeight.w600)),
+            child: Text('Save',
+                style: GoogleFonts.albertSans(
+                    color: ColorManager.orange, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -497,7 +546,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     controller.dispose();
     if (saved != true || !mounted) return;
 
-    final pathLines = controller.text.trim().split(RegExp(r'\n')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final pathLines = controller.text
+        .trim()
+        .split(RegExp(r'\n'))
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
     final newSections = cs.sections.map((s) {
       if (s.isAsdAdaptivePlatformSection) {
         return CaseStudySection(
@@ -526,7 +580,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       await _caseStudyService.setCaseStudyWithId('asd', updated);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Adaptive & responsive images updated'), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text('Adaptive & responsive images updated'),
+              backgroundColor: Colors.green),
         );
         await _loadCaseStudies();
       }
@@ -544,19 +600,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xff1a1a2e),
-        title: Text('Delete "${cs.title}"?', style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
+        title: Text('Delete "${cs.title}"?',
+            style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark)),
         content: Text(
           'This will remove the case study from the list.',
-          style: GoogleFonts.albertSans(color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
+          style: GoogleFonts.albertSans(
+              color: ColorManager.accentGoldDark.withValues(alpha: 0.70)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('Cancel', style: GoogleFonts.albertSans(color: ColorManager.orange)),
+            child: Text('Cancel',
+                style: GoogleFonts.albertSans(color: ColorManager.orange)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: GoogleFonts.albertSans(color: Colors.red)),
+            child: Text('Delete',
+                style: GoogleFonts.albertSans(color: Colors.red)),
           ),
         ],
       ),
@@ -566,7 +626,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       await _caseStudyService.deleteCaseStudy(cs.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Case study removed'), backgroundColor: Colors.orange),
+          const SnackBar(
+              content: Text('Case study removed'),
+              backgroundColor: Colors.orange),
         );
         _loadCaseStudies();
       }
@@ -614,7 +676,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           label: 'Back to home',
           button: true,
           child: IconButton(
-            icon: Icon(Icons.arrow_back, color: ColorManager.portfolioTextTitle),
+            icon:
+                Icon(Icons.arrow_back, color: ColorManager.portfolioTextTitle),
             onPressed: () => context.go(AppRoutes.home),
           ),
         ),
@@ -637,375 +700,450 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               child: CustomScrollView(
                 controller: _scrollController,
                 slivers: [
-                if (_isLoadingPortfolio)
+                  if (_isLoadingPortfolio)
+                    SliverToBoxAdapter(
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.white.withValues(alpha: 0.1),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            ColorManager.portfolioTextTitle),
+                      ),
+                    ),
                   SliverToBoxAdapter(
-                    child: LinearProgressIndicator(
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(ColorManager.portfolioTextTitle),
-                    ),
-                  ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      // Aligns section edges with "My Own Design System" card (page 16/24/32 + card gutter 12/24).
-                      left: isMobile ? 28 : (isTablet ? 48 : 56),
-                      right: isMobile ? 28 : (isTablet ? 48 : 56),
-                      top: 0,
-                      bottom: isMobile ? 20 : 28,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 1. Hero (animation + title only)
-                        _buildHero(
-                          he: he,
-                          wi: wi,
-                          titleSize: titleSize,
-                          bodySize: bodySize,
-                          isMobile: isMobile,
-                          sectionTitleSize: sectionTitleSize,
-                        ),
-                        SizedBox(height: gapAfterHero),
-
-                        // Content below hero
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                        // 2. My Own Design System card
-                        _DesignSystemHighlight(
-                          designSystemTitleSize: isMobile ? 24 : (sectionTitleSize + 6),
-                          designSystemSubSize: isMobile ? 14 : (bodySize - 1),
-                          bodySize: bodySize,
-                          isMobile: isMobile,
-                          onTapLink: () => _launchUrl(_designSystemUrl),
-                        ),
-                        SizedBox(height: gapAfterDesignSystemCard),
-
-                        // 3. End-to-end product design from research to cross-platform delivery
-                        Center(
-                          child: SelectableText(
-                            'End-to-end product design from research to cross-platform delivery',
-                            style: GoogleFonts.albertSans(
-                              color: ColorManager.portfolioTextTitle,
-                              fontSize: isMobile ? bodySize + 4 : bodySize + 6,
-                              fontWeight: FontWeight.w800,
-                              height: 1.25,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: gapAfterSubtitle),
-
-                        // 4. Design Philosophy & Principles card
-                        _DesignPhilosophyCard(
-                          bodySize: bodySize,
-                          isMobile: isMobile,
-                        ),
-                        SizedBox(height: gapAfterDesignPhilosophy),
-                        _PortfolioSectionNav(
-                          bodySize: bodySize,
-                          isMobile: isMobile,
-                          onTapFeatured: () => _scrollToSection(_featuredCaseStudiesKey),
-                          onTapApps: () => _scrollToSection(_appShowcaseKey),
-                          onTapPublications: () => _scrollToSection(_publicationsKey),
-                          onTapOpenSource: () => _scrollToSection(_openSourceKey),
-                        ),
-                        SizedBox(height: 14),
-
-                        // 5. Featured Case Studies
-                        KeyedSubtree(
-                          key: _featuredCaseStudiesKey,
-                          child: _SectionTitle(
-                            title: 'Featured Case Studies',
-                            sectionTitleSize: sectionTitleSize,
-                            goldGradient: true,
-                          ),
-                        ),
-                        if (AdminService.isAdmin()) ...[
-                          SizedBox(height: gapAfterFeaturedTitle),
-                          OutlinedButton.icon(
-                            onPressed: _navigateToAddCaseStudy,
-                            icon: Icon(Icons.add, size: 18, color: ColorManager.portfolioTextBody),
-                            label: Text(
-                              'Add case study',
-                              style: GoogleFonts.albertSans(color: ColorManager.portfolioTextBody, fontWeight: FontWeight.w600),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
-                            ),
-                          ),
-                        ],
-                        SizedBox(height: gapAfterFeaturedTitle),
-                        _FeaturedCaseStudiesShowcase(
-                          caseStudies: _displayCaseStudies,
-                          isMobile: isMobile,
-                          bodySize: bodySize,
-                          gapBetweenCards: gapBetweenCaseStudyCards,
-                          onOpenCaseStudy: (id) => context.go(AppRoutes.portfolioCaseStudyPath(id)),
-                          showAdminActions: AdminService.isAdmin(),
-                          onEdit: AdminService.isAdmin() ? _navigateToEditCaseStudy : null,
-                          onDelete: AdminService.isAdmin() ? _deleteCaseStudy : null,
-                          canDeleteCaseStudy: (id) =>
-                              _caseStudiesFromFirestore?.any((f) => f.id == id) ?? false,
-                          onEditAdaptiveSection:
-                              AdminService.isAdmin() ? (cs) => _openEditAdaptiveSection(cs) : null,
-                        ),
-                        SizedBox(height: gapAfterCaseStudies),
-
-                        // 6. App Showcase (2 columns or responsive grid)
-                        KeyedSubtree(
-                          key: _appShowcaseKey,
-                          child: _SectionTitle(
-                            title: 'App Showcase',
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        // Aligns section edges with "My Own Design System" card (page 16/24/32 + card gutter 12/24).
+                        left: isMobile ? 28 : (isTablet ? 48 : 56),
+                        right: isMobile ? 28 : (isTablet ? 48 : 56),
+                        top: 0,
+                        bottom: isMobile ? 20 : 28,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Hero (animation + title only)
+                          _buildHero(
+                            he: he,
+                            wi: wi,
+                            titleSize: titleSize,
+                            bodySize: bodySize,
+                            isMobile: isMobile,
                             sectionTitleSize: sectionTitleSize,
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 8, bottom: 10),
-                            child: OutlinedButton.icon(
-                              onPressed: () => context.push(AppRoutes.portfolioDesignSystemPath('4ideas')),
-                              icon: Icon(Icons.design_services_outlined, size: 18, color: ColorManager.portfolioTextBody),
-                              label: Text(
-                                'Open 4iDeas Design System',
-                                style: GoogleFonts.albertSans(
-                                  color: ColorManager.portfolioTextBody,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (AdminService.isAdmin()) ...[
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 12),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: ElevatedButton.icon(
-                                onPressed: _navigateToAddApp,
-                                icon: Icon(Icons.add, size: 18, color: Colors.white),
-                                label: Text('Add app', style: GoogleFonts.albertSans(color: Colors.white, fontWeight: FontWeight.w600)),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorManager.orange,
-                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        SizedBox(height: gapAfterAppShowcaseTitle),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final double availableWidth = constraints.maxWidth;
-                            final bool isAdmin = AdminService.isAdmin();
-                            int crossAxisCount;
-                            double mainAxisExtent;
-                            double spacing;
-                            // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
-                            if (availableWidth > 900) {
-                              crossAxisCount = 3;
-                              mainAxisExtent = 432;
-                              spacing = 18;
-                            } else if (availableWidth > 600) {
-                              crossAxisCount = 2;
-                              mainAxisExtent = 452;
-                              spacing = 16;
-                            } else {
-                              crossAxisCount = 1;
-                              mainAxisExtent = 476;
-                              spacing = 14;
-                            }
-                            return GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                mainAxisExtent: mainAxisExtent,
-                                crossAxisSpacing: spacing,
-                                mainAxisSpacing: spacing,
-                              ),
-                              itemCount: _displayApps.length,
-                              itemBuilder: (context, index) {
-                                final app = _displayApps[index];
-                                return PortfolioAppCard(
-                                  app: app,
-                                  isMobile: isMobile,
-                                  isTablet: isTablet,
-                                  showAdminActions: isAdmin,
-                                  onEdit: isAdmin ? () => _navigateToEditApp(app) : null,
-                                  onDelete: isAdmin && _firestoreDocIdForPortfolioApp(app) != null
-                                      ? () => _deleteApp(app)
-                                      : null,
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        SizedBox(height: gapAfterAppShowcase),
+                          SizedBox(height: gapAfterHero),
 
-                        // 7. Publications
-                        KeyedSubtree(
-                          key: _publicationsKey,
-                          child: _SectionTitle(
-                            title: "John Colani's Publications",
-                            sectionTitleSize: sectionTitleSize,
-                          ),
-                        ),
-                        if (AdminService.isAdmin()) ...[
-                          SizedBox(height: gapAfterPublicationsTitle),
-                          OutlinedButton.icon(
-                            onPressed: _navigateToAddPublication,
-                            icon: Icon(Icons.add, size: 18, color: ColorManager.portfolioTextBody),
-                            label: Text(
-                              'Add publication',
-                              style: GoogleFonts.albertSans(color: ColorManager.portfolioTextBody, fontWeight: FontWeight.w600),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
-                            ),
-                          ),
-                        ],
-                        SizedBox(height: gapAfterPublicationsTitle),
-                        ..._displayPublications.map(
-                          (p) => Padding(
-                            padding: EdgeInsets.only(bottom: 10),
-                            child: PortfolioPublicationCard(
-                              publication: p,
-                              isMobile: isMobile,
-                              isTablet: isTablet,
-                              showAdminActions: AdminService.isAdmin() && _publicationsFromFirestore != null,
-                              onEdit: AdminService.isAdmin() && _publicationsFromFirestore != null ? () => _navigateToEditPublication(p) : null,
-                              onDelete: AdminService.isAdmin() && _publicationsFromFirestore != null ? () => _deletePublication(p) : null,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton.icon(
-                            onPressed: () => _launchUrl(PortfolioData.mediumProfile),
-                            icon: Icon(
-                              Icons.open_in_new,
-                              size: 16,
-                              color: ColorManager.portfolioTextBody,
-                            ),
-                            label: SelectableText(
-                              'View all on Medium',
-                              style: GoogleFonts.albertSans(
-                                color: ColorManager.portfolioTextBody,
-                                fontSize: bodySize,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: gapAfterPublications),
-
-                        // 8. Open Source & Package
-                        KeyedSubtree(
-                          key: _openSourceKey,
-                          child: _SectionTitle(
-                            title: "John Colani's Packages",
-                            sectionTitleSize: sectionTitleSize,
-                          ),
-                        ),
-                        if (AdminService.isAdmin()) ...[
-                          SizedBox(height: gapAfterOpenSourceTitle),
-                          OutlinedButton.icon(
-                            onPressed: _navigateToAddOpenSource,
-                            icon: Icon(Icons.add, size: 18, color: ColorManager.portfolioTextBody),
-                            label: Text(
-                              'Add open source item',
-                              style: GoogleFonts.albertSans(color: ColorManager.portfolioTextBody, fontWeight: FontWeight.w600),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.5)),
-                            ),
-                          ),
-                        ],
-                        SizedBox(height: gapAfterOpenSourceTitle),
-                        ..._displayOpenSourceItems.asMap().entries.map((e) {
-                          final item = e.value;
-                          final prev =
-                              e.key > 0 ? _displayOpenSourceItems[e.key - 1] : null;
-                          final isGithub = item.url.contains('github.com');
-                          final prevWasGithub =
-                              prev?.url.contains('github.com') ?? false;
-                          final showGithubSectionTitle = isGithub && !prevWasGithub;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                          // Content below hero
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (showGithubSectionTitle)
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: 8,
-                                    top: e.key > 0 ? 4 : 0,
+                              // 2. My Own Design System card
+                              _DesignSystemHighlight(
+                                designSystemTitleSize:
+                                    isMobile ? 24 : (sectionTitleSize + 6),
+                                designSystemSubSize:
+                                    isMobile ? 14 : (bodySize - 1),
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                                onTapLink: () => _launchUrl(_designSystemUrl),
+                              ),
+                              SizedBox(height: gapAfterDesignSystemCard),
+
+                              // 3. End-to-end product design from research to cross-platform delivery
+                              Center(
+                                child: SelectableText(
+                                  'End-to-end product design from research to cross-platform delivery',
+                                  style: GoogleFonts.albertSans(
+                                    color: ColorManager.portfolioTextTitle,
+                                    fontSize:
+                                        isMobile ? bodySize + 4 : bodySize + 6,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.25,
                                   ),
-                                  child: SelectableText(
-                                    "John Colani's GitHub repository",
+                                ),
+                              ),
+                              SizedBox(height: gapAfterSubtitle),
+
+                              // 4. Design Philosophy & Principles card
+                              _DesignPhilosophyCard(
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                              ),
+                              SizedBox(height: gapAfterDesignPhilosophy),
+                              _PortfolioSectionNav(
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                                onTapFeatured: () =>
+                                    _scrollToSection(_featuredCaseStudiesKey),
+                                onTapApps: () =>
+                                    _scrollToSection(_appShowcaseKey),
+                                onTapPublications: () =>
+                                    _scrollToSection(_publicationsKey),
+                                onTapOpenSource: () =>
+                                    _scrollToSection(_openSourceKey),
+                              ),
+                              SizedBox(height: 14),
+
+                              // 5. Featured Case Studies
+                              KeyedSubtree(
+                                key: _featuredCaseStudiesKey,
+                                child: _SectionTitle(
+                                  title: 'Featured Case Studies',
+                                  sectionTitleSize: sectionTitleSize,
+                                  goldGradient: true,
+                                ),
+                              ),
+                              if (AdminService.isAdmin()) ...[
+                                SizedBox(height: gapAfterFeaturedTitle),
+                                OutlinedButton.icon(
+                                  onPressed: _navigateToAddCaseStudy,
+                                  icon: Icon(Icons.add,
+                                      size: 18,
+                                      color: ColorManager.portfolioTextBody),
+                                  label: Text(
+                                    'Add case study',
                                     style: GoogleFonts.albertSans(
-                                      color: ColorManager.portfolioTextTitle,
-                                      fontSize: bodySize + 1,
-                                      fontWeight: FontWeight.w700,
+                                        color: ColorManager.portfolioTextBody,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        color: ColorManager.portfolioTextBody
+                                            .withValues(alpha: 0.5)),
+                                  ),
+                                ),
+                              ],
+                              SizedBox(height: gapAfterFeaturedTitle),
+                              _FeaturedCaseStudiesShowcase(
+                                caseStudies: _displayCaseStudies,
+                                isMobile: isMobile,
+                                bodySize: bodySize,
+                                gapBetweenCards: gapBetweenCaseStudyCards,
+                                onOpenCaseStudy: (id) => context
+                                    .go(AppRoutes.portfolioCaseStudyPath(id)),
+                                showAdminActions: AdminService.isAdmin(),
+                                onEdit: AdminService.isAdmin()
+                                    ? _navigateToEditCaseStudy
+                                    : null,
+                                onDelete: AdminService.isAdmin()
+                                    ? _deleteCaseStudy
+                                    : null,
+                                canDeleteCaseStudy: (id) =>
+                                    _caseStudiesFromFirestore
+                                        ?.any((f) => f.id == id) ??
+                                    false,
+                                onEditAdaptiveSection: AdminService.isAdmin()
+                                    ? (cs) => _openEditAdaptiveSection(cs)
+                                    : null,
+                              ),
+                              SizedBox(height: gapAfterCaseStudies),
+
+                              // 6. App Showcase (2 columns or responsive grid)
+                              KeyedSubtree(
+                                key: _appShowcaseKey,
+                                child: _SectionTitle(
+                                  title: 'App Showcase',
+                                  sectionTitleSize: sectionTitleSize,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 8, bottom: 10),
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => context.push(
+                                        AppRoutes.portfolioDesignSystemPath(
+                                            '4ideas')),
+                                    icon: Icon(Icons.design_services_outlined,
+                                        size: 18,
+                                        color: ColorManager.portfolioTextBody),
+                                    label: Text(
+                                      'Open 4iDeas Design System',
+                                      style: GoogleFonts.albertSans(
+                                        color: ColorManager.portfolioTextBody,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          color: ColorManager.portfolioTextBody
+                                              .withValues(alpha: 0.5)),
                                     ),
                                   ),
                                 ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  bottom: e.key < _displayOpenSourceItems.length - 1 ? 12 : 0,
+                              ),
+                              if (AdminService.isAdmin()) ...[
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 12),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: ElevatedButton.icon(
+                                      onPressed: _navigateToAddApp,
+                                      icon: Icon(Icons.add,
+                                          size: 18, color: Colors.white),
+                                      label: Text('Add app',
+                                          style: GoogleFonts.albertSans(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: ColorManager.orange,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 10),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                child: _OpenSourceCard(
-                                  item: item,
-                                  isMobile: isMobile,
-                                  bodySize: bodySize,
-                                  showAdminActions: AdminService.isAdmin() &&
-                                      _openSourceFromFirestore != null,
-                                  onEdit: AdminService.isAdmin() &&
-                                          _openSourceFromFirestore != null
-                                      ? () => _navigateToEditOpenSource(item)
-                                      : null,
-                                  onDelete: AdminService.isAdmin() &&
-                                          _openSourceFromFirestore != null
-                                      ? () => _deleteOpenSource(item)
-                                      : null,
+                              ],
+                              SizedBox(height: gapAfterAppShowcaseTitle),
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final double availableWidth =
+                                      constraints.maxWidth;
+                                  final bool isAdmin = AdminService.isAdmin();
+                                  int crossAxisCount;
+                                  double mainAxisExtent;
+                                  double spacing;
+                                  // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
+                                  if (availableWidth > 900) {
+                                    crossAxisCount = 3;
+                                    mainAxisExtent = 432;
+                                    spacing = 18;
+                                  } else if (availableWidth > 600) {
+                                    crossAxisCount = 2;
+                                    mainAxisExtent = 452;
+                                    spacing = 16;
+                                  } else {
+                                    crossAxisCount = 1;
+                                    mainAxisExtent = 476;
+                                    spacing = 14;
+                                  }
+                                  return GridView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: crossAxisCount,
+                                      mainAxisExtent: mainAxisExtent,
+                                      crossAxisSpacing: spacing,
+                                      mainAxisSpacing: spacing,
+                                    ),
+                                    itemCount: _displayApps.length,
+                                    itemBuilder: (context, index) {
+                                      final app = _displayApps[index];
+                                      return PortfolioAppCard(
+                                        app: app,
+                                        isMobile: isMobile,
+                                        isTablet: isTablet,
+                                        showAdminActions: isAdmin,
+                                        onEdit: isAdmin
+                                            ? () => _navigateToEditApp(app)
+                                            : null,
+                                        onDelete: isAdmin &&
+                                                _firestoreDocIdForPortfolioApp(
+                                                        app) !=
+                                                    null
+                                            ? () => _deleteApp(app)
+                                            : null,
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              SizedBox(height: gapAfterAppShowcase),
+
+                              // 7. Publications
+                              KeyedSubtree(
+                                key: _publicationsKey,
+                                child: _SectionTitle(
+                                  title: "John Colani's Publications",
+                                  sectionTitleSize: sectionTitleSize,
                                 ),
                               ),
+                              if (AdminService.isAdmin()) ...[
+                                SizedBox(height: gapAfterPublicationsTitle),
+                                OutlinedButton.icon(
+                                  onPressed: _navigateToAddPublication,
+                                  icon: Icon(Icons.add,
+                                      size: 18,
+                                      color: ColorManager.portfolioTextBody),
+                                  label: Text(
+                                    'Add publication',
+                                    style: GoogleFonts.albertSans(
+                                        color: ColorManager.portfolioTextBody,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        color: ColorManager.portfolioTextBody
+                                            .withValues(alpha: 0.5)),
+                                  ),
+                                ),
+                              ],
+                              SizedBox(height: gapAfterPublicationsTitle),
+                              ..._displayPublications.map(
+                                (p) => Padding(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  child: PortfolioPublicationCard(
+                                    publication: p,
+                                    isMobile: isMobile,
+                                    isTablet: isTablet,
+                                    showAdminActions: AdminService.isAdmin() &&
+                                        _publicationsFromFirestore != null,
+                                    onEdit: AdminService.isAdmin() &&
+                                            _publicationsFromFirestore != null
+                                        ? () => _navigateToEditPublication(p)
+                                        : null,
+                                    onDelete: AdminService.isAdmin() &&
+                                            _publicationsFromFirestore != null
+                                        ? () => _deletePublication(p)
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  onPressed: () =>
+                                      _launchUrl(PortfolioData.mediumProfile),
+                                  icon: Icon(
+                                    Icons.open_in_new,
+                                    size: 16,
+                                    color: ColorManager.portfolioTextBody,
+                                  ),
+                                  label: SelectableText(
+                                    'View all on Medium',
+                                    style: GoogleFonts.albertSans(
+                                      color: ColorManager.portfolioTextBody,
+                                      fontSize: bodySize,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: gapAfterPublications),
+
+                              // 8. Open Source & Package
+                              KeyedSubtree(
+                                key: _openSourceKey,
+                                child: _SectionTitle(
+                                  title: "John Colani's Packages",
+                                  sectionTitleSize: sectionTitleSize,
+                                ),
+                              ),
+                              if (AdminService.isAdmin()) ...[
+                                SizedBox(height: gapAfterOpenSourceTitle),
+                                OutlinedButton.icon(
+                                  onPressed: _navigateToAddOpenSource,
+                                  icon: Icon(Icons.add,
+                                      size: 18,
+                                      color: ColorManager.portfolioTextBody),
+                                  label: Text(
+                                    'Add open source item',
+                                    style: GoogleFonts.albertSans(
+                                        color: ColorManager.portfolioTextBody,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        color: ColorManager.portfolioTextBody
+                                            .withValues(alpha: 0.5)),
+                                  ),
+                                ),
+                              ],
+                              SizedBox(height: gapAfterOpenSourceTitle),
+                              ..._displayOpenSourceItems
+                                  .asMap()
+                                  .entries
+                                  .map((e) {
+                                final item = e.value;
+                                final prev = e.key > 0
+                                    ? _displayOpenSourceItems[e.key - 1]
+                                    : null;
+                                final isGithub =
+                                    item.url.contains('github.com');
+                                final prevWasGithub =
+                                    prev?.url.contains('github.com') ?? false;
+                                final showGithubSectionTitle =
+                                    isGithub && !prevWasGithub;
+                                return Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (showGithubSectionTitle)
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom: 8,
+                                          top: e.key > 0 ? 4 : 0,
+                                        ),
+                                        child: SelectableText(
+                                          "John Colani's GitHub repository",
+                                          style: GoogleFonts.albertSans(
+                                            color:
+                                                ColorManager.portfolioTextTitle,
+                                            fontSize: bodySize + 1,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom: e.key <
+                                                _displayOpenSourceItems.length -
+                                                    1
+                                            ? 12
+                                            : 0,
+                                      ),
+                                      child: _OpenSourceCard(
+                                        item: item,
+                                        isMobile: isMobile,
+                                        bodySize: bodySize,
+                                        showAdminActions:
+                                            AdminService.isAdmin() &&
+                                                _openSourceFromFirestore !=
+                                                    null,
+                                        onEdit: AdminService.isAdmin() &&
+                                                _openSourceFromFirestore != null
+                                            ? () =>
+                                                _navigateToEditOpenSource(item)
+                                            : null,
+                                        onDelete: AdminService.isAdmin() &&
+                                                _openSourceFromFirestore != null
+                                            ? () => _deleteOpenSource(item)
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                              SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  onPressed: () =>
+                                      _launchUrl(PortfolioData.githubProfile),
+                                  icon: Icon(
+                                    Icons.open_in_new,
+                                    size: 16,
+                                    color: ColorManager.portfolioTextBody,
+                                  ),
+                                  label: SelectableText(
+                                    'GitHub Profile',
+                                    style: GoogleFonts.albertSans(
+                                      color: ColorManager.portfolioTextBody,
+                                      fontSize: bodySize,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: he * 0.03),
                             ],
-                          );
-                        }),
-                        SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton.icon(
-                            onPressed: () =>
-                                _launchUrl(PortfolioData.githubProfile),
-                            icon: Icon(
-                              Icons.open_in_new,
-                              size: 16,
-                              color: ColorManager.portfolioTextBody,
-                            ),
-                            label: SelectableText(
-                              'GitHub Profile',
-                              style: GoogleFonts.albertSans(
-                                color: ColorManager.portfolioTextBody,
-                                fontSize: bodySize,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
                           ),
-                        ),
-                        SizedBox(height: he * 0.03),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
               ),
             ),
           ),
@@ -1026,8 +1164,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final double heroYOffset = isMobile ? -he * 0.05 : -he * 0.06;
     // Lottie behind title. Keep a tighter hero block height so next section
     // sits closer while preserving the text position.
-    final double lottieHeight = (isMobile ? he * 0.34 : he * 0.30).clamp(220.0, 300.0);
-    final double lottieWidth = (wi * (isMobile ? 0.9 : 0.82)).clamp(320.0, 780.0);
+    final double lottieHeight =
+        (isMobile ? he * 0.34 : he * 0.30).clamp(220.0, 300.0);
+    final double lottieWidth =
+        (wi * (isMobile ? 0.9 : 0.82)).clamp(320.0, 780.0);
 
     return Center(
       child: Transform.translate(
@@ -1062,7 +1202,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         errorBuilder: (_, __, ___) => Icon(
                           Icons.palette_outlined,
                           size: titleSize,
-                          color: ColorManager.portfolioTextBody.withValues(alpha: 0.4),
+                          color: ColorManager.portfolioTextBody
+                              .withValues(alpha: 0.4),
                         ),
                       ),
                     ),
@@ -1074,7 +1215,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   child: Transform.translate(
                     offset: Offset(0, 44),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: math.max(8.0, wi * 0.04)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: math.max(8.0, wi * 0.04)),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1105,10 +1247,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 const TextSpan(text: '\n&\n'),
                                 TextSpan(
                                   text: 'Flutter',
-                                  style: GoogleFonts.albertSans(fontWeight: FontWeight.w900),
+                                  style: GoogleFonts.albertSans(
+                                      fontWeight: FontWeight.w900),
                                 ),
                                 const TextSpan(
-                                  text: ' Cross platform development for mobile web and desktop.',
+                                  text:
+                                      ' Cross platform development for mobile web and desktop.',
                                 ),
                               ],
                             ),
@@ -1395,7 +1539,8 @@ class _NeonBorderOrbitPainter extends CustomPainter {
     for (int i = 14; i >= 0; i--) {
       final t = i / 14;
       final offset = (head - (i * 7.5)) % metric.length;
-      final tangent = metric.getTangentForOffset(offset < 0 ? offset + metric.length : offset);
+      final tangent = metric
+          .getTangentForOffset(offset < 0 ? offset + metric.length : offset);
       if (tangent == null) continue;
       final alpha = (1 - t) * 0.85;
       final radius = 1.5 + ((1 - t) * 3.2);
@@ -1573,18 +1718,32 @@ class _PortfolioSectionNav extends StatelessWidget {
       runSpacing: 10,
       children: actions
           .map(
-            (item) => OutlinedButton(
-              onPressed: item.$2,
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: ColorManager.portfolioTextBody.withValues(alpha: 0.45)),
-                padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 14, vertical: 10),
+            (item) => DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: AppColors.goldGradient,
+                borderRadius: BorderRadius.circular(999),
               ),
-              child: Text(
-                item.$1,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextBody,
-                  fontSize: bodySize - 1,
-                  fontWeight: FontWeight.w600,
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: OutlinedButton(
+                  onPressed: item.$2,
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide.none,
+                    backgroundColor:
+                        ColorManager.backgroundDark.withValues(alpha: 0.92),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 12 : 14,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: Text(
+                    item.$1,
+                    style: GoogleFonts.albertSans(
+                      color: ColorManager.portfolioTextBody,
+                      fontSize: bodySize - 1,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1715,7 +1874,9 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
     );
 
     if (showAdminActions &&
-        (onEdit != null || (onDelete != null && canDelete) || onEditAdaptiveSection != null)) {
+        (onEdit != null ||
+            (onDelete != null && canDelete) ||
+            onEditAdaptiveSection != null)) {
       return Stack(
         clipBehavior: Clip.none,
         children: [
@@ -1728,25 +1889,31 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
               children: [
                 if (onEditAdaptiveSection != null)
                   IconButton(
-                    icon: Icon(Icons.image, size: 22, color: ColorManager.portfolioTextBody),
+                    icon: Icon(Icons.image,
+                        size: 22, color: ColorManager.portfolioTextBody),
                     onPressed: () => onEditAdaptiveSection!(caseStudy),
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    constraints:
+                        const BoxConstraints(minWidth: 36, minHeight: 36),
                     tooltip: 'Edit Adaptive section images',
                   ),
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: 22, color: ColorManager.portfolioTextBody),
+                    icon: Icon(Icons.edit,
+                        size: 22, color: ColorManager.portfolioTextBody),
                     onPressed: () => onEdit!(caseStudy),
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    constraints:
+                        const BoxConstraints(minWidth: 36, minHeight: 36),
                   ),
                 if (onDelete != null && canDelete)
                   IconButton(
-                    icon: Icon(Icons.delete_outline, size: 22, color: Colors.red),
+                    icon:
+                        Icon(Icons.delete_outline, size: 22, color: Colors.red),
                     onPressed: () => onDelete!(caseStudy),
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    constraints:
+                        const BoxConstraints(minWidth: 36, minHeight: 36),
                   ),
               ],
             ),
@@ -1766,10 +1933,13 @@ class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
   final List<String>? heroImagePaths;
   final bool isMobile;
   final String caseStudyId;
+
   /// Previously 150; +20% for larger scroll/thumbnail area.
   static const double _height = 180;
+
   /// Portrait thumbnail width for multi-image strips (mobile-style screenshots).
   static const double _multiHeroPortraitThumbWidth = 72;
+
   /// Horizontal gap between portrait thumbnails so frames don’t stack visually.
   static const double _multiHeroPortraitGap = 10;
 
@@ -1793,7 +1963,8 @@ class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
       _FeaturedCaseStudyHeroStripState();
 }
 
-class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip> {
+class _FeaturedCaseStudyHeroStripState
+    extends State<_FeaturedCaseStudyHeroStrip> {
   int? _hoveredIndex;
   OverlayEntry? _hoverPreviewEntry;
   final ScrollController _multiHeroScrollController = ScrollController();
@@ -1812,7 +1983,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _startAutoScrollIfNeeded());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _startAutoScrollIfNeeded());
   }
 
   bool get _usePortraitMultiHeroStrip =>
@@ -1837,7 +2009,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
       'assets/images/sales_rep/salesrep_dashboard.png': 'Sales Dashboard',
       'assets/images/sales_rep/salesrep_home.png': 'Sales Home',
       'assets/images/scheduler/scheduler dashboard.png': 'Scheduler Dashboard',
-      'assets/images/scheduler/scheduler dashboard 01.png': 'Scheduler Planning',
+      'assets/images/scheduler/scheduler dashboard 01.png':
+          'Scheduler Planning',
       'assets/images/installer/installer dashboard.png': 'Installer Dashboard',
       'assets/images/installer/installer home screen.png': 'Installer Home',
       'assets/images/admin/admin_trending_material.jpeg': 'Trending Materials',
@@ -1863,7 +2036,9 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
     if (cleaned.isEmpty) return 'Case Study Image';
     return cleaned
         .split(RegExp(r'\s+'))
-        .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.length > 1 ? w.substring(1) : ''}')
+        .map((w) => w.isEmpty
+            ? w
+            : '${w[0].toUpperCase()}${w.length > 1 ? w.substring(1) : ''}')
         .join(' ');
   }
 
@@ -1899,7 +2074,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                     maxHeight: 980,
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 28, vertical: 24),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(18),
                       child: DecoratedBox(
@@ -1956,7 +2132,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
 
   void _startAutoScrollIfNeeded() {
     _autoScrollTimer?.cancel();
-    _autoScrollTimer = Timer.periodic(_autoScrollTick, (_) => _autoScrollOnce());
+    _autoScrollTimer =
+        Timer.periodic(_autoScrollTick, (_) => _autoScrollOnce());
   }
 
   void _autoScrollOnce() {
@@ -1990,7 +2167,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
     _resumeAutoScrollTimer?.cancel();
   }
 
-  void _scheduleAutoScrollResume([Duration delay = const Duration(milliseconds: 1200)]) {
+  void _scheduleAutoScrollResume(
+      [Duration delay = const Duration(milliseconds: 1200)]) {
     _resumeAutoScrollTimer?.cancel();
     _resumeAutoScrollTimer = Timer(delay, () {
       _autoScrollPaused = false;
@@ -2098,9 +2276,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                   child: AnimatedSlide(
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOutCubic,
-                    offset: isHoveredTile
-                        ? const Offset(0, -0.02)
-                        : Offset.zero,
+                    offset:
+                        isHoveredTile ? const Offset(0, -0.02) : Offset.zero,
                     child: AnimatedScale(
                       duration: const Duration(milliseconds: 220),
                       curve: Curves.easeOutCubic,
@@ -2115,8 +2292,7 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                           boxShadow: isHoveredTile
                               ? [
                                   BoxShadow(
-                                    color: Colors.black
-                                        .withValues(alpha: 0.35),
+                                    color: Colors.black.withValues(alpha: 0.35),
                                     blurRadius: 18,
                                     offset: const Offset(0, 10),
                                   ),
@@ -2148,12 +2324,11 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.black
-                                        .withValues(alpha: 0.55),
+                                    color: Colors.black.withValues(alpha: 0.55),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: Colors.white
-                                          .withValues(alpha: 0.24),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.24),
                                     ),
                                   ),
                                   child: Text(
@@ -2288,7 +2463,8 @@ class _FeaturedCaseStudyHeroStripState extends State<_FeaturedCaseStudyHeroStrip
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+                    color:
+                        ColorManager.portfolioTextBody.withValues(alpha: 0.5),
                   ),
                 ),
               );
@@ -2542,7 +2718,8 @@ class _OpenSourceCard extends StatelessWidget {
             horizontal: isMobile ? 20 : 28,
             vertical: isMobile ? 20 : 24,
           ),
-          decoration: ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
+          decoration:
+              ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
           child: Row(
             children: [
               Icon(icon, color: ColorManager.portfolioTextBody, size: 28),
@@ -2570,7 +2747,8 @@ class _OpenSourceCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.open_in_new, color: ColorManager.portfolioTextBody, size: 20),
+              Icon(Icons.open_in_new,
+                  color: ColorManager.portfolioTextBody, size: 20),
             ],
           ),
         ),
@@ -2590,14 +2768,16 @@ class _OpenSourceCard extends StatelessWidget {
               children: [
                 if (onEdit != null)
                   IconButton(
-                    icon: Icon(Icons.edit, size: 20, color: ColorManager.portfolioTextBody),
+                    icon: Icon(Icons.edit,
+                        size: 20, color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 32, minHeight: 32),
                   ),
                 if (onDelete != null)
                   IconButton(
-                    icon: Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                    icon:
+                        Icon(Icons.delete_outline, size: 20, color: Colors.red),
                     onPressed: onDelete,
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(minWidth: 32, minHeight: 32),

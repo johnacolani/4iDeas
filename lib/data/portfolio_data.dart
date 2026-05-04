@@ -7,15 +7,19 @@ class PortfolioApp {
   final String description;
   final String? imagePath;
   final bool useComingSoonPlaceholder;
+
   /// When true, show the image (if any) with a "Coming Soon" overlay.
   final bool showComingSoonOverlay;
   final String? appStoreUrl;
   final String? playStoreUrl;
   final String? webUrl;
+
   /// macOS download: Mac App Store, hosted `.dmg`/`.zip`, GitHub Release, or Firebase Storage URL (not a bundled asset).
   final String? macosUrl;
+
   /// Windows: Microsoft Store, hosted `.exe`/`.msix`, or GitHub Release URL.
   final String? windowsUrl;
+
   /// When set, tapping the app card navigates to this case study (go_router) instead of opening [webUrl].
   /// Use when the product also has a full case study on this site (e.g. ASD USA → case study `asd`).
   final String? caseStudyId;
@@ -56,7 +60,8 @@ class PortfolioApp {
       name: map['name'] as String? ?? '',
       description: map['description'] as String? ?? '',
       imagePath: map['imagePath'] as String?,
-      useComingSoonPlaceholder: map['useComingSoonPlaceholder'] as bool? ?? false,
+      useComingSoonPlaceholder:
+          map['useComingSoonPlaceholder'] as bool? ?? false,
       showComingSoonOverlay: map['showComingSoonOverlay'] as bool? ?? false,
       appStoreUrl: map['appStoreUrl'] as String?,
       playStoreUrl: map['playStoreUrl'] as String?,
@@ -102,6 +107,7 @@ class OpenSourceItem {
   final String title;
   final String subtitle;
   final String url;
+
   /// Icon name for Icons (e.g. 'widgets_outlined', 'code').
   final String iconName;
   final int order;
@@ -140,10 +146,13 @@ class PortfolioCaseStudy {
   final String title;
   final String subtitle;
   final String overview;
+
   /// Optional: design philosophy & principles applied in this case study.
   final String? designApproach;
+
   /// Featured case study card strip: asset path (e.g. `assets/images/...`) or `https://` URL.
   final String? heroImagePath;
+
   /// When non-empty, featured hero shows a horizontal strip of images (same height as single-hero); scrolls if needed.
   final List<String>? heroImagePaths;
   final List<CaseStudySection> sections;
@@ -167,7 +176,8 @@ class PortfolioCaseStudy {
         'overview': overview,
         'designApproach': designApproach,
         'heroImagePath': heroImagePath,
-        if (heroImagePaths != null && heroImagePaths!.isNotEmpty) 'heroImagePaths': heroImagePaths,
+        if (heroImagePaths != null && heroImagePaths!.isNotEmpty)
+          'heroImagePaths': heroImagePaths,
         'sections': sections.map((s) => s.toMap()).toList(),
         'order': order,
       };
@@ -175,12 +185,18 @@ class PortfolioCaseStudy {
   static PortfolioCaseStudy fromMap(String docId, Map<String, dynamic> map) {
     final sectionsList = map['sections'] as List<dynamic>?;
     final sections = sectionsList != null
-        ? sectionsList.map((e) => CaseStudySection.fromMap(Map<String, dynamic>.from(e as Map))).toList()
+        ? sectionsList
+            .map((e) =>
+                CaseStudySection.fromMap(Map<String, dynamic>.from(e as Map)))
+            .toList()
         : <CaseStudySection>[];
     final rawHeroPaths = map['heroImagePaths'];
     List<String>? heroImagePaths;
     if (rawHeroPaths is List) {
-      heroImagePaths = rawHeroPaths.map((e) => '$e'.trim()).where((e) => e.isNotEmpty).toList();
+      heroImagePaths = rawHeroPaths
+          .map((e) => '$e'.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
       if (heroImagePaths.isEmpty) heroImagePaths = null;
     }
     return PortfolioCaseStudy(
@@ -201,7 +217,8 @@ class PortfolioCaseStudy {
     if (id != 'asd') return this;
     final list = List<CaseStudySection>.from(sections);
     final adaptiveI = list.indexWhere((s) => s.isAsdAdaptivePlatformSection);
-    final designI = list.indexWhere((s) => s.title.trim().startsWith('Design System'));
+    final designI =
+        list.indexWhere((s) => s.title.trim().startsWith('Design System'));
     if (adaptiveI < 0 || designI < 0) return this;
     if (adaptiveI == designI - 1) return this;
     final adaptive = list.removeAt(adaptiveI);
@@ -249,8 +266,10 @@ class CaseStudySection {
   final String title;
   final String content;
   final List<String>? imagePaths;
+
   /// When set, used instead of [imagePaths]; allows a description per image.
   final List<CaseStudyImage>? images;
+
   /// When true, show a control to open the full HTML design-system doc for this case study (see [PortfolioData.caseStudyHasDesignSystemDoc]).
   final bool opensDesignSystemDoc;
 
@@ -286,7 +305,10 @@ class CaseStudySection {
       title: map['title'] as String? ?? '',
       content: map['content'] as String? ?? '',
       imagePaths: imagePaths?.map((e) => e.toString()).toList(),
-      images: imagesList?.map((e) => CaseStudyImage.fromMap(Map<String, dynamic>.from(e as Map))).toList(),
+      images: imagesList
+          ?.map((e) =>
+              CaseStudyImage.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList(),
       opensDesignSystemDoc: map['opensDesignSystemDoc'] as bool? ?? false,
     );
   }
@@ -309,7 +331,8 @@ class CaseStudySection {
     return false;
   }
 
-  static bool matchesAdaptivePlatformSection(String title, Iterable<String> imagePaths) {
+  static bool matchesAdaptivePlatformSection(
+      String title, Iterable<String> imagePaths) {
     return CaseStudySection(
       title: title,
       content: '',
@@ -334,7 +357,12 @@ class PortfolioData {
 
   /// Design-system HTML docs keyed by id.
   /// Includes case-study docs (e.g. `service-flow`) and app-level docs (e.g. `4ideas`).
-  static const Map<String, CaseStudyDesignSystemDocPaths> designSystemDocsByCaseStudyId = {
+  static const Map<String, CaseStudyDesignSystemDocPaths>
+      designSystemDocsByCaseStudyId = {
+    'asdusa': CaseStudyDesignSystemDocPaths(
+      webRelativePath: 'assets/assets/design_system/ASD_App_Design_System.html',
+      flutterAssetPath: 'assets/design_system/ASD_App_Design_System.html',
+    ),
     'service-flow': CaseStudyDesignSystemDocPaths(
       webRelativePath: 'docs/serviceflow-design-system.html',
       flutterAssetPath: 'assets/docs/serviceflow-design-system.html',
@@ -348,7 +376,8 @@ class PortfolioData {
   static bool caseStudyHasDesignSystemDoc(String id) =>
       designSystemDocsByCaseStudyId.containsKey(id);
 
-  static CaseStudyDesignSystemDocPaths? designSystemDocPathsForCaseStudy(String id) =>
+  static CaseStudyDesignSystemDocPaths? designSystemDocPathsForCaseStudy(
+          String id) =>
       designSystemDocsByCaseStudyId[id];
 
   static const String portfolioVideoUrl =
@@ -897,7 +926,8 @@ class PortfolioData {
 
   /// Featured-card hero strip for Rose Chat seasonal case study (same pattern as Twin Scriptures).
   static List<String> get roseChatSeasonalFeaturedHeroPaths => [
-        for (final name in _roseSeasonalScreenshotFileNames) '$_roseSeasonalAssetDir/$name',
+        for (final name in _roseSeasonalScreenshotFileNames)
+          '$_roseSeasonalAssetDir/$name',
       ];
 
   /// Service Flow: iPhone simulator captures (`assets/images/service_flow/`), capture order.
@@ -919,7 +949,8 @@ class PortfolioData {
         PortfolioCaseStudy(
           id: 'rose-chat-seasonal-campaign-engine',
           title: 'Rose AI Seasonal and Holiday Celebration Campaign',
-          subtitle: 'Designed and Built: Dynamic Campaign UX, Governance, and Rollout at Scale',
+          subtitle:
+              'Designed and Built: Dynamic Campaign UX, Governance, and Rollout at Scale',
           overview:
               'A flagship Rose AI case study showing how I designed and built a backend-driven seasonal experience system at production scale. '
               'The campaign engine transforms chat with contextual greetings, seasonal themes, dynamic assets, preview controls, and safe rollout logic without app redeploys.',
@@ -989,7 +1020,8 @@ class PortfolioData {
         PortfolioCaseStudy(
           id: 'service-flow',
           title: 'Service Flow (Multi-tenant SaaS UX Case Study)',
-          subtitle: 'Multi-tenant SaaS Product Design and Flutter Workflow Architecture',
+          subtitle:
+              'Multi-tenant SaaS Product Design and Flutter Workflow Architecture',
           overview:
               'Service Flow is a Multi-tenant SaaS case study for structuring complex operational work across field teams and office teams. '
               'The focus is clarity under pressure: predictable navigation, legible hierarchy, tenant-safe data boundaries, and a design system that keeps product and engineering aligned. '
@@ -1049,8 +1081,10 @@ class PortfolioData {
         ),
         PortfolioCaseStudy(
           id: 'asd',
-          title: 'Absolute Stone Design (ASD) — Enterprise Flutter Operations Case Study',
-          subtitle: 'Enterprise Multi-role Product Design, Flutter Engineering, and Firebase Delivery',
+          title:
+              'Absolute Stone Design (ASD) — Enterprise Flutter Operations Case Study',
+          subtitle:
+              'Enterprise Multi-role Product Design, Flutter Engineering, and Firebase Delivery',
           overview:
               'ASD is a production Flutter and Firebase platform for stone fabrication and installation: multiple internal roles, external clients, live job state, admin governance, and an AI assistant scoped for real support load—not a demo. '
               'This case study is written for hiring managers: how the problem was framed, what I owned, where UX and architecture meet, and what shipped. Screens illustrate breadth and craft; they are evidence, not decoration.',
@@ -1138,8 +1172,7 @@ class PortfolioData {
             ),
             CaseStudySection(
               title: 'Outcome, impact, and technologies',
-              content:
-                  '**Outcome and impact (honest framing):**\n'
+              content: '**Outcome and impact (honest framing):**\n'
                   'Where instrumented “before/after metrics” were not run as an engagement KPI, the impact story is best stated in **operational terms** you can diligence: job state became **legible in the product** instead of distributed across channels; client and internal visibility improved relative to the prior patchwork; onboarding and role changes could move through **admin flows** rather than bespoke requests; AI-assisted interactions were designed to be **reviewable and correctable** rather than a black box.\n\n'
                   'Quantified business outcomes vary by how the org measures (ticket volume, cycle time, CS inquiry mix). What I can stand behind is **shipping behavior**: a coherent multi-role system, a governable AI surface, and a codebase structure intended to keep cost of change manageable as requirements evolve.\n\n'
                   '**Technologies used:**\n'
@@ -1154,7 +1187,8 @@ class PortfolioData {
         PortfolioCaseStudy(
           id: 'twin-scriptures',
           title: 'Twin Scriptures (Personalized Spiritual App Case Study)',
-          subtitle: 'Consumer Product Design with Flutter, Personalization, and RTL UX',
+          subtitle:
+              'Consumer Product Design with Flutter, Personalization, and RTL UX',
           overview:
               'Scripture reading that feels personal and culturally respectful. Replaced long forms with visual preference selection—themes, fonts, seasons, emotions—so users shape the UI. '
               'Persian–English and Turkish–English, RTL support, multi-platform. "Show, Don\'t Ask" design strategy; high onboarding completion and strong user feedback on personalization.',
@@ -1193,29 +1227,101 @@ class PortfolioData {
                   '**Architecture:** Short onboarding → structured choices (seasonal, emotional, cultural) → themes and typography applied globally. Single preference model; UI and content respond consistently. Design and implementation aligned on the preference schema so theming and content stay in sync.\n\n'
                   'Screens below show the onboarding flows and resulting experience.',
               images: [
-                CaseStudyImage(path: 'assets/images/on_boarding_image/access_camera_10_1.png', description: 'Permission to access device camera for importing personal images.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/book_mark_home_17.png', description: 'Bookmarks and home screen with quick access to saved verses.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/choos_fonts_15.png', description: 'Font selection for English and Persian to personalize reading comfort.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/christmas_image_13.png', description: 'Christmas seasonal theme option for the reading experience.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/color_theme_4.png', description: 'Color theme picker for app accent and background.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/complete_on_boarding.png', description: 'Completion screen: "Everything is Ready!" with summary of choices.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/create_new_color_4_1.png', description: 'Create a custom color for themes.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/custome_home_screen_16.png', description: 'Customizable home screen layout and preferences.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/default_app_00.png', description: 'Default app appearance before personalization.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/emotional_state_14.png', description: 'Emotional state selection (e.g. peaceful, joyful) for matching content.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/fall_image_8.png', description: 'Fall / autumn seasonal theme.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/import_image_10.png', description: 'Import personal images for backgrounds or themes.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/navigate_book_mark_18.png', description: 'Navigation to bookmarks and saved content.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/new_year_image_11.png', description: 'New Year seasonal theme option.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/nowruz_image_12.png', description: 'Nowruz (Persian New Year) cultural theme.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/on_boarding_en_1.png', description: 'Onboarding flow in English.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/on_boarding_fa_2.png', description: 'Onboarding flow in Persian (Farsi) with RTL.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/on_boarding_tr_3.png', description: 'Onboarding flow in Turkish.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/seasonal_theme_5.png', description: 'Seasonal theme selector (Spring, Summer, Fall, Winter).'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/spring_image_6.png', description: 'Spring seasonal theme.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/summer_image_7.png', description: 'Summer seasonal theme.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/system_theme_4_2.png', description: 'Follow system light/dark theme.'),
-                CaseStudyImage(path: 'assets/images/on_boarding_image/winter_image_9.png', description: 'Winter seasonal theme.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/access_camera_10_1.png',
+                    description:
+                        'Permission to access device camera for importing personal images.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/book_mark_home_17.png',
+                    description:
+                        'Bookmarks and home screen with quick access to saved verses.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/choos_fonts_15.png',
+                    description:
+                        'Font selection for English and Persian to personalize reading comfort.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/christmas_image_13.png',
+                    description:
+                        'Christmas seasonal theme option for the reading experience.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/color_theme_4.png',
+                    description:
+                        'Color theme picker for app accent and background.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/complete_on_boarding.png',
+                    description:
+                        'Completion screen: "Everything is Ready!" with summary of choices.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/create_new_color_4_1.png',
+                    description: 'Create a custom color for themes.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/custome_home_screen_16.png',
+                    description:
+                        'Customizable home screen layout and preferences.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/default_app_00.png',
+                    description:
+                        'Default app appearance before personalization.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/emotional_state_14.png',
+                    description:
+                        'Emotional state selection (e.g. peaceful, joyful) for matching content.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/fall_image_8.png',
+                    description: 'Fall / autumn seasonal theme.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/import_image_10.png',
+                    description:
+                        'Import personal images for backgrounds or themes.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/navigate_book_mark_18.png',
+                    description: 'Navigation to bookmarks and saved content.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/new_year_image_11.png',
+                    description: 'New Year seasonal theme option.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/nowruz_image_12.png',
+                    description: 'Nowruz (Persian New Year) cultural theme.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/on_boarding_en_1.png',
+                    description: 'Onboarding flow in English.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/on_boarding_fa_2.png',
+                    description:
+                        'Onboarding flow in Persian (Farsi) with RTL.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/on_boarding_tr_3.png',
+                    description: 'Onboarding flow in Turkish.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/seasonal_theme_5.png',
+                    description:
+                        'Seasonal theme selector (Spring, Summer, Fall, Winter).'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/spring_image_6.png',
+                    description: 'Spring seasonal theme.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/summer_image_7.png',
+                    description: 'Summer seasonal theme.'),
+                CaseStudyImage(
+                    path:
+                        'assets/images/on_boarding_image/system_theme_4_2.png',
+                    description: 'Follow system light/dark theme.'),
+                CaseStudyImage(
+                    path: 'assets/images/on_boarding_image/winter_image_9.png',
+                    description: 'Winter seasonal theme.'),
               ],
             ),
             CaseStudySection(
@@ -1228,8 +1334,7 @@ class PortfolioData {
             ),
             CaseStudySection(
               title: 'Outcome & Impact',
-              content:
-                  '**Before → After**\n\n'
+              content: '**Before → After**\n\n'
                   '**Onboarding** — Was: text forms, high abandonment. Now: visual preference selection; completion far above industry (~40% baseline); users report a personal, owned experience and strong engagement with themes.\n\n'
                   '**Experience** — Was: generic. Now: themes, fonts, seasons, and emotions chosen by the user; the app reflects their choices everywhere. Personalization as a system—one preference model, consistent expression.\n\n'
                   '**Reach** — Multi-platform (iOS, Android, Web, Linux, macOS, Windows). Free, no ads, no in-app purchases—spiritual content accessible to all.',
@@ -1240,7 +1345,8 @@ class PortfolioData {
 
   /// Renamed assets: `asd-app-0001.jpg` → `asd-001.jpg` (Firestore may still list old names).
   static String migrateAsdAdaptiveAssetPath(String path) {
-    final m = RegExp(r'asd-app-(\d+)\.(jpg|jpeg|png)', caseSensitive: false).firstMatch(path);
+    final m = RegExp(r'asd-app-(\d+)\.(jpg|jpeg|png)', caseSensitive: false)
+        .firstMatch(path);
     if (m == null) return path;
     final dirEnd = path.lastIndexOf('/') + 1;
     if (dirEnd <= 0) return path;
@@ -1250,7 +1356,8 @@ class PortfolioData {
   }
 
   /// Firestore ASD often stores an older adaptive section title/body; keep copy in sync with [caseStudies].
-  static PortfolioCaseStudy mergeFirestoreAsdAdaptiveCopyFromStatic(PortfolioCaseStudy firestoreAsd) {
+  static PortfolioCaseStudy mergeFirestoreAsdAdaptiveCopyFromStatic(
+      PortfolioCaseStudy firestoreAsd) {
     if (firestoreAsd.id != 'asd') return firestoreAsd;
     PortfolioCaseStudy? staticAsd;
     for (final c in caseStudies) {
@@ -1260,7 +1367,9 @@ class PortfolioData {
       }
     }
     if (staticAsd == null) return firestoreAsd;
-    final staticAdaptiveList = staticAsd.sections.where((s) => s.isAsdAdaptivePlatformSection).toList();
+    final staticAdaptiveList = staticAsd.sections
+        .where((s) => s.isAsdAdaptivePlatformSection)
+        .toList();
     if (staticAdaptiveList.isEmpty) return firestoreAsd;
     final staticAdaptive = staticAdaptiveList.first;
 
@@ -1272,13 +1381,15 @@ class PortfolioData {
       // Firestore often still has 7 old paths; static repo lists all current assets (e.g. 12).
       List<String> fromFirestore = const [];
       if (s.images != null && s.images!.isNotEmpty) {
-        fromFirestore = s.images!.map((i) => migrateAsdAdaptiveAssetPath(i.path)).toList();
+        fromFirestore =
+            s.images!.map((i) => migrateAsdAdaptiveAssetPath(i.path)).toList();
       } else if (s.imagePaths != null && s.imagePaths!.isNotEmpty) {
         fromFirestore = s.imagePaths!.map(migrateAsdAdaptiveAssetPath).toList();
       }
 
       final List<String> paths;
-      if (fromFirestore.length >= staticPaths.length && fromFirestore.isNotEmpty) {
+      if (fromFirestore.length >= staticPaths.length &&
+          fromFirestore.isNotEmpty) {
         // Admin extended list in Firestore — trust it.
         paths = fromFirestore;
       } else if (staticPaths.isNotEmpty) {
@@ -1297,8 +1408,9 @@ class PortfolioData {
     }).toList();
 
     final String? hero = firestoreAsd.heroImagePath?.trim();
-    final String? heroResolved =
-        (hero != null && hero.isNotEmpty) ? hero : staticAsd.heroImagePath?.trim();
+    final String? heroResolved = (hero != null && hero.isNotEmpty)
+        ? hero
+        : staticAsd.heroImagePath?.trim();
 
     final rp = firestoreAsd.heroImagePaths;
     final hasRemotePaths = rp != null && rp.isNotEmpty;
@@ -1315,7 +1427,9 @@ class PortfolioData {
       subtitle: firestoreAsd.subtitle,
       overview: firestoreAsd.overview,
       designApproach: firestoreAsd.designApproach,
-      heroImagePath: (heroResolved != null && heroResolved.isNotEmpty) ? heroResolved : null,
+      heroImagePath: (heroResolved != null && heroResolved.isNotEmpty)
+          ? heroResolved
+          : null,
       heroImagePaths: heroPathsResolved,
       sections: newSections,
       order: firestoreAsd.order,
@@ -1332,7 +1446,8 @@ class PortfolioData {
   }
 
   /// When Firestore omits [PortfolioCaseStudy.heroImagePath] or [PortfolioCaseStudy.heroImagePaths], use bundled static defaults.
-  static PortfolioCaseStudy mergeHeroFromStaticIfMissing(PortfolioCaseStudy remote) {
+  static PortfolioCaseStudy mergeHeroFromStaticIfMissing(
+      PortfolioCaseStudy remote) {
     PortfolioCaseStudy? local;
     for (final c in caseStudies) {
       if (c.id == remote.id) {
