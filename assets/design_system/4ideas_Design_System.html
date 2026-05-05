@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>4ideas</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    :root {
+      --page-bg: #F5F2EB;
+      --page-fg: #1A1917;
+      --card: #FFFCF7;
+      --card-border: rgba(26, 25, 23, 0.08);
+      --text-secondary: #5C5A56;
+      --accent: #6FA8A1;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--page-bg);
+      color: var(--page-fg);
+      font-family: Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 34px; }
+    .meta { margin: 0 0 24px; color: var(--text-secondary); }
+    section { margin-bottom: 24px; }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+    }
+    .lead { color: var(--text-secondary); margin: 0 0 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .card + .card { margin-top: 12px; }
+    .color-group h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .grid-swatches {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    .swatch {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fff;
+      cursor: pointer;
+    }
+    .swatch:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.12); transform: translateY(-1px); }
+    .chip { height: 72px; }
+    .lbl {
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .lbl strong {
+      display: block;
+      margin-bottom: 4px;
+      font-family: Roboto, sans-serif;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: #1A1917;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 160ms ease;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--card-border);
+      vertical-align: top;
+    }
+    th { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }
+    code { font-family: var(--mono); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip-pill {
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #fff;
+    }
+    .doc-data-h { margin: 20px 0 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+    .doc-vis-h { margin: 20px 0 10px; font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+    .doc-preview-visuals { margin-top: 8px; }
+    .doc-visual-canvas {
+      background: #fafafa;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .doc-visual-canvas--wide { justify-content: flex-start; align-items: stretch; flex-wrap: wrap; }
+    .doc-visual-canvas--component { min-height: 120px; min-width: 200px; max-width: 320px; margin-left: auto; }
+    .doc-mini-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--card-border); flex-wrap: wrap; }
+    .doc-mini-row:last-child { border-bottom: none; }
+    .doc-mini-label { font-size: 12px; color: var(--text-secondary); }
+    .doc-spacing-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .doc-spacing-tile { border: 1px solid var(--card-border); border-radius: 10px; padding: 10px; background: #fff; }
+    .doc-spacing-name { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; margin-bottom: 8px; }
+    .doc-spacing-bar-wrap { height: 24px; display: flex; align-items: center; background: #eee; border-radius: 4px; padding: 0 6px; }
+    .doc-spacing-bar { height: 12px; background: var(--accent); border-radius: 3px; max-width: 100%; }
+    .doc-grid-strip { display: flex; gap: 4px; height: 48px; width: 100%; border: 1px solid var(--card-border); border-radius: 8px; padding: 4px; background: #fff; }
+    .doc-grid-cell { flex: 1; background: rgba(123, 111, 157, 0.12); border-radius: 6px; }
+    .doc-grid-caption { margin: 10px 0 0; font-size: 12px; color: var(--text-secondary); }
+    .doc-radius-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .doc-radius-item { text-align: center; font-size: 11px; color: var(--text-secondary); }
+    .doc-radius-box { width: 36px; height: 36px; border: 2px solid var(--accent); background: #fff; margin: 0 auto 6px; }
+    .doc-shadow-visuals { display: flex; flex-direction: column; gap: 16px; }
+    .doc-shadow-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+    .doc-shadow-sample { width: 72px; height: 72px; background: #fff; border-radius: 8px; }
+    .doc-effect-stage { position: relative; height: 120px; border-radius: 12px; overflow: hidden; }
+    .doc-effect-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #90CAF9 0%, #CE93D8 100%); }
+    .doc-effect-glass-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .doc-effect-glass { padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.35); color: #fff; font-size: 13px; font-weight: 500; }
+    .doc-overlay-stage { position: relative; height: 120px; border-radius: 12px; overflow: hidden; }
+    .doc-overlay-bg { height: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0; color: #888; font-size: 12px; }
+    .doc-overlay-top { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .doc-overlay-card { background: rgba(255,255,255,0.92); padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .doc-gradient-visuals { display: flex; flex-direction: column; gap: 12px; }
+    .doc-gradient-row { display: flex; flex-direction: column; gap: 6px; }
+    .doc-gradient-bar { height: 28px; border-radius: 8px; border: 1px solid var(--card-border); }
+    .doc-role-visuals { display: flex; flex-direction: column; gap: 10px; }
+    .doc-role-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .doc-role-swatch { width: 36px; height: 36px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.12); }
+    .doc-component-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--card-border); }
+    .doc-component-row:last-child { border-bottom: none; }
+    .doc-component-meta { flex: 1 1 200px; }
+    .doc-component-desc { margin: 6px 0 0; font-size: 12px; color: var(--text-secondary); }
+    .doc-project-icons { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+    .doc-icon-project { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+    .doc-icon-size-visuals { display: flex; flex-direction: column; gap: 8px; }
+    .doc-icon-size-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .doc-icon-star { color: var(--text-secondary); line-height: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>4ideas</h1>
+      <p class="meta">Version 1.0.0 | ASD App </p>
+    </header>
+    <section>
+      <h2>Color</h2>
+      <p class="lead">Same groups and order as the in-app Preview (Core → ramps → semantic). Click a swatch to copy hex.</p>
+      <div class="card color-group">
+  <h3>Core &amp; surfaces</h3>
+  <div class="grid-swatches"><div class="swatch" data-hex="#5B6ABF" title="Click to copy #5B6ABF">
+  <div class="chip" style="background:#5B6ABF"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light1</strong>
+    #5B6ABF
+  </div>
+</div>
+<div class="swatch" data-hex="#4A5175" title="Click to copy #4A5175">
+  <div class="chip" style="background:#4A5175"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light4</strong>
+    #4A5175
+  </div>
+</div>
+<div class="swatch" data-hex="#6372C3" title="Click to copy #6372C3">
+  <div class="chip" style="background:#6372C3"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light2</strong>
+    #6372C3
+  </div>
+</div>
+<div class="swatch" data-hex="#28305C" title="Click to copy #28305C">
+  <div class="chip" style="background:#28305C"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light1</strong>
+    #28305C
+  </div>
+</div>
+<div class="swatch" data-hex="#A9B1DE" title="Click to copy #A9B1DE">
+  <div class="chip" style="background:#A9B1DE"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light10</strong>
+    #A9B1DE
+  </div>
+</div>
+<div class="swatch" data-hex="#2B3362" title="Click to copy #2B3362">
+  <div class="chip" style="background:#2B3362"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark8</strong>
+    #2B3362
+  </div>
+</div>
+<div class="swatch" data-hex="#AB7D21" title="Click to copy #AB7D21">
+  <div class="chip" style="background:#AB7D21"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark5</strong>
+    #AB7D21
+  </div>
+</div></div>
+</div>
+<div class="card color-group">
+  <h3>Ramp — Gold Gradient</h3>
+  <div class="grid-swatches"><div class="swatch" data-hex="#624713" title="Click to copy #624713">
+  <div class="chip" style="background:#624713"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark10</strong>
+    #624713
+  </div>
+</div>
+<div class="swatch" data-hex="#705216" title="Click to copy #705216">
+  <div class="chip" style="background:#705216"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark9</strong>
+    #705216
+  </div>
+</div>
+<div class="swatch" data-hex="#7F5D18" title="Click to copy #7F5D18">
+  <div class="chip" style="background:#7F5D18"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark8</strong>
+    #7F5D18
+  </div>
+</div>
+<div class="swatch" data-hex="#8E671B" title="Click to copy #8E671B">
+  <div class="chip" style="background:#8E671B"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark7</strong>
+    #8E671B
+  </div>
+</div>
+<div class="swatch" data-hex="#9C721E" title="Click to copy #9C721E">
+  <div class="chip" style="background:#9C721E"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark6</strong>
+    #9C721E
+  </div>
+</div>
+<div class="swatch" data-hex="#AB7D21" title="Click to copy #AB7D21">
+  <div class="chip" style="background:#AB7D21"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark5</strong>
+    #AB7D21
+  </div>
+</div>
+<div class="swatch" data-hex="#B98724" title="Click to copy #B98724">
+  <div class="chip" style="background:#B98724"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark4</strong>
+    #B98724
+  </div>
+</div>
+<div class="swatch" data-hex="#C89227" title="Click to copy #C89227">
+  <div class="chip" style="background:#C89227"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark3</strong>
+    #C89227
+  </div>
+</div>
+<div class="swatch" data-hex="#D79D29" title="Click to copy #D79D29">
+  <div class="chip" style="background:#D79D29"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark2</strong>
+    #D79D29
+  </div>
+</div>
+<div class="swatch" data-hex="#E5A72C" title="Click to copy #E5A72C">
+  <div class="chip" style="background:#E5A72C"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_dark1</strong>
+    #E5A72C
+  </div>
+</div>
+<div class="swatch" data-hex="#F4B22F" title="Click to copy #F4B22F">
+  <div class="chip" style="background:#F4B22F"></div>
+  <div class="lbl">
+    <strong>Gold Gradient</strong>
+    #F4B22F
+  </div>
+</div>
+<div class="swatch" data-hex="#F5B639" title="Click to copy #F5B639">
+  <div class="chip" style="background:#F5B639"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light1</strong>
+    #F5B639
+  </div>
+</div>
+<div class="swatch" data-hex="#F5BA44" title="Click to copy #F5BA44">
+  <div class="chip" style="background:#F5BA44"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light2</strong>
+    #F5BA44
+  </div>
+</div>
+<div class="swatch" data-hex="#F6BE4E" title="Click to copy #F6BE4E">
+  <div class="chip" style="background:#F6BE4E"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light3</strong>
+    #F6BE4E
+  </div>
+</div>
+<div class="swatch" data-hex="#F6C159" title="Click to copy #F6C159">
+  <div class="chip" style="background:#F6C159"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light4</strong>
+    #F6C159
+  </div>
+</div>
+<div class="swatch" data-hex="#F7C563" title="Click to copy #F7C563">
+  <div class="chip" style="background:#F7C563"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light5</strong>
+    #F7C563
+  </div>
+</div>
+<div class="swatch" data-hex="#F7C96D" title="Click to copy #F7C96D">
+  <div class="chip" style="background:#F7C96D"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light6</strong>
+    #F7C96D
+  </div>
+</div>
+<div class="swatch" data-hex="#F8CD78" title="Click to copy #F8CD78">
+  <div class="chip" style="background:#F8CD78"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light7</strong>
+    #F8CD78
+  </div>
+</div>
+<div class="swatch" data-hex="#F8D182" title="Click to copy #F8D182">
+  <div class="chip" style="background:#F8D182"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light8</strong>
+    #F8D182
+  </div>
+</div>
+<div class="swatch" data-hex="#F9D58D" title="Click to copy #F9D58D">
+  <div class="chip" style="background:#F9D58D"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light9</strong>
+    #F9D58D
+  </div>
+</div>
+<div class="swatch" data-hex="#FAD997" title="Click to copy #FAD997">
+  <div class="chip" style="background:#FAD997"></div>
+  <div class="lbl">
+    <strong>Gold Gradient_light10</strong>
+    #FAD997
+  </div>
+</div></div>
+</div>
+<div class="card color-group">
+  <h3>Ramp — Primary Blue</h3>
+  <div class="grid-swatches"><div class="swatch" data-hex="#21274B" title="Click to copy #21274B">
+  <div class="chip" style="background:#21274B"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark10</strong>
+    #21274B
+  </div>
+</div>
+<div class="swatch" data-hex="#262D56" title="Click to copy #262D56">
+  <div class="chip" style="background:#262D56"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark9</strong>
+    #262D56
+  </div>
+</div>
+<div class="swatch" data-hex="#2B3362" title="Click to copy #2B3362">
+  <div class="chip" style="background:#2B3362"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark8</strong>
+    #2B3362
+  </div>
+</div>
+<div class="swatch" data-hex="#30396D" title="Click to copy #30396D">
+  <div class="chip" style="background:#30396D"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark7</strong>
+    #30396D
+  </div>
+</div>
+<div class="swatch" data-hex="#343F78" title="Click to copy #343F78">
+  <div class="chip" style="background:#343F78"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark6</strong>
+    #343F78
+  </div>
+</div>
+<div class="swatch" data-hex="#394584" title="Click to copy #394584">
+  <div class="chip" style="background:#394584"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark5</strong>
+    #394584
+  </div>
+</div>
+<div class="swatch" data-hex="#3E4A8F" title="Click to copy #3E4A8F">
+  <div class="chip" style="background:#3E4A8F"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark4</strong>
+    #3E4A8F
+  </div>
+</div>
+<div class="swatch" data-hex="#43509A" title="Click to copy #43509A">
+  <div class="chip" style="background:#43509A"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark3</strong>
+    #43509A
+  </div>
+</div>
+<div class="swatch" data-hex="#4856A5" title="Click to copy #4856A5">
+  <div class="chip" style="background:#4856A5"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark2</strong>
+    #4856A5
+  </div>
+</div>
+<div class="swatch" data-hex="#4D5CB1" title="Click to copy #4D5CB1">
+  <div class="chip" style="background:#4D5CB1"></div>
+  <div class="lbl">
+    <strong>Primary Blue_dark1</strong>
+    #4D5CB1
+  </div>
+</div>
+<div class="swatch" data-hex="#5262BC" title="Click to copy #5262BC">
+  <div class="chip" style="background:#5262BC"></div>
+  <div class="lbl">
+    <strong>Primary Blue</strong>
+    #5262BC
+  </div>
+</div>
+<div class="swatch" data-hex="#5B6ABF" title="Click to copy #5B6ABF">
+  <div class="chip" style="background:#5B6ABF"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light1</strong>
+    #5B6ABF
+  </div>
+</div>
+<div class="swatch" data-hex="#6372C3" title="Click to copy #6372C3">
+  <div class="chip" style="background:#6372C3"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light2</strong>
+    #6372C3
+  </div>
+</div>
+<div class="swatch" data-hex="#6C7AC6" title="Click to copy #6C7AC6">
+  <div class="chip" style="background:#6C7AC6"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light3</strong>
+    #6C7AC6
+  </div>
+</div>
+<div class="swatch" data-hex="#7581C9" title="Click to copy #7581C9">
+  <div class="chip" style="background:#7581C9"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light4</strong>
+    #7581C9
+  </div>
+</div>
+<div class="swatch" data-hex="#7D89CD" title="Click to copy #7D89CD">
+  <div class="chip" style="background:#7D89CD"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light5</strong>
+    #7D89CD
+  </div>
+</div>
+<div class="swatch" data-hex="#8691D0" title="Click to copy #8691D0">
+  <div class="chip" style="background:#8691D0"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light6</strong>
+    #8691D0
+  </div>
+</div>
+<div class="swatch" data-hex="#8F99D3" title="Click to copy #8F99D3">
+  <div class="chip" style="background:#8F99D3"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light7</strong>
+    #8F99D3
+  </div>
+</div>
+<div class="swatch" data-hex="#97A1D7" title="Click to copy #97A1D7">
+  <div class="chip" style="background:#97A1D7"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light8</strong>
+    #97A1D7
+  </div>
+</div>
+<div class="swatch" data-hex="#A0A9DA" title="Click to copy #A0A9DA">
+  <div class="chip" style="background:#A0A9DA"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light9</strong>
+    #A0A9DA
+  </div>
+</div>
+<div class="swatch" data-hex="#A9B1DE" title="Click to copy #A9B1DE">
+  <div class="chip" style="background:#A9B1DE"></div>
+  <div class="lbl">
+    <strong>Primary Blue_light10</strong>
+    #A9B1DE
+  </div>
+</div></div>
+</div>
+<div class="card color-group">
+  <h3>Ramp — Primary Color dark Blue</h3>
+  <div class="grid-swatches"><div class="swatch" data-hex="#0C0F21" title="Click to copy #0C0F21">
+  <div class="chip" style="background:#0C0F21"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark10</strong>
+    #0C0F21
+  </div>
+</div>
+<div class="swatch" data-hex="#0D1126" title="Click to copy #0D1126">
+  <div class="chip" style="background:#0D1126"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark9</strong>
+    #0D1126
+  </div>
+</div>
+<div class="swatch" data-hex="#0F132B" title="Click to copy #0F132B">
+  <div class="chip" style="background:#0F132B"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark8</strong>
+    #0F132B
+  </div>
+</div>
+<div class="swatch" data-hex="#111530" title="Click to copy #111530">
+  <div class="chip" style="background:#111530"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark7</strong>
+    #111530
+  </div>
+</div>
+<div class="swatch" data-hex="#131835" title="Click to copy #131835">
+  <div class="chip" style="background:#131835"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark6</strong>
+    #131835
+  </div>
+</div>
+<div class="swatch" data-hex="#141A3A" title="Click to copy #141A3A">
+  <div class="chip" style="background:#141A3A"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark5</strong>
+    #141A3A
+  </div>
+</div>
+<div class="swatch" data-hex="#161C3F" title="Click to copy #161C3F">
+  <div class="chip" style="background:#161C3F"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark4</strong>
+    #161C3F
+  </div>
+</div>
+<div class="swatch" data-hex="#181E44" title="Click to copy #181E44">
+  <div class="chip" style="background:#181E44"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark3</strong>
+    #181E44
+  </div>
+</div>
+<div class="swatch" data-hex="#1A2149" title="Click to copy #1A2149">
+  <div class="chip" style="background:#1A2149"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark2</strong>
+    #1A2149
+  </div>
+</div>
+<div class="swatch" data-hex="#1B234E" title="Click to copy #1B234E">
+  <div class="chip" style="background:#1B234E"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_dark1</strong>
+    #1B234E
+  </div>
+</div>
+<div class="swatch" data-hex="#1D2553" title="Click to copy #1D2553">
+  <div class="chip" style="background:#1D2553"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue</strong>
+    #1D2553
+  </div>
+</div>
+<div class="swatch" data-hex="#28305C" title="Click to copy #28305C">
+  <div class="chip" style="background:#28305C"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light1</strong>
+    #28305C
+  </div>
+</div>
+<div class="swatch" data-hex="#343B64" title="Click to copy #343B64">
+  <div class="chip" style="background:#343B64"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light2</strong>
+    #343B64
+  </div>
+</div>
+<div class="swatch" data-hex="#3F466D" title="Click to copy #3F466D">
+  <div class="chip" style="background:#3F466D"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light3</strong>
+    #3F466D
+  </div>
+</div>
+<div class="swatch" data-hex="#4A5175" title="Click to copy #4A5175">
+  <div class="chip" style="background:#4A5175"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light4</strong>
+    #4A5175
+  </div>
+</div>
+<div class="swatch" data-hex="#565C7E" title="Click to copy #565C7E">
+  <div class="chip" style="background:#565C7E"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light5</strong>
+    #565C7E
+  </div>
+</div>
+<div class="swatch" data-hex="#616687" title="Click to copy #616687">
+  <div class="chip" style="background:#616687"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light6</strong>
+    #616687
+  </div>
+</div>
+<div class="swatch" data-hex="#6C718F" title="Click to copy #6C718F">
+  <div class="chip" style="background:#6C718F"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light7</strong>
+    #6C718F
+  </div>
+</div>
+<div class="swatch" data-hex="#777C98" title="Click to copy #777C98">
+  <div class="chip" style="background:#777C98"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light8</strong>
+    #777C98
+  </div>
+</div>
+<div class="swatch" data-hex="#8387A0" title="Click to copy #8387A0">
+  <div class="chip" style="background:#8387A0"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light9</strong>
+    #8387A0
+  </div>
+</div>
+<div class="swatch" data-hex="#8E92A9" title="Click to copy #8E92A9">
+  <div class="chip" style="background:#8E92A9"></div>
+  <div class="lbl">
+    <strong>Primary Color dark Blue_light10</strong>
+    #8E92A9
+  </div>
+</div></div>
+</div>
+<div class="card color-group">
+  <h3>Semantic colors</h3>
+  <div class="grid-swatches"><div class="swatch" data-hex="#003530" title="Click to copy #003530">
+  <div class="chip" style="background:#003530"></div>
+  <div class="lbl">
+    <strong>Success message_dark10</strong>
+    #003530
+  </div>
+</div>
+<div class="swatch" data-hex="#003D37" title="Click to copy #003D37">
+  <div class="chip" style="background:#003D37"></div>
+  <div class="lbl">
+    <strong>Success message_dark9</strong>
+    #003D37
+  </div>
+</div>
+<div class="swatch" data-hex="#00453E" title="Click to copy #00453E">
+  <div class="chip" style="background:#00453E"></div>
+  <div class="lbl">
+    <strong>Success message_dark8</strong>
+    #00453E
+  </div>
+</div>
+<div class="swatch" data-hex="#004D46" title="Click to copy #004D46">
+  <div class="chip" style="background:#004D46"></div>
+  <div class="lbl">
+    <strong>Success message_dark7</strong>
+    #004D46
+  </div>
+</div>
+<div class="swatch" data-hex="#00544D" title="Click to copy #00544D">
+  <div class="chip" style="background:#00544D"></div>
+  <div class="lbl">
+    <strong>Success message_dark6</strong>
+    #00544D
+  </div>
+</div>
+<div class="swatch" data-hex="#005C54" title="Click to copy #005C54">
+  <div class="chip" style="background:#005C54"></div>
+  <div class="lbl">
+    <strong>Success message_dark5</strong>
+    #005C54
+  </div>
+</div>
+<div class="swatch" data-hex="#00645B" title="Click to copy #00645B">
+  <div class="chip" style="background:#00645B"></div>
+  <div class="lbl">
+    <strong>Success message_dark4</strong>
+    #00645B
+  </div>
+</div>
+<div class="swatch" data-hex="#006C62" title="Click to copy #006C62">
+  <div class="chip" style="background:#006C62"></div>
+  <div class="lbl">
+    <strong>Success message_dark3</strong>
+    #006C62
+  </div>
+</div>
+<div class="swatch" data-hex="#00746A" title="Click to copy #00746A">
+  <div class="chip" style="background:#00746A"></div>
+  <div class="lbl">
+    <strong>Success message_dark2</strong>
+    #00746A
+  </div>
+</div>
+<div class="swatch" data-hex="#007C71" title="Click to copy #007C71">
+  <div class="chip" style="background:#007C71"></div>
+  <div class="lbl">
+    <strong>Success message_dark1</strong>
+    #007C71
+  </div>
+</div>
+<div class="swatch" data-hex="#008478" title="Click to copy #008478">
+  <div class="chip" style="background:#008478"></div>
+  <div class="lbl">
+    <strong>Success message</strong>
+    #008478
+  </div>
+</div>
+<div class="swatch" data-hex="#0D8A7F" title="Click to copy #0D8A7F">
+  <div class="chip" style="background:#0D8A7F"></div>
+  <div class="lbl">
+    <strong>Success message_light1</strong>
+    #0D8A7F
+  </div>
+</div>
+<div class="swatch" data-hex="#1A9086" title="Click to copy #1A9086">
+  <div class="chip" style="background:#1A9086"></div>
+  <div class="lbl">
+    <strong>Success message_light2</strong>
+    #1A9086
+  </div>
+</div>
+<div class="swatch" data-hex="#26968C" title="Click to copy #26968C">
+  <div class="chip" style="background:#26968C"></div>
+  <div class="lbl">
+    <strong>Success message_light3</strong>
+    #26968C
+  </div>
+</div>
+<div class="swatch" data-hex="#339D93" title="Click to copy #339D93">
+  <div class="chip" style="background:#339D93"></div>
+  <div class="lbl">
+    <strong>Success message_light4</strong>
+    #339D93
+  </div>
+</div>
+<div class="swatch" data-hex="#40A39A" title="Click to copy #40A39A">
+  <div class="chip" style="background:#40A39A"></div>
+  <div class="lbl">
+    <strong>Success message_light5</strong>
+    #40A39A
+  </div>
+</div>
+<div class="swatch" data-hex="#4DA9A1" title="Click to copy #4DA9A1">
+  <div class="chip" style="background:#4DA9A1"></div>
+  <div class="lbl">
+    <strong>Success message_light6</strong>
+    #4DA9A1
+  </div>
+</div>
+<div class="swatch" data-hex="#59AFA7" title="Click to copy #59AFA7">
+  <div class="chip" style="background:#59AFA7"></div>
+  <div class="lbl">
+    <strong>Success message_light7</strong>
+    #59AFA7
+  </div>
+</div>
+<div class="swatch" data-hex="#66B5AE" title="Click to copy #66B5AE">
+  <div class="chip" style="background:#66B5AE"></div>
+  <div class="lbl">
+    <strong>Success message_light8</strong>
+    #66B5AE
+  </div>
+</div>
+<div class="swatch" data-hex="#73BBB5" title="Click to copy #73BBB5">
+  <div class="chip" style="background:#73BBB5"></div>
+  <div class="lbl">
+    <strong>Success message_light9</strong>
+    #73BBB5
+  </div>
+</div>
+<div class="swatch" data-hex="#80C2BC" title="Click to copy #80C2BC">
+  <div class="chip" style="background:#80C2BC"></div>
+  <div class="lbl">
+    <strong>Success message_light10</strong>
+    #80C2BC
+  </div>
+</div>
+<div class="swatch" data-hex="#603900" title="Click to copy #603900">
+  <div class="chip" style="background:#603900"></div>
+  <div class="lbl">
+    <strong>Warning message_dark10</strong>
+    #603900
+  </div>
+</div>
+<div class="swatch" data-hex="#6E4200" title="Click to copy #6E4200">
+  <div class="chip" style="background:#6E4200"></div>
+  <div class="lbl">
+    <strong>Warning message_dark9</strong>
+    #6E4200
+  </div>
+</div>
+<div class="swatch" data-hex="#7D4A00" title="Click to copy #7D4A00">
+  <div class="chip" style="background:#7D4A00"></div>
+  <div class="lbl">
+    <strong>Warning message_dark8</strong>
+    #7D4A00
+  </div>
+</div>
+<div class="swatch" data-hex="#8B5300" title="Click to copy #8B5300">
+  <div class="chip" style="background:#8B5300"></div>
+  <div class="lbl">
+    <strong>Warning message_dark7</strong>
+    #8B5300
+  </div>
+</div>
+<div class="swatch" data-hex="#9A5C00" title="Click to copy #9A5C00">
+  <div class="chip" style="background:#9A5C00"></div>
+  <div class="lbl">
+    <strong>Warning message_dark6</strong>
+    #9A5C00
+  </div>
+</div>
+<div class="swatch" data-hex="#A86400" title="Click to copy #A86400">
+  <div class="chip" style="background:#A86400"></div>
+  <div class="lbl">
+    <strong>Warning message_dark5</strong>
+    #A86400
+  </div>
+</div>
+<div class="swatch" data-hex="#B66D00" title="Click to copy #B66D00">
+  <div class="chip" style="background:#B66D00"></div>
+  <div class="lbl">
+    <strong>Warning message_dark4</strong>
+    #B66D00
+  </div>
+</div>
+<div class="swatch" data-hex="#C57500" title="Click to copy #C57500">
+  <div class="chip" style="background:#C57500"></div>
+  <div class="lbl">
+    <strong>Warning message_dark3</strong>
+    #C57500
+  </div>
+</div>
+<div class="swatch" data-hex="#D37E00" title="Click to copy #D37E00">
+  <div class="chip" style="background:#D37E00"></div>
+  <div class="lbl">
+    <strong>Warning message_dark2</strong>
+    #D37E00
+  </div>
+</div>
+<div class="swatch" data-hex="#E28600" title="Click to copy #E28600">
+  <div class="chip" style="background:#E28600"></div>
+  <div class="lbl">
+    <strong>Warning message_dark1</strong>
+    #E28600
+  </div>
+</div>
+<div class="swatch" data-hex="#F08F00" title="Click to copy #F08F00">
+  <div class="chip" style="background:#F08F00"></div>
+  <div class="lbl">
+    <strong>Warning message</strong>
+    #F08F00
+  </div>
+</div>
+<div class="swatch" data-hex="#F1950D" title="Click to copy #F1950D">
+  <div class="chip" style="background:#F1950D"></div>
+  <div class="lbl">
+    <strong>Warning message_light1</strong>
+    #F1950D
+  </div>
+</div>
+<div class="swatch" data-hex="#F29A1A" title="Click to copy #F29A1A">
+  <div class="chip" style="background:#F29A1A"></div>
+  <div class="lbl">
+    <strong>Warning message_light2</strong>
+    #F29A1A
+  </div>
+</div>
+<div class="swatch" data-hex="#F2A026" title="Click to copy #F2A026">
+  <div class="chip" style="background:#F2A026"></div>
+  <div class="lbl">
+    <strong>Warning message_light3</strong>
+    #F2A026
+  </div>
+</div>
+<div class="swatch" data-hex="#F3A533" title="Click to copy #F3A533">
+  <div class="chip" style="background:#F3A533"></div>
+  <div class="lbl">
+    <strong>Warning message_light4</strong>
+    #F3A533
+  </div>
+</div>
+<div class="swatch" data-hex="#F4AB40" title="Click to copy #F4AB40">
+  <div class="chip" style="background:#F4AB40"></div>
+  <div class="lbl">
+    <strong>Warning message_light5</strong>
+    #F4AB40
+  </div>
+</div>
+<div class="swatch" data-hex="#F5B14D" title="Click to copy #F5B14D">
+  <div class="chip" style="background:#F5B14D"></div>
+  <div class="lbl">
+    <strong>Warning message_light6</strong>
+    #F5B14D
+  </div>
+</div>
+<div class="swatch" data-hex="#F5B659" title="Click to copy #F5B659">
+  <div class="chip" style="background:#F5B659"></div>
+  <div class="lbl">
+    <strong>Warning message_light7</strong>
+    #F5B659
+  </div>
+</div>
+<div class="swatch" data-hex="#F6BC66" title="Click to copy #F6BC66">
+  <div class="chip" style="background:#F6BC66"></div>
+  <div class="lbl">
+    <strong>Warning message_light8</strong>
+    #F6BC66
+  </div>
+</div>
+<div class="swatch" data-hex="#F7C173" title="Click to copy #F7C173">
+  <div class="chip" style="background:#F7C173"></div>
+  <div class="lbl">
+    <strong>Warning message_light9</strong>
+    #F7C173
+  </div>
+</div>
+<div class="swatch" data-hex="#F8C780" title="Click to copy #F8C780">
+  <div class="chip" style="background:#F8C780"></div>
+  <div class="lbl">
+    <strong>Warning message_light10</strong>
+    #F8C780
+  </div>
+</div>
+<div class="swatch" data-hex="#4C0A20" title="Click to copy #4C0A20">
+  <div class="chip" style="background:#4C0A20"></div>
+  <div class="lbl">
+    <strong>Error message_dark10</strong>
+    #4C0A20
+  </div>
+</div>
+<div class="swatch" data-hex="#580C25" title="Click to copy #580C25">
+  <div class="chip" style="background:#580C25"></div>
+  <div class="lbl">
+    <strong>Error message_dark9</strong>
+    #580C25
+  </div>
+</div>
+<div class="swatch" data-hex="#630D2A" title="Click to copy #630D2A">
+  <div class="chip" style="background:#630D2A"></div>
+  <div class="lbl">
+    <strong>Error message_dark8</strong>
+    #630D2A
+  </div>
+</div>
+<div class="swatch" data-hex="#6F0F2F" title="Click to copy #6F0F2F">
+  <div class="chip" style="background:#6F0F2F"></div>
+  <div class="lbl">
+    <strong>Error message_dark7</strong>
+    #6F0F2F
+  </div>
+</div>
+<div class="swatch" data-hex="#7A1034" title="Click to copy #7A1034">
+  <div class="chip" style="background:#7A1034"></div>
+  <div class="lbl">
+    <strong>Error message_dark6</strong>
+    #7A1034
+  </div>
+</div>
+<div class="swatch" data-hex="#861239" title="Click to copy #861239">
+  <div class="chip" style="background:#861239"></div>
+  <div class="lbl">
+    <strong>Error message_dark5</strong>
+    #861239
+  </div>
+</div>
+<div class="swatch" data-hex="#91133E" title="Click to copy #91133E">
+  <div class="chip" style="background:#91133E"></div>
+  <div class="lbl">
+    <strong>Error message_dark4</strong>
+    #91133E
+  </div>
+</div>
+<div class="swatch" data-hex="#9D1542" title="Click to copy #9D1542">
+  <div class="chip" style="background:#9D1542"></div>
+  <div class="lbl">
+    <strong>Error message_dark3</strong>
+    #9D1542
+  </div>
+</div>
+<div class="swatch" data-hex="#A81647" title="Click to copy #A81647">
+  <div class="chip" style="background:#A81647"></div>
+  <div class="lbl">
+    <strong>Error message_dark2</strong>
+    #A81647
+  </div>
+</div>
+<div class="swatch" data-hex="#B4184C" title="Click to copy #B4184C">
+  <div class="chip" style="background:#B4184C"></div>
+  <div class="lbl">
+    <strong>Error message_dark1</strong>
+    #B4184C
+  </div>
+</div>
+<div class="swatch" data-hex="#BF1951" title="Click to copy #BF1951">
+  <div class="chip" style="background:#BF1951"></div>
+  <div class="lbl">
+    <strong>Error message</strong>
+    #BF1951
+  </div>
+</div>
+<div class="swatch" data-hex="#C2255A" title="Click to copy #C2255A">
+  <div class="chip" style="background:#C2255A"></div>
+  <div class="lbl">
+    <strong>Error message_light1</strong>
+    #C2255A
+  </div>
+</div>
+<div class="swatch" data-hex="#C53062" title="Click to copy #C53062">
+  <div class="chip" style="background:#C53062"></div>
+  <div class="lbl">
+    <strong>Error message_light2</strong>
+    #C53062
+  </div>
+</div>
+<div class="swatch" data-hex="#C93C6B" title="Click to copy #C93C6B">
+  <div class="chip" style="background:#C93C6B"></div>
+  <div class="lbl">
+    <strong>Error message_light3</strong>
+    #C93C6B
+  </div>
+</div>
+<div class="swatch" data-hex="#CC4774" title="Click to copy #CC4774">
+  <div class="chip" style="background:#CC4774"></div>
+  <div class="lbl">
+    <strong>Error message_light4</strong>
+    #CC4774
+  </div>
+</div>
+<div class="swatch" data-hex="#CF537D" title="Click to copy #CF537D">
+  <div class="chip" style="background:#CF537D"></div>
+  <div class="lbl">
+    <strong>Error message_light5</strong>
+    #CF537D
+  </div>
+</div>
+<div class="swatch" data-hex="#D25E85" title="Click to copy #D25E85">
+  <div class="chip" style="background:#D25E85"></div>
+  <div class="lbl">
+    <strong>Error message_light6</strong>
+    #D25E85
+  </div>
+</div>
+<div class="swatch" data-hex="#D56A8E" title="Click to copy #D56A8E">
+  <div class="chip" style="background:#D56A8E"></div>
+  <div class="lbl">
+    <strong>Error message_light7</strong>
+    #D56A8E
+  </div>
+</div>
+<div class="swatch" data-hex="#D97597" title="Click to copy #D97597">
+  <div class="chip" style="background:#D97597"></div>
+  <div class="lbl">
+    <strong>Error message_light8</strong>
+    #D97597
+  </div>
+</div>
+<div class="swatch" data-hex="#DC819F" title="Click to copy #DC819F">
+  <div class="chip" style="background:#DC819F"></div>
+  <div class="lbl">
+    <strong>Error message_light9</strong>
+    #DC819F
+  </div>
+</div>
+<div class="swatch" data-hex="#DF8CA8" title="Click to copy #DF8CA8">
+  <div class="chip" style="background:#DF8CA8"></div>
+  <div class="lbl">
+    <strong>Error message_light10</strong>
+    #DF8CA8
+  </div>
+</div></div>
+</div>
+    </section>
+    <section>
+      <h2>Typography</h2>
+      <div class="card"><p class="lead">Primary: <strong>Roboto</strong> · Fallback: system-ui</p>
+<div class="chips"><span class="chip-pill">thin: 100</span><span class="chip-pill">extraLight: 200</span><span class="chip-pill">light: 300</span><span class="chip-pill">regular: 400</span><span class="chip-pill">medium: 500</span><span class="chip-pill">semiBold: 600</span><span class="chip-pill">bold: 700</span><span class="chip-pill">extraBold: 800</span><span class="chip-pill">black: 900</span></div>
+<h3 class="doc-data-h">Font sizes (data)</h3>
+<table><thead><tr><th>Token</th><th>Size</th><th>Line Height</th></tr></thead><tbody><tr><td><code>label</code></td><td>12px</td><td>1.25</td></tr><tr><td><code>caption</code></td><td>14px</td><td>1.4</td></tr><tr><td><code>body</code></td><td>16px</td><td>1.5</td></tr><tr><td><code>subtitle</code></td><td>20px</td><td>1.35</td></tr><tr><td><code>title</code></td><td>24px</td><td>1.3</td></tr><tr><td><code>heading</code></td><td>32px</td><td>1.25</td></tr><tr><td><code>display</code></td><td>48px</td><td>1.2</td></tr></tbody></table>
+<h3 class="doc-data-h">Text styles (data)</h3>
+<p class="lead">No text styles defined.</p>
+<div class="doc-preview-visuals"><h4 class="doc-vis-h">Font family</h4>
+<div class="doc-visual-canvas doc-visual-canvas--wide">
+  <div style="font-family:'Roboto',system-ui,sans-serif;font-size:22px;line-height:1.3;color:#1A1917;">The quick brown fox jumps over the lazy dog</div>
+</div>
+<h4 class="doc-vis-h">Weights</h4><div class="doc-visual-canvas doc-visual-canvas--wide"><div class="doc-mini-row"><span class="doc-mini-label"><code>thin</code> · 100</span><span style="font-weight:100;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>extraLight</code> · 200</span><span style="font-weight:200;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>light</code> · 300</span><span style="font-weight:300;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>regular</code> · 400</span><span style="font-weight:400;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>medium</code> · 500</span><span style="font-weight:500;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>semiBold</code> · 600</span><span style="font-weight:600;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>bold</code> · 700</span><span style="font-weight:700;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>extraBold</code> · 800</span><span style="font-weight:800;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>black</code> · 900</span><span style="font-weight:900;font-size:26px;font-family:'Roboto',sans-serif;">Ag</span></div></div>
+<h4 class="doc-vis-h">Font sizes</h4><div class="doc-visual-canvas doc-visual-canvas--wide"><div class="doc-mini-row"><span class="doc-mini-label"><code>label</code></span><span style="font-size:12px;font-family:'Roboto',sans-serif;line-height:1.2;">label sample</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>caption</code></span><span style="font-size:14px;font-family:'Roboto',sans-serif;line-height:1.2;">caption sample</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>body</code></span><span style="font-size:16px;font-family:'Roboto',sans-serif;line-height:1.2;">body sample</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>subtitle</code></span><span style="font-size:20px;font-family:'Roboto',sans-serif;line-height:1.2;">subtitle sample</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>title</code></span><span style="font-size:24px;font-family:'Roboto',sans-serif;line-height:1.2;">title sample</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>heading</code></span><span style="font-size:32px;font-family:'Roboto',sans-serif;line-height:1.2;">heading sample</span></div><div class="doc-mini-row"><span class="doc-mini-label"><code>display</code></span><span style="font-size:48px;font-family:'Roboto',sans-serif;line-height:1.2;">display sample</span></div></div></div>
+</div>
+    </section>
+    <section>
+      <h2>Layout & Shape</h2>
+      <div class="card"><h3>Spacing</h3>
+<p class="lead">Spacing scale (steps): <code>0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96</code></p>
+<table><thead><tr><th>Token</th><th>Value</th></tr></thead><tbody><tr><td><code>0</code></td><td>0px</td></tr><tr><td><code>1</code></td><td>4px</td></tr><tr><td><code>2</code></td><td>8px</td></tr><tr><td><code>3</code></td><td>12px</td></tr><tr><td><code>4</code></td><td>16px</td></tr><tr><td><code>5</code></td><td>20px</td></tr><tr><td><code>6</code></td><td>24px</td></tr><tr><td><code>8</code></td><td>32px</td></tr><tr><td><code>10</code></td><td>40px</td></tr><tr><td><code>12</code></td><td>48px</td></tr><tr><td><code>16</code></td><td>64px</td></tr><tr><td><code>20</code></td><td>80px</td></tr><tr><td><code>24</code></td><td>96px</td></tr></tbody></table>
+<h4 class="doc-vis-h">Spacing preview</h4><div class="doc-spacing-grid"><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>0</code><span>0px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:4px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>1</code><span>4px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:4px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>2</code><span>8px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:8px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>3</code><span>12px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:12px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>4</code><span>16px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:16px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>5</code><span>20px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:20px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>6</code><span>24px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:24px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>8</code><span>32px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:32px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>10</code><span>40px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:40px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>12</code><span>48px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:48px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>16</code><span>64px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:64px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>20</code><span>80px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:80px;"></div></div></div><div class="doc-spacing-tile"><div class="doc-spacing-name"><code>24</code><span>96px</span></div><div class="doc-spacing-bar-wrap"><div class="doc-spacing-bar" style="width:96px;"></div></div></div></div>
+<h3>Grid</h3>
+<p class="lead">Columns: <strong>12</strong> · Gutter: <strong>16px</strong> · Margin: <strong>16px</strong></p>
+<h4>Breakpoints</h4><table><thead><tr><th>Name</th><th>Width</th></tr></thead><tbody><tr><td><code>desktop</code></td><td>1200px</td></tr><tr><td><code>mobile</code></td><td>360px</td></tr><tr><td><code>tablet</code></td><td>768px</td></tr></tbody></table>
+<h4 class="doc-vis-h">Grid preview</h4>
+<div class="doc-visual-canvas doc-visual-canvas--wide">
+  <div class="doc-grid-strip"><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div><div class="doc-grid-cell"></div></div>
+  <p class="doc-grid-caption">Columns: 12 · Gutter: 16px · Margin: 16px</p>
+</div>
+</div>
+      <div class="card"><h3>Border Radius</h3><table><thead><tr><th>Token</th><th>Value</th></tr></thead><tbody><tr><td><code>none</code></td><td>0px</td></tr><tr><td><code>sm</code></td><td>8px</td></tr><tr><td><code>base</code></td><td>12px</td></tr><tr><td><code>md</code></td><td>16px</td></tr><tr><td><code>lg</code></td><td>24px</td></tr><tr><td><code>xl</code></td><td>30px</td></tr><tr><td><code>full</code></td><td>9999px</td></tr></tbody></table><h4 class="doc-vis-h">Radius preview</h4><div class="doc-radius-grid"><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:0px;"></div><span><code>none</code> 0px</span></div><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:4px;"></div><span><code>sm</code> 8px</span></div><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:6px;"></div><span><code>base</code> 12px</span></div><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:8px;"></div><span><code>md</code> 16px</span></div><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:12px;"></div><span><code>lg</code> 24px</span></div><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:15px;"></div><span><code>xl</code> 30px</span></div><div class="doc-radius-item"><div class="doc-radius-box" style="border-radius:18px;"></div><span><code>full</code> 9999px</span></div></div></div>
+    </section>
+    <section>
+      <h2>Shadows</h2>
+      <div class="card"><table><thead><tr><th>Token</th><th>Value</th></tr></thead><tbody><tr><td><code>app-bar</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>button</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>card</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>dropdown</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>fab</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>lg</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>md</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>sm</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr><tr><td><code>xl</code></td><td>0px 2px 4px 0px rgba(0, 0, 0, 0.10)</td></tr></tbody></table><h4 class="doc-vis-h">Shadow preview</h4><div class="doc-shadow-visuals"><div class="doc-shadow-row"><div><code>app-bar</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>button</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>card</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>dropdown</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>fab</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>lg</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>md</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>sm</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div><div class="doc-shadow-row"><div><code>xl</code></div><div class="doc-shadow-sample" style="box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.10);"></div></div></div></div>
+    </section>
+    <section>
+      <h2>Visual Effects</h2>
+      <div class="card"><h3>Glass Morphism</h3>
+<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td><code>backdrop</code></td><td>blur(10px)</td></tr><tr><td><code>background</code></td><td>rgba(255, 255, 255, 0.1)</td></tr><tr><td><code>border</code></td><td>1px solid rgba(255, 255, 255, 0.2)</td></tr><tr><td><code>description</code></td><td>Glass morphism effect</td></tr></tbody></table>
+<h3>Dark Overlay</h3>
+<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td><code>background</code></td><td>rgba(26, 26, 46, 0.6)</td></tr><tr><td><code>description</code></td><td>Dark overlay for modals and cards</td></tr></tbody></table>
+<div class="doc-preview-visuals"><h4 class="doc-vis-h">Glass morphism</h4>
+<div class="doc-effect-stage">
+  <div class="doc-effect-bg"></div>
+  <div class="doc-effect-glass-wrap">
+    <div class="doc-effect-glass" style="backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(255, 255, 255, 0.1);">Glass panel</div>
+  </div>
+</div><h4 class="doc-vis-h">Dark overlay</h4>
+<div class="doc-overlay-stage">
+  <div class="doc-overlay-bg">Content behind</div>
+  <div class="doc-overlay-top" style="background:rgba(26, 26, 46, 0.6);"><span class="doc-overlay-card">Overlay on top</span></div>
+</div></div>
+</div>
+    </section>
+    <section>
+      <h2>Components & Assets</h2>
+      <div class="card"><h3>Buttons</h3><p class="lead doc-data-h" style="margin-top:0;">Data</p><table><thead><tr><th>Component</th><th>Description / value</th></tr></thead><tbody><tr><td><code>Login Button</code></td><td>{height: 48, states: {hover: {enabled: true, description: Hover state}, disabled: {description: Disabled state, enabled: true}, default: {description: Default state, enabled: true}, active: {enabled: true, description: Active state}, focus: {enabled: true, description: Focus state}}, fontSize: 16, label: Login, borderRadius: 8}</td></tr></tbody></table><p class="lead doc-data-h">Visual preview</p><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Login Button</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><button type="button" style="min-height:48px;padding:0 16px;border-radius:8px;font-size:16px;font-weight:600;border:none;background:#6750A4;color:#fff;cursor:default;font-family:inherit;">Login</button></div></div>
+<h3>Cards</h3><p class="lead doc-data-h" style="margin-top:0;">Data</p><table><thead><tr><th>Component</th><th>Description / value</th></tr></thead><tbody><tr><td><code>Listview card</code></td><td>{height: 48, borderRadius: 8, padding: 16}</td></tr></tbody></table><p class="lead doc-data-h">Visual preview</p><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Listview card</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="padding:16px;border:1px solid #ddd;border-radius:8px;background:#fff;font-weight:600;font-size:12px;">Listview card</div></div></div>
+<h3>Inputs</h3><p class="lead doc-data-h" style="margin-top:0;">Data</p><table><thead><tr><th>Component</th><th>Description / value</th></tr></thead><tbody><tr><td><code>Username TextField </code></td><td>{borderRadius: 8, states: {hover: {description: Hover state, enabled: true}, default: {enabled: true, description: Default state}, disabled: {description: Disabled state, enabled: true}, focus: {enabled: true, description: Focus state}, active: {description: Active state, enabled: true}}, height: 48, padding: 16}</td></tr></tbody></table><p class="lead doc-data-h">Visual preview</p><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Username TextField </code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="width:160px;text-align:left;"><span style="font-size:11px;color:#666;display:block;margin-bottom:4px;">Username TextField </span><div style="border:1px solid #ccc;border-radius:8px;padding:8px 12px;font-size:14px;color:#999;">…</div></div></div></div>
+<h3>Avatars</h3><p class="lead doc-data-h" style="margin-top:0;">Data</p><table><thead><tr><th>Component</th><th>Description / value</th></tr></thead><tbody><tr><td><code>Avatar</code></td><td>{height: 48, borderRadius: 48}</td></tr></tbody></table><p class="lead doc-data-h">Visual preview</p><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Avatar</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="width:48px;height:48px;border-radius:50%;background:#E8DEF8;color:#4A4459;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:22px;">A</div></div></div>
+<h3>Alerts</h3><p class="lead doc-data-h" style="margin-top:0;">Data</p><table><thead><tr><th>Component</th><th>Description / value</th></tr></thead><tbody><tr><td><code>info</code></td><td>{borderRadius: 8px, variant: info, message: Short message users should notice., alertMessage: Short message users should notice., alertTitle: info, alertVariant: info}</td></tr><tr><td><code>Success</code></td><td>{alertVariant: success, alertTitle: Success, message: Short message users should notice., alertMessage: Short message users should notice., variant: success, borderRadius: 8px}</td></tr><tr><td><code>Warning</code></td><td>{borderRadius: 8px, variant: warning, alertTitle: Warning, alertMessage: Short message users should notice., message: Short message users should notice., alertVariant: warning}</td></tr><tr><td><code>Error</code></td><td>{message: Short message users should notice., alertMessage: Short message users should notice., alertTitle: Error, alertVariant: error, borderRadius: 8px, variant: error}</td></tr></tbody></table><p class="lead doc-data-h">Visual preview</p><div class="doc-component-row"><div class="doc-component-meta"><strong><code>info</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="max-width:170px;padding:6px 8px;background:#E3F2FD;border-left:3px solid #1565C0;border-radius:8px;font-size:10px;color:#0D47A1;"><div style="display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">i</span><div><strong style="display:block;font-size:10px;margin-bottom:2px;">info</strong>Short message users should notice.</div></div></div></div></div><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Success</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="max-width:170px;padding:6px 8px;background:#E8F5E9;border-left:3px solid #2E7D32;border-radius:8px;font-size:10px;color:#1B5E20;"><div style="display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✓</span><div><strong style="display:block;font-size:10px;margin-bottom:2px;">Success</strong>Short message users should notice.</div></div></div></div></div><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Warning</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="max-width:170px;padding:6px 8px;background:#FFF8E1;border-left:3px solid #F57F17;border-radius:8px;font-size:10px;color:#E65100;"><div style="display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">!</span><div><strong style="display:block;font-size:10px;margin-bottom:2px;">Warning</strong>Short message users should notice.</div></div></div></div></div><div class="doc-component-row"><div class="doc-component-meta"><strong><code>Error</code></strong></div><div class="doc-visual-canvas doc-visual-canvas--component"><div style="max-width:170px;padding:6px 8px;background:#FFEBEE;border-left:3px solid #C62828;border-radius:8px;font-size:10px;color:#B71C1C;"><div style="display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;">✕</span><div><strong style="display:block;font-size:10px;margin-bottom:2px;">Error</strong>Short message users should notice.</div></div></div></div></div>
+<h3>Icon Sizes</h3><table><thead><tr><th>Token</th><th>Size</th></tr></thead><tbody><tr><td><code>xs</code></td><td>16px</td></tr><tr><td><code>sm</code></td><td>20px</td></tr><tr><td><code>md</code></td><td>24px</td></tr><tr><td><code>lg</code></td><td>28px</td></tr><tr><td><code>xl</code></td><td>32px</td></tr><tr><td><code>2xl</code></td><td>40px</td></tr></tbody></table><h4 class="doc-vis-h">Icon sizes preview</h4><div class="doc-icon-size-visuals"><div class="doc-icon-size-row"><span><code>xs</code> 16px</span><span class="doc-icon-star" style="font-size:16px;">★</span></div><div class="doc-icon-size-row"><span><code>sm</code> 20px</span><span class="doc-icon-star" style="font-size:20px;">★</span></div><div class="doc-icon-size-row"><span><code>md</code> 24px</span><span class="doc-icon-star" style="font-size:24px;">★</span></div><div class="doc-icon-size-row"><span><code>lg</code> 28px</span><span class="doc-icon-star" style="font-size:28px;">★</span></div><div class="doc-icon-size-row"><span><code>xl</code> 32px</span><span class="doc-icon-star" style="font-size:32px;">★</span></div><div class="doc-icon-size-row"><span><code>2xl</code> 40px</span><span class="doc-icon-star" style="font-size:40px;">★</span></div></div></div>
+    </section>
+    <section>
+      <h2>Advanced Tokens</h2>
+      <div class="card"><h3>Gradients</h3>
+<p class="lead">No gradients defined.</p>
+
+<h3>Roles</h3>
+<p class="lead">No roles defined.</p>
+
+<h3>Semantic Tokens</h3>
+<p class="lead">No semantic tokens defined.</p>
+<h3>Motion Tokens</h3>
+<table><thead><tr><th>Group</th><th>Token</th><th>Value</th></tr></thead><tbody><tr><td>duration</td><td><code>fast</code></td><td>150ms</td></tr><tr><td>duration</td><td><code>medium</code></td><td>300ms</td></tr><tr><td>duration</td><td><code>slow</code></td><td>500ms</td></tr><tr><td>easing</td><td><code>ease-in</code></td><td>cubic-bezier(0.4, 0, 1, 1)</td></tr><tr><td>easing</td><td><code>ease-in-out</code></td><td>cubic-bezier(0.4, 0, 0.2, 1)</td></tr><tr><td>easing</td><td><code>ease-out</code></td><td>cubic-bezier(0, 0, 0.2, 1)</td></tr><tr><td>easing</td><td><code>linear</code></td><td>linear</td></tr></tbody></table>
+</div>
+    </section>
+  </div>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <script>
+    (function () {
+      const toast = document.getElementById('toast');
+      let timer = null;
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(timer);
+        timer = setTimeout(() => toast.classList.remove('show'), 1400);
+      }
+      document.querySelectorAll('.swatch[data-hex]').forEach((el) => {
+        el.addEventListener('click', async () => {
+          const hex = el.getAttribute('data-hex');
+          if (!hex) return;
+          try {
+            await navigator.clipboard.writeText(hex);
+            showToast('Copied ' + hex);
+          } catch (_) {
+            showToast('Copy failed');
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

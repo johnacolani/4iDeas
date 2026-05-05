@@ -368,8 +368,12 @@ class PortfolioData {
       flutterAssetPath: 'assets/docs/serviceflow-design-system.html',
     ),
     '4ideas': CaseStudyDesignSystemDocPaths(
-      webRelativePath: 'docs/4ideas-design-system.html',
-      flutterAssetPath: 'assets/docs/4ideas-design-system.html',
+      webRelativePath: 'assets/assets/design_system/4ideas_Design_System.html',
+      flutterAssetPath: 'assets/design_system/4ideas_Design_System.html',
+    ),
+    '4ideas-design-system': CaseStudyDesignSystemDocPaths(
+      webRelativePath: 'assets/assets/design_system/4ideas_Design_System.html',
+      flutterAssetPath: 'assets/design_system/4ideas_Design_System.html',
     ),
   };
 
