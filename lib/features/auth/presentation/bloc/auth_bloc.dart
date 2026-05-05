@@ -28,7 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ReloadUserUseCase reloadUserUseCase;
   final SignInWithGoogleUseCase signInWithGoogleUseCase;
   final SignInWithAppleUseCase signInWithAppleUseCase;
-  
+
   StreamSubscription<User?>? _authStateSubscription;
 
   AuthBloc({
@@ -68,11 +68,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       debugPrint('AuthBloc is already closed, skipping stream subscription');
       return;
     }
-    
+
     try {
       // Try to get the stream
       final stream = checkAuthStatusUseCase();
-      
+
       // Only subscribe if we got a valid stream and BLoC is still open
       if (!isClosed) {
         _authStateSubscription = stream.listen(
@@ -80,7 +80,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             if (!isClosed) {
               try {
                 if (user != null) {
-                  if (state is! Authenticated || (state as Authenticated).user.uid != user.uid) {
+                  final currentUser = switch (state) {
+                    Authenticated(user: final authUser) => authUser,
+                    EmailNotVerified(user: final authUser) => authUser,
+                    _ => null,
+                  };
+                  if (currentUser != user) {
                     add(_AuthUserChanged(user));
                   }
                 } else {
@@ -111,7 +116,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       // If stream can't be created (Firebase not initialized), just continue
       // The app will work, but auth features won't function
-      debugPrint('Could not create auth stream (Firebase may not be configured): $e');
+      debugPrint(
+          'Could not create auth stream (Firebase may not be configured): $e');
       // Emit unauthenticated state immediately if BLoC is still open
       if (!isClosed) {
         try {
@@ -122,7 +128,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     }
   }
-  
+
   @override
   Future<void> close() {
     // Cancel subscription first, then close the BLoC
@@ -130,7 +136,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _authStateSubscription = null;
     return super.close();
   }
-  
+
   void _onAuthUserChanged(_AuthUserChanged event, Emitter<AuthState> emit) {
     if (event.user != null) {
       final user = event.user as User;
@@ -340,8 +346,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 class _AuthUserChanged extends AuthEvent {
   final dynamic user;
   const _AuthUserChanged(this.user);
-  
+
   @override
   List<Object?> get props => [user];
 }
-
