@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -728,6 +729,296 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
   double _webPrimaryButtonLabelFs(bool isMobile) => isMobile ? 14.sp : 16;
   double _webPrimaryButtonIconSize(bool isMobile) => isMobile ? 16.sp : 20;
 
+  Widget _glassPanel({
+    required Widget child,
+    required EdgeInsetsGeometry padding,
+    required Color borderColor,
+    double borderRadius = 28,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            color: const Color(0xFF15120F).withValues(alpha: 0.74),
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(color: borderColor, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.28),
+                blurRadius: 36,
+                offset: const Offset(0, 18),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStartProjectHero(bool isMobile) {
+    return _glassPanel(
+      borderColor: ColorManager.accentGold.withValues(alpha: 0.34),
+      padding: EdgeInsets.all(isMobile ? 20 : 30),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _heroContent(isMobile),
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _heroContent(isMobile),
+                  ),
+                ),
+                const SizedBox(width: 28),
+                Expanded(
+                  flex: 4,
+                  child: _buildProjectBriefCard(isMobile),
+                ),
+              ],
+            ),
+    );
+  }
+
+  List<Widget> _heroContent(bool isMobile) {
+    return [
+      _heroPill(Icons.auto_awesome_rounded, 'Product strategy + Flutter build'),
+      SizedBox(height: isMobile ? 16 : 18),
+      Text(
+        'Start your app project with a clear, build-ready brief.',
+        style: GoogleFonts.roboto(
+          color: ColorManager.onDarkPrimary,
+          fontSize: isMobile ? 31 : 48,
+          fontWeight: FontWeight.w900,
+          height: 1.03,
+          letterSpacing: -1.2,
+        ),
+      ),
+      const SizedBox(height: 14),
+      Text(
+        'Tell us the problem, audience, platforms, budget, timeline, and visual direction. We use this to scope the first conversation and protect your time.',
+        style: GoogleFonts.roboto(
+          color: ColorManager.onDarkSecondary,
+          fontSize: isMobile ? 14.5 : 17,
+          height: 1.55,
+        ),
+      ),
+      SizedBox(height: isMobile ? 18 : 24),
+      Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _heroSignal(Icons.lock_outline_rounded, 'Draft autosaves'),
+          _heroSignal(Icons.verified_user_outlined, 'Account required to send'),
+          _heroSignal(Icons.schedule_rounded, 'Response after review'),
+        ],
+      ),
+      if (isMobile) ...[
+        const SizedBox(height: 18),
+        _buildProjectBriefCard(isMobile),
+      ],
+    ];
+  }
+
+  Widget _buildProjectBriefCard(bool isMobile) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'What happens next',
+            style: GoogleFonts.roboto(
+              color: ColorManager.onDarkPrimary,
+              fontSize: isMobile ? 18 : 21,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 14),
+          _briefStep('1', 'Share the product context'),
+          _briefStep('2', 'We review scope, risks, and fit'),
+          _briefStep('3', 'You get a focused next-step plan'),
+        ],
+      ),
+    );
+  }
+
+  Widget _briefStep(String number, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: ColorManager.accentGold.withValues(alpha: 0.16),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: ColorManager.accentGold.withValues(alpha: 0.36),
+              ),
+            ),
+            child: Text(
+              number,
+              style: GoogleFonts.roboto(
+                color: ColorManager.accentGold,
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.roboto(
+                color: ColorManager.onDarkSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroPill(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: ColorManager.accentGold.withValues(alpha: 0.13),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: ColorManager.accentGold.withValues(alpha: 0.34),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: ColorManager.accentGold, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: GoogleFonts.roboto(
+              color: ColorManager.accentGold,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _heroSignal(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: ColorManager.primaryTeal, size: 17),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: GoogleFonts.roboto(
+              color: ColorManager.onDarkSecondary,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuthNotice(bool isMobile) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        if (authState is Authenticated) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: EdgeInsets.only(bottom: isMobile ? 14 : 18),
+          child: _glassPanel(
+            borderColor: ColorManager.accentGold.withValues(alpha: 0.32),
+            borderRadius: 18,
+            padding: EdgeInsets.all(isMobile ? 14 : 16),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Icon(
+                  Icons.lock_outline_rounded,
+                  color: ColorManager.accentGold,
+                  size: 22,
+                ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 560),
+                  child: Text(
+                    'You can fill this out now. To submit the project brief, sign in or create an account so we can attach the request to your profile.',
+                    style: GoogleFonts.roboto(
+                      color: ColorManager.onDarkSecondary,
+                      fontSize: isMobile ? 13 : 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.push(AppRoutes.login),
+                  child: Text(
+                    'Log in',
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w800,
+                      color: ColorManager.accentGold,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => context.push(AppRoutes.signUp),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorManager.accentGold,
+                    foregroundColor: ColorManager.backgroundDark,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Create account',
+                    style: GoogleFonts.roboto(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTextField({
     required String label,
     required String hint,
@@ -985,32 +1276,49 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
   }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 1.h : 1.2.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  color: _orderAccent,
-                  size: _webSectionIconSize(isMobile),
+      child: _glassPanel(
+        borderColor: ColorManager.accentGold.withValues(alpha: 0.20),
+        borderRadius: 22,
+        padding: EdgeInsets.all(isMobile ? 16 : 22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (icon != null) ...[
+                  Container(
+                    width: isMobile ? 34 : 40,
+                    height: isMobile ? 34 : 40,
+                    decoration: BoxDecoration(
+                      color: _orderAccent.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _orderAccent.withValues(alpha: 0.26),
+                      ),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: _orderAccent,
+                      size: _webSectionIconSize(isMobile),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                Text(
+                  title,
+                  style: GoogleFonts.roboto(
+                    color: ColorManager.onDarkPrimary,
+                    fontSize: _webSectionTitleFs(isMobile),
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
+                  ),
                 ),
-                SizedBox(width: 1.w),
               ],
-              Text(
-                title,
-                style: GoogleFonts.roboto(
-                  color: _orderAccent,
-                  fontSize: _webSectionTitleFs(isMobile),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: isMobile ? 0.8.h : 0.8.h),
-          ...children,
-        ],
+            ),
+            SizedBox(height: isMobile ? 1.h : 1.h),
+            ...children,
+          ],
+        ),
       ),
     );
   }
@@ -1018,8 +1326,9 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
   Widget _buildFancyDesignSection(bool isMobile) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 2.h),
-      child: Container(
-        decoration: ColorManager.orderFormCardDecoration(borderRadius: 16),
+      child: _glassPanel(
+        borderColor: ColorManager.accentCoral.withValues(alpha: 0.28),
+        borderRadius: 22,
         padding: EdgeInsets.all(isMobile ? 1.5.h : 1.5.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1035,9 +1344,9 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                 Text(
                   'Design Requirements',
                   style: GoogleFonts.roboto(
-                    color: ColorManager.textPrimary,
+                    color: ColorManager.onDarkPrimary,
                     fontSize: _webCardHeaderTitleFs(isMobile),
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
@@ -1313,7 +1622,7 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
         title: Text(
-          'Order Here',
+          'Start Project',
           style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 20 : 18,
@@ -1340,318 +1649,249 @@ class _OrderHereScreenState extends State<OrderHereScreen> {
                         vertical: isMobile ? 1.h : 1.2.h,
                       ),
                       sliver: SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            BlocBuilder<AuthBloc, AuthState>(
-                              builder: (context, authState) {
-                                if (authState is Authenticated) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                      bottom: isMobile ? 12 : 16),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.all(isMobile ? 14 : 16),
-                                    decoration: BoxDecoration(
-                                      color: ColorManager.accentGold
-                                          .withValues(alpha: 0.22),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: ColorManager.accentGold
-                                            .withValues(alpha: 0.45),
-                                      ),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1120),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildStartProjectHero(isMobile),
+                                SizedBox(height: isMobile ? 18 : 24),
+                                _buildAuthNotice(isMobile),
+                                // Client Information
+                                _buildSection(
+                                  title: 'Client Information',
+                                  children: [
+                                    _buildTextField(
+                                      label: 'Full Name *',
+                                      hint: 'Enter your full name',
+                                      controller: _clientNameController,
+                                      isMobile: isMobile,
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Icon(
-                                              Icons.lock_outline,
-                                              color: Colors.white,
-                                              size: 22,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: Text(
-                                                'Sign in to submit your order. You can fill out the form first; submission requires an account.',
-                                                style: GoogleFonts.roboto(
-                                                  color: Colors.white,
-                                                  fontSize: isMobile ? 13 : 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  height: 1.35,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: isMobile ? 10 : 12),
-                                        Wrap(
-                                          spacing: 10,
-                                          runSpacing: 8,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  context.push(AppRoutes.login),
-                                              child: Text(
-                                                'Log in',
-                                                style: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () => context
-                                                  .push(AppRoutes.signUp),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    ColorManager.backgroundDark,
-                                                foregroundColor:
-                                                    ColorManager.accentGold,
-                                              ),
-                                              child: Text(
-                                                'Sign up',
-                                                style: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                    _buildTextField(
+                                      label: 'Email *',
+                                      hint: 'your.email@example.com',
+                                      controller: _clientEmailController,
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildTextField(
+                                      label: 'Phone Number',
+                                      hint: '+1 (555) 123-4567',
+                                      controller: _clientPhoneController,
+                                      isRequired: false,
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildTextField(
+                                      label: 'Company/Organization',
+                                      hint: 'Your company name (optional)',
+                                      controller: _clientCompanyController,
+                                      isRequired: false,
+                                      isMobile: isMobile,
+                                    ),
+                                  ],
+                                  isMobile: isMobile,
+                                ),
+
+                                // App Details
+                                _buildSection(
+                                  title: 'App Details',
+                                  icon: Icons.apps,
+                                  children: [
+                                    _buildTextField(
+                                      label: 'App Name *',
+                                      hint: 'Enter your app name',
+                                      controller: _appNameController,
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildDropdown(
+                                      label: 'App Type *',
+                                      items: [
+                                        'Mobile App',
+                                        'Web App',
+                                        'Desktop App',
+                                        'Cross-Platform App',
+                                        'Progressive Web App (PWA)',
+                                        'Other',
                                       ],
+                                      value: _selectedAppType,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedAppType = value;
+                                        });
+                                      },
+                                      isMobile: isMobile,
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                            // Client Information
-                            _buildSection(
-                              title: 'Client Information',
-                              children: [
-                                _buildTextField(
-                                  label: 'Full Name *',
-                                  hint: 'Enter your full name',
-                                  controller: _clientNameController,
-                                  isMobile: isMobile,
-                                ),
-                                _buildTextField(
-                                  label: 'Email *',
-                                  hint: 'your.email@example.com',
-                                  controller: _clientEmailController,
-                                  isMobile: isMobile,
-                                ),
-                                _buildTextField(
-                                  label: 'Phone Number',
-                                  hint: '+1 (555) 123-4567',
-                                  controller: _clientPhoneController,
-                                  isRequired: false,
-                                  isMobile: isMobile,
-                                ),
-                                _buildTextField(
-                                  label: 'Company/Organization',
-                                  hint: 'Your company name (optional)',
-                                  controller: _clientCompanyController,
-                                  isRequired: false,
-                                  isMobile: isMobile,
-                                ),
-                              ],
-                              isMobile: isMobile,
-                            ),
-
-                            // App Details
-                            _buildSection(
-                              title: 'App Details',
-                              icon: Icons.apps,
-                              children: [
-                                _buildTextField(
-                                  label: 'App Name *',
-                                  hint: 'Enter your app name',
-                                  controller: _appNameController,
-                                  isMobile: isMobile,
-                                ),
-                                _buildDropdown(
-                                  label: 'App Type *',
-                                  items: [
-                                    'Mobile App',
-                                    'Web App',
-                                    'Desktop App',
-                                    'Cross-Platform App',
-                                    'Progressive Web App (PWA)',
-                                    'Other',
+                                    _buildTextField(
+                                      label: 'App Description *',
+                                      hint: 'Describe what your app does',
+                                      controller: _appDescriptionController,
+                                      maxLines: 4,
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildTextField(
+                                      label: 'Key Features',
+                                      hint:
+                                          'List main features (e.g., User authentication, Payment processing, etc.)',
+                                      controller: _appFeaturesController,
+                                      maxLines: 4,
+                                      isRequired: false,
+                                      isMobile: isMobile,
+                                    ),
                                   ],
-                                  value: _selectedAppType,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedAppType = value;
-                                    });
-                                  },
                                   isMobile: isMobile,
                                 ),
-                                _buildTextField(
-                                  label: 'App Description *',
-                                  hint: 'Describe what your app does',
-                                  controller: _appDescriptionController,
-                                  maxLines: 4,
-                                  isMobile: isMobile,
-                                ),
-                                _buildTextField(
-                                  label: 'Key Features',
-                                  hint:
-                                      'List main features (e.g., User authentication, Payment processing, etc.)',
-                                  controller: _appFeaturesController,
-                                  maxLines: 4,
-                                  isRequired: false,
-                                  isMobile: isMobile,
-                                ),
-                              ],
-                              isMobile: isMobile,
-                            ),
 
-                            // Target Platforms
-                            _buildSection(
-                              title: 'Target Platforms',
-                              icon: Icons.devices,
-                              children: [
-                                _buildPlatformCheckboxes(),
-                              ],
-                              isMobile: isMobile,
-                            ),
-
-                            // Project Details
-                            _buildSection(
-                              title: 'Project Details',
-                              icon: Icons.assignment,
-                              children: [
-                                _buildDropdown(
-                                  label: 'Project Priority *',
-                                  items: [
-                                    'Low',
-                                    'Medium',
-                                    'High',
-                                    'Urgent',
+                                // Target Platforms
+                                _buildSection(
+                                  title: 'Target Platforms',
+                                  icon: Icons.devices,
+                                  children: [
+                                    _buildPlatformCheckboxes(),
                                   ],
-                                  value: _selectedPriority,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedPriority = value;
-                                    });
-                                  },
                                   isMobile: isMobile,
                                 ),
-                                _buildTextField(
-                                  label: 'Budget Range',
-                                  hint: r'e.g., $5,000 - $10,000 or Flexible',
-                                  controller: _budgetController,
-                                  isRequired: false,
-                                  isMobile: isMobile,
-                                ),
-                                _buildTextField(
-                                  label: 'Timeline',
-                                  hint: 'e.g., 3 months, ASAP, Flexible',
-                                  controller: _timelineController,
-                                  isRequired: false,
-                                  isMobile: isMobile,
-                                ),
-                                _buildTextField(
-                                  label: 'Additional Notes',
-                                  hint:
-                                      'Any other information you\'d like to share',
-                                  controller: _additionalNotesController,
-                                  maxLines: 4,
-                                  isRequired: false,
-                                  isMobile: isMobile,
-                                ),
-                              ],
-                              isMobile: isMobile,
-                            ),
 
-                            // Design Requirements
-                            _buildFancyDesignSection(isMobile),
-
-                            SizedBox(height: 3.h),
-
-                            // Submit Button
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: _isSubmitting ? null : _submitForm,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorManager.accentGold,
-                                  foregroundColor: ColorManager.backgroundDark,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isMobile ? 8.w : 6.w,
-                                    vertical: isMobile ? 2.h : 1.5.h,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 0,
-                                  disabledBackgroundColor: ColorManager
-                                      .accentGold
-                                      .withValues(alpha: 0.5),
+                                // Project Details
+                                _buildSection(
+                                  title: 'Project Details',
+                                  icon: Icons.assignment,
+                                  children: [
+                                    _buildDropdown(
+                                      label: 'Project Priority *',
+                                      items: [
+                                        'Low',
+                                        'Medium',
+                                        'High',
+                                        'Urgent',
+                                      ],
+                                      value: _selectedPriority,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedPriority = value;
+                                        });
+                                      },
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildTextField(
+                                      label: 'Budget Range',
+                                      hint:
+                                          r'e.g., $5,000 - $10,000 or Flexible',
+                                      controller: _budgetController,
+                                      isRequired: false,
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildTextField(
+                                      label: 'Timeline',
+                                      hint: 'e.g., 3 months, ASAP, Flexible',
+                                      controller: _timelineController,
+                                      isRequired: false,
+                                      isMobile: isMobile,
+                                    ),
+                                    _buildTextField(
+                                      label: 'Additional Notes',
+                                      hint:
+                                          'Any other information you\'d like to share',
+                                      controller: _additionalNotesController,
+                                      maxLines: 4,
+                                      isRequired: false,
+                                      isMobile: isMobile,
+                                    ),
+                                  ],
+                                  isMobile: isMobile,
                                 ),
-                                child: _isSubmitting
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          SizedBox(
-                                            width: _webPrimaryButtonIconSize(
-                                                isMobile),
-                                            height: _webPrimaryButtonIconSize(
-                                                isMobile),
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                ColorManager.backgroundDark,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 2.w),
-                                          Text(
-                                            'Submitting...',
-                                            style: GoogleFonts.roboto(
-                                              color: Colors.white,
-                                              fontSize:
-                                                  _webPrimaryButtonLabelFs(
-                                                      isMobile),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.send,
-                                            color: Colors.white,
-                                            size: _webPrimaryButtonIconSize(
-                                                isMobile),
-                                          ),
-                                          SizedBox(width: 1.w),
-                                          Text(
-                                            'Submit Order',
-                                            style: GoogleFonts.roboto(
-                                              color: Colors.white,
-                                              fontSize:
-                                                  _webPrimaryButtonLabelFs(
-                                                      isMobile),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
+
+                                // Design Requirements
+                                _buildFancyDesignSection(isMobile),
+
+                                SizedBox(height: 3.h),
+
+                                // Submit Button
+                                Center(
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        _isSubmitting ? null : _submitForm,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: ColorManager.accentGold,
+                                      foregroundColor:
+                                          ColorManager.backgroundDark,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 8.w : 6.w,
+                                        vertical: isMobile ? 2.h : 1.5.h,
                                       ),
-                              ),
-                            ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 0,
+                                      disabledBackgroundColor: ColorManager
+                                          .accentGold
+                                          .withValues(alpha: 0.5),
+                                    ),
+                                    child: _isSubmitting
+                                        ? Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SizedBox(
+                                                width:
+                                                    _webPrimaryButtonIconSize(
+                                                        isMobile),
+                                                height:
+                                                    _webPrimaryButtonIconSize(
+                                                        isMobile),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(
+                                                    ColorManager.backgroundDark,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 2.w),
+                                              Text(
+                                                'Submitting...',
+                                                style: GoogleFonts.roboto(
+                                                  color: ColorManager
+                                                      .backgroundDark,
+                                                  fontSize:
+                                                      _webPrimaryButtonLabelFs(
+                                                          isMobile),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.rocket_launch_rounded,
+                                                color:
+                                                    ColorManager.backgroundDark,
+                                                size: _webPrimaryButtonIconSize(
+                                                    isMobile),
+                                              ),
+                                              SizedBox(width: 1.w),
+                                              Text(
+                                                'Submit Project Brief',
+                                                style: GoogleFonts.roboto(
+                                                  color: ColorManager
+                                                      .backgroundDark,
+                                                  fontSize:
+                                                      _webPrimaryButtonLabelFs(
+                                                          isMobile),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
 
-                            SizedBox(height: 3.h),
-                          ],
+                                SizedBox(height: 3.h),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),

@@ -28,6 +28,9 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
   String? _timeline;
   bool _submitting = false;
 
+  static const Color _fieldTextColor = HomeWarmColors.headlinePrimary;
+  static const Color _fieldMutedColor = HomeWarmColors.bodyEmphasis;
+
   static const _projectTypes = [
     'New MVP or product',
     'Design + Flutter build',
@@ -68,12 +71,12 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
       labelText: label,
       hintText: hint,
       labelStyle: GoogleFonts.roboto(
-        color: HomeWarmColors.bodyEmphasis,
+        color: _fieldMutedColor,
         fontWeight: FontWeight.w600,
         fontSize: 14,
       ),
       hintStyle: GoogleFonts.roboto(
-        color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.45),
+        color: _fieldMutedColor.withValues(alpha: 0.58),
         fontSize: 15,
       ),
       filled: true,
@@ -85,11 +88,74 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: HomeWarmColors.sectionAccent, width: 1.5),
+        borderSide:
+            const BorderSide(color: HomeWarmColors.sectionAccent, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(color: Colors.red.shade400),
+      ),
+    );
+  }
+
+  TextStyle get _fieldTextStyle => GoogleFonts.roboto(
+        color: _fieldTextColor,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      );
+
+  TextStyle get _menuItemTextStyle => GoogleFonts.roboto(
+        color: _fieldTextColor,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      );
+
+  Widget _dropdownItem(String value) {
+    return Text(
+      value,
+      overflow: TextOverflow.ellipsis,
+      style: _menuItemTextStyle,
+    );
+  }
+
+  void _clearFormFields() {
+    _formKey.currentState?.reset();
+    _name.clear();
+    _email.clear();
+    _company.clear();
+    _description.clear();
+    setState(() {
+      _projectType = null;
+      _budgetRange = null;
+      _timeline = null;
+    });
+  }
+
+  void _showProjectSentSnackBar() {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        backgroundColor: const Color(0xFF166534),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Project inquiry sent to 4iDeas. We will review it and get back to you soon.',
+                style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -136,21 +202,9 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
       setState(() => _submitting = false);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        _formKey.currentState!.reset();
-        setState(() {
-          _projectType = null;
-          _budgetRange = null;
-          _timeline = null;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Thanks—your note was sent. I will get back to you shortly.',
-              style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
-            ),
-            backgroundColor: const Color(0xFF166534),
-          ),
-        );
+        FocusScope.of(context).unfocus();
+        _clearFormFields();
+        _showProjectSentSnackBar();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -221,20 +275,25 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             SizedBox(height: isMobile ? 18 : 22),
             TextFormField(
               controller: _name,
+              style: _fieldTextStyle,
               textInputAction: TextInputAction.next,
               decoration: _fieldDecoration('Name', hint: 'Jane Doe'),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Please enter your name' : null,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Please enter your name'
+                  : null,
             ),
             SizedBox(height: isMobile ? 12 : 14),
             TextFormField(
               controller: _email,
+              style: _fieldTextStyle,
               keyboardType: TextInputType.emailAddress,
               autofillHints: const [AutofillHints.email],
               textInputAction: TextInputAction.next,
               decoration: _fieldDecoration('Email', hint: 'you@company.com'),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Please enter your email';
+                if (v == null || v.trim().isEmpty) {
+                  return 'Please enter your email';
+                }
                 if (!v.contains('@')) return 'Enter a valid email';
                 return null;
               },
@@ -242,53 +301,90 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             SizedBox(height: isMobile ? 12 : 14),
             TextFormField(
               controller: _company,
+              style: _fieldTextStyle,
               textInputAction: TextInputAction.next,
-              decoration: _fieldDecoration('Company or startup name (optional)'),
+              decoration:
+                  _fieldDecoration('Company or startup name (optional)'),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             DropdownButtonFormField<String>(
               // ignore: deprecated_member_use
               value: _projectType,
               decoration: _fieldDecoration('Project type'),
+              style: _fieldTextStyle,
+              dropdownColor: Colors.white,
+              iconEnabledColor: HomeWarmColors.sectionAccent,
+              iconDisabledColor: _fieldMutedColor,
               items: _projectTypes
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.roboto(fontSize: 14))))
+                  .map((e) =>
+                      DropdownMenuItem(value: e, child: _dropdownItem(e)))
                   .toList(),
               onChanged: (v) => setState(() => _projectType = v),
-              hint: Text('Select…', style: GoogleFonts.roboto(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
+              hint: Text(
+                'Select...',
+                style: GoogleFonts.roboto(
+                  color: _fieldMutedColor.withValues(alpha: 0.62),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             DropdownButtonFormField<String>(
               // ignore: deprecated_member_use
               value: _budgetRange,
               decoration: _fieldDecoration('Budget range'),
+              style: _fieldTextStyle,
+              dropdownColor: Colors.white,
+              iconEnabledColor: HomeWarmColors.sectionAccent,
+              iconDisabledColor: _fieldMutedColor,
               items: _budgetRanges
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.roboto(fontSize: 14))))
+                  .map((e) =>
+                      DropdownMenuItem(value: e, child: _dropdownItem(e)))
                   .toList(),
               onChanged: (v) => setState(() => _budgetRange = v),
-              hint: Text('Select…', style: GoogleFonts.roboto(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
+              hint: Text(
+                'Select...',
+                style: GoogleFonts.roboto(
+                  color: _fieldMutedColor.withValues(alpha: 0.62),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             DropdownButtonFormField<String>(
               // ignore: deprecated_member_use
               value: _timeline,
               decoration: _fieldDecoration('Timeline'),
+              style: _fieldTextStyle,
+              dropdownColor: Colors.white,
+              iconEnabledColor: HomeWarmColors.sectionAccent,
+              iconDisabledColor: _fieldMutedColor,
               items: _timelines
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e, style: GoogleFonts.roboto(fontSize: 14))))
+                  .map((e) =>
+                      DropdownMenuItem(value: e, child: _dropdownItem(e)))
                   .toList(),
               onChanged: (v) => setState(() => _timeline = v),
-              hint: Text('Select…', style: GoogleFonts.roboto(color: HomeWarmColors.bodyEmphasis.withValues(alpha: 0.55))),
+              hint: Text(
+                'Select...',
+                style: GoogleFonts.roboto(
+                  color: _fieldMutedColor.withValues(alpha: 0.62),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             SizedBox(height: isMobile ? 12 : 14),
             TextFormField(
               controller: _description,
+              style: _fieldTextStyle,
               minLines: 4,
               maxLines: 8,
               decoration: _fieldDecoration(
                 'What do you want to build?',
                 hint: 'A few sentences on your app idea and desired outcome.',
               ),
-              validator: (v) =>
-                  (v == null || v.trim().length < 20) ? 'Add at least a short description (20+ characters)' : null,
+              validator: (v) => (v == null || v.trim().length < 20)
+                  ? 'Add at least a short description (20+ characters)'
+                  : null,
             ),
             SizedBox(height: isMobile ? 20 : 24),
             FilledButton(
@@ -297,13 +393,15 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
                 backgroundColor: HomeWarmColors.sectionAccent,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(vertical: isMobile ? 15 : 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
               child: _submitting
                   ? const SizedBox(
                       height: 22,
                       width: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.2, color: Colors.white),
                     )
                   : Text(
                       'Start a Project',
