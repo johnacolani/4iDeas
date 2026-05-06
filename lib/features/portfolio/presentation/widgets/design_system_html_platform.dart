@@ -7,9 +7,11 @@ import 'design_system_html_platform_stub.dart'
 Widget buildDesignSystemHtmlView({
   required String webRelativePath,
   required String flutterAssetPath,
+  required String documentLabel,
 }) {
   return impl.buildDesignSystemHtmlView(
     webRelativePath: webRelativePath,
     flutterAssetPath: flutterAssetPath,
+    documentLabel: documentLabel,
   );
 }

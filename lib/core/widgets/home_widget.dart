@@ -28,88 +28,96 @@ class HomeWidget extends StatelessWidget {
     final double heroTopSpacing = 0.0;
 
     return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          top: false,
-          child: Scrollbar(
-            thumbVisibility: true,
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        top: false,
+        child: Scrollbar(
+          thumbVisibility: true,
+          interactive: false,
+          child: FocusTraversalGroup(
+            policy: ReadingOrderTraversalPolicy(),
             child: CustomScrollView(
               slivers: [
-              SliverToBoxAdapter(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: heroTopSpacing),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: wi < 400 ? 12 : 16),
-                      child: Center(
-                        child: HomeHeroSection(
-                          wi: wi,
-                          isMobile: isMobile,
-                          isTablet: isTablet,
-                          imageBelowPlatforms: HeroPlatformsGif(screenWidth: wi),
-                        ),
-                      ),
-                    ),
-                    TrustBuildingHomeSections(
-                      wi: wi,
-                      isMobile: isMobile,
-                      isTablet: isTablet,
-                    ),
-                    SizedBox(height: isMobile ? 18 : 26),
-                    // Title before backend sections
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile
-                            ? wi * 0.05
-                            : (isTablet ? wi * 0.08 : wi * 0.1),
-                      ),
-                      child: Center(
-                        child: SelectableText(
-                          'Your backend could be',
-                          style: GoogleFonts.roboto(
-                            fontSize: isMobile
-                                ? (wi < 400 ? 18 : 20)
-                                : (isTablet ? wi * 0.028 : wi * 0.032),
-                            fontWeight: FontWeight.bold,
-                            color: HomeWarmColors.sectionAccent,
+                SliverToBoxAdapter(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: heroTopSpacing),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: wi < 400 ? 12 : 16),
+                        child: Center(
+                          child: HomeHeroSection(
+                            wi: wi,
+                            isMobile: isMobile,
+                            isTablet: isTablet,
+                            imageBelowPlatforms:
+                                HeroPlatformsGif(screenWidth: wi),
                           ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? wi * 0.12 : (isTablet ? wi * 0.2 : wi * 0.25),
-                        vertical: isMobile ? 12 : 16,
+                      TrustBuildingHomeSections(
+                        wi: wi,
+                        isMobile: isMobile,
+                        isTablet: isTablet,
                       ),
-                      child: Divider(
-                        color: HomeWarmColors.dividerLine,
-                        thickness: 1,
+                      SizedBox(height: isMobile ? 18 : 26),
+                      // Title before backend sections
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile
+                              ? wi * 0.05
+                              : (isTablet ? wi * 0.08 : wi * 0.1),
+                        ),
+                        child: Center(
+                          child: SelectableText(
+                            'Your backend could be',
+                            style: GoogleFonts.roboto(
+                              fontSize: isMobile
+                                  ? (wi < 400 ? 18 : 20)
+                                  : (isTablet ? wi * 0.028 : wi * 0.032),
+                              fontWeight: FontWeight.bold,
+                              color: HomeWarmColors.sectionAccent,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: isMobile ? 20 : 32),
-                    // Firebase Backend Section
-                    FirebaseBackendSection(
-                      wi: wi,
-                      isMobile: isMobile,
-                    ),
-                    // AWS Backend Section
-                    AWSBackendSection(
-                      wi: wi,
-                      isMobile: isMobile,
-                    ),
-                    // SEO Optimization Section
-                    SEOOptimizationSection(
-                      wi: wi,
-                      isMobile: isMobile,
-                    ),
-                  ],
-                ),
-              )
-            ],
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile
+                              ? wi * 0.12
+                              : (isTablet ? wi * 0.2 : wi * 0.25),
+                          vertical: isMobile ? 12 : 16,
+                        ),
+                        child: Divider(
+                          color: HomeWarmColors.dividerLine,
+                          thickness: 1,
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 20 : 32),
+                      // Firebase Backend Section
+                      FirebaseBackendSection(
+                        wi: wi,
+                        isMobile: isMobile,
+                      ),
+                      // AWS Backend Section
+                      AWSBackendSection(
+                        wi: wi,
+                        isMobile: isMobile,
+                      ),
+                      // SEO Optimization Section
+                      SEOOptimizationSection(
+                        wi: wi,
+                        isMobile: isMobile,
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }

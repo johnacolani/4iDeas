@@ -4,14 +4,22 @@ import 'package:webview_flutter/webview_flutter.dart';
 Widget buildDesignSystemHtmlView({
   required String webRelativePath,
   required String flutterAssetPath,
+  required String documentLabel,
 }) {
-  return _DesignSystemWebView(assetPath: flutterAssetPath);
+  return _DesignSystemWebView(
+    assetPath: flutterAssetPath,
+    documentLabel: documentLabel,
+  );
 }
 
 class _DesignSystemWebView extends StatefulWidget {
   final String assetPath;
+  final String documentLabel;
 
-  const _DesignSystemWebView({required this.assetPath});
+  const _DesignSystemWebView({
+    required this.assetPath,
+    required this.documentLabel,
+  });
 
   @override
   State<_DesignSystemWebView> createState() => _DesignSystemWebViewState();
@@ -38,14 +46,22 @@ class _DesignSystemWebViewState extends State<_DesignSystemWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        WebViewWidget(controller: _controller),
-        if (_loading)
-          const Center(
-            child: CircularProgressIndicator(),
-          ),
-      ],
+    return Semantics(
+      container: true,
+      label: widget.documentLabel,
+      child: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (_loading)
+            Center(
+              child: Semantics(
+                label: 'Loading design system document',
+                liveRegion: true,
+                child: const CircularProgressIndicator(),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
