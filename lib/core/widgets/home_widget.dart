@@ -9,7 +9,7 @@ import 'aws_backend_section.dart';
 import 'seo_optimization_section.dart';
 import 'trust_home_sections.dart';
 
-class HomeWidget extends StatelessWidget {
+class HomeWidget extends StatefulWidget {
   const HomeWidget({
     super.key,
     required this.he,
@@ -20,8 +20,22 @@ class HomeWidget extends StatelessWidget {
   final double wi;
 
   @override
+  State<HomeWidget> createState() => _HomeWidgetState();
+}
+
+class _HomeWidgetState extends State<HomeWidget> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Responsive breakpoints (HomeWidget is only used from MobileScreen, width under 600.)
+    final double wi = widget.wi;
     final bool isMobile = wi < 600;
     final bool isTablet = wi >= 600 && wi < 1024;
     // Home route: chrome is above scroll in [HomeScreen]; only a small breath under the CTA row.
@@ -32,11 +46,13 @@ class HomeWidget extends StatelessWidget {
       body: SafeArea(
         top: false,
         child: Scrollbar(
+          controller: _scrollController,
           thumbVisibility: true,
           interactive: false,
           child: FocusTraversalGroup(
             policy: ReadingOrderTraversalPolicy(),
             child: CustomScrollView(
+              controller: _scrollController,
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
