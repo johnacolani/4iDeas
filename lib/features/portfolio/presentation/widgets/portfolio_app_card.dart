@@ -625,8 +625,14 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
   }
 
   Widget _buildOpenDesignSystemButton(BuildContext context, double bodySize) {
+    if (!PortfolioData.caseStudyHasDesignSystemDoc(app.id)) {
+      return const SizedBox.shrink();
+    }
+
     final bool isAsdUsaCard = app.id.toLowerCase() == 'asdusa' ||
         app.name.toLowerCase().contains('asd usa');
+    final bool is4ideasCard = app.id.toLowerCase() == 'my-web-site' ||
+        app.id.toLowerCase() == '4ideas-design-system';
 
     final baseStyle = OutlinedButton.styleFrom(
       side: BorderSide(
@@ -641,7 +647,9 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
 
     final String label = isAsdUsaCard
         ? 'ASD App Design System'
-        : 'Open ${app.name} Design System';
+        : is4ideasCard
+            ? 'Open 4iDeas Design System'
+            : 'Open ${app.name} Design System';
     return OutlinedButton(
       onPressed: () =>
           context.push(AppRoutes.portfolioDesignSystemPath(app.id)),

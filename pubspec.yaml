@@ -95,6 +95,7 @@ flutter:
     - assets/platforms/
     - assets/icons/
     - assets/design_system/ASD_App_Design_System.html
+    - assets/design_system/4ideas_Design_System.html
     - assets/docs/serviceflow-design-system.html
     - assets/docs/4ideas-design-system.html
     - assets/waveloop.json

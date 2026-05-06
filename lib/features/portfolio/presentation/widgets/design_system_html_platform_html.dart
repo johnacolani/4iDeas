@@ -4,9 +4,11 @@ import 'dart:html' as html;
 import 'dart:ui_web' as ui_web;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 String _absoluteUrlForWebRelativePath(String webRelativePath) {
-  final baseHref = html.document.querySelector('base')?.getAttribute('href')?.trim();
+  final baseHref =
+      html.document.querySelector('base')?.getAttribute('href')?.trim();
   if (baseHref != null &&
       (baseHref.startsWith('http://') || baseHref.startsWith('https://'))) {
     return Uri.parse(baseHref).resolve(webRelativePath).toString();
@@ -21,36 +23,80 @@ Widget buildDesignSystemHtmlView({
   required String webRelativePath,
   required String flutterAssetPath,
 }) {
-  return _DesignSystemHtmlIframe(url: _absoluteUrlForWebRelativePath(webRelativePath));
+  return _DesignSystemHtmlIframe(
+    url: _absoluteUrlForWebRelativePath(webRelativePath),
+    assetPath: flutterAssetPath,
+  );
 }
 
 class _DesignSystemHtmlIframe extends StatefulWidget {
   final String url;
+  final String assetPath;
 
-  const _DesignSystemHtmlIframe({required this.url});
+  const _DesignSystemHtmlIframe({
+    required this.url,
+    required this.assetPath,
+  });
 
   @override
-  State<_DesignSystemHtmlIframe> createState() => _DesignSystemHtmlIframeState();
+  State<_DesignSystemHtmlIframe> createState() =>
+      _DesignSystemHtmlIframeState();
 }
 
 class _DesignSystemHtmlIframeState extends State<_DesignSystemHtmlIframe> {
-  late final String _viewType = 'design-system-iframe-${identityHashCode(this)}';
+  late final String _viewType =
+      'design-system-iframe-${identityHashCode(this)}';
+  late final html.IFrameElement _iframe;
+  var _loading = true;
 
   @override
   void initState() {
     super.initState();
+    _iframe = html.IFrameElement()
+      ..style.border = 'none'
+      ..style.width = '100%'
+      ..style.height = '100%'
+      ..style.backgroundColor = '#ffffff';
+
     ui_web.platformViewRegistry.registerViewFactory(_viewType, (int _) {
-      final iframe = html.IFrameElement()
-        ..src = widget.url
-        ..style.border = 'none'
-        ..style.width = '100%'
-        ..style.height = '100%';
-      return iframe;
+      return _iframe;
     });
+    _loadHtml();
+  }
+
+  Future<void> _loadHtml() async {
+    try {
+      final source = await rootBundle.loadString(widget.assetPath);
+      _iframe.setAttribute('srcdoc', _withBaseHref(source, widget.url));
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    } catch (error) {
+      _iframe.src = widget.url;
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  String _withBaseHref(String source, String url) {
+    final baseTag = '<base href="$url">';
+    if (source.contains('<head>')) {
+      return source.replaceFirst('<head>', '<head>$baseTag');
+    }
+    return '$baseTag$source';
   }
 
   @override
   Widget build(BuildContext context) {
-    return HtmlElementView(viewType: _viewType);
+    return Stack(
+      children: [
+        HtmlElementView(viewType: _viewType),
+        if (_loading)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+      ],
+    );
   }
 }

@@ -371,6 +371,10 @@ class PortfolioData {
       webRelativePath: 'assets/assets/design_system/4ideas_Design_System.html',
       flutterAssetPath: 'assets/design_system/4ideas_Design_System.html',
     ),
+    'my-web-site': CaseStudyDesignSystemDocPaths(
+      webRelativePath: 'assets/assets/design_system/4ideas_Design_System.html',
+      flutterAssetPath: 'assets/design_system/4ideas_Design_System.html',
+    ),
     '4ideas-design-system': CaseStudyDesignSystemDocPaths(
       webRelativePath: 'assets/assets/design_system/4ideas_Design_System.html',
       flutterAssetPath: 'assets/design_system/4ideas_Design_System.html',
