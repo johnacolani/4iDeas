@@ -25,6 +25,7 @@ import 'package:four_ideas/screens/insights_screen.dart';
 import 'package:four_ideas/screens/local_richmond_landing_screen.dart';
 import 'package:four_ideas/screens/seo_topic_landing_screen.dart';
 import 'package:four_ideas/screens/case_studies_screen.dart';
+import 'package:four_ideas/screens/qr_code_generator_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -42,25 +43,31 @@ abstract class AppRoutes {
   static const String services = '/services';
   static const String about = '/about';
   static const String orderHere = '/order-here';
+
   /// Full-page contact (matches drawer + deep link); same content as the legacy modal.
   static const String contact = '/contact';
   static const String insights = '/insights';
   static String insightsArticlePath(String slug) => '$insights/$slug';
   static const String caseStudies = '/case-studies';
+  static const String qrCodeGenerator = '/qr-code-generator';
 
   /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
   static const String flutterAppDevelopment = '/flutter-app-development';
   static const String flutterMvpDevelopment = '/flutter-mvp-development';
   static const String firebaseAppDevelopment = '/firebase-app-development';
-  static const String productDesignUxMobileApps = '/product-design-ux-mobile-apps';
+  static const String productDesignUxMobileApps =
+      '/product-design-ux-mobile-apps';
   static const String aiChatbotAdminDashboardDevelopment =
       '/ai-chatbot-admin-dashboard-development';
   static const String flutterWebAppDevelopment = '/flutter-web-app-development';
   static const String flutterDeveloperVirginia = '/flutter-developer-virginia';
-  static const String flutterDeveloperRichmondVa = '/flutter-developer-richmond-va';
+  static const String flutterDeveloperRichmondVa =
+      '/flutter-developer-richmond-va';
   static const String mvpAppDevelopment = '/mvp-app-development';
-  static const String productDesignFlutterEngineering = '/product-design-flutter-engineering';
-  static const String firebaseAppDevelopmentServices = '/firebase-app-development-services';
+  static const String productDesignFlutterEngineering =
+      '/product-design-flutter-engineering';
+  static const String firebaseAppDevelopmentServices =
+      '/firebase-app-development-services';
 
   static const String login = '/login';
   static const String signUp = '/signup';
@@ -119,7 +126,8 @@ GoRouter createAppRouter() {
         path: '${AppRoutes.portfolioCaseStudy}/:id',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          final found = PortfolioData.caseStudies.where((c) => c.id == id).toList();
+          final found =
+              PortfolioData.caseStudies.where((c) => c.id == id).toList();
           if (found.isEmpty) {
             return Scaffold(
               body: Center(
@@ -127,7 +135,8 @@ GoRouter createAppRouter() {
               ),
             );
           }
-          return CaseStudyDetailScreen(caseStudy: found.first.withAdaptiveBeforeDesignSystem());
+          return CaseStudyDetailScreen(
+              caseStudy: found.first.withAdaptiveBeforeDesignSystem());
         },
       ),
       GoRoute(
@@ -157,6 +166,10 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.caseStudies,
         builder: (context, state) => const CaseStudiesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.qrCodeGenerator,
+        builder: (context, state) => const QrCodeGeneratorScreen(),
       ),
       GoRoute(
         path: '${AppRoutes.insights}/:slug',

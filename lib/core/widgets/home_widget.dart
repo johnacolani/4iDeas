@@ -5,6 +5,7 @@ import '../home_warm_colors.dart';
 import 'firebase_backend_section.dart';
 import 'hero_platforms_gif.dart';
 import 'home_hero_section.dart';
+import 'home_qr_code_section.dart';
 import 'aws_backend_section.dart';
 import 'seo_optimization_section.dart';
 import 'trust_home_sections.dart';
@@ -73,6 +74,12 @@ class _HomeWidgetState extends State<HomeWidget> {
                         ),
                       ),
                       TrustBuildingHomeSections(
+                        wi: wi,
+                        isMobile: isMobile,
+                        isTablet: isTablet,
+                      ),
+                      SizedBox(height: isMobile ? 18 : 26),
+                      HomeQrCodeSection(
                         wi: wi,
                         isMobile: isMobile,
                         isTablet: isTablet,
