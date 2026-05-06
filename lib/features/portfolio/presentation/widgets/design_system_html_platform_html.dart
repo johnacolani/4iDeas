@@ -22,20 +22,24 @@ String _absoluteUrlForWebRelativePath(String webRelativePath) {
 Widget buildDesignSystemHtmlView({
   required String webRelativePath,
   required String flutterAssetPath,
+  required String documentLabel,
 }) {
   return _DesignSystemHtmlIframe(
     url: _absoluteUrlForWebRelativePath(webRelativePath),
     assetPath: flutterAssetPath,
+    documentLabel: documentLabel,
   );
 }
 
 class _DesignSystemHtmlIframe extends StatefulWidget {
   final String url;
   final String assetPath;
+  final String documentLabel;
 
   const _DesignSystemHtmlIframe({
     required this.url,
     required this.assetPath,
+    required this.documentLabel,
   });
 
   @override
@@ -53,10 +57,14 @@ class _DesignSystemHtmlIframeState extends State<_DesignSystemHtmlIframe> {
   void initState() {
     super.initState();
     _iframe = html.IFrameElement()
+      ..title = widget.documentLabel
       ..style.border = 'none'
       ..style.width = '100%'
       ..style.height = '100%'
       ..style.backgroundColor = '#ffffff';
+    _iframe
+      ..setAttribute('aria-label', widget.documentLabel)
+      ..setAttribute('tabindex', '0');
 
     ui_web.platformViewRegistry.registerViewFactory(_viewType, (int _) {
       return _iframe;
@@ -89,14 +97,22 @@ class _DesignSystemHtmlIframeState extends State<_DesignSystemHtmlIframe> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        HtmlElementView(viewType: _viewType),
-        if (_loading)
-          const Center(
-            child: CircularProgressIndicator(),
-          ),
-      ],
+    return Semantics(
+      container: true,
+      label: widget.documentLabel,
+      child: Stack(
+        children: [
+          HtmlElementView(viewType: _viewType),
+          if (_loading)
+            Center(
+              child: Semantics(
+                label: 'Loading design system document',
+                liveRegion: true,
+                child: const CircularProgressIndicator(),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

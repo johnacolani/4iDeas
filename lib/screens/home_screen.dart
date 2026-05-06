@@ -46,6 +46,7 @@ int _primaryHighlightIndex(String path) {
 /// ~10% narrower than prior desktop widths (274 ≈ 304×0.9, 241 ≈ 268×0.9).
 const double _kServicesMenuMinWidth = 274;
 const double _kAdminMenuMinWidth = 241;
+
 /// Dividers between dropdown rows (Services, Admin, hamburger).
 const Color _kPopupMenuDividerColor = Color(0xFF3F3F46);
 
@@ -98,43 +99,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const AppBackground(),
-          Positioned.fill(
-            child: Column(
-              children: [
-                SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _ModernTopAppBar(
-                        isMobile: isMobile,
-                        tabHoverIndicatorIndex: desktopNavHover
-                            ? _hoveredPrimaryIndex
-                            : null,
-                        onNavTabHover:
-                            desktopNavHover ? _onNavTabHoverStart : null,
-                        onNavTabHoverEnd:
-                            desktopNavHover ? _onNavTabHoverEnd : null,
-                      ),
-                      SizedBox(height: isMobile ? 0 : 6),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: SafeArea(
+      body: FocusTraversalGroup(
+        policy: ReadingOrderTraversalPolicy(),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const AppBackground(),
+            Positioned.fill(
+              child: Column(
+                children: [
+                  SafeArea(
                     top: false,
-                    child: const WebScreen(),
+                    bottom: false,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _ModernTopAppBar(
+                          isMobile: isMobile,
+                          tabHoverIndicatorIndex:
+                              desktopNavHover ? _hoveredPrimaryIndex : null,
+                          onNavTabHover:
+                              desktopNavHover ? _onNavTabHoverStart : null,
+                          onNavTabHoverEnd:
+                              desktopNavHover ? _onNavTabHoverEnd : null,
+                        ),
+                        SizedBox(height: isMobile ? 0 : 6),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: SafeArea(
+                      top: false,
+                      child: const WebScreen(),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -260,7 +263,8 @@ class _ModernTopAppBar extends StatelessWidget {
                                                   Color(0xFFD89A1C),
                                                 ],
                                               ).createShader(
-                                                const Rect.fromLTWH(0, 0, 56, 24),
+                                                const Rect.fromLTWH(
+                                                    0, 0, 56, 24),
                                               ),
                                           ),
                                         ),
@@ -441,9 +445,7 @@ class _NavUnderlineLink extends StatelessWidget {
       onEnter: onNavTabHover != null
           ? (_) => onNavTabHover!(route, layerIndex)
           : null,
-      onExit: onNavTabHoverEnd != null
-          ? (_) => onNavTabHoverEnd!(route)
-          : null,
+      onExit: onNavTabHoverEnd != null ? (_) => onNavTabHoverEnd!(route) : null,
       child: TextButton(
         onPressed: () => context.go(route),
         style: TextButton.styleFrom(
@@ -469,9 +471,7 @@ class _NavUnderlineLink extends StatelessWidget {
               Container(
                 height: 2.4,
                 decoration: BoxDecoration(
-                  color: selected
-                      ? AppColors.primaryGold
-                      : Colors.transparent,
+                  color: selected ? AppColors.primaryGold : Colors.transparent,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -483,18 +483,20 @@ class _NavUnderlineLink extends StatelessWidget {
   }
 }
 
-typedef _HoverNavMenuPanelBuilder =
-    Widget Function(BuildContext context, VoidCallback closeMenu);
+typedef _HoverNavMenuPanelBuilder = Widget Function(
+    BuildContext context, VoidCallback closeMenu);
 
 /// Desktop only: opens below the trigger on hover (no click required).
 class _DesktopHoverNavDropdown extends StatefulWidget {
   const _DesktopHoverNavDropdown({
     required this.trigger,
+    required this.triggerLabel,
     required this.menuMinWidth,
     required this.menuBuilder,
   });
 
   final Widget trigger;
+  final String triggerLabel;
   final double menuMinWidth;
   final _HoverNavMenuPanelBuilder menuBuilder;
 
@@ -614,7 +616,26 @@ class _DesktopHoverNavDropdownState extends State<_DesktopHoverNavDropdown> {
           _insertOverlay();
         },
         onExit: (_) => _scheduleClose(),
-        child: widget.trigger,
+        child: Semantics(
+          button: true,
+          label: widget.triggerLabel,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _insertOverlay,
+              onFocusChange: (focused) {
+                if (focused) {
+                  _cancelCloseTimer();
+                  _insertOverlay();
+                }
+              },
+              focusColor: AppColors.primaryGold.withValues(alpha: 0.16),
+              hoverColor: Colors.white.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(8),
+              child: widget.trigger,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -687,6 +708,7 @@ class _PrimaryDesktopNav extends StatelessWidget {
                       ? (_) => onNavTabHoverEnd!(AppRoutes.services)
                       : null,
                   child: _DesktopHoverNavDropdown(
+                    triggerLabel: 'Open services menu',
                     menuMinWidth: _kServicesMenuMinWidth,
                     menuBuilder: (ctx, close) {
                       return Column(
@@ -720,7 +742,8 @@ class _PrimaryDesktopNav extends StatelessWidget {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        HomeNavMenuItems.servicesHubItems[i].label,
+                                        HomeNavMenuItems
+                                            .servicesHubItems[i].label,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 15.5,
@@ -800,6 +823,7 @@ class _PrimaryDesktopNav extends StatelessWidget {
                 if (showAdmin) ...[
                   const SizedBox(width: 8),
                   _DesktopHoverNavDropdown(
+                    triggerLabel: 'Open admin menu',
                     menuMinWidth: _kAdminMenuMinWidth,
                     menuBuilder: (ctx, close) {
                       Widget row({
@@ -944,18 +968,18 @@ class _AccountMetaBlock extends StatelessWidget {
         children: [
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, authState) {
-              if (authState is Authenticated ||
-                  authState is EmailNotVerified) {
+              if (authState is Authenticated || authState is EmailNotVerified) {
                 final userEmail = authState is Authenticated
                     ? authState.user.email
                     : (authState as EmailNotVerified).user.email;
                 final sepStyle =
                     textStyle?.copyWith(color: AppColors.primaryGold);
-                final emailStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.78),
-                      fontSize: mobile ? 10.5 : 11.5,
-                      fontWeight: FontWeight.w500,
-                    );
+                final emailStyle =
+                    Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.78),
+                          fontSize: mobile ? 10.5 : 11.5,
+                          fontWeight: FontWeight.w500,
+                        );
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: mobile
@@ -963,9 +987,8 @@ class _AccountMetaBlock extends StatelessWidget {
                       : CrossAxisAlignment.center,
                   children: [
                     Wrap(
-                      alignment: mobile
-                          ? WrapAlignment.end
-                          : WrapAlignment.center,
+                      alignment:
+                          mobile ? WrapAlignment.end : WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       spacing: 2,
                       runSpacing: 4,
@@ -1004,8 +1027,7 @@ class _AccountMetaBlock extends StatelessWidget {
                       constraints: const BoxConstraints(maxWidth: 220),
                       child: Text(
                         userEmail ?? '',
-                        textAlign:
-                            mobile ? TextAlign.end : TextAlign.center,
+                        textAlign: mobile ? TextAlign.end : TextAlign.center,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: emailStyle,

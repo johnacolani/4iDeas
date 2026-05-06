@@ -15,8 +15,8 @@ import 'package:google_fonts/google_fonts.dart';
 class HomeNavMenuItems {
   HomeNavMenuItems._();
 
-  static final List<({String label, String route, IconData icon})> servicesHubItems =
-      <({String label, String route, IconData icon})>[
+  static final List<({String label, String route, IconData icon})>
+      servicesHubItems = <({String label, String route, IconData icon})>[
     (
       label: 'Services overview',
       route: AppRoutes.services,
@@ -227,9 +227,11 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
 
   @override
   Widget build(BuildContext context) {
-    const icon = Padding(
-      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      child: Icon(
+    final icon = IconButton(
+      tooltip: 'Open navigation menu',
+      onPressed: _toggleOverlay,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      icon: const Icon(
         Icons.menu,
         color: AppColors.primaryGold,
         size: 28,
@@ -246,18 +248,10 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
           _insertOverlay();
         },
         onExit: (_) => _scheduleClose(),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _toggleOverlay,
-          child: icon,
-        ),
-      );
-    } else {
-      trigger = GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _toggleOverlay,
         child: icon,
       );
+    } else {
+      trigger = icon;
     }
 
     return CompositedTransformTarget(

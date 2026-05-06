@@ -268,6 +268,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
               children: [
                 if (onEdit != null)
                   IconButton(
+                    tooltip: 'Edit ${app.name}',
                     icon: Icon(Icons.edit,
                         size: isMobile ? 18 : 20,
                         color: ColorManager.portfolioTextBody),
@@ -279,6 +280,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   ),
                 if (onDelete != null)
                   IconButton(
+                    tooltip: 'Delete ${app.name}',
                     icon: Icon(Icons.delete_outline,
                         size: isMobile ? 18 : 20, color: Colors.red[300]),
                     onPressed: onDelete,
@@ -408,7 +410,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             ),
             child: Text(
               'View case study',
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
@@ -428,7 +430,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                 ),
                 child: Text(
                   'Open live product',
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.roboto(
@@ -452,7 +454,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
             ),
             child: Text(
               'Discuss a similar project',
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
@@ -666,7 +668,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
           Expanded(
             child: Text(
               label,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
@@ -795,15 +797,20 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
 
     Widget wrapped = content;
     if (onImageTap != null) {
-      wrapped = Semantics(
-        button: true,
-        label: 'Open web app',
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onImageTap,
-            child: wrapped,
+      wrapped = Tooltip(
+        message: 'Open ${app.name} web app',
+        child: Semantics(
+          button: true,
+          label: 'Open ${app.name} web app',
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onImageTap,
+              borderRadius: BorderRadius.circular(8),
+              focusColor: accentGold.withValues(alpha: 0.24),
+              hoverColor: accentGold.withValues(alpha: 0.16),
+              child: wrapped,
+            ),
           ),
         ),
       );
@@ -818,13 +825,19 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
   }
 
   Widget _buildPlaceholder() {
-    return Container(
-      color: ColorManager.blue.withValues(alpha: 0.15),
-      alignment: Alignment.center,
-      child: Icon(
-        Icons.phone_android,
-        size: 48,
-        color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+    return Semantics(
+      image: true,
+      label: 'No preview image available for ${app.name}',
+      child: Container(
+        color: ColorManager.blue.withValues(alpha: 0.15),
+        alignment: Alignment.center,
+        child: ExcludeSemantics(
+          child: Icon(
+            Icons.phone_android,
+            size: 48,
+            color: ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+          ),
+        ),
       ),
     );
   }
@@ -925,6 +938,7 @@ class _LinkChip extends StatefulWidget {
 
 class _LinkChipState extends State<_LinkChip> {
   bool _isHovered = false;
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
@@ -936,55 +950,71 @@ class _LinkChipState extends State<_LinkChip> {
     final Color hoverBorderColor =
         ColorManager.portfolioTextTitle.withValues(alpha: 0.55);
     final Color buttonTitleColor =
-        _isHovered ? hoverTitleColor : baseTitleColor;
+        (_isHovered || _isFocused) ? hoverTitleColor : baseTitleColor;
     final Color buttonBorderColor =
-        _isHovered ? hoverBorderColor : baseBorderColor;
-    final Color chipBackground = _isHovered
+        (_isHovered || _isFocused) ? hoverBorderColor : baseBorderColor;
+    final Color chipBackground = (_isHovered || _isFocused)
         ? widget.accentGold.withValues(alpha: 0.20)
         : widget.accentGold.withValues(alpha: 0.14);
+    final String actionLabel = 'Open ${widget.label} for this app';
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(8),
-          splashFactory: NoSplash.splashFactory,
-          overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: minTouchTarget,
-              minHeight: minTouchTarget,
-            ),
-            child: Center(
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: widget.isMobile ? 10 : 12,
-                  vertical: widget.isMobile ? 8 : 10,
-                ),
-                decoration: BoxDecoration(
-                  color: chipBackground,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: buttonBorderColor),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(widget.icon,
-                        size: widget.isMobile ? 12 : 14,
-                        color: buttonTitleColor),
-                    SizedBox(width: 4),
-                    SelectableText(
-                      widget.label,
-                      style: GoogleFonts.roboto(
-                        color: buttonTitleColor,
-                        fontSize: widget.isMobile ? 10 : 11,
-                        fontWeight: FontWeight.w600,
+    return Tooltip(
+      message: actionLabel,
+      child: Semantics(
+        button: true,
+        label: actionLabel,
+        child: ExcludeSemantics(
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _isHovered = true),
+            onExit: (_) => setState(() => _isHovered = false),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: widget.onTap,
+                onFocusChange: (focused) =>
+                    setState(() => _isFocused = focused),
+                borderRadius: BorderRadius.circular(8),
+                splashFactory: NoSplash.splashFactory,
+                focusColor: widget.accentGold.withValues(alpha: 0.24),
+                hoverColor: widget.accentGold.withValues(alpha: 0.18),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: minTouchTarget,
+                    minHeight: minTouchTarget,
+                  ),
+                  child: Center(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.isMobile ? 10 : 12,
+                        vertical: widget.isMobile ? 8 : 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: chipBackground,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: buttonBorderColor,
+                          width: _isFocused ? 2 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(widget.icon,
+                              size: widget.isMobile ? 12 : 14,
+                              color: buttonTitleColor),
+                          SizedBox(width: 4),
+                          SelectableText(
+                            widget.label,
+                            style: GoogleFonts.roboto(
+                              color: buttonTitleColor,
+                              fontSize: widget.isMobile ? 10 : 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

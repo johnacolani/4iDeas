@@ -199,8 +199,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           .where((s) => !firestoreIds.contains(s.id))
           .toList();
       final mergedFirestore = fromFirestore.map((cs) {
-        if (cs.id == 'asd')
+        if (cs.id == 'asd') {
           return PortfolioData.mergeFirestoreAsdAdaptiveCopyFromStatic(cs);
+        }
         return PortfolioData.mergeHeroFromStaticIfMissing(cs);
       }).toList();
       list = [...mergedFirestore, ...staticOnly];
@@ -676,6 +677,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           label: 'Back to home',
           button: true,
           child: IconButton(
+            tooltip: 'Back to home',
             icon:
                 Icon(Icons.arrow_back, color: ColorManager.portfolioTextTitle),
             onPressed: () => context.go(AppRoutes.home),
@@ -898,6 +900,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   final double availableWidth =
                                       constraints.maxWidth;
                                   final bool isAdmin = AdminService.isAdmin();
+                                  final double textScale =
+                                      MediaQuery.textScalerOf(context)
+                                          .scale(1)
+                                          .clamp(1.0, 1.35)
+                                          .toDouble();
                                   int crossAxisCount;
                                   double mainAxisExtent;
                                   double spacing;
@@ -915,6 +922,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                     mainAxisExtent = 476;
                                     spacing = 14;
                                   }
+                                  mainAxisExtent += (textScale - 1) * 180;
                                   return GridView.builder(
                                     shrinkWrap: true,
                                     physics:
@@ -1363,92 +1371,70 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
     final double attributionFontSize = widget.designSystemSubSize + 8;
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: widget.onTapLink,
-        borderRadius: BorderRadius.circular(radius),
-        child: AnimatedBuilder(
-          animation: _orbitController,
-          builder: (context, child) {
-            return Stack(
-              children: [
-                child!,
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: CustomPaint(
-                      painter: _NeonBorderOrbitPainter(
-                        progress: _orbitController.value,
-                        borderRadius: radius,
+      child: Tooltip(
+        message: 'Open My Own Design System',
+        child: Semantics(
+          button: true,
+          label: 'Open My Own Design System',
+          child: InkWell(
+            onTap: widget.onTapLink,
+            borderRadius: BorderRadius.circular(radius),
+            focusColor: ColorManager.accentGold.withValues(alpha: 0.22),
+            hoverColor: ColorManager.accentGold.withValues(alpha: 0.12),
+            child: AnimatedBuilder(
+              animation: _orbitController,
+              builder: (context, child) {
+                return Stack(
+                  children: [
+                    child!,
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _NeonBorderOrbitPainter(
+                            progress: _orbitController.value,
+                            borderRadius: radius,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                );
+              },
+              child: _portfolioFrostedGlassPanel(
+                borderRadius: radius,
+                padding: EdgeInsets.symmetric(
+                  horizontal: widget.isMobile ? 20 : 28,
+                  vertical: widget.isMobile ? 20 : 24,
                 ),
-              ],
-            );
-          },
-          child: _portfolioFrostedGlassPanel(
-            borderRadius: radius,
-            padding: EdgeInsets.symmetric(
-              horizontal: widget.isMobile ? 20 : 28,
-              vertical: widget.isMobile ? 20 : 24,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (!widget.isMobile) ...[
-                  Icon(
-                    Icons.palette_outlined,
-                    size: 48,
-                    color: ColorManager.portfolioTextBody,
-                  ),
-                  SizedBox(width: 24),
-                ],
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.isMobile) ...[
-                        _portfolioGoldGradientTitle(
-                          SelectableText(
-                            'My Own Design System',
-                            style: GoogleFonts.playfairDisplay(
-                              color: Colors.white,
-                              fontSize: widget.designSystemTitleSize,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                              height: 1.2,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        SelectableText(
-                          'Designed and developed by: John Colani',
-                          style: GoogleFonts.cormorantGaramond(
-                            color: ColorManager.portfolioTextBody,
-                            fontSize: attributionFontSize,
-                            fontWeight: FontWeight.w600,
-                            fontStyle: FontStyle.italic,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ] else
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: _portfolioGoldGradientTitle(
-                                SelectableText(
-                                  'My Own Design System',
-                                  style: GoogleFonts.playfairDisplay(
-                                    color: Colors.white,
-                                    fontSize: widget.designSystemTitleSize,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.5,
-                                    height: 1.2,
-                                  ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (!widget.isMobile) ...[
+                      Icon(
+                        Icons.palette_outlined,
+                        size: 48,
+                        color: ColorManager.portfolioTextBody,
+                      ),
+                      SizedBox(width: 24),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (widget.isMobile) ...[
+                            _portfolioGoldGradientTitle(
+                              SelectableText(
+                                'My Own Design System',
+                                style: GoogleFonts.playfairDisplay(
+                                  color: Colors.white,
+                                  fontSize: widget.designSystemTitleSize,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                  height: 1.2,
                                 ),
                               ),
                             ),
-                            SizedBox(width: 28),
+                            SizedBox(height: 4),
                             SelectableText(
                               'Designed and developed by: John Colani',
                               style: GoogleFonts.cormorantGaramond(
@@ -1459,50 +1445,81 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                                 letterSpacing: 0.3,
                               ),
                             ),
-                          ],
-                        ),
-                      SizedBox(height: 10),
-                      SelectableText(
-                        'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
-                        style: GoogleFonts.albertSans(
-                          color: ColorManager.portfolioTextBody,
-                          fontSize: widget.bodySize - 1,
-                          height: 1.4,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.open_in_new,
-                            size: 18,
-                            color: ColorManager.portfolioTextBody,
-                          ),
-                          SizedBox(width: 8),
+                          ] else
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: _portfolioGoldGradientTitle(
+                                    SelectableText(
+                                      'My Own Design System',
+                                      style: GoogleFonts.playfairDisplay(
+                                        color: Colors.white,
+                                        fontSize: widget.designSystemTitleSize,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.5,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 28),
+                                SelectableText(
+                                  'Designed and developed by: John Colani',
+                                  style: GoogleFonts.cormorantGaramond(
+                                    color: ColorManager.portfolioTextBody,
+                                    fontSize: attributionFontSize,
+                                    fontWeight: FontWeight.w600,
+                                    fontStyle: FontStyle.italic,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          SizedBox(height: 10),
                           SelectableText(
-                            'Open Design System →',
+                            'A living design system built in Flutter—components, patterns, and UI primitives crafted for real products. Explore the full showcase and token-based theming.',
                             style: GoogleFonts.albertSans(
                               color: ColorManager.portfolioTextBody,
-                              fontSize: widget.bodySize,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.2,
+                              fontSize: widget.bodySize - 1,
+                              height: 1.4,
+                              fontWeight: FontWeight.w400,
                             ),
+                          ),
+                          SizedBox(height: 14),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.open_in_new,
+                                size: 18,
+                                color: ColorManager.portfolioTextBody,
+                              ),
+                              SizedBox(width: 8),
+                              SelectableText(
+                                'Open Design System →',
+                                style: GoogleFonts.albertSans(
+                                  color: ColorManager.portfolioTextBody,
+                                  fontSize: widget.bodySize,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                    ),
+                    if (widget.isMobile) ...[
+                      SizedBox(width: 12),
+                      Icon(
+                        Icons.palette_outlined,
+                        size: 36,
+                        color: ColorManager.portfolioTextBody,
+                      ),
                     ],
-                  ),
+                  ],
                 ),
-                if (widget.isMobile) ...[
-                  SizedBox(width: 12),
-                  Icon(
-                    Icons.palette_outlined,
-                    size: 36,
-                    color: ColorManager.portfolioTextBody,
-                  ),
-                ],
-              ],
+              ),
             ),
           ),
         ),
@@ -1582,105 +1599,114 @@ class _DesignPhilosophyCard extends StatelessWidget {
     final double introSize = bodySize - 0.5;
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: () => context.push(AppRoutes.designPhilosophy),
-        borderRadius: BorderRadius.circular(radius),
-        child: _portfolioFrostedGlassPanel(
-          borderRadius: radius,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 28,
-            vertical: isMobile ? 20 : 24,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.auto_awesome,
-                color: ColorManager.portfolioTextBody,
-                size: isMobile ? 32 : 36,
+      child: Tooltip(
+        message: 'Read full design philosophy',
+        child: Semantics(
+          button: true,
+          label: 'Read full design philosophy and principles',
+          child: InkWell(
+            onTap: () => context.push(AppRoutes.designPhilosophy),
+            borderRadius: BorderRadius.circular(radius),
+            focusColor: ColorManager.accentGold.withValues(alpha: 0.22),
+            hoverColor: ColorManager.accentGold.withValues(alpha: 0.12),
+            child: _portfolioFrostedGlassPanel(
+              borderRadius: radius,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 28,
+                vertical: isMobile ? 20 : 24,
               ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _portfolioGoldGradientTitle(
-                      SelectableText(
-                        'Design Philosophy & Principles',
-                        style: GoogleFonts.albertSans(
-                          color: Colors.white,
-                          fontSize: bodySize + 2,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _portfolioGoldGradientTitle(
-                      SelectableText(
-                        'Integrated Product Design',
-                        style: GoogleFonts.albertSans(
-                          color: Colors.white,
-                          fontSize: bodySize + 1,
-                          fontWeight: FontWeight.w800,
-                          height: 1.25,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    SelectableText(
-                      'Understanding humans deeply and solving real problems with care, clarity, and intention.',
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.portfolioTextBody,
-                        fontSize: introSize,
-                        height: 1.45,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Text(
-                      'Design does not begin with screens or tools—it begins with understanding people. '
-                      'In digital products, visual clutter and weak hierarchy create fatigue; '
-                      'the designer\'s job is to protect users, not overwhelm them.',
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.portfolioTextBody,
-                        fontSize: bodySize - 1,
-                        height: 1.45,
-                      ),
-                      maxLines: isMobile ? 6 : 5,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 14),
-                    Row(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.auto_awesome,
+                    color: ColorManager.portfolioTextBody,
+                    size: isMobile ? 32 : 36,
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.arrow_forward,
-                          size: 18,
-                          color: ColorManager.portfolioTextBody,
+                        _portfolioGoldGradientTitle(
+                          SelectableText(
+                            'Design Philosophy & Principles',
+                            style: GoogleFonts.albertSans(
+                              color: Colors.white,
+                              fontSize: bodySize + 2,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                        SizedBox(width: 8),
+                        SizedBox(height: 10),
+                        _portfolioGoldGradientTitle(
+                          SelectableText(
+                            'Integrated Product Design',
+                            style: GoogleFonts.albertSans(
+                              color: Colors.white,
+                              fontSize: bodySize + 1,
+                              fontWeight: FontWeight.w800,
+                              height: 1.25,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 6),
                         SelectableText(
-                          'Read full philosophy',
+                          'Understanding humans deeply and solving real problems with care, clarity, and intention.',
                           style: GoogleFonts.albertSans(
                             color: ColorManager.portfolioTextBody,
-                            fontSize: bodySize,
-                            fontWeight: FontWeight.w700,
+                            fontSize: introSize,
+                            height: 1.45,
+                            fontWeight: FontWeight.w600,
                           ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          'Design does not begin with screens or tools—it begins with understanding people. '
+                          'In digital products, visual clutter and weak hierarchy create fatigue; '
+                          'the designer\'s job is to protect users, not overwhelm them.',
+                          style: GoogleFonts.albertSans(
+                            color: ColorManager.portfolioTextBody,
+                            fontSize: bodySize - 1,
+                            height: 1.45,
+                          ),
+                          maxLines: isMobile ? 6 : 5,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 18,
+                              color: ColorManager.portfolioTextBody,
+                            ),
+                            SizedBox(width: 8),
+                            SelectableText(
+                              'Read full philosophy',
+                              style: GoogleFonts.albertSans(
+                                color: ColorManager.portfolioTextBody,
+                                fontSize: bodySize,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      color: ColorManager.portfolioTextBody,
+                      size: 18,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: 8),
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: Icon(
-                  Icons.arrow_forward_ios,
-                  color: ColorManager.portfolioTextBody,
-                  size: 18,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -1899,6 +1925,7 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
                   ),
                 if (onEdit != null)
                   IconButton(
+                    tooltip: 'Edit ${caseStudy.title}',
                     icon: Icon(Icons.edit,
                         size: 22, color: ColorManager.portfolioTextBody),
                     onPressed: () => onEdit!(caseStudy),
@@ -1908,6 +1935,7 @@ class _FeaturedCaseStudyRow extends StatelessWidget {
                   ),
                 if (onDelete != null && canDelete)
                   IconButton(
+                    tooltip: 'Delete ${caseStudy.title}',
                     icon:
                         Icon(Icons.delete_outline, size: 22, color: Colors.red),
                     onPressed: () => onDelete!(caseStudy),
@@ -2522,119 +2550,128 @@ class _PremiumFeaturedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double cornerRadius = 22;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onOpen,
-        borderRadius: BorderRadius.circular(cornerRadius),
-        child: _portfolioFrostedGlassPanel(
-          borderRadius: cornerRadius,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 28,
-            vertical: isMobile ? 20 : 24,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final w = constraints.maxWidth;
-                  final double heroHorizontalInset =
-                      w.isFinite && w > 0 ? w * 0.15 : 0.0;
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: heroHorizontalInset,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: _FeaturedCaseStudyHeroStrip(
-                        heroImagePath: caseStudy.heroImagePath,
-                        heroImagePaths: caseStudy.heroImagePaths,
-                        isMobile: isMobile,
-                        caseStudyId: caseStudy.id,
-                      ),
-                    ),
-                  );
-                },
+    return Tooltip(
+      message: 'View ${caseStudy.title} case study',
+      child: Semantics(
+        button: true,
+        label: 'View ${caseStudy.title} case study',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onOpen,
+            borderRadius: BorderRadius.circular(cornerRadius),
+            focusColor: ColorManager.accentGold.withValues(alpha: 0.22),
+            hoverColor: ColorManager.accentGold.withValues(alpha: 0.12),
+            child: _portfolioFrostedGlassPanel(
+              borderRadius: cornerRadius,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 28,
+                vertical: isMobile ? 20 : 24,
               ),
-              const SizedBox(height: 14),
-              _portfolioGoldGradientTitle(
-                Text(
-                  caseStudy.title,
-                  style: GoogleFonts.albertSans(
-                    color: Colors.white,
-                    fontSize: bodySize + 8,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                caseStudy.subtitle,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextBody,
-                  fontSize: bodySize,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                caseStudy.overview,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.albertSans(
-                  color: ColorManager.portfolioTextBody,
-                  fontSize: bodySize - 0.5,
-                  height: 1.45,
-                ),
-              ),
-              if (tags.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: tags
-                      .map(
-                        (tag) => Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(999),
-                            color: Colors.white.withValues(alpha: 0.08),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.24),
-                            ),
-                          ),
-                          child: Text(
-                            tag,
-                            style: GoogleFonts.albertSans(
-                              color: ColorManager.portfolioTextBody,
-                              fontSize: bodySize - 2,
-                              fontWeight: FontWeight.w600,
-                            ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final w = constraints.maxWidth;
+                      final double heroHorizontalInset =
+                          w.isFinite && w > 0 ? w * 0.15 : 0.0;
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: heroHorizontalInset,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: _FeaturedCaseStudyHeroStrip(
+                            heroImagePath: caseStudy.heroImagePath,
+                            heroImagePaths: caseStudy.heroImagePaths,
+                            isMobile: isMobile,
+                            caseStudyId: caseStudy.id,
                           ),
                         ),
-                      )
-                      .toList(),
-                ),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                children: [
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  _portfolioGoldGradientTitle(
+                    Text(
+                      caseStudy.title,
+                      style: GoogleFonts.albertSans(
+                        color: Colors.white,
+                        fontSize: bodySize + 8,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
                   Text(
-                    'View Case Study',
+                    caseStudy.subtitle,
                     style: GoogleFonts.albertSans(
                       color: ColorManager.portfolioTextBody,
                       fontSize: bodySize,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward,
-                      color: ColorManager.portfolioTextBody, size: 18),
+                  const SizedBox(height: 12),
+                  Text(
+                    caseStudy.overview,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.albertSans(
+                      color: ColorManager.portfolioTextBody,
+                      fontSize: bodySize - 0.5,
+                      height: 1.45,
+                    ),
+                  ),
+                  if (tags.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: tags
+                          .map(
+                            (tag) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(999),
+                                color: Colors.white.withValues(alpha: 0.08),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.24),
+                                ),
+                              ),
+                              child: Text(
+                                tag,
+                                style: GoogleFonts.albertSans(
+                                  color: ColorManager.portfolioTextBody,
+                                  fontSize: bodySize - 2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Text(
+                        'View Case Study',
+                        style: GoogleFonts.albertSans(
+                          color: ColorManager.portfolioTextBody,
+                          fontSize: bodySize,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(Icons.arrow_forward,
+                          color: ColorManager.portfolioTextBody, size: 18),
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -2703,53 +2740,62 @@ class _OpenSourceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final icon = _iconFromName(item.iconName);
 
-    Widget cardContent = Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () async {
-          final uri = Uri.parse(item.url);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : 28,
-            vertical: isMobile ? 20 : 24,
-          ),
-          decoration:
-              ColorManager.portfolioHighlightCardDecoration(borderRadius: 16),
-          child: Row(
-            children: [
-              Icon(icon, color: ColorManager.portfolioTextBody, size: 28),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectableText(
-                      item.title,
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.portfolioTextTitle,
-                        fontSize: bodySize + 2,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    SelectableText(
-                      item.subtitle,
-                      style: GoogleFonts.albertSans(
-                        color: ColorManager.portfolioTextBody,
-                        fontSize: bodySize - 1,
-                      ),
-                    ),
-                  ],
-                ),
+    Widget cardContent = Tooltip(
+      message: 'Open ${item.title}',
+      child: Semantics(
+        button: true,
+        label: 'Open ${item.title}',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () async {
+              final uri = Uri.parse(item.url);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+            borderRadius: BorderRadius.circular(16),
+            focusColor: ColorManager.accentGold.withValues(alpha: 0.22),
+            hoverColor: ColorManager.accentGold.withValues(alpha: 0.12),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20 : 28,
+                vertical: isMobile ? 20 : 24,
               ),
-              Icon(Icons.open_in_new,
-                  color: ColorManager.portfolioTextBody, size: 20),
-            ],
+              decoration: ColorManager.portfolioHighlightCardDecoration(
+                  borderRadius: 16),
+              child: Row(
+                children: [
+                  Icon(icon, color: ColorManager.portfolioTextBody, size: 28),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SelectableText(
+                          item.title,
+                          style: GoogleFonts.albertSans(
+                            color: ColorManager.portfolioTextTitle,
+                            fontSize: bodySize + 2,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        SelectableText(
+                          item.subtitle,
+                          style: GoogleFonts.albertSans(
+                            color: ColorManager.portfolioTextBody,
+                            fontSize: bodySize - 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.open_in_new,
+                      color: ColorManager.portfolioTextBody, size: 20),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -2768,6 +2814,7 @@ class _OpenSourceCard extends StatelessWidget {
               children: [
                 if (onEdit != null)
                   IconButton(
+                    tooltip: 'Edit ${item.title}',
                     icon: Icon(Icons.edit,
                         size: 20, color: ColorManager.portfolioTextBody),
                     onPressed: onEdit,
@@ -2776,6 +2823,7 @@ class _OpenSourceCard extends StatelessWidget {
                   ),
                 if (onDelete != null)
                   IconButton(
+                    tooltip: 'Delete ${item.title}',
                     icon:
                         Icon(Icons.delete_outline, size: 20, color: Colors.red),
                     onPressed: onDelete,

@@ -19,6 +19,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const documentTitle = 'Design system document';
     final paths =
         PortfolioData.designSystemDocPathsForCaseStudy(designSystemId);
     if (paths == null) {
@@ -27,6 +28,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
         appBar: FrostedAppBar.gold(
           iconTheme: const IconThemeData(color: Colors.white),
           leading: IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => context.pop(),
           ),
@@ -39,26 +41,31 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
             ),
           ),
         ),
-        body: Stack(
-          children: [
-            const AppBackground(),
-            Padding(
-              padding: FrostedAppBar.contentPaddingUnderAppBar(context),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    'Design system not found for this case study.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.roboto(
-                      color: ColorManager.textSecondary,
-                      fontSize: 16,
+        body: FocusTraversalGroup(
+          child: Stack(
+            children: [
+              const AppBackground(),
+              Padding(
+                padding: FrostedAppBar.contentPaddingUnderAppBar(context),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        'Design system not found for this case study.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.roboto(
+                          color: ColorManager.textSecondary,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -68,6 +75,7 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
       appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (context.canPop()) {
@@ -94,31 +102,34 @@ class CaseStudyDesignSystemScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          const AppBackground(),
-          Positioned.fill(
-            child: Padding(
-              padding: FrostedAppBar.contentPaddingUnderAppBar(context)
-                  .add(const EdgeInsets.all(12)),
-              child: Container(
-                decoration: ColorManager.portfolioHighlightCardDecoration(
-                    borderRadius: 16),
-                padding: const EdgeInsets.all(6),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: ColoredBox(
-                    color: Colors.white,
-                    child: buildDesignSystemHtmlView(
-                      webRelativePath: paths.webRelativePath,
-                      flutterAssetPath: paths.flutterAssetPath,
+      body: FocusTraversalGroup(
+        child: Stack(
+          children: [
+            const AppBackground(),
+            Positioned.fill(
+              child: Padding(
+                padding: FrostedAppBar.contentPaddingUnderAppBar(context)
+                    .add(const EdgeInsets.all(12)),
+                child: Container(
+                  decoration: ColorManager.portfolioHighlightCardDecoration(
+                      borderRadius: 16),
+                  padding: const EdgeInsets.all(6),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: ColoredBox(
+                      color: Colors.white,
+                      child: buildDesignSystemHtmlView(
+                        webRelativePath: paths.webRelativePath,
+                        flutterAssetPath: paths.flutterAssetPath,
+                        documentLabel: documentTitle,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

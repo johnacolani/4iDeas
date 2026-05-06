@@ -10,6 +10,7 @@ import '../core/widgets/firebase_backend_section.dart';
 import '../core/widgets/modern_hero_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 import '../core/widgets/trust_home_sections.dart';
+
 class WebScreen extends StatefulWidget {
   const WebScreen({super.key});
 
@@ -39,8 +40,7 @@ class _WebScreenState extends State<WebScreen> {
     final bool isBodyDesktop = Responsive.isDesktop(context);
     // Small nudge from app bar; narrow gets extra air so the hero title does not crowd the header.
     final double contentTopNudge = isNarrowView ? 4.0 : 8.0;
-    final double narrowHeroTopBreathing =
-        isNarrowView ? 22.0 : 0.0;
+    final double narrowHeroTopBreathing = isNarrowView ? 22.0 : 0.0;
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -49,101 +49,107 @@ class _WebScreenState extends State<WebScreen> {
         child: Scrollbar(
           controller: _scrollController,
           thumbVisibility: true,
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  // Web / tablet: extra left gutter; narrow phones keep full width + center.
-                  padding: EdgeInsets.only(
-                    left: isNarrowView ? 0.0 : AppBreakpoints.homeContentGutter,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: isNarrowView
-                        ? CrossAxisAlignment.center
-                        : (isBodyDesktop
-                            ? CrossAxisAlignment.stretch
-                            : CrossAxisAlignment.center),
-                    children: [
-                      SizedBox(
-                        height: contentTopNudge + narrowHeroTopBreathing,
-                      ),
-                      const ModernHeroSection(),
-                      SizedBox(height: isMobile ? 4 : 6),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 8 : 56,
-                          vertical: isMobile ? 2 : 3,
+          interactive: false,
+          child: FocusTraversalGroup(
+            policy: ReadingOrderTraversalPolicy(),
+            child: CustomScrollView(
+              controller: _scrollController,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    // Web / tablet: extra left gutter; narrow phones keep full width + center.
+                    padding: EdgeInsets.only(
+                      left:
+                          isNarrowView ? 0.0 : AppBreakpoints.homeContentGutter,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: isNarrowView
+                          ? CrossAxisAlignment.center
+                          : (isBodyDesktop
+                              ? CrossAxisAlignment.stretch
+                              : CrossAxisAlignment.center),
+                      children: [
+                        SizedBox(
+                          height: contentTopNudge + narrowHeroTopBreathing,
                         ),
-                        child: Center(
-                          child: PlatformProofChips(
-                            isMobile: isMobile,
-                            isTablet: isTablet,
+                        const ModernHeroSection(),
+                        SizedBox(height: isMobile ? 4 : 6),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 8 : 56,
+                            vertical: isMobile ? 2 : 3,
+                          ),
+                          child: Center(
+                            child: PlatformProofChips(
+                              isMobile: isMobile,
+                              isTablet: isTablet,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: isMobile ? 8 : 12),
-                      TrustBuildingHomeSections(
-                        wi: wi,
-                        isMobile: isMobile,
-                        isTablet: isTablet,
-                      ),
-                      SizedBox(height: isMobile ? 28 : 36),
-                      // Title before backend sections
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile
-                              ? wi * 0.04
-                              : (isTablet ? wi * 0.08 : wi * 0.1),
+                        SizedBox(height: isMobile ? 8 : 12),
+                        TrustBuildingHomeSections(
+                          wi: wi,
+                          isMobile: isMobile,
+                          isTablet: isTablet,
                         ),
-                        child: SelectableText(
-                          'Your backend could be',
-                          textAlign: isBodyDesktop
-                              ? TextAlign.start
-                              : TextAlign.center,
-                          style: GoogleFonts.roboto(
-                            fontSize: isMobile
-                                ? (wi < 400 ? 18 : 20)
-                                : (isTablet ? wi * 0.028 : wi * 0.032),
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGold,
+                        SizedBox(height: isMobile ? 28 : 36),
+                        // Title before backend sections
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile
+                                ? wi * 0.04
+                                : (isTablet ? wi * 0.08 : wi * 0.1),
+                          ),
+                          child: SelectableText(
+                            'Your backend could be',
+                            textAlign: isBodyDesktop
+                                ? TextAlign.start
+                                : TextAlign.center,
+                            style: GoogleFonts.roboto(
+                              fontSize: isMobile
+                                  ? (wi < 400 ? 18 : 20)
+                                  : (isTablet ? wi * 0.028 : wi * 0.032),
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryGold,
+                            ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile
-                              ? wi * 0.12
-                              : (isTablet ? wi * 0.2 : wi * 0.25),
-                          vertical: isMobile ? 12 : 12,
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile
+                                ? wi * 0.12
+                                : (isTablet ? wi * 0.2 : wi * 0.25),
+                            vertical: isMobile ? 12 : 12,
+                          ),
+                          child: Divider(
+                            color: HomeWarmColors.dividerLine,
+                            thickness: 1,
+                          ),
                         ),
-                        child: Divider(
-                          color: HomeWarmColors.dividerLine,
-                          thickness: 1,
+                        SizedBox(height: isMobile ? 20 : 32),
+                        // Firebase Backend Section
+                        FirebaseBackendSection(
+                          wi: wi,
+                          isMobile: isMobile,
                         ),
-                      ),
-                      SizedBox(height: isMobile ? 20 : 32),
-                      // Firebase Backend Section
-                      FirebaseBackendSection(
-                        wi: wi,
-                        isMobile: isMobile,
-                      ),
-                      // AWS Backend Section
-                      AWSBackendSection(
-                        wi: wi,
-                        isMobile: isMobile,
-                      ),
-                      // SEO Optimization Section
-                      SEOOptimizationSection(
-                        wi: wi,
-                        isMobile: isMobile,
-                      ),
-                    ],
+                        // AWS Backend Section
+                        AWSBackendSection(
+                          wi: wi,
+                          isMobile: isMobile,
+                        ),
+                        // SEO Optimization Section
+                        SEOOptimizationSection(
+                          wi: wi,
+                          isMobile: isMobile,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
