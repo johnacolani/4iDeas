@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
@@ -11,6 +13,70 @@ const List<Color> _kPhilosophyTextGradient = <Color>[
   Color(0xFFF5B32F),
   Color(0xFFD89A1C),
 ];
+
+const List<_ClientDesignPrinciple> _kClientDesignPrinciples =
+    <_ClientDesignPrinciple>[
+  _ClientDesignPrinciple(
+    icon: Icons.business_center_outlined,
+    title: 'Business-First Thinking',
+    body:
+        'Before I design, I try to understand the client’s business, workflow, users, and goals. This helps me create solutions that are not only visually clean, but also useful for the company and meaningful for the people who use the product.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.person_search_outlined,
+    title: 'User-Centered Experience',
+    body:
+        'Every screen should help users complete their task with less confusion and less effort. I focus on clear navigation, simple flows, readable content, and thoughtful interactions that make the product feel natural and easy to use.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.accessibility_new_outlined,
+    title: 'Accessibility by Design',
+    body:
+        'Accessibility is part of my design process from the beginning. Using WCAG principles, I design interfaces with strong color contrast, clear labels, helpful error messages, visible focus states, keyboard-friendly navigation, proper touch targets, and screen-reader-aware structure.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.grid_view_outlined,
+    title: 'Consistent Design Systems',
+    body:
+        'Strong products need strong systems. I use reusable components, design tokens, spacing rules, typography styles, and consistent UI patterns so the product can grow without becoming hard to manage.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.devices_outlined,
+    title: 'Responsive and Cross-Platform Design',
+    body:
+        'I design for real usage across mobile, tablet, desktop, and web. Each layout should feel natural on the device where it is used, while keeping the same brand, structure, and experience across platforms.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.code_outlined,
+    title: 'Design That Developers Can Build',
+    body:
+        'Because I also build apps with Flutter, I design with implementation in mind. I think about reusable widgets, clean architecture, performance, states, errors, loading flows, and how the design will work as a real product, not only as a static mockup.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.rocket_launch_outlined,
+    title: 'From MVP to Production',
+    body:
+        'I help clients start with a focused MVP that solves the most important problem first. Then I improve the product step by step with better features, stronger UI, cleaner architecture, and scalable systems for long-term growth.',
+  ),
+  _ClientDesignPrinciple(
+    icon: Icons.favorite_border_outlined,
+    title: 'Care, Quality, and Ownership',
+    body:
+        'I treat every project with care and ownership. Small details shape trust, so I focus on products that look professional, work smoothly, support real users, and create long-term value for the client.',
+  ),
+];
+
+class _ClientDesignPrinciple {
+  final IconData icon;
+  final String title;
+  final String body;
+
+  const _ClientDesignPrinciple({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+}
 
 BoxDecoration _grayFrostedCardDecoration({double borderRadius = 12}) {
   return BoxDecoration(
@@ -174,8 +240,8 @@ Widget _circleMethodDescription(double bodySize) {
 }
 
 Widget _starDescription(double bodySize) {
-  final baseStyle = GoogleFonts.roboto(
-      color: Colors.white, fontSize: bodySize, height: 1.5);
+  final baseStyle =
+      GoogleFonts.roboto(color: Colors.white, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
   return Column(
@@ -211,8 +277,8 @@ Widget _starDescription(double bodySize) {
 }
 
 Widget _userTypesDescription(double bodySize) {
-  final baseStyle = GoogleFonts.roboto(
-      color: Colors.white, fontSize: bodySize, height: 1.5);
+  final baseStyle =
+      GoogleFonts.roboto(color: Colors.white, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
   return Column(
@@ -241,8 +307,8 @@ Widget _userTypesDescription(double bodySize) {
 }
 
 Widget _wcagDescription(double bodySize) {
-  final baseStyle = GoogleFonts.roboto(
-      color: Colors.white, fontSize: bodySize, height: 1.5);
+  final baseStyle =
+      GoogleFonts.roboto(color: Colors.white, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
   return Column(
@@ -427,6 +493,12 @@ class DesignPhilosophyScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: he * 0.04),
+                            _ClientFocusedPrinciplesSection(
+                              bodySize: bodySize,
+                              he: he,
+                              isMobile: isMobile,
+                            ),
+                            SizedBox(height: he * 0.025),
                             _PhilosophyBlock(
                               title: 'Design Philosophy — North Star',
                               bodySize: bodySize,
@@ -959,6 +1031,199 @@ class _PhilosophyBlock extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _ClientFocusedPrinciplesSection extends StatelessWidget {
+  final double bodySize;
+  final double he;
+  final bool isMobile;
+
+  const _ClientFocusedPrinciplesSection({
+    required this.bodySize,
+    required this.he,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(isMobile ? 16 : 22),
+          decoration: _grayFrostedCardDecoration(borderRadius: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SelectableText(
+                'Client-Focused Product Principles',
+                style: _philosophyGradientStyle(
+                  fontSize: bodySize + 3,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: he * 0.012),
+              SelectableText(
+                'Great product design is not only about making beautiful screens. It is about understanding the business goal, the users, and the real problem behind the product. My design process focuses on creating digital experiences that are clear, useful, accessible, and ready to grow.',
+                style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontSize: bodySize,
+                  height: 1.55,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: he * 0.016),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.black.withValues(alpha: 0.18),
+                  border: Border.all(
+                    color: ColorManager.accentGold.withValues(alpha: 0.32),
+                  ),
+                ),
+                child: SelectableText(
+                  'When a client trusts me with an idea, I treat it like a real business product, not just a design task. I design every product with care, clarity, accessibility, and long-term growth in mind.',
+                  style: GoogleFonts.roboto(
+                    color: Colors.white,
+                    fontSize: bodySize,
+                    height: 1.55,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(height: he * 0.018),
+              _ClientPrinciplesGrid(
+                bodySize: bodySize,
+                isMobile: isMobile,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ClientPrinciplesGrid extends StatelessWidget {
+  final double bodySize;
+  final bool isMobile;
+
+  const _ClientPrinciplesGrid({
+    required this.bodySize,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double gap = isMobile ? 12 : 14;
+        final int columns = constraints.maxWidth >= 640 ? 2 : 1;
+        final double cardWidth = columns == 1
+            ? constraints.maxWidth
+            : (constraints.maxWidth - gap) / columns;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: _kClientDesignPrinciples
+              .map(
+                (principle) => SizedBox(
+                  width: cardWidth,
+                  child: _ClientPrincipleCard(
+                    principle: principle,
+                    bodySize: bodySize,
+                    isMobile: isMobile,
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+  }
+}
+
+class _ClientPrincipleCard extends StatelessWidget {
+  final _ClientDesignPrinciple principle;
+  final double bodySize;
+  final bool isMobile;
+
+  const _ClientPrincipleCard({
+    required this.principle,
+    required this.bodySize,
+    required this.isMobile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MergeSemantics(
+      child: Container(
+        constraints: BoxConstraints(minHeight: isMobile ? 0 : 258),
+        padding: EdgeInsets.all(isMobile ? 14 : 16),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.20),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.18),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: ColorManager.accentGold.withValues(alpha: 0.12),
+                      border: Border.all(
+                        color: ColorManager.accentGold.withValues(alpha: 0.34),
+                      ),
+                    ),
+                    child: Icon(
+                      principle.icon,
+                      color: ColorManager.accentGold,
+                      size: 21,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: SelectableText(
+                    principle.title,
+                    style: _philosophyGradientStyle(
+                      fontSize: bodySize + 1,
+                      fontWeight: FontWeight.bold,
+                      height: 1.25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            SelectableText(
+              principle.body,
+              style: GoogleFonts.roboto(
+                color: Colors.white,
+                fontSize: bodySize - 0.5,
+                height: 1.5,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
