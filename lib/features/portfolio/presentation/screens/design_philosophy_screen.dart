@@ -99,6 +99,73 @@ BoxDecoration _grayFrostedCardDecoration({double borderRadius = 12}) {
   );
 }
 
+Widget _frostedGlassContainer({
+  required Widget child,
+  double borderRadius = 12,
+  EdgeInsetsGeometry? padding,
+  double? width,
+  BoxConstraints? constraints,
+  AlignmentGeometry? alignment,
+  BoxDecoration? decoration,
+}) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(borderRadius),
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+      child: Container(
+        width: width,
+        constraints: constraints,
+        alignment: alignment,
+        padding: padding,
+        decoration: decoration ??
+            _grayFrostedCardDecoration(borderRadius: borderRadius),
+        child: child,
+      ),
+    ),
+  );
+}
+
+BoxDecoration _wcagGoldenFrostedDecoration({double borderRadius = 14}) {
+  return BoxDecoration(
+    color: const Color(0xFF1F2937).withValues(alpha: 0.24),
+    borderRadius: BorderRadius.circular(borderRadius),
+    border: Border.all(
+      color: ColorManager.accentGold.withValues(alpha: 0.34),
+      width: 1.0,
+    ),
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        ColorManager.accentGold.withValues(alpha: 0.16),
+        Colors.white.withValues(alpha: 0.08),
+        const Color(0xFF111827).withValues(alpha: 0.18),
+        Colors.transparent,
+      ],
+      stops: const [0.0, 0.34, 0.72, 1.0],
+    ),
+  );
+}
+
+BoxDecoration _wcagGoldenInnerDecoration({double borderRadius = 12}) {
+  return BoxDecoration(
+    color: Colors.black.withValues(alpha: 0.18),
+    borderRadius: BorderRadius.circular(borderRadius),
+    border: Border.all(
+      color: ColorManager.accentGold.withValues(alpha: 0.24),
+    ),
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        ColorManager.accentGold.withValues(alpha: 0.10),
+        Colors.white.withValues(alpha: 0.05),
+        Colors.black.withValues(alpha: 0.10),
+      ],
+    ),
+  );
+}
+
 TextStyle _philosophyGradientStyle({
   required double fontSize,
   FontWeight fontWeight = FontWeight.w700,
@@ -134,10 +201,10 @@ Widget _principleItem(double bodySize, String text) {
 Widget _frameworkItem(
     double bodySize, double he, String name, String description,
     {Widget? descriptionChild}) {
-  return Container(
+  return _frostedGlassContainer(
     width: double.infinity,
     padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: _grayFrostedCardDecoration(borderRadius: 12),
+    borderRadius: 12,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -307,38 +374,375 @@ Widget _userTypesDescription(double bodySize) {
 }
 
 Widget _wcagDescription(double bodySize) {
-  final baseStyle =
-      GoogleFonts.roboto(color: Colors.white, fontSize: bodySize, height: 1.5);
-  final boldStyle = _philosophyGradientStyle(
-      fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-          padding: const EdgeInsets.only(left: _circleMethodIndent, bottom: 4),
-          child: SelectableText.rich(TextSpan(style: baseStyle, children: [
-            TextSpan(text: 'Perceivable', style: boldStyle),
-            const TextSpan(text: ' (contrast, typography, alternatives)')
-          ]))),
-      Padding(
-          padding: const EdgeInsets.only(left: _circleMethodIndent, bottom: 4),
-          child: SelectableText.rich(TextSpan(style: baseStyle, children: [
-            TextSpan(text: 'Operable', style: boldStyle),
-            const TextSpan(text: ' (keyboard, focus, touch targets)')
-          ]))),
-      Padding(
-          padding: const EdgeInsets.only(left: _circleMethodIndent, bottom: 4),
-          child: SelectableText.rich(TextSpan(style: baseStyle, children: [
-            TextSpan(text: 'Understandable', style: boldStyle),
-            const TextSpan(text: ' (consistent nav, error messages)')
-          ]))),
-      Padding(
-          padding: const EdgeInsets.only(left: _circleMethodIndent, bottom: 4),
-          child: SelectableText.rich(TextSpan(style: baseStyle, children: [
-            TextSpan(text: 'Robust', style: boldStyle),
-            const TextSpan(text: ' (semantic structure, cross-platform).')
-          ]))),
+      _wcagText(
+        bodySize,
+        'WCAG means Web Content Accessibility Guidelines. It is a global standard from the W3C Web Accessibility Initiative for making websites, apps, SaaS dashboards, design systems, and Flutter products work better for people with visual, hearing, motor, cognitive, speech, and learning disabilities.',
+        weight: FontWeight.w600,
+      ),
+      const SizedBox(height: 12),
+      _wcagText(
+        bodySize,
+        'For real product work, my practical target is WCAG 2.2 Level AA. WCAG 2.2 became a W3C Recommendation on October 5, 2023. WCAG 3.0 is still in progress, so I use 2.2 AA today while watching future changes.',
+      ),
+      const SizedBox(height: 16),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'The Main Idea: POUR',
+        children: [
+          _wcagCardGrid(
+            bodySize: bodySize,
+            cards: const [
+              (
+                Icons.visibility_outlined,
+                'Perceivable',
+                'Users must be able to see, hear, or understand the content. This means alt text, strong contrast, captions, resizable text, and no color-only meaning.'
+              ),
+              (
+                Icons.keyboard_alt_outlined,
+                'Operable',
+                'Users must be able to use the interface. Controls should work with keyboard, mouse, touch, and assistive technology, with visible focus and no keyboard traps.'
+              ),
+              (
+                Icons.psychology_alt_outlined,
+                'Understandable',
+                'Users must understand the content and actions. Labels, navigation, forms, instructions, and errors should be clear, consistent, and human.'
+              ),
+              (
+                Icons.integration_instructions_outlined,
+                'Robust',
+                'The product should work with assistive technologies. In Flutter, this means semantic structure, proper labels, focus order, and accessible tap areas.'
+              ),
+            ],
+          ),
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'WCAG Levels and Versions',
+        bullets: const [
+          'Level A removes the biggest blockers, such as making buttons usable by keyboard.',
+          'Level AA is the professional target for most business, government, and enterprise work. Normal text usually needs at least 4.5:1 contrast; large text and UI components need at least 3:1.',
+          'Level AAA is the highest level. It is excellent, but not always practical for every screen or product constraint.',
+          'WCAG 2.0 is still referenced by many laws. WCAG 2.1 added more mobile, low-vision, and cognitive support. WCAG 2.2 added new success criteria and removed the old Parsing requirement.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'Rules I Check First',
+        bullets: const [
+          'Color contrast: text, icons, buttons, disabled states, and error states must be readable.',
+          'Alt text: meaningful images need labels; decorative images should be ignored by screen readers.',
+          'Keyboard access: Tab, Shift + Tab, Enter, Space, Escape, and arrow keys should work where expected.',
+          'Visible focus: users must see where they are when navigating by keyboard.',
+          'Forms and errors: fields need visible labels, clear required states, and helpful error messages near the field.',
+          'Structure: headings and reading order should make sense, especially on Flutter Web where semantics need extra care.',
+          'Touch targets: important controls should be large enough, around 44 by 44 pixels when possible.',
+          'Captions and transcripts: video and audio content need accessible alternatives.',
+          'No color-only meaning: use color plus text, icons, or labels for statuses like Approved, Rejected, Pending, Error, or Success.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'Simple Product Examples',
+        children: [
+          _wcagExample(
+            bodySize,
+            bad: 'Red field means error.',
+            better:
+                'Show a red border, an error icon, and text like “Email is required.”',
+          ),
+          _wcagExample(
+            bodySize,
+            bad: 'A dropdown only works with mouse hover.',
+            better:
+                'The dropdown works with mouse, keyboard, screen reader, and touch.',
+          ),
+          _wcagExample(
+            bodySize,
+            bad: 'Invalid input.',
+            better:
+                'Password must be at least 8 characters, or enter a valid email like name@example.com.',
+          ),
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'How WCAG Shapes a Design System',
+        bullets: const [
+          'Accessible color tokens and contrast-tested text styles.',
+          'Button, icon button, and link focus states.',
+          'Accessible form field components and error patterns.',
+          'Minimum touch target sizes and spacing rules.',
+          'Keyboard navigation and modal behavior rules.',
+          'Screen reader labels, empty states, loading states, and reduced motion support.',
+          'Design tokens that define not only brand color, but also readable text, focus rings, disabled states, and non-color error indicators.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'How I Apply WCAG in Flutter',
+        bullets: const [
+          'Prefer built-in widgets such as ElevatedButton, TextButton, OutlinedButton, IconButton, TextFormField, CheckboxListTile, and ListTile.',
+          'Use Semantics when a custom widget needs a better screen reader label.',
+          'Use Tooltip for icon-only controls and never leave icon buttons unnamed.',
+          'Use ExcludeSemantics for decorative icons or images to avoid duplicate announcements.',
+          'Use MergeSemantics when an icon and text should be read as one meaning, such as “Payment failed.”',
+          'Respect text scaling by avoiding fixed-height containers that cut off larger text.',
+          'Use Focus, FocusTraversalGroup, visible focus states, and proper button widgets for Flutter Web and desktop keyboard support.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'Screen Checklist',
+        bullets: const [
+          'Every button has clear text or a screen reader label.',
+          'Text and UI contrast are readable.',
+          'The user can navigate with keyboard and see focus.',
+          'Forms have visible labels, clear required fields, and useful errors.',
+          'Layout still works with larger text.',
+          'Images have alt text when meaningful, and decorative images are ignored.',
+          'Modals can be closed and do not trap keyboard users.',
+          'Instructions are simple and buttons use clear words, such as “View project details” instead of “Click here.”',
+          'Motion is not excessive, loading states are clear, and reduced motion is considered.',
+          'The screen is tested on mobile, web, keyboard, and screen reader.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'Testing Tools and Manual Testing',
+        bullets: const [
+          'Web tools: Chrome Lighthouse, axe DevTools, WAVE, Stark, Accessibility Insights, and Color Contrast Analyzer.',
+          'Screen readers: VoiceOver on macOS and iPhone, TalkBack on Android, NVDA on Windows, and JAWS for enterprise testing.',
+          'Flutter tools: Accessibility Inspector, Semantics Debugger, manual VoiceOver/TalkBack testing, and keyboard testing on Flutter Web/Desktop.',
+          'Automated tools only catch part of the problem. Manual testing is still required.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'Common Mistakes I Avoid',
+        bullets: const [
+          'Low-contrast gray text.',
+          'Icon-only buttons with no label.',
+          'Removing focus outlines.',
+          'Custom clickable containers that are not keyboard accessible.',
+          'Placeholder text used instead of labels.',
+          'Errors shown only with red color.',
+          'Modals that trap keyboard users.',
+          'Not testing text scaling, screen readers, or keyboard navigation.',
+          'Beautiful UI that cannot be used without a mouse.',
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'My Practical Accessibility Statement',
+        children: [
+          _wcagText(
+            bodySize,
+            'I use WCAG as a practical quality standard, not just a checklist. In design, I check contrast, touch target size, readable typography, focus states, form errors, and clear navigation. In Flutter, I use built-in accessible widgets when possible, add Semantics for custom components, test text scaling, and verify the experience with keyboard and screen readers.',
+            weight: FontWeight.w600,
+          ),
+        ],
+      ),
+      _wcagSection(
+        bodySize: bodySize,
+        title: 'Learning Path and Practice',
+        bullets: const [
+          'Learn POUR: Perceivable, Operable, Understandable, Robust.',
+          'Learn A, AA, and AAA, then focus on WCAG 2.2 AA for real projects.',
+          'Practice the common rules first: contrast, keyboard, focus, alt text, forms, headings, and captions.',
+          'Apply accessibility to design systems through tokens, components, and patterns.',
+          'Apply accessibility to Flutter through Semantics, Tooltip, focus, text scaling, and screen reader testing.',
+          'Take one real screen and check buttons, contrast, keyboard navigation, focus, labels, errors, text scaling, icon labels, color-only meaning, and screen reader flow.',
+        ],
+      ),
     ],
+  );
+}
+
+Widget _wcagSection({
+  required double bodySize,
+  required String title,
+  List<String> bullets = const [],
+  List<Widget> children = const [],
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: _frostedGlassContainer(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      borderRadius: 14,
+      decoration: _wcagGoldenFrostedDecoration(borderRadius: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SelectableText(
+            title,
+            style: _philosophyGradientStyle(
+              fontSize: bodySize + 1,
+              fontWeight: FontWeight.bold,
+              height: 1.25,
+            ),
+          ),
+          if (bullets.isNotEmpty || children.isNotEmpty)
+            const SizedBox(height: 8),
+          if (bullets.isNotEmpty)
+            ...bullets.map((text) => _wcagBullet(bodySize, text)),
+          ...children,
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _wcagText(
+  double bodySize,
+  String text, {
+  FontWeight weight = FontWeight.w500,
+}) {
+  return SelectableText(
+    text,
+    style: GoogleFonts.roboto(
+      color: Colors.white,
+      fontSize: bodySize,
+      height: 1.55,
+      fontWeight: weight,
+    ),
+  );
+}
+
+Widget _wcagBullet(double bodySize, String text) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(
+              color: ColorManager.accentGold,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        const SizedBox(width: 9),
+        Expanded(child: _wcagText(bodySize, text)),
+      ],
+    ),
+  );
+}
+
+Widget _wcagCardGrid({
+  required double bodySize,
+  required List<(IconData, String, String)> cards,
+}) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final columns = constraints.maxWidth >= 540 ? 2 : 1;
+      const gap = 10.0;
+      final width = columns == 1
+          ? constraints.maxWidth
+          : (constraints.maxWidth - gap) / columns;
+      return Wrap(
+        spacing: gap,
+        runSpacing: gap,
+        children: cards
+            .map(
+              (card) => SizedBox(
+                width: width,
+                child: _wcagInfoCard(
+                  bodySize: bodySize,
+                  icon: card.$1,
+                  title: card.$2,
+                  body: card.$3,
+                ),
+              ),
+            )
+            .toList(),
+      );
+    },
+  );
+}
+
+Widget _wcagInfoCard({
+  required double bodySize,
+  required IconData icon,
+  required String title,
+  required String body,
+}) {
+  return MergeSemantics(
+    child: _frostedGlassContainer(
+      padding: const EdgeInsets.all(12),
+      borderRadius: 12,
+      decoration: _wcagGoldenInnerDecoration(borderRadius: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ExcludeSemantics(
+                child: Icon(
+                  icon,
+                  color: ColorManager.accentGold,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SelectableText(
+                  title,
+                  style: GoogleFonts.roboto(
+                    color: Colors.white,
+                    fontSize: bodySize,
+                    fontWeight: FontWeight.bold,
+                    height: 1.25,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          _wcagText(bodySize - 0.5, body),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _wcagExample(
+  double bodySize, {
+  required String bad,
+  required String better,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: _frostedGlassContainer(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      borderRadius: 12,
+      decoration: _wcagGoldenInnerDecoration(borderRadius: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _wcagText(bodySize, 'Bad: $bad'),
+          const SizedBox(height: 4),
+          SelectableText(
+            'Better: $better',
+            style: GoogleFonts.roboto(
+              color: Colors.white,
+              fontSize: bodySize,
+              height: 1.55,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 
@@ -1004,10 +1408,10 @@ class _PhilosophyBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return _frostedGlassContainer(
       width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
-      decoration: _grayFrostedCardDecoration(borderRadius: 16),
+      borderRadius: 16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1049,63 +1453,58 @@ class _ClientFocusedPrinciplesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isMobile ? 16 : 22),
-          decoration: _grayFrostedCardDecoration(borderRadius: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SelectableText(
-                'Client-Focused Product Principles',
-                style: _philosophyGradientStyle(
-                  fontSize: bodySize + 3,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: he * 0.012),
-              SelectableText(
-                'Great product design is not only about making beautiful screens. It is about understanding the business goal, the users, and the real problem behind the product. My design process focuses on creating digital experiences that are clear, useful, accessible, and ready to grow.',
-                style: GoogleFonts.roboto(
-                  color: Colors.white,
-                  fontSize: bodySize,
-                  height: 1.55,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: he * 0.016),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: Colors.black.withValues(alpha: 0.18),
-                  border: Border.all(
-                    color: ColorManager.accentGold.withValues(alpha: 0.32),
-                  ),
-                ),
-                child: SelectableText(
-                  'When a client trusts me with an idea, I treat it like a real business product, not just a design task. I design every product with care, clarity, accessibility, and long-term growth in mind.',
-                  style: GoogleFonts.roboto(
-                    color: Colors.white,
-                    fontSize: bodySize,
-                    height: 1.55,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              SizedBox(height: he * 0.018),
-              _ClientPrinciplesGrid(
-                bodySize: bodySize,
-                isMobile: isMobile,
-              ),
-            ],
+    return _frostedGlassContainer(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 16 : 22),
+      borderRadius: 20,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SelectableText(
+            'Client-Focused Product Principles',
+            style: _philosophyGradientStyle(
+              fontSize: bodySize + 3,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
+          SizedBox(height: he * 0.012),
+          SelectableText(
+            'Great product design is not only about making beautiful screens. It is about understanding the business goal, the users, and the real problem behind the product. My design process focuses on creating digital experiences that are clear, useful, accessible, and ready to grow.',
+            style: GoogleFonts.roboto(
+              color: Colors.white,
+              fontSize: bodySize,
+              height: 1.55,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: he * 0.016),
+          _frostedGlassContainer(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            borderRadius: 14,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: Colors.black.withValues(alpha: 0.18),
+              border: Border.all(
+                color: ColorManager.accentGold.withValues(alpha: 0.32),
+              ),
+            ),
+            child: SelectableText(
+              'When a client trusts me with an idea, I treat it like a real business product, not just a design task. I design every product with care, clarity, accessibility, and long-term growth in mind.',
+              style: GoogleFonts.roboto(
+                color: Colors.white,
+                fontSize: bodySize,
+                height: 1.55,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          SizedBox(height: he * 0.018),
+          _ClientPrinciplesGrid(
+            bodySize: bodySize,
+            isMobile: isMobile,
+          ),
+        ],
       ),
     );
   }
@@ -1165,9 +1564,10 @@ class _ClientPrincipleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MergeSemantics(
-      child: Container(
+      child: _frostedGlassContainer(
         constraints: BoxConstraints(minHeight: isMobile ? 0 : 258),
         padding: EdgeInsets.all(isMobile ? 14 : 16),
+        borderRadius: 14,
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.20),
           borderRadius: BorderRadius.circular(14),
@@ -1182,9 +1582,14 @@ class _ClientPrincipleCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ExcludeSemantics(
-                  child: Container(
+                  child: _frostedGlassContainer(
                     width: 38,
-                    height: 38,
+                    constraints: const BoxConstraints(
+                      minWidth: 38,
+                      minHeight: 38,
+                    ),
+                    alignment: Alignment.center,
+                    borderRadius: 999,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: ColorManager.accentGold.withValues(alpha: 0.12),
