@@ -7,8 +7,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../app_router.dart';
 import '../design_system/responsive.dart';
-import '../design_system/theme.dart';
-import '../home_warm_colors.dart';
 
 class HomeQrCodeSection extends StatefulWidget {
   const HomeQrCodeSection({
@@ -35,7 +33,6 @@ class _HomeQrCodeSectionState extends State<HomeQrCodeSection> {
   @override
   void initState() {
     super.initState();
-    _textController.text = _qrData;
   }
 
   @override
@@ -78,19 +75,10 @@ class _HomeQrCodeSectionState extends State<HomeQrCodeSection> {
                 width: double.infinity,
                 padding: EdgeInsets.all(widget.isMobile ? 18 : 24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0B1B3A).withValues(alpha: 0.52),
+                  color: const Color(0xFF6B7280).withValues(alpha: 0.50),
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: AppColors.primaryGold.withValues(alpha: 0.32),
-                  ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryGold.withValues(alpha: 0.12),
-                      Colors.white.withValues(alpha: 0.07),
-                      Colors.transparent,
-                    ],
+                    color: Colors.white.withValues(alpha: 0.32),
                   ),
                 ),
                 child: widget.isMobile
@@ -174,14 +162,42 @@ class _HomeQrCodeSectionState extends State<HomeQrCodeSection> {
             fontWeight: FontWeight.w600,
           ),
           decoration: InputDecoration(
-            labelText: 'Text or URL',
+            label: Transform.translate(
+              offset: const Offset(0, -13),
+              child: _buildTextFieldLabel(),
+            ),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
             hintText: _defaultWebsiteUrl,
             helperText: 'Press Enter or choose Generate QR Code.',
-            prefixIcon: const Icon(Icons.link),
+            hintStyle: GoogleFonts.roboto(
+              color: const Color(0xFF94A3B8),
+              fontWeight: FontWeight.w600,
+            ),
+            helperStyle: GoogleFonts.roboto(
+              color: const Color(0xFFD1D5DB),
+              fontWeight: FontWeight.w500,
+            ),
+            prefixIcon: const Icon(
+              Icons.link,
+              color: Color(0xFF64748B),
+            ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: const Color(0xFFF1F5F9),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(
+                color: Color(0xFFCBD5E1),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(
+                color: Color(0xFF475569),
+                width: 1.6,
+              ),
             ),
           ),
           textInputAction: TextInputAction.done,
@@ -190,6 +206,20 @@ class _HomeQrCodeSectionState extends State<HomeQrCodeSection> {
         const SizedBox(height: 14),
         _buildActions(context),
       ],
+    );
+  }
+
+  Widget _buildTextFieldLabel() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      child: Text(
+        'Text or URL',
+        style: GoogleFonts.roboto(
+          color: Colors.white,
+          fontSize: 12.5,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
     );
   }
 
@@ -203,8 +233,11 @@ class _HomeQrCodeSectionState extends State<HomeQrCodeSection> {
           icon: const Icon(Icons.qr_code_2_rounded),
           label: const Text('Generate QR Code'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: HomeWarmColors.sectionAccent,
+            backgroundColor: const Color(0xFF0F172A),
             foregroundColor: Colors.white,
+            side: const BorderSide(
+              color: Color(0xFF64748B),
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
