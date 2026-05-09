@@ -407,13 +407,17 @@ class PortfolioData {
           id: 'asdusa',
           name: 'ASD USA',
           description:
-              'Enterprise multi-role Flutter + Firebase operations app (admin, sales, scheduler, installer, client): workflows, dashboards, governed AI, and adaptive UI across iOS, Android, and web. Full case study covers product thinking, architecture tradeoffs, and shipped work—not a screenshot gallery.',
+              'Enterprise multi-role Flutter + Firebase operations app (admin, sales, scheduler, installer, client): workflows, dashboards, governed AI, and adaptive UI across iOS, Android, web, macOS, and Windows. Full case study covers product thinking, architecture tradeoffs, and shipped work—not a screenshot gallery.',
           imagePath: 'assets/images/asd_app_adaptive/asd-web-app.png',
           appStoreUrl:
               'https://apps.apple.com/us/app/asdusa/id1588331742?platform=iphone',
           playStoreUrl:
               'https://play.google.com/store/apps/details?id=com.JohnColani.asdapp',
           webUrl: 'https://absolute-stone-design-app.web.app/',
+          macosUrl:
+              'https://firebasestorage.googleapis.com/v0/b/absolute-stone-design-app.firebasestorage.app/o/platforms%2Fasd_app_10_18.zip?alt=media&token=a9b17a19-50aa-48ba-aa90-e893ee71641f',
+          windowsUrl:
+              'https://firebasestorage.googleapis.com/v0/b/absolute-stone-design-app.firebasestorage.app/o/platforms%2Fasd_app_10_18.app.zip?alt=media&token=4594e06f-e48f-4512-953a-684446fc5abe',
           caseStudyId: 'asd',
         ),
         PortfolioApp(
