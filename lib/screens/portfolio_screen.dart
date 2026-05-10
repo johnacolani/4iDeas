@@ -1269,7 +1269,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           const SizedBox(height: 18),
                           _portfolioGoldGradientTitle(
                             SelectableText(
-                              'Interactive Prototype with Figma and Functional Prototype with Flutter and Origami Studio',
+                              'Figma for visual exploration. Flutter for real-device prototypes. From research to production code.',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.albertSans(
                                 color: Colors.white,

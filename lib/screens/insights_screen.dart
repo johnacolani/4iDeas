@@ -107,36 +107,57 @@ class InsightsScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 18),
                         Text(
-                          'Planned Articles',
+                          'Coming up next',
                           style: GoogleFonts.roboto(
-                            fontSize: bodySize + 4,
+                            fontSize: bodySize + 3,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        ..._plannedArticleTitles.map(
-                          (title) => Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: AppColors.bgCard,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.borderColor),
-                            ),
-                            child: Text(
-                              '$title (TODO: publish full article page)',
-                              style: GoogleFonts.roboto(
-                                fontSize: bodySize - 0.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Drafts in progress. Subscribe by reaching out and I will share when these publish.',
+                          style: GoogleFonts.roboto(
+                            fontSize: bodySize - 1,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
                           ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _plannedArticleTitles
+                              .map(
+                                (t) => Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: AppColors.primaryGold
+                                          .withValues(alpha: 0.30),
+                                    ),
+                                    color: AppColors.bgCard
+                                        .withValues(alpha: 0.55),
+                                  ),
+                                  child: Text(
+                                    t,
+                                    style: GoogleFonts.roboto(
+                                      fontSize: bodySize - 1.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        const SizedBox(height: 22),
                         _InsightsBottomCta(
                           bodySize: bodySize,
                           onContact: () => context.go(AppRoutes.contact),

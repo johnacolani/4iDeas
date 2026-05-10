@@ -53,6 +53,12 @@ const List<_ClientDesignPrinciple> _kClientDesignPrinciples =
         'Because I also build apps with Flutter, I design with implementation in mind. I think about reusable widgets, clean architecture, performance, states, errors, loading flows, and how the design will work as a real product, not only as a static mockup.',
   ),
   _ClientDesignPrinciple(
+    icon: Icons.smartphone_outlined,
+    title: 'Real-Device Prototypes with Flutter',
+    body:
+        'I prototype in Figma for fast visual exploration and in Flutter when a flow needs to feel real. Flutter lets me run the prototype on a physical iPhone, Android, tablet, or desktop the same day — so I can test gestures, transitions, keyboards, real network states, accessibility, and one-handed reach on the device that will actually ship the product. Decisions stop being guesses about feel and become observations from real use.',
+  ),
+  _ClientDesignPrinciple(
     icon: Icons.rocket_launch_outlined,
     title: 'From MVP to Production',
     body:
