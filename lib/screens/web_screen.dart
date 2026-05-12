@@ -11,6 +11,7 @@ import '../core/widgets/modern_hero_section.dart';
 import '../core/widgets/home_qr_code_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 import '../core/widgets/trust_home_sections.dart';
+import '../core/widgets/home_brand_footer_mark.dart';
 
 class WebScreen extends StatefulWidget {
   const WebScreen({super.key});
@@ -150,6 +151,11 @@ class _WebScreenState extends State<WebScreen> {
                         SEOOptimizationSection(
                           wi: wi,
                           isMobile: isMobile,
+                        ),
+                        HomeBrandFooterMark(
+                          topPadding: isMobile ? 40 : 56,
+                          bottomPadding: isMobile ? 32 : 48,
+                          horizontalPadding: isMobile ? 12 : 24,
                         ),
                       ],
                     ),

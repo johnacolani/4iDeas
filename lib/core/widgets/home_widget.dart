@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../home_warm_colors.dart';
 import 'firebase_backend_section.dart';
 import 'hero_platforms_gif.dart';
+import 'home_brand_footer_mark.dart';
 import 'home_hero_section.dart';
 import 'home_qr_code_section.dart';
 import 'aws_backend_section.dart';
@@ -132,6 +133,11 @@ class _HomeWidgetState extends State<HomeWidget> {
                       SEOOptimizationSection(
                         wi: wi,
                         isMobile: isMobile,
+                      ),
+                      HomeBrandFooterMark(
+                        topPadding: isMobile ? 36 : 48,
+                        bottomPadding: isMobile ? 28 : 40,
+                        horizontalPadding: wi < 400 ? 10 : 16,
                       ),
                     ],
                   ),
