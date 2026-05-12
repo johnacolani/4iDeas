@@ -57,6 +57,9 @@ abstract final class HomeWarmColors {
   static const sectionAccent = Color(0xFF123A66);
   static const dividerLine = Color(0xFFE2E8F0);
 
+  /// Portfolio page & case study detail — card/panel/chip outlines (warm stone vs cool [dividerLine]).
+  static const portfolioWarmBorder = Color(0xFFC9BDB0);
+
   // Platform row — standard recognizable hues, minimal glow
   static const platformIos = Color(0xFF007AFF);
   static const platformAndroid = Color(0xFF3DDC84);

@@ -100,20 +100,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: LayoutBuilder(
                   builder: (context, safeConstraints) {
                     return Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        Positioned(
-                          left: 4,
-                          top: 4,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: SculptedLoginTokens.offWhite
-                                  .withValues(alpha: 0.90),
-                              size: 20,
-                            ),
-                            onPressed: () => _onBack(context),
-                          ),
-                        ),
                         Center(
                           child: Scrollbar(
                             controller: _scrollController,
@@ -274,6 +262,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ),
                               ),
                             ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 4,
+                          top: 4,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: SculptedLoginTokens.offWhite
+                                  .withValues(alpha: 0.90),
+                              size: 20,
+                            ),
+                            onPressed: () => _onBack(context),
                           ),
                         ),
                       ],

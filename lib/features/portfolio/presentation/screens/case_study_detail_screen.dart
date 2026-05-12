@@ -1,24 +1,47 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/design_system/theme.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
-import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:go_router/go_router.dart';
 
 /// Corner radius (in logical pixels) used for all case study images in this screen.
 const double kCaseStudyImageCornerRadius = 30;
-const Color _textPrimary = Colors.white;
-const Color _textSecondary = Color(0xFFD1D5DB);
-const Color _textMuted = Color(0xFF9CA3AF);
-const Color _glassBase = Color(0xFF0F172A);
-const Color _glassBaseAlt = Color(0xFF111827);
 const LinearGradient _goldGradient = LinearGradient(
   colors: [AppColors.primaryGold, AppColors.primaryGoldDark],
 );
+
+/// Page backdrop and elevated panels — matches [PortfolioScreen] warm shell.
+BoxDecoration _caseStudyLightPanelDecoration({
+  required double borderRadius,
+  bool goldAccentBorder = false,
+  List<Color>? gradientColors,
+}) {
+  final colors = gradientColors ??
+      <Color>[
+        Colors.white.withValues(alpha: 0.88),
+        HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.94),
+        HomeWarmColors.bloomNorth.withValues(alpha: 0.55),
+      ];
+  return BoxDecoration(
+    borderRadius: BorderRadius.circular(borderRadius),
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: colors,
+    ),
+    border: Border.all(
+      color: goldAccentBorder
+          ? ColorManager.accentGold.withValues(alpha: 0.48)
+          : HomeWarmColors.portfolioWarmBorder,
+      width: goldAccentBorder ? 1.5 : 1,
+    ),
+  );
+}
 
 /// Adaptive Platform screenshots (landscape). Matches asset aspect so layout isn’t mistaken for phone portrait.
 const double kAdaptivePlatformImageWidth = 2720;
@@ -128,11 +151,13 @@ class CaseStudyDetailScreen extends StatelessWidget {
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     return Scaffold(
+      backgroundColor: HomeWarmColors.shellTop,
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back,
+              color: ColorManager.portfolioTextTitle),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -142,12 +167,12 @@ class CaseStudyDetailScreen extends StatelessWidget {
           },
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: ColorManager.portfolioTextTitle),
         centerTitle: true,
         title: SelectableText(
           caseStudy.title,
-          style: GoogleFonts.roboto(
-            color: Colors.white,
+          style: GoogleFonts.albertSans(
+            color: ColorManager.portfolioTextTitle,
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
           ),
@@ -155,7 +180,22 @@ class CaseStudyDetailScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          const AppBackground(),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: const [
+                    HomeWarmColors.shellTop,
+                    HomeWarmColors.bloomCenter,
+                    HomeWarmColors.shellBottom,
+                  ],
+                  stops: const [0.0, 0.48, 1.0],
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
@@ -186,7 +226,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                 child: Text(
                                   caseStudy.title,
                                   style: GoogleFonts.roboto(
-                                    color: _textPrimary,
+                                    color: Colors.white,
                                     fontSize: isMobile
                                         ? sectionTitleSize + 4
                                         : sectionTitleSize + 6,
@@ -200,7 +240,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             SelectableText(
                               caseStudy.subtitle,
                               style: GoogleFonts.roboto(
-                                color: _textSecondary,
+                                color: ColorManager.portfolioTextBody,
                                 fontSize: sectionTitleSize,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -217,7 +257,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             SelectableText(
                               caseStudy.overview,
                               style: GoogleFonts.roboto(
-                                color: _textSecondary,
+                                color: ColorManager.portfolioTextBody,
                                 fontSize: bodySize,
                                 height: 1.6,
                               ),
@@ -275,13 +315,9 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             Container(
                               width: double.infinity,
                               padding: EdgeInsets.all(isMobile ? 16 : 20),
-                              decoration: BoxDecoration(
-                                color: _glassBase.withValues(alpha: 0.54),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color:
-                                      AppColors.primaryGold.withValues(alpha: 0.24),
-                                ),
+                              decoration: _caseStudyLightPanelDecoration(
+                                borderRadius: 14,
+                                goldAccentBorder: true,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,7 +329,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                     child: Text(
                                       'Next steps',
                                       style: GoogleFonts.roboto(
-                                        color: _textPrimary,
+                                        color: Colors.white,
                                         fontSize: bodySize + 1,
                                         fontWeight: FontWeight.w800,
                                       ),
@@ -303,7 +339,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                   Text(
                                     'Explore related service options, review more proof, or start a project conversation.',
                                     style: GoogleFonts.roboto(
-                                      color: _textSecondary,
+                                      color: ColorManager.portfolioTextBody,
                                       fontSize: bodySize - 1,
                                       height: 1.45,
                                     ),
@@ -317,8 +353,9 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                         onPressed: () =>
                                             context.go(AppRoutes.contact),
                                         style: FilledButton.styleFrom(
-                                          backgroundColor: AppColors.primaryGold,
-                                          foregroundColor: const Color(0xFF0B0F19),
+                                          backgroundColor:
+                                              ColorManager.portfolioTextTitle,
+                                          foregroundColor: Colors.white,
                                         ),
                                         child: Text(
                                           'Discuss a similar project',
@@ -330,10 +367,11 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                         onPressed: () =>
                                             context.go(AppRoutes.services),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor: AppColors.primaryGold,
+                                          foregroundColor:
+                                              ColorManager.portfolioTextTitle,
                                           side: BorderSide(
-                                            color: AppColors.primaryGold
-                                                .withValues(alpha: 0.55),
+                                            color:
+                                                HomeWarmColors.portfolioWarmBorder,
                                           ),
                                         ),
                                         child: Text(
@@ -346,10 +384,11 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                         onPressed: () => context.go(
                                             '${AppRoutes.portfolio}?section=featured'),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor: AppColors.primaryGold,
+                                          foregroundColor:
+                                              ColorManager.portfolioTextTitle,
                                           side: BorderSide(
-                                            color: AppColors.primaryGold
-                                                .withValues(alpha: 0.55),
+                                            color:
+                                                HomeWarmColors.portfolioWarmBorder,
                                           ),
                                         ),
                                         child: Text(
@@ -397,11 +436,9 @@ class _AsdCaseStudyAtAGlance extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: _glassBase.withValues(alpha: 0.54),
-          borderRadius: BorderRadius.circular(14),
-          border:
-              Border.all(color: AppColors.primaryGold.withValues(alpha: 0.22)),
+        decoration: _caseStudyLightPanelDecoration(
+          borderRadius: 14,
+          goldAccentBorder: true,
         ),
         child: Wrap(
           spacing: 8,
@@ -410,10 +447,10 @@ class _AsdCaseStudyAtAGlance extends StatelessWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
               decoration: BoxDecoration(
-                color: _glassBaseAlt.withValues(alpha: 0.54),
+                color: HomeWarmColors.shellSurfaceSolid,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.22),
+                  color: HomeWarmColors.portfolioWarmBorder,
                 ),
               ),
               child: Text(
@@ -421,7 +458,7 @@ class _AsdCaseStudyAtAGlance extends StatelessWidget {
                 style: GoogleFonts.roboto(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: _textSecondary,
+                  color: ColorManager.portfolioTextBody,
                   letterSpacing: 0.15,
                 ),
               ),
@@ -459,17 +496,9 @@ class _AsdCaseStudyOutline extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.22)),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _glassBase.withValues(alpha: 0.58),
-            _glassBaseAlt.withValues(alpha: 0.52),
-          ],
-        ),
+      decoration: _caseStudyLightPanelDecoration(
+        borderRadius: 14,
+        goldAccentBorder: true,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,7 +509,7 @@ class _AsdCaseStudyOutline extends StatelessWidget {
             child: Text(
               'In this case study',
               style: GoogleFonts.roboto(
-                color: _textPrimary,
+                color: Colors.white,
                 fontSize: bodySize + 1,
                 fontWeight: FontWeight.w800,
               ),
@@ -498,7 +527,7 @@ class _AsdCaseStudyOutline extends StatelessWidget {
                     child: Text(
                       '${i + 1}.',
                       style: GoogleFonts.roboto(
-                        color: _textMuted,
+                        color: HomeWarmColors.iconLocation,
                         fontSize: bodySize - 1,
                         fontWeight: FontWeight.w700,
                       ),
@@ -508,7 +537,7 @@ class _AsdCaseStudyOutline extends StatelessWidget {
                     child: Text(
                       _items[i],
                       style: GoogleFonts.roboto(
-                        color: _textSecondary,
+                        color: ColorManager.portfolioTextBody,
                         fontSize: bodySize - 1,
                         height: 1.4,
                         fontWeight: FontWeight.w600,
@@ -542,45 +571,38 @@ class _DesignApproachBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isMobile ? 16 : 20),
-          decoration: BoxDecoration(
-            color: _glassBase.withValues(alpha: 0.52),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.primaryGold.withValues(alpha: 0.20),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ShaderMask(
-                shaderCallback: (bounds) => _goldGradient.createShader(bounds),
-                blendMode: BlendMode.srcIn,
-                child: Text(
-                  'Design approach & principles',
-                  style: GoogleFonts.roboto(
-                    color: _textPrimary,
-                    fontSize: bodySize + 2,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(height: he * 0.012),
-              SelectableText(
-                content,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(isMobile ? 16 : 20),
+        decoration: _caseStudyLightPanelDecoration(
+          borderRadius: 16,
+          goldAccentBorder: true,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => _goldGradient.createShader(bounds),
+              blendMode: BlendMode.srcIn,
+              child: Text(
+                'Design approach & principles',
                 style: GoogleFonts.roboto(
-                  color: _textSecondary,
-                  fontSize: bodySize,
-                  height: 1.55,
+                  color: Colors.white,
+                  fontSize: bodySize + 2,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: he * 0.012),
+            SelectableText(
+              content,
+              style: GoogleFonts.roboto(
+                color: ColorManager.portfolioTextBody,
+                fontSize: bodySize,
+                height: 1.55,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -613,10 +635,10 @@ class _ClickableImage extends StatelessWidget {
       height: h,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: _glassBaseAlt.withValues(alpha: 0.62),
+        color: HomeWarmColors.shellSurfaceSolid,
         borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
         border: Border.all(
-          color: Colors.white24,
+          color: HomeWarmColors.portfolioWarmBorder,
         ),
       ),
       child: Column(
@@ -625,14 +647,14 @@ class _ClickableImage extends StatelessWidget {
         children: [
           Icon(
             Icons.image_not_supported,
-            color: _textMuted,
+            color: HomeWarmColors.iconLocation,
             size: 40,
           ),
           SizedBox(height: 8),
           SelectableText(
             'Image not found',
             style: GoogleFonts.roboto(
-              color: _textMuted,
+              color: HomeWarmColors.iconLocation,
               fontSize: 12,
             ),
           ),
@@ -644,10 +666,10 @@ class _ClickableImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
-      color: _glassBaseAlt.withValues(alpha: 0.56),
+      color: HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.75),
       borderRadius: BorderRadius.circular(kCaseStudyImageCornerRadius),
       border: Border.all(
-        color: Colors.white24,
+        color: HomeWarmColors.portfolioWarmBorder,
         width: 1,
       ),
     );
@@ -824,7 +846,7 @@ class _ImageWithCaption extends StatelessWidget {
               SelectableText(
                 displayDescription,
                 style: GoogleFonts.roboto(
-                  color: _textSecondary,
+                  color: ColorManager.portfolioTextBody,
                   fontSize: bodySize * 0.9,
                   height: 1.35,
                 ),
@@ -869,10 +891,11 @@ class _FullScreenImage extends StatelessWidget {
                       return Container(
                         padding: EdgeInsets.all(40),
                         decoration: BoxDecoration(
-                          color: _glassBase.withValues(alpha: 0.72),
+                          color: HomeWarmColors.shellSurfaceSolid
+                              .withValues(alpha: 0.96),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white24,
+                            color: HomeWarmColors.portfolioWarmBorder,
                           ),
                         ),
                         child: Column(
@@ -880,14 +903,14 @@ class _FullScreenImage extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.image_not_supported,
-                              color: _textMuted,
+                              color: HomeWarmColors.iconLocation,
                               size: 60,
                             ),
                             SizedBox(height: 16),
                             SelectableText(
                               'Image not found',
                               style: GoogleFonts.roboto(
-                                color: _textSecondary,
+                                color: ColorManager.portfolioTextBody,
                                 fontSize: 16,
                               ),
                             ),
@@ -905,13 +928,15 @@ class _FullScreenImage extends StatelessWidget {
               child: IconButton(
                 icon: Icon(
                   Icons.close,
-                  color: _textPrimary,
+                  color: HomeWarmColors.textInk,
                   size: 32,
                 ),
                 onPressed: () => context.pop(),
                 style: IconButton.styleFrom(
-                  backgroundColor: _glassBase.withValues(alpha: 0.7),
-                  shape: CircleBorder(),
+                  backgroundColor: HomeWarmColors.shellSurfaceSolid
+                      .withValues(alpha: 0.94),
+                  side: BorderSide(color: HomeWarmColors.portfolioWarmBorder),
+                  shape: const CircleBorder(),
                 ),
               ),
             ),
@@ -949,92 +974,78 @@ class _SectionBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isSolution = title == 'The Solution';
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isMobile ? 16 : 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: title == 'The Solution'
-                  ? [
-                      _glassBase.withValues(alpha: 0.62),
-                      _glassBaseAlt.withValues(alpha: 0.58),
-                      const Color(0xFF35222A).withValues(alpha: 0.56),
-                    ]
-                  : [
-                      _glassBase.withValues(alpha: 0.62),
-                      _glassBaseAlt.withValues(alpha: 0.58),
-                      _glassBase.withValues(alpha: 0.52),
-                    ],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: title == 'The Solution'
-                  ? AppColors.primaryGold.withValues(alpha: 0.28)
-                  : Colors.white24,
-              width: 1.5,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Semantics(
-                header: true,
-                child: ShaderMask(
-                  shaderCallback: (bounds) => _goldGradient.createShader(bounds),
-                  blendMode: BlendMode.srcIn,
-                  child: Text(
-                    title,
-                    style: GoogleFonts.roboto(
-                      color: _textPrimary,
-                      fontSize: bodySize + 4,
-                      fontWeight: FontWeight.bold,
-                    ),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(isMobile ? 16 : 20),
+        decoration: _caseStudyLightPanelDecoration(
+          borderRadius: 16,
+          goldAccentBorder: isSolution,
+          gradientColors: isSolution
+              ? <Color>[
+                  Colors.white.withValues(alpha: 0.90),
+                  HomeWarmColors.bloomSouthEast.withValues(alpha: 0.42),
+                  HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.92),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semantics(
+              header: true,
+              child: ShaderMask(
+                shaderCallback: (bounds) => _goldGradient.createShader(bounds),
+                blendMode: BlendMode.srcIn,
+                child: Text(
+                  title,
+                  style: GoogleFonts.roboto(
+                    color: Colors.white,
+                    fontSize: bodySize + 4,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(height: he * 0.015),
-              SelectableText(
-                content,
-                style: GoogleFonts.roboto(
-                  color: _textSecondary,
-                  fontSize: bodySize,
-                  height: 1.6,
+            ),
+            SizedBox(height: he * 0.015),
+            SelectableText(
+              content,
+              style: GoogleFonts.roboto(
+                color: ColorManager.portfolioTextBody,
+                fontSize: bodySize,
+                height: 1.6,
+              ),
+            ),
+            if (opensDesignSystemDoc &&
+                PortfolioData.caseStudyHasDesignSystemDoc(caseStudyId)) ...[
+              SizedBox(height: he * 0.02),
+              FilledButton.icon(
+                onPressed: () => context.push(
+                  AppRoutes.portfolioCaseStudyDesignSystemPath(caseStudyId),
+                ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: ColorManager.portfolioTextTitle,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 16 : 20,
+                    vertical: 14,
+                  ),
+                ),
+                icon: const Icon(Icons.auto_stories_outlined),
+                label: Text(
+                  'Open design system (full document)',
+                  style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w600,
+                    fontSize: bodySize,
+                  ),
                 ),
               ),
-              if (opensDesignSystemDoc &&
-                  PortfolioData.caseStudyHasDesignSystemDoc(caseStudyId)) ...[
-                SizedBox(height: he * 0.02),
-                FilledButton.icon(
-                  onPressed: () => context.push(
-                    AppRoutes.portfolioCaseStudyDesignSystemPath(caseStudyId),
-                  ),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: const Color(0xFF0B0F19),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 16 : 20,
-                      vertical: 14,
-                    ),
-                  ),
-                  icon: const Icon(Icons.auto_stories_outlined),
-                  label: Text(
-                    'Open design system (full document)',
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w600,
-                      fontSize: bodySize,
-                    ),
-                  ),
-                ),
-              ],
-              if (displayImages.isNotEmpty) ...[
-                SizedBox(height: he * 0.02),
-                LayoutBuilder(
+            ],
+            if (displayImages.isNotEmpty) ...[
+              SizedBox(height: he * 0.02),
+              LayoutBuilder(
                   builder: (context, constraints) {
                     final List<CaseStudyImage> sortedImages =
                         caseStudyId == 'rose-chat-seasonal-campaign-engine' &&
@@ -1207,7 +1218,6 @@ class _SectionBlock extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

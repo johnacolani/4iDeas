@@ -108,20 +108,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: LayoutBuilder(
                   builder: (context, safeConstraints) {
                     return Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        Positioned(
-                          left: 4,
-                          top: 4,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: SculptedLoginTokens.offWhite
-                                  .withValues(alpha: 0.90),
-                              size: 20,
-                            ),
-                            onPressed: () => _onBack(context),
-                          ),
-                        ),
                         Center(
                           child: Scrollbar(
                             controller: _scrollController,
@@ -452,6 +440,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                             ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 4,
+                          top: 4,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: SculptedLoginTokens.offWhite
+                                  .withValues(alpha: 0.90),
+                              size: 20,
+                            ),
+                            onPressed: () => _onBack(context),
                           ),
                         ),
                       ],

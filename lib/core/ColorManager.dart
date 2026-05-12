@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:four_ideas/core/home_warm_colors.dart';
+
 /// Which of [ColorManager]’s gradient + border cards to paint.
 ///
 /// On Flutter **web (HTML)**, a single [BoxDecoration] must not combine [gradient]
@@ -42,9 +44,9 @@ class ColorManager {
   static const textSecondary = Color(0xFF4A4640);
   static const textMuted = Color(0xFF6E6860);
 
-  /// Portfolio screen (`portfolio_screen.dart`) typography on dark shell.
-  static const portfolioTextBody = Color(0xFFD1D5DB);
-  static const portfolioTextTitle = Colors.white;
+  /// Portfolio screen — typography on light warm shell (`portfolio_screen.dart`).
+  static const portfolioTextBody = HomeWarmColors.bodyEmphasis;
+  static const portfolioTextTitle = HomeWarmColors.textInk;
 
   /// Light gray surfaces (cards, case study blocks on light backgrounds).
   static const containerSurface = Color(0xFFE8E6E3);
@@ -180,7 +182,7 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.04),
         ],
       ),
-      border: Border.all(color: accentGold.withValues(alpha: 0.5), width: 1.5),
+      border: Border.all(color: accentGold.withValues(alpha: 0.58), width: 1.5),
     );
   }
 

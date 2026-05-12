@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/core/widgets/adaptive_asset_image.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/data/portfolio_conversion_copy.dart';
@@ -133,8 +134,8 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.26),
-                          width: 1.0,
+                          color: ColorManager.accentGold.withValues(alpha: 0.62),
+                          width: 1.5,
                         ),
                       ),
                     ),
@@ -943,12 +944,11 @@ class _LinkChipState extends State<_LinkChip> {
   @override
   Widget build(BuildContext context) {
     const double minTouchTarget = 48.0;
+    final Color baseBorderColor = HomeWarmColors.portfolioWarmBorder;
     final Color baseTitleColor = ColorManager.portfolioTextBody;
-    final Color baseBorderColor =
-        ColorManager.portfolioTextBody.withValues(alpha: 0.45);
     final Color hoverTitleColor = ColorManager.portfolioTextTitle;
     final Color hoverBorderColor =
-        ColorManager.portfolioTextTitle.withValues(alpha: 0.55);
+        ColorManager.accentGold.withValues(alpha: 0.58);
     final Color buttonTitleColor =
         (_isHovered || _isFocused) ? hoverTitleColor : baseTitleColor;
     final Color buttonBorderColor =

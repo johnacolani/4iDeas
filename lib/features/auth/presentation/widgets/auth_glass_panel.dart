@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'login_orbit_painter.dart';
 import 'sculpted_login_tokens.dart';
 
-/// Shared frosted blue glass card + orbit (login, sign-up, forgot password).
+/// Shared frosted warm glass card + orbit (login, sign-up, forgot password).
 class AuthGlassPanel extends StatelessWidget {
   const AuthGlassPanel({
     super.key,
@@ -31,17 +31,17 @@ class AuthGlassPanel extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                SculptedLoginTokens.loginGlassBlueLight.withValues(
+                SculptedLoginTokens.loginGlassWarmLight.withValues(
                   alpha: SculptedLoginTokens.loginPanelGlassOpacity,
                 ),
-                SculptedLoginTokens.loginGlassBlueDeep.withValues(
+                SculptedLoginTokens.loginGlassWarmDeep.withValues(
                   alpha: SculptedLoginTokens.loginPanelGlassOpacity,
                 ),
               ],
             ),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: const Color(0xFFB8D4F0).withValues(alpha: 0.20),
+              color: const Color(0xFFDBCFC4).withValues(alpha: 0.22),
               width: 1,
             ),
             boxShadow: [
@@ -52,7 +52,7 @@ class AuthGlassPanel extends StatelessWidget {
                 spreadRadius: -4,
               ),
               BoxShadow(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.06),
+                color: const Color(0xFFC9A96E).withValues(alpha: 0.08),
                 blurRadius: 28,
                 spreadRadius: -8,
               ),

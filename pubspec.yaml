@@ -81,6 +81,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/images/login/loginscreen.svg
     - assets/images/vision_exercise.png
     - assets/images/app_store/
     - assets/images/design_system/

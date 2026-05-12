@@ -232,10 +232,10 @@ class _OrbitTextFieldState extends State<OrbitTextField> {
         final borderWidth = focused || hasError ? 1.35 : 1.0;
 
         final fillColor = focused
-            ? SculptedLoginTokens.loginGlassBlueLight.withValues(
+            ? SculptedLoginTokens.loginGlassWarmLight.withValues(
                 alpha: SculptedLoginTokens.loginGlassOpacity,
               )
-            : SculptedLoginTokens.loginGlassBlueDeep.withValues(
+            : SculptedLoginTokens.loginGlassWarmDeep.withValues(
                 alpha: SculptedLoginTokens.loginGlassOpacity,
               );
 

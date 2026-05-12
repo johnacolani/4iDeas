@@ -12,7 +12,7 @@ import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
-import 'package:four_ideas/helper/app_background.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/services/portfolio_content_service.dart';
 import 'package:four_ideas/services/publication_content_service.dart';
 import 'package:four_ideas/services/admin_service.dart';
@@ -32,6 +32,35 @@ Widget _portfolioGoldGradientTitle(Widget child) {
     shaderCallback: (Rect bounds) =>
         AppColors.goldGradient.createShader(bounds),
     child: child,
+  );
+}
+
+/// Moving gold highlight across title text (My Own Design System).
+Widget _animatedGoldShimmerTitle(Animation<double> animation, Widget textChild) {
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (context, child) {
+      final double t = animation.value;
+      return ShaderMask(
+        blendMode: BlendMode.srcIn,
+        shaderCallback: (Rect bounds) {
+          return LinearGradient(
+            begin: Alignment(-1.15 + 2.35 * t, -0.38),
+            end: Alignment(-0.15 + 2.35 * t, 0.42),
+            colors: [
+              AppColors.primaryGoldDark,
+              ColorManager.accentGold,
+              const Color(0xFFFFE8B0),
+              AppColors.primaryGold,
+              AppColors.primaryGoldDark,
+            ],
+            stops: const [0.0, 0.22, 0.48, 0.74, 1.0],
+          ).createShader(bounds);
+        },
+        child: child!,
+      );
+    },
+    child: textChild,
   );
 }
 
@@ -669,6 +698,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     // ---------- END GAPS ----------
 
     return Scaffold(
+      backgroundColor: HomeWarmColors.shellTop,
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
         iconTheme: IconThemeData(color: ColorManager.portfolioTextTitle),
@@ -694,7 +724,22 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
       body: Stack(
         children: [
-          const AppBackground(),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: const [
+                    HomeWarmColors.shellTop,
+                    HomeWarmColors.bloomCenter,
+                    HomeWarmColors.shellBottom,
+                  ],
+                  stops: const [0.0, 0.48, 1.0],
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
@@ -705,9 +750,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   if (_isLoadingPortfolio)
                     SliverToBoxAdapter(
                       child: LinearProgressIndicator(
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            ColorManager.portfolioTextTitle),
+                        backgroundColor:
+                            HomeWarmColors.portfolioWarmBorder.withValues(alpha: 0.45),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                            HomeWarmColors.sectionAccent),
                       ),
                     ),
                   SliverToBoxAdapter(
@@ -808,8 +854,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   ),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        color: ColorManager.portfolioTextBody
-                                            .withValues(alpha: 0.5)),
+                                        color:
+                                            HomeWarmColors.portfolioWarmBorder),
                                   ),
                                 ),
                               ],
@@ -866,8 +912,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       side: BorderSide(
-                                          color: ColorManager.portfolioTextBody
-                                              .withValues(alpha: 0.5)),
+                                          color:
+                                              HomeWarmColors.portfolioWarmBorder),
                                     ),
                                   ),
                                 ),
@@ -981,8 +1027,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   ),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        color: ColorManager.portfolioTextBody
-                                            .withValues(alpha: 0.5)),
+                                        color:
+                                            HomeWarmColors.portfolioWarmBorder),
                                   ),
                                 ),
                               ],
@@ -1053,8 +1099,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   ),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        color: ColorManager.portfolioTextBody
-                                            .withValues(alpha: 0.5)),
+                                        color:
+                                            HomeWarmColors.portfolioWarmBorder),
                                   ),
                                 ),
                               ],
@@ -1197,11 +1243,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         fit: BoxFit.fitHeight,
                         delegates: LottieDelegates(
                           values: [
-                            // Light blue tint over the full composition.
                             ValueDelegate.colorFilter(
                               ['**'],
-                              value: const ColorFilter.mode(
-                                Color(0xFF93C5FD),
+                              value: ColorFilter.mode(
+                                HomeWarmColors.iconLocation
+                                    .withValues(alpha: 0.95),
                                 BlendMode.srcATop,
                               ),
                             ),
@@ -1293,11 +1339,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 }
 
+/// Orbit highlight on [_DesignSystemHighlight]: head dot radius; panel border matches.
+const double _kDesignSystemOrbitDotRadius = 3.2;
+
 /// Frosted glass panel matching [_PremiumFeaturedCard] / featured case studies.
 Widget _portfolioFrostedGlassPanel({
   required Widget child,
   required EdgeInsetsGeometry padding,
   double borderRadius = 22,
+  double borderWidth = 1,
 }) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(borderRadius),
@@ -1312,13 +1362,14 @@ Widget _portfolioFrostedGlassPanel({
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white.withValues(alpha: 0.14),
-              Colors.white.withValues(alpha: 0.05),
-              ColorManager.portfolioTextBody.withValues(alpha: 0.12),
+              Colors.white.withValues(alpha: 0.88),
+              HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.94),
+              HomeWarmColors.bloomNorth.withValues(alpha: 0.55),
             ],
           ),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.28),
+            color: HomeWarmColors.portfolioWarmBorder,
+            width: borderWidth,
           ),
         ),
         child: child,
@@ -1347,8 +1398,9 @@ class _DesignSystemHighlight extends StatefulWidget {
 }
 
 class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _orbitController;
+  late final AnimationController _goldShimmerController;
 
   @override
   void initState() {
@@ -1357,11 +1409,16 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
       vsync: this,
       duration: const Duration(milliseconds: 4200),
     )..repeat();
+    _goldShimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2800),
+    )..repeat();
   }
 
   @override
   void dispose() {
     _orbitController.dispose();
+    _goldShimmerController.dispose();
     super.dispose();
   }
 
@@ -1402,6 +1459,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
               },
               child: _portfolioFrostedGlassPanel(
                 borderRadius: radius,
+                borderWidth: _kDesignSystemOrbitDotRadius,
                 padding: EdgeInsets.symmetric(
                   horizontal: widget.isMobile ? 20 : 28,
                   vertical: widget.isMobile ? 20 : 24,
@@ -1422,7 +1480,8 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.isMobile) ...[
-                            _portfolioGoldGradientTitle(
+                            _animatedGoldShimmerTitle(
+                              _goldShimmerController,
                               SelectableText(
                                 'My Own Design System',
                                 style: GoogleFonts.playfairDisplay(
@@ -1450,12 +1509,14 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Expanded(
-                                  child: _portfolioGoldGradientTitle(
+                                  child: _animatedGoldShimmerTitle(
+                                    _goldShimmerController,
                                     SelectableText(
                                       'My Own Design System',
                                       style: GoogleFonts.playfairDisplay(
                                         color: Colors.white,
-                                        fontSize: widget.designSystemTitleSize,
+                                        fontSize:
+                                            widget.designSystemTitleSize,
                                         fontWeight: FontWeight.w800,
                                         letterSpacing: 0.5,
                                         height: 1.2,
@@ -1562,7 +1623,7 @@ class _NeonBorderOrbitPainter extends CustomPainter {
       final alpha = (1 - t) * 0.85;
       final radius = 1.5 + ((1 - t) * 3.2);
       final glowPaint = Paint()
-        ..color = Colors.white.withValues(alpha: alpha)
+        ..color = Colors.white.withValues(alpha: alpha * 0.82)
         ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 6);
       canvas.drawCircle(tangent.position, radius + 1.2, glowPaint);
     }
@@ -1571,7 +1632,7 @@ class _NeonBorderOrbitPainter extends CustomPainter {
     if (headTangent != null) {
       canvas.drawCircle(
         headTangent.position,
-        3.2,
+        _kDesignSystemOrbitDotRadius,
         Paint()..color = Colors.white.withValues(alpha: 0.98),
       );
     }
@@ -1755,8 +1816,7 @@ class _PortfolioSectionNav extends StatelessWidget {
                   onPressed: item.$2,
                   style: OutlinedButton.styleFrom(
                     side: BorderSide.none,
-                    backgroundColor:
-                        ColorManager.backgroundDark.withValues(alpha: 0.92),
+                    backgroundColor: HomeWarmColors.shellSurfaceSolid,
                     padding: EdgeInsets.symmetric(
                       horizontal: isMobile ? 12 : 14,
                       vertical: 10,
@@ -2109,7 +2169,9 @@ class _FeaturedCaseStudyHeroStripState
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.32),
+                            color:
+                                HomeWarmColors.portfolioWarmBorder.withValues(
+                                    alpha: 0.82),
                             width: 1.4,
                           ),
                           boxShadow: [
@@ -2320,7 +2382,8 @@ class _FeaturedCaseStudyHeroStripState
                           boxShadow: isHoveredTile
                               ? [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.35),
+                                    color: HomeWarmColors.sectionAccent
+                                        .withValues(alpha: 0.12),
                                     blurRadius: 18,
                                     offset: const Offset(0, 10),
                                   ),
@@ -2352,11 +2415,11 @@ class _FeaturedCaseStudyHeroStripState
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.55),
+                                    color: HomeWarmColors.shellSurfaceSolid
+                                        .withValues(alpha: 0.96),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.24),
+                                      color: HomeWarmColors.portfolioWarmBorder,
                                     ),
                                   ),
                                   child: Text(
@@ -2364,7 +2427,7 @@ class _FeaturedCaseStudyHeroStripState
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.albertSans(
-                                      color: Colors.white,
+                                      color: HomeWarmColors.textInk,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12,
                                     ),
@@ -2396,8 +2459,13 @@ class _FeaturedCaseStudyHeroStripState
                   tooltip: 'Scroll left',
                   onPressed: () => _scrollMultiHeroBy(-220),
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.black.withValues(alpha: 0.34),
-                    foregroundColor: Colors.white,
+                    backgroundColor: HomeWarmColors.shellSurfaceSolid
+                        .withValues(alpha: 0.96),
+                    foregroundColor: HomeWarmColors.textInk,
+                    side: BorderSide(color: HomeWarmColors.portfolioWarmBorder),
+                    elevation: 1,
+                    shadowColor:
+                        HomeWarmColors.sectionAccent.withValues(alpha: 0.08),
                   ),
                   icon: const Icon(Icons.chevron_left),
                 ),
@@ -2412,8 +2480,13 @@ class _FeaturedCaseStudyHeroStripState
                   tooltip: 'Scroll right',
                   onPressed: () => _scrollMultiHeroBy(220),
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.black.withValues(alpha: 0.34),
-                    foregroundColor: Colors.white,
+                    backgroundColor: HomeWarmColors.shellSurfaceSolid
+                        .withValues(alpha: 0.96),
+                    foregroundColor: HomeWarmColors.textInk,
+                    side: BorderSide(color: HomeWarmColors.portfolioWarmBorder),
+                    elevation: 1,
+                    shadowColor:
+                        HomeWarmColors.sectionAccent.withValues(alpha: 0.08),
                   ),
                   icon: const Icon(Icons.chevron_right),
                 ),
@@ -2455,7 +2528,7 @@ class _FeaturedCaseStudyHeroStripState
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.18),
+          color: HomeWarmColors.portfolioWarmBorder,
         ),
       ),
       child: stripContent,
@@ -2492,7 +2565,7 @@ class _FeaturedCaseStudyHeroStripState
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color:
-                        ColorManager.portfolioTextBody.withValues(alpha: 0.5),
+                        HomeWarmColors.portfolioWarmBorder.withValues(alpha: 0.55),
                   ),
                 ),
               );
@@ -2635,9 +2708,10 @@ class _PremiumFeaturedCard extends StatelessWidget {
                                   horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(999),
-                                color: Colors.white.withValues(alpha: 0.08),
+                                color: HomeWarmColors.sectionAccent
+                                    .withValues(alpha: 0.08),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.24),
+                                  color: HomeWarmColors.portfolioWarmBorder,
                                 ),
                               ),
                               child: Text(

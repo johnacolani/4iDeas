@@ -17,18 +17,20 @@ abstract final class SculptedLoginTokens {
   static const double iconDockDiameter = 44;
   static const double orbButtonSize = 92;
 
-  static const Color loginGlassBlueLight = Color(0xFF1E3A5F);
-  static const Color loginGlassBlueDeep = Color(0xFF0F1F38);
+  /// Warm frosted glass gradient stops — panel uses [loginPanelGlassOpacity];
+  /// orbit text fields use [loginGlassOpacity].
+  static const Color loginGlassWarmLight = Color(0xFF3F3630);
+  static const Color loginGlassWarmDeep = Color(0xFF1E1A17);
 
-  /// Blue frosted glass panel (alpha = 6% → ~94% transparent).
+  /// Warm frosted glass panel tint (alpha = 6% → ~94% transparent).
   static const double loginPanelGlassOpacity = 0.06;
   /// Orbit text field pill fill on login.
   static const double loginGlassOpacity = 0.38;
 
-  /// Idle (unfocused) text field border — very light blue on glass.
-  static const Color loginFieldBorderIdle = Color(0xFFE4EEF8);
+  /// Idle (unfocused) text field border — warm cream on glass.
+  static const Color loginFieldBorderIdle = Color(0xFFEDE5DC);
 
-  /// Focused text field border — light blue (glow uses [cyanFocus] separately).
-  static const Color loginFieldBorderFocused = Color(0xFFB8D9F5);
+  /// Focused text field border — warm highlight (glow uses [cyanFocus] separately).
+  static const Color loginFieldBorderFocused = Color(0xFFE8D4BC);
   static const String svgAsset = 'assets/images/login/loginscreen.svg';
 }
