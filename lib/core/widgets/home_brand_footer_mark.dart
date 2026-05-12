@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../home_warm_colors.dart';
 
-/// Large warm “4iDeas” at end of home scroll: rule under the type + flipped reflection.
+/// Large white “4iDeas” at end of home scroll: rule under the type + flipped reflection.
 ///
 /// Uses [Transform.flip] so the mirror stays visible on web (avoid aggressive vertical clips).
 class HomeBrandFooterMark extends StatelessWidget {
@@ -12,8 +12,8 @@ class HomeBrandFooterMark extends StatelessWidget {
     required this.topPadding,
     required this.bottomPadding,
     required this.horizontalPadding,
-    this.primaryOpacity = 0.5,
-    this.mirrorOpacity = 0.12,
+    this.primaryOpacity = 1.0,
+    this.mirrorOpacity = 0.22,
   });
 
   final double topPadding;
@@ -43,23 +43,6 @@ class HomeBrandFooterMark extends StatelessWidget {
     );
   }
 
-  Widget _gradientLettermark() {
-    return ShaderMask(
-      blendMode: BlendMode.srcIn,
-      shaderCallback: (Rect bounds) => LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          HomeWarmColors.bloomCenter,
-          HomeWarmColors.drawerBorder,
-          const Color(0xFFB08C64),
-        ],
-        stops: const [0.0, 0.55, 1.0],
-      ).createShader(bounds),
-      child: _lettermark(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -77,27 +60,29 @@ class HomeBrandFooterMark extends StatelessWidget {
                 children: [
                   // Nudge type + reflection toward the rule (tighter than raw gaps).
                   Transform.translate(
-                    offset: const Offset(0, 12),
+                    offset: const Offset(0, 9),
                     child: Opacity(
                       opacity: primaryOpacity,
-                      child: _gradientLettermark(),
+                      child: _lettermark(),
                     ),
                   ),
+                  const SizedBox(height: 1),
                   Divider(
                     height: 1,
                     thickness: 2,
                     color: HomeWarmColors.portfolioWarmBorder
                         .withValues(alpha: 0.9),
                   ),
-                  // Mirror: flip + opacity.
+                  const SizedBox(height: 2),
+                  // Mirror: flip + opacity; small gaps + slight pull toward rule.
                   Transform.translate(
-                    offset: const Offset(0, -14),
+                    offset: const Offset(0, -6),
                     child: Opacity(
                       opacity: mirrorOpacity.clamp(0.0, 1.0),
                       child: Transform.flip(
                         flipY: true,
                         filterQuality: FilterQuality.medium,
-                        child: _gradientLettermark(),
+                        child: _lettermark(),
                       ),
                     ),
                   ),

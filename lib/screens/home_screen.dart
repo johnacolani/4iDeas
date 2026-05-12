@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import '../helper/app_background.dart';
 import '../core/design_system/responsive.dart';
 import '../core/design_system/theme.dart';
+import '../core/widgets/home_brand_inline_mark.dart';
 import '../widgets/home_mobile_nav_menu_button.dart';
 
 const LinearGradient _kNavIconGoldGradient = LinearGradient(
@@ -240,37 +241,9 @@ class _ModernTopAppBar extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: RichText(
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    text: TextSpan(
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall
-                                          ?.copyWith(
-                                            fontSize: 22,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                      children: [
-                                        TextSpan(
-                                          text: '4i',
-                                          style: TextStyle(
-                                            foreground: Paint()
-                                              ..shader = const LinearGradient(
-                                                colors: [
-                                                  Color(0xFFF5B32F),
-                                                  Color(0xFFD89A1C),
-                                                ],
-                                              ).createShader(
-                                                const Rect.fromLTWH(
-                                                    0, 0, 56, 24),
-                                              ),
-                                          ),
-                                        ),
-                                        const TextSpan(text: 'Deas'),
-                                      ],
-                                    ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: const HomeBrandInlineMark(compact: true),
                                   ),
                                 ),
                               ],
@@ -323,35 +296,7 @@ class _ModernTopAppBar extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 10),
-                            RichText(
-                              text: TextSpan(
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                      fontSize: 30,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                children: [
-                                  TextSpan(
-                                    text: '4i',
-                                    style: TextStyle(
-                                      foreground: Paint()
-                                        ..shader = const LinearGradient(
-                                          colors: [
-                                            Color(0xFFF5B32F),
-                                            Color(0xFFD89A1C),
-                                          ],
-                                        ).createShader(
-                                          const Rect.fromLTWH(0, 0, 56, 24),
-                                        ),
-                                    ),
-                                  ),
-                                  const TextSpan(text: 'Deas'),
-                                ],
-                              ),
-                            ),
+                            const HomeBrandInlineMark(compact: false),
                           ],
                         ),
                       ),
