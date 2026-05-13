@@ -443,7 +443,7 @@ class PortfolioData {
           name: 'Service Flow',
           description:
               'Multi-tenant SaaS for field service operations: shared platform, tenant-specific configuration, role-based workflows, and a token-based design system. Case study covers tenancy model, system thinking, and the living ServiceFlow design spec.',
-          imagePath: serviceFlowFeaturedHeroPaths.first,
+          imagePath: 'assets/images/app_store/service_flow_web.png',
           caseStudyId: 'service-flow',
         ),
         PortfolioApp(
