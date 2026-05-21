@@ -6,11 +6,10 @@ class AutoScrollImage extends StatefulWidget {
   const AutoScrollImage({super.key});
 
   @override
-  _AutoScrollImageState createState() => _AutoScrollImageState();
+  State<AutoScrollImage> createState() => _AutoScrollImageState();
 }
 
 class _AutoScrollImageState extends State<AutoScrollImage> {
-
   final ScrollController _scrollController = ScrollController();
   final int itemCount = 10;
   final double itemWidth = 80.0;

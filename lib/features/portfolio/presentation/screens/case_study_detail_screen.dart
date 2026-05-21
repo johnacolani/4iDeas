@@ -156,8 +156,7 @@ class CaseStudyDetailScreen extends StatelessWidget {
       appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: ColorManager.portfolioTextTitle),
+          icon: Icon(Icons.arrow_back, color: ColorManager.portfolioTextTitle),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -248,7 +247,8 @@ class CaseStudyDetailScreen extends StatelessWidget {
                             SizedBox(height: he * 0.02),
                             _CaseStudyIntentLinks(
                               bodySize: bodySize,
-                              onServices: () => context.go(AppRoutes.services),
+                              onServices: () =>
+                                  context.push(AppRoutes.services),
                               onPortfolio: () => context.go(
                                   '${AppRoutes.portfolio}?section=featured'),
                               onContact: () => context.go(AppRoutes.contact),
@@ -365,13 +365,13 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                       ),
                                       OutlinedButton(
                                         onPressed: () =>
-                                            context.go(AppRoutes.services),
+                                            context.push(AppRoutes.services),
                                         style: OutlinedButton.styleFrom(
                                           foregroundColor:
                                               ColorManager.portfolioTextTitle,
                                           side: BorderSide(
-                                            color:
-                                                HomeWarmColors.portfolioWarmBorder,
+                                            color: HomeWarmColors
+                                                .portfolioWarmBorder,
                                           ),
                                         ),
                                         child: Text(
@@ -387,8 +387,8 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                           foregroundColor:
                                               ColorManager.portfolioTextTitle,
                                           side: BorderSide(
-                                            color:
-                                                HomeWarmColors.portfolioWarmBorder,
+                                            color: HomeWarmColors
+                                                .portfolioWarmBorder,
                                           ),
                                         ),
                                         child: Text(
@@ -933,8 +933,8 @@ class _FullScreenImage extends StatelessWidget {
                 ),
                 onPressed: () => context.pop(),
                 style: IconButton.styleFrom(
-                  backgroundColor: HomeWarmColors.shellSurfaceSolid
-                      .withValues(alpha: 0.94),
+                  backgroundColor:
+                      HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.94),
                   side: BorderSide(color: HomeWarmColors.portfolioWarmBorder),
                   shape: const CircleBorder(),
                 ),
@@ -1046,178 +1046,177 @@ class _SectionBlock extends StatelessWidget {
             if (displayImages.isNotEmpty) ...[
               SizedBox(height: he * 0.02),
               LayoutBuilder(
-                  builder: (context, constraints) {
-                    final List<CaseStudyImage> sortedImages =
-                        caseStudyId == 'rose-chat-seasonal-campaign-engine' &&
-                                title == 'Seasonal campaign UI'
-                            ? List<CaseStudyImage>.from(displayImages)
-                            : _sortImagesByTrailingNumber(displayImages);
-                    final double availableWidth =
-                        constraints.maxWidth.isFinite &&
-                                constraints.maxWidth > 0
-                            ? constraints.maxWidth
-                            : wi;
-                    final bool isDesignSystem =
-                        title == 'Design System (v3.0.11)';
-                    final bool isSolutionSection = title == 'The Solution';
-                    // Firestore title typos still get correct layout if paths are under asd_app_adaptive.
-                    final bool isAdaptivePlatformSection =
-                        CaseStudySection.matchesAdaptivePlatformSection(
-                      title,
-                      displayImages.map((i) => i.path),
-                    );
+                builder: (context, constraints) {
+                  final List<CaseStudyImage> sortedImages =
+                      caseStudyId == 'rose-chat-seasonal-campaign-engine' &&
+                              title == 'Seasonal campaign UI'
+                          ? List<CaseStudyImage>.from(displayImages)
+                          : _sortImagesByTrailingNumber(displayImages);
+                  final double availableWidth =
+                      constraints.maxWidth.isFinite && constraints.maxWidth > 0
+                          ? constraints.maxWidth
+                          : wi;
+                  final bool isDesignSystem =
+                      title == 'Design System (v3.0.11)';
+                  final bool isSolutionSection = title == 'The Solution';
+                  // Firestore title typos still get correct layout if paths are under asd_app_adaptive.
+                  final bool isAdaptivePlatformSection =
+                      CaseStudySection.matchesAdaptivePlatformSection(
+                    title,
+                    displayImages.map((i) => i.path),
+                  );
 
-                    double imageWidth;
-                    double imageHeight;
-                    int crossAxisCount;
+                  double imageWidth;
+                  double imageHeight;
+                  int crossAxisCount;
 
-                    if (isDesignSystem) {
-                      imageHeight = isMobile ? 240 : 320;
-                      crossAxisCount =
-                          isMobile ? 1 : (availableWidth > 900 ? 3 : 2);
-                      imageWidth = isMobile
-                          ? availableWidth
-                          : (availableWidth - (crossAxisCount - 1) * 12) /
-                              crossAxisCount;
-                    } else if (isAdaptivePlatformSection) {
-                      // Landscape assets 2720×1504 — full width on phone; capped height on wider layouts.
-                      final double aspect = kAdaptivePlatformAspectRatio;
-                      crossAxisCount = 1;
-                      imageWidth = availableWidth;
-                      imageHeight = imageWidth / aspect;
-                      if (!isMobile) {
-                        final double maxH = availableWidth > 960 ? 520 : 440;
-                        if (imageHeight > maxH) {
-                          imageHeight = maxH;
-                          imageWidth = imageHeight * aspect;
-                        }
+                  if (isDesignSystem) {
+                    imageHeight = isMobile ? 240 : 320;
+                    crossAxisCount =
+                        isMobile ? 1 : (availableWidth > 900 ? 3 : 2);
+                    imageWidth = isMobile
+                        ? availableWidth
+                        : (availableWidth - (crossAxisCount - 1) * 12) /
+                            crossAxisCount;
+                  } else if (isAdaptivePlatformSection) {
+                    // Landscape assets 2720×1504 — full width on phone; capped height on wider layouts.
+                    final double aspect = kAdaptivePlatformAspectRatio;
+                    crossAxisCount = 1;
+                    imageWidth = availableWidth;
+                    imageHeight = imageWidth / aspect;
+                    if (!isMobile) {
+                      final double maxH = availableWidth > 960 ? 520 : 440;
+                      if (imageHeight > maxH) {
+                        imageHeight = maxH;
+                        imageWidth = imageHeight * aspect;
                       }
-                    } else if (isSolutionSection) {
-                      crossAxisCount = isMobile
-                          ? 2
-                          : (availableWidth > 900
-                              ? 4
-                              : (availableWidth > 600 ? 3 : 2));
-                      final double spacing = 12;
-                      final double totalGaps = (crossAxisCount - 1) * spacing;
-                      final double cellWidth =
-                          (availableWidth - totalGaps) / crossAxisCount;
-                      imageWidth = cellWidth;
-                      imageHeight = cellWidth * (2796 / 1290);
-                    } else {
-                      imageHeight = isMobile
-                          ? 450
-                          : (availableWidth > 1200
-                              ? 550
-                              : (availableWidth > 800 ? 500 : 450));
-                      imageWidth = imageHeight * (1290 / 2796);
-                      crossAxisCount = isMobile
-                          ? 1
-                          : (availableWidth > 1200
-                              ? 4
-                              : (availableWidth > 900 ? 3 : 2));
                     }
-
+                  } else if (isSolutionSection) {
+                    crossAxisCount = isMobile
+                        ? 2
+                        : (availableWidth > 900
+                            ? 4
+                            : (availableWidth > 600 ? 3 : 2));
                     final double spacing = 12;
-                    final bool showOneByOneCentered = isMobile &&
-                        !isDesignSystem &&
-                        !isSolutionSection &&
-                        !isAdaptivePlatformSection;
-                    final bool hasDescriptions = sortedImages.any((img) =>
-                        img.description != null && img.description!.isNotEmpty);
+                    final double totalGaps = (crossAxisCount - 1) * spacing;
+                    final double cellWidth =
+                        (availableWidth - totalGaps) / crossAxisCount;
+                    imageWidth = cellWidth;
+                    imageHeight = cellWidth * (2796 / 1290);
+                  } else {
+                    imageHeight = isMobile
+                        ? 450
+                        : (availableWidth > 1200
+                            ? 550
+                            : (availableWidth > 800 ? 500 : 450));
+                    imageWidth = imageHeight * (1290 / 2796);
+                    crossAxisCount = isMobile
+                        ? 1
+                        : (availableWidth > 1200
+                            ? 4
+                            : (availableWidth > 900 ? 3 : 2));
+                  }
 
-                    Widget buildImageItem(
-                      CaseStudyImage item, {
-                      BoxFit fit = BoxFit.cover,
-                      bool fitInside = false,
-                    }) {
-                      return _ImageWithCaption(
-                        imagePath: item.path,
-                        description: item.description,
-                        imageWidth: imageWidth,
-                        imageHeight: imageHeight,
-                        bodySize: bodySize,
-                        onTap: () => onImageTap(item.path),
-                        imageFit: fit,
-                        imageFitInsideContainer: fitInside,
-                      );
-                    }
+                  final double spacing = 12;
+                  final bool showOneByOneCentered = isMobile &&
+                      !isDesignSystem &&
+                      !isSolutionSection &&
+                      !isAdaptivePlatformSection;
+                  final bool hasDescriptions = sortedImages.any((img) =>
+                      img.description != null && img.description!.isNotEmpty);
 
-                    if (isAdaptivePlatformSection) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: List.generate(sortedImages.length, (index) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom:
-                                  index < sortedImages.length - 1 ? spacing : 0,
-                            ),
-                            child: Center(
-                              child: buildImageItem(
-                                sortedImages[index],
-                                fit: BoxFit.contain,
-                                fitInside: true,
-                              ),
-                            ),
-                          );
-                        }),
-                      );
-                    }
+                  Widget buildImageItem(
+                    CaseStudyImage item, {
+                    BoxFit fit = BoxFit.cover,
+                    bool fitInside = false,
+                  }) {
+                    return _ImageWithCaption(
+                      imagePath: item.path,
+                      description: item.description,
+                      imageWidth: imageWidth,
+                      imageHeight: imageHeight,
+                      bodySize: bodySize,
+                      onTap: () => onImageTap(item.path),
+                      imageFit: fit,
+                      imageFitInsideContainer: fitInside,
+                    );
+                  }
 
-                    if (showOneByOneCentered) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: List.generate(sortedImages.length, (index) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom:
-                                  index < sortedImages.length - 1 ? spacing : 0,
-                            ),
-                            child: Center(
-                              child: buildImageItem(sortedImages[index]),
-                            ),
-                          );
-                        }),
-                      );
-                    }
-
-                    if (isSolutionSection && sortedImages.length > 1) {
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          mainAxisSpacing: spacing,
-                          crossAxisSpacing: spacing,
-                          childAspectRatio: imageWidth /
-                              (imageHeight + (hasDescriptions ? 88 : 48)),
-                        ),
-                        itemCount: sortedImages.length,
-                        itemBuilder: (context, index) {
-                          return Center(
-                            child: buildImageItem(sortedImages[index]),
-                          );
-                        },
-                      );
-                    }
-
-                    return Wrap(
-                      spacing: spacing,
-                      runSpacing: spacing,
-                      alignment: isSolutionSection
-                          ? WrapAlignment.center
-                          : WrapAlignment.start,
+                  if (isAdaptivePlatformSection) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: List.generate(sortedImages.length, (index) {
-                        return buildImageItem(sortedImages[index]);
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom:
+                                index < sortedImages.length - 1 ? spacing : 0,
+                          ),
+                          child: Center(
+                            child: buildImageItem(
+                              sortedImages[index],
+                              fit: BoxFit.contain,
+                              fitInside: true,
+                            ),
+                          ),
+                        );
                       }),
                     );
-                  },
-                ),
-              ],
+                  }
+
+                  if (showOneByOneCentered) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: List.generate(sortedImages.length, (index) {
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom:
+                                index < sortedImages.length - 1 ? spacing : 0,
+                          ),
+                          child: Center(
+                            child: buildImageItem(sortedImages[index]),
+                          ),
+                        );
+                      }),
+                    );
+                  }
+
+                  if (isSolutionSection && sortedImages.length > 1) {
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        mainAxisSpacing: spacing,
+                        crossAxisSpacing: spacing,
+                        childAspectRatio: imageWidth /
+                            (imageHeight + (hasDescriptions ? 88 : 48)),
+                      ),
+                      itemCount: sortedImages.length,
+                      itemBuilder: (context, index) {
+                        return Center(
+                          child: buildImageItem(sortedImages[index]),
+                        );
+                      },
+                    );
+                  }
+
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    alignment: isSolutionSection
+                        ? WrapAlignment.center
+                        : WrapAlignment.start,
+                    children: List.generate(sortedImages.length, (index) {
+                      return buildImageItem(sortedImages[index]);
+                    }),
+                  );
+                },
+              ),
             ],
-          ),
+          ],
         ),
+      ),
     );
   }
 }

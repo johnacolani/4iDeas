@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/design_system/theme.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
+import 'package:four_ideas/data/portfolio_conversion_copy.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_app_card.dart';
+import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_positioning_sections.dart';
 import 'package:four_ideas/features/portfolio/presentation/widgets/portfolio_publication_card.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/services/portfolio_content_service.dart';
@@ -36,7 +36,8 @@ Widget _portfolioGoldGradientTitle(Widget child) {
 }
 
 /// Moving gold highlight across title text (My Own Design System).
-Widget _animatedGoldShimmerTitle(Animation<double> animation, Widget textChild) {
+Widget _animatedGoldShimmerTitle(
+    Animation<double> animation, Widget textChild) {
   return AnimatedBuilder(
     animation: animation,
     builder: (context, child) {
@@ -80,6 +81,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final CaseStudyContentService _caseStudyService = CaseStudyContentService();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _featuredCaseStudiesKey = GlobalKey();
+  final GlobalKey _processKey = GlobalKey();
+  final GlobalKey _aiKey = GlobalKey();
   final GlobalKey _appShowcaseKey = GlobalKey();
   final GlobalKey _publicationsKey = GlobalKey();
   final GlobalKey _openSourceKey = GlobalKey();
@@ -679,17 +682,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final bool isTablet = wi >= 600 && wi < 1024;
 
     final double titleSize = isMobile ? 24 : (isTablet ? 28 : 32);
-    final double sectionTitleSize = isMobile ? 20 : (isTablet ? 22 : 24);
+    final double sectionTitleSize = isMobile ? 23 : (isTablet ? 27 : 31);
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     // ---------- CONTROLLABLE GAPS (adjust these to control distance between sections) ----------
-    final double gapAfterHero = 0.0;
-    final double gapAfterSubtitle = he * 0.012;
+    final double gapAfterHero = isMobile ? 8.0 : 10.0;
+    final double gapAfterProofBand = he * 0.03;
     final double gapAfterDesignSystemCard = he * 0.03;
-    final double gapAfterDesignPhilosophy = he * 0.012;
-    final double gapAfterFeaturedTitle = 8.0;
-    final double gapBetweenCaseStudyCards = 24.0;
-    final double gapAfterCaseStudies = he * 0.04;
+    final double gapAfterDesignPhilosophy = he * 0.028;
+    final double gapAfterProcess = he * 0.035;
+    final double gapAfterAi = he * 0.035;
+    final double gapAfterCaseStudyStructure = he * 0.03;
+    final double gapAfterFeaturedTitle = 16.0;
+    final double gapBetweenCaseStudyCards = 30.0;
+    final double gapAfterCaseStudies = he * 0.055;
     final double gapAfterAppShowcaseTitle = 16.0;
     final double gapAfterAppShowcase = he * 0.04;
     final double gapAfterPublicationsTitle = 12.0;
@@ -731,9 +737,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: const [
-                    HomeWarmColors.shellTop,
-                    HomeWarmColors.bloomCenter,
-                    HomeWarmColors.shellBottom,
+                    Color(0xFFEDE6DA),
+                    Color(0xFFE3D8C8),
+                    Color(0xFFD8CBBA),
                   ],
                   stops: const [0.0, 0.48, 1.0],
                 ),
@@ -750,8 +756,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   if (_isLoadingPortfolio)
                     SliverToBoxAdapter(
                       child: LinearProgressIndicator(
-                        backgroundColor:
-                            HomeWarmColors.portfolioWarmBorder.withValues(alpha: 0.45),
+                        backgroundColor: HomeWarmColors.portfolioWarmBorder
+                            .withValues(alpha: 0.45),
                         valueColor: const AlwaysStoppedAnimation<Color>(
                             HomeWarmColors.sectionAccent),
                       ),
@@ -768,14 +774,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 1. Hero (animation + title only)
-                          _buildHero(
+                          // 1. Hero
+                          PortfolioPositioningHero(
                             he: he,
                             wi: wi,
                             titleSize: titleSize,
                             bodySize: bodySize,
                             isMobile: isMobile,
-                            sectionTitleSize: sectionTitleSize,
                           ),
                           SizedBox(height: gapAfterHero),
 
@@ -783,6 +788,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              PortfolioProofBand(
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                              ),
+                              SizedBox(height: gapAfterProofBand),
+
                               // 2. My Own Design System card
                               _DesignSystemHighlight(
                                 designSystemTitleSize:
@@ -795,32 +806,44 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               ),
                               SizedBox(height: gapAfterDesignSystemCard),
 
-                              // 3. End-to-end product design from research to cross-platform delivery
-                              Center(
-                                child: SelectableText(
-                                  'End-to-end product design from research to cross-platform delivery',
-                                  style: GoogleFonts.albertSans(
-                                    color: ColorManager.portfolioTextTitle,
-                                    fontSize:
-                                        isMobile ? bodySize + 4 : bodySize + 6,
-                                    fontWeight: FontWeight.w800,
-                                    height: 1.25,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: gapAfterSubtitle),
-
-                              // 4. Design Philosophy & Principles card
+                              // 3. Design Philosophy & Principles card
                               _DesignPhilosophyCard(
                                 bodySize: bodySize,
                                 isMobile: isMobile,
                               ),
                               SizedBox(height: gapAfterDesignPhilosophy),
+                              KeyedSubtree(
+                                key: _processKey,
+                                child: PortfolioIterationProcessSection(
+                                  sectionTitleSize: sectionTitleSize,
+                                  bodySize: bodySize,
+                                  isMobile: isMobile,
+                                ),
+                              ),
+                              SizedBox(height: gapAfterProcess),
+                              KeyedSubtree(
+                                key: _aiKey,
+                                child: PortfolioAiProductSection(
+                                  sectionTitleSize: sectionTitleSize,
+                                  bodySize: bodySize,
+                                  isMobile: isMobile,
+                                ),
+                              ),
+                              SizedBox(height: gapAfterAi),
+                              PortfolioCaseStudyStructureSection(
+                                sectionTitleSize: sectionTitleSize,
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                              ),
+                              SizedBox(height: gapAfterCaseStudyStructure),
                               _PortfolioSectionNav(
                                 bodySize: bodySize,
                                 isMobile: isMobile,
                                 onTapFeatured: () =>
                                     _scrollToSection(_featuredCaseStudiesKey),
+                                onTapProcess: () =>
+                                    _scrollToSection(_processKey),
+                                onTapAi: () => _scrollToSection(_aiKey),
                                 onTapApps: () =>
                                     _scrollToSection(_appShowcaseKey),
                                 onTapPublications: () =>
@@ -888,7 +911,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               KeyedSubtree(
                                 key: _appShowcaseKey,
                                 child: _SectionTitle(
-                                  title: 'App Showcase',
+                                  title: 'Shipped Product Builds',
                                   sectionTitleSize: sectionTitleSize,
                                 ),
                               ),
@@ -912,8 +935,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       side: BorderSide(
-                                          color:
-                                              HomeWarmColors.portfolioWarmBorder),
+                                          color: HomeWarmColors
+                                              .portfolioWarmBorder),
                                     ),
                                   ),
                                 ),
@@ -957,15 +980,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   // Taller cells so wrapped platform chips (Web, macOS, Windows, stores) stay visible.
                                   if (availableWidth > 900) {
                                     crossAxisCount = 3;
-                                    mainAxisExtent = 432;
+                                    mainAxisExtent = 500;
                                     spacing = 18;
                                   } else if (availableWidth > 600) {
                                     crossAxisCount = 2;
-                                    mainAxisExtent = 452;
+                                    mainAxisExtent = 520;
                                     spacing = 16;
                                   } else {
                                     crossAxisCount = 1;
-                                    mainAxisExtent = 476;
+                                    mainAxisExtent = 560;
                                     spacing = 14;
                                   }
                                   mainAxisExtent += (textScale - 1) * 180;
@@ -987,6 +1010,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                         app: app,
                                         isMobile: isMobile,
                                         isTablet: isTablet,
+                                        conversionPitch:
+                                            appShowcasePitchForId(app.id),
+                                        onDiscussSimilar: () =>
+                                            context.go(AppRoutes.contact),
                                         showAdminActions: isAdmin,
                                         onEdit: isAdmin
                                             ? () => _navigateToEditApp(app)
@@ -1205,138 +1232,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
     );
   }
-
-  Widget _buildHero({
-    required double he,
-    required double wi,
-    required double titleSize,
-    required double bodySize,
-    required bool isMobile,
-    required double sectionTitleSize,
-  }) {
-    // Keep title clear of frosted app bar, especially on desktop web.
-    final double heroYOffset = isMobile ? -he * 0.05 : -he * 0.06;
-    // Lottie behind title. Keep a tighter hero block height so next section
-    // sits closer while preserving the text position.
-    final double lottieHeight =
-        (isMobile ? he * 0.34 : he * 0.30).clamp(220.0, 300.0);
-    final double lottieWidth =
-        (wi * (isMobile ? 0.9 : 0.82)).clamp(320.0, 780.0);
-
-    return Center(
-      child: Transform.translate(
-        offset: Offset(0, heroYOffset),
-        child: Center(
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              SizedBox(
-                width: lottieWidth,
-                height: lottieHeight,
-                child: Center(
-                  child: Transform.translate(
-                    offset: Offset(0, -he * 0.08),
-                    child: Opacity(
-                      opacity: 0.3,
-                      child: Lottie.asset(
-                        'assets/waveloop.json',
-                        fit: BoxFit.fitHeight,
-                        delegates: LottieDelegates(
-                          values: [
-                            ValueDelegate.colorFilter(
-                              ['**'],
-                              value: ColorFilter.mode(
-                                HomeWarmColors.iconLocation
-                                    .withValues(alpha: 0.95),
-                                BlendMode.srcATop,
-                              ),
-                            ),
-                          ],
-                        ),
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.palette_outlined,
-                          size: titleSize,
-                          color: ColorManager.portfolioTextBody
-                              .withValues(alpha: 0.4),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned.fill(
-                child: Center(
-                  child: Transform.translate(
-                    offset: Offset(0, 44),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: math.max(8.0, wi * 0.04)),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SelectableText.rich(
-                            TextSpan(
-                              style: GoogleFonts.albertSans(
-                                color: ColorManager.portfolioTextTitle,
-                                fontSize: titleSize,
-                                fontWeight: FontWeight.w700,
-                                height: 1.25,
-                              ),
-                              children: [
-                                WidgetSpan(
-                                  alignment: PlaceholderAlignment.baseline,
-                                  baseline: TextBaseline.alphabetic,
-                                  child: _portfolioGoldGradientTitle(
-                                    Text(
-                                      'Product Design',
-                                      style: GoogleFonts.albertSans(
-                                        color: Colors.white,
-                                        fontSize: titleSize,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1.25,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const TextSpan(text: '\n&\n'),
-                                TextSpan(
-                                  text: 'Flutter',
-                                  style: GoogleFonts.albertSans(
-                                      fontWeight: FontWeight.w900),
-                                ),
-                                const TextSpan(
-                                  text:
-                                      ' Cross platform development for mobile web and desktop.',
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 18),
-                          _portfolioGoldGradientTitle(
-                            SelectableText(
-                              'Figma for visual exploration. Flutter for real-device prototypes. From research to production code.',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.albertSans(
-                                color: Colors.white,
-                                fontSize: (bodySize - 1).clamp(13.0, 18.0),
-                                fontWeight: FontWeight.w700,
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 /// Orbit highlight on [_DesignSystemHighlight]: head dot radius; panel border matches.
@@ -1515,8 +1410,7 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
                                       'My Own Design System',
                                       style: GoogleFonts.playfairDisplay(
                                         color: Colors.white,
-                                        fontSize:
-                                            widget.designSystemTitleSize,
+                                        fontSize: widget.designSystemTitleSize,
                                         fontWeight: FontWeight.w800,
                                         letterSpacing: 0.5,
                                         height: 1.2,
@@ -1779,6 +1673,8 @@ class _PortfolioSectionNav extends StatelessWidget {
   final double bodySize;
   final bool isMobile;
   final VoidCallback onTapFeatured;
+  final VoidCallback onTapProcess;
+  final VoidCallback onTapAi;
   final VoidCallback onTapApps;
   final VoidCallback onTapPublications;
   final VoidCallback onTapOpenSource;
@@ -1787,6 +1683,8 @@ class _PortfolioSectionNav extends StatelessWidget {
     required this.bodySize,
     required this.isMobile,
     required this.onTapFeatured,
+    required this.onTapProcess,
+    required this.onTapAi,
     required this.onTapApps,
     required this.onTapPublications,
     required this.onTapOpenSource,
@@ -1796,7 +1694,9 @@ class _PortfolioSectionNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = <(String, VoidCallback)>[
       ('Featured Case Studies', onTapFeatured),
-      ('App Showcase', onTapApps),
+      ('Design Process', onTapProcess),
+      ('AI Product UX', onTapAi),
+      ('Shipped Products', onTapApps),
       ("John Colani's Publications", onTapPublications),
       ("John Colani's Packages", onTapOpenSource),
     ];
@@ -2169,9 +2069,8 @@ class _FeaturedCaseStudyHeroStripState
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color:
-                                HomeWarmColors.portfolioWarmBorder.withValues(
-                                    alpha: 0.82),
+                            color: HomeWarmColors.portfolioWarmBorder
+                                .withValues(alpha: 0.82),
                             width: 1.4,
                           ),
                           boxShadow: [
@@ -2564,8 +2463,8 @@ class _FeaturedCaseStudyHeroStripState
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color:
-                        HomeWarmColors.portfolioWarmBorder.withValues(alpha: 0.55),
+                    color: HomeWarmColors.portfolioWarmBorder
+                        .withValues(alpha: 0.55),
                   ),
                 ),
               );
@@ -2623,6 +2522,7 @@ class _PremiumFeaturedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const double cornerRadius = 22;
+    final pitch = caseStudyPitchForId(caseStudy.id);
     return Tooltip(
       message: 'View ${caseStudy.title} case study',
       child: Semantics(
@@ -2696,6 +2596,15 @@ class _PremiumFeaturedCard extends StatelessWidget {
                       height: 1.45,
                     ),
                   ),
+                  if (pitch != null) ...[
+                    const SizedBox(height: 14),
+                    _FeaturedPitchLines(
+                      bodySize: bodySize,
+                      businessContext: pitch.businessContext,
+                      myRole: pitch.myRole,
+                      keyOutcome: pitch.keyOutcome,
+                    ),
+                  ],
                   if (tags.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Wrap(
@@ -2749,6 +2658,56 @@ class _PremiumFeaturedCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FeaturedPitchLines extends StatelessWidget {
+  final double bodySize;
+  final String businessContext;
+  final String myRole;
+  final String keyOutcome;
+
+  const _FeaturedPitchLines({
+    required this.bodySize,
+    required this.businessContext,
+    required this.myRole,
+    required this.keyOutcome,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <(String, String)>[
+      ('Problem space', businessContext),
+      ('My role', myRole),
+      ('Impact', keyOutcome),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final item in items) ...[
+          Text(
+            item.$1.toUpperCase(),
+            style: GoogleFonts.albertSans(
+              color: ColorManager.portfolioTextBody.withValues(alpha: 0.72),
+              fontSize: bodySize - 3,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.7,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            item.$2,
+            style: GoogleFonts.albertSans(
+              color: ColorManager.portfolioTextBody,
+              fontSize: bodySize - 1,
+              height: 1.35,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (item != items.last) const SizedBox(height: 9),
+        ],
+      ],
     );
   }
 }

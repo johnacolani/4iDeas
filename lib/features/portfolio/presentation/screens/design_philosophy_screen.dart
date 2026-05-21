@@ -4,15 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
-import 'package:four_ideas/helper/app_background.dart';
 import 'package:go_router/go_router.dart';
 
-const List<Color> _kPhilosophyTextGradient = <Color>[
-  Color(0xFFFFF4B5),
-  Color(0xFFF5B32F),
-  Color(0xFFD89A1C),
-];
+const Color _kPhilosophyTitleInk = Color(0xFF342818);
+const Color _kPhilosophyIconInk = Color(0xFF4A351C);
+const Color _kPhilosophyBodyInk = Color(0xFF3F352A);
 
 const List<_ClientDesignPrinciple> _kClientDesignPrinciples =
     <_ClientDesignPrinciple>[
@@ -179,14 +177,11 @@ TextStyle _philosophyGradientStyle({
   double letterSpacing = 0.2,
 }) {
   return GoogleFonts.roboto(
+    color: _kPhilosophyTitleInk,
     fontSize: fontSize,
     fontWeight: fontWeight,
     height: height,
     letterSpacing: letterSpacing,
-    foreground: Paint()
-      ..shader = const LinearGradient(
-        colors: _kPhilosophyTextGradient,
-      ).createShader(const Rect.fromLTWH(0, 0, 520, 40)),
   );
 }
 
@@ -196,7 +191,7 @@ Widget _principleItem(double bodySize, String text) {
     child: SelectableText(
       '• $text',
       style: GoogleFonts.roboto(
-        color: Colors.white,
+        color: _kPhilosophyBodyInk,
         fontSize: bodySize,
         height: 1.45,
       ),
@@ -229,7 +224,7 @@ Widget _frameworkItem(
           SelectableText(
             description,
             style: GoogleFonts.roboto(
-              color: Colors.white,
+              color: _kPhilosophyBodyInk,
               fontSize: bodySize,
               height: 1.5,
             ),
@@ -243,7 +238,7 @@ const double _circleMethodIndent = 32; // 2 tabs
 
 Widget _circleMethodDescription(double bodySize) {
   final baseStyle = GoogleFonts.roboto(
-    color: Colors.white,
+    color: _kPhilosophyBodyInk,
     fontSize: bodySize,
     height: 1.5,
   );
@@ -313,8 +308,8 @@ Widget _circleMethodDescription(double bodySize) {
 }
 
 Widget _starDescription(double bodySize) {
-  final baseStyle =
-      GoogleFonts.roboto(color: Colors.white, fontSize: bodySize, height: 1.5);
+  final baseStyle = GoogleFonts.roboto(
+      color: _kPhilosophyBodyInk, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
   return Column(
@@ -350,8 +345,8 @@ Widget _starDescription(double bodySize) {
 }
 
 Widget _userTypesDescription(double bodySize) {
-  final baseStyle =
-      GoogleFonts.roboto(color: Colors.white, fontSize: bodySize, height: 1.5);
+  final baseStyle = GoogleFonts.roboto(
+      color: _kPhilosophyBodyInk, fontSize: bodySize, height: 1.5);
   final boldStyle = _philosophyGradientStyle(
       fontSize: bodySize, fontWeight: FontWeight.bold, height: 1.5);
   return Column(
@@ -607,11 +602,12 @@ Widget _wcagText(
   double bodySize,
   String text, {
   FontWeight weight = FontWeight.w500,
+  Color color = _kPhilosophyBodyInk,
 }) {
   return SelectableText(
     text,
     style: GoogleFonts.roboto(
-      color: Colors.white,
+      color: color,
       fontSize: bodySize,
       height: 1.55,
       fontWeight: weight,
@@ -631,7 +627,7 @@ Widget _wcagBullet(double bodySize, String text) {
             width: 5,
             height: 5,
             decoration: BoxDecoration(
-              color: ColorManager.accentGold,
+              color: _kPhilosophyIconInk,
               shape: BoxShape.circle,
             ),
           ),
@@ -694,7 +690,7 @@ Widget _wcagInfoCard({
               ExcludeSemantics(
                 child: Icon(
                   icon,
-                  color: ColorManager.accentGold,
+                  color: _kPhilosophyIconInk,
                   size: 20,
                 ),
               ),
@@ -703,7 +699,7 @@ Widget _wcagInfoCard({
                 child: SelectableText(
                   title,
                   style: GoogleFonts.roboto(
-                    color: Colors.white,
+                    color: _kPhilosophyTitleInk,
                     fontSize: bodySize,
                     fontWeight: FontWeight.bold,
                     height: 1.25,
@@ -731,11 +727,26 @@ Widget _wcagExample(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       borderRadius: 12,
-      decoration: _wcagGoldenInnerDecoration(borderRadius: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2937).withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _kPhilosophyIconInk.withValues(alpha: 0.36),
+        ),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF111827).withValues(alpha: 0.72),
+            const Color(0xFF1F2937).withValues(alpha: 0.64),
+            Colors.black.withValues(alpha: 0.42),
+          ],
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _wcagText(bodySize, 'Bad: $bad'),
+          _wcagText(bodySize, 'Bad: $bad', color: Colors.white),
           const SizedBox(height: 4),
           SelectableText(
             'Better: $better',
@@ -783,7 +794,7 @@ Widget _processStep(
       SelectableText.rich(
         TextSpan(
           style: GoogleFonts.roboto(
-            color: Colors.white,
+            color: _kPhilosophyBodyInk,
             fontSize: bodySize,
             height: 1.55,
           ),
@@ -814,7 +825,7 @@ Widget _processStep(
               child: SelectableText(
                 '• $b',
                 style: GoogleFonts.roboto(
-                  color: Colors.white,
+                  color: _kPhilosophyBodyInk,
                   fontSize: bodySize - 1,
                   height: 1.45,
                 ),
@@ -839,11 +850,12 @@ class DesignPhilosophyScreen extends StatelessWidget {
     final double bodySize = isMobile ? 15 : (isTablet ? 16 : 17);
 
     return Scaffold(
+      backgroundColor: HomeWarmColors.shellTop,
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.gold(
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: ColorManager.portfolioTextTitle),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -853,12 +865,12 @@ class DesignPhilosophyScreen extends StatelessWidget {
           },
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: ColorManager.portfolioTextTitle),
         centerTitle: true,
         title: SelectableText(
           'Design Philosophy & Principles',
           style: GoogleFonts.roboto(
-            color: Colors.white,
+            color: ColorManager.portfolioTextTitle,
             fontSize: isMobile ? 16 : 18,
             fontWeight: FontWeight.w600,
           ),
@@ -866,7 +878,22 @@ class DesignPhilosophyScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          const AppBackground(),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: const [
+                    Color(0xFFE6DED0),
+                    Color(0xFFD8CBBB),
+                    Color(0xFFCABAA8),
+                  ],
+                  stops: const [0.0, 0.48, 1.0],
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: FrostedAppBar.contentPaddingUnderAppBar(context),
             child: Scrollbar(
@@ -929,7 +956,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'It begins with understanding people.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -938,7 +965,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'In digital products:',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -947,7 +974,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'visual clutter is a cognitive sharp edge;',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -955,7 +982,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'poor hierarchy creates fatigue;',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -963,7 +990,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'ignoring privacy can harm users.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -972,7 +999,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText.rich(
                                     TextSpan(
                                       style: GoogleFonts.roboto(
-                                        color: Colors.white,
+                                        color: _kPhilosophyBodyInk,
                                         fontSize: bodySize,
                                         height: 1.55,
                                       ),
@@ -1016,7 +1043,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText.rich(
                                     TextSpan(
                                       style: GoogleFonts.roboto(
-                                        color: Colors.white,
+                                        color: _kPhilosophyBodyInk,
                                         fontSize: bodySize,
                                         height: 1.55,
                                       ),
@@ -1037,7 +1064,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'it is the foundation of every decision.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -1046,7 +1073,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'Users open up only when they feel respected.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -1055,7 +1082,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText.rich(
                                     TextSpan(
                                       style: GoogleFonts.roboto(
-                                        color: Colors.white,
+                                        color: _kPhilosophyBodyInk,
                                         fontSize: bodySize,
                                         height: 1.55,
                                       ),
@@ -1088,7 +1115,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'I listen more than I ask.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -1097,7 +1124,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'Without empathy, design becomes decoration.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                       fontWeight: FontWeight.bold,
@@ -1107,7 +1134,7 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                   SelectableText(
                                     'AI can analyze patterns, but it cannot feel frustration, fear, or trust. That responsibility remains human.',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.white,
+                                      color: _kPhilosophyBodyInk,
                                       fontSize: bodySize,
                                       height: 1.55,
                                     ),
@@ -1372,9 +1399,8 @@ class DesignPhilosophyScreen extends StatelessWidget {
                                             horizontal: isMobile ? 6 : 10),
                                         child: Icon(
                                           Icons.star_rounded,
-                                          color: ColorManager.accentGold
-                                              .withValues(
-                                                  alpha: 0.75 - i * 0.08),
+                                          color: _kPhilosophyIconInk.withValues(
+                                              alpha: 0.64 - i * 0.07),
                                           size: isMobile ? 28 : 36,
                                         ),
                                       )),
@@ -1435,7 +1461,7 @@ class _PhilosophyBlock extends StatelessWidget {
             SelectableText(
               content!,
               style: GoogleFonts.roboto(
-                color: Colors.white,
+                color: _kPhilosophyBodyInk,
                 fontSize: bodySize,
                 height: 1.55,
               ),
@@ -1477,7 +1503,7 @@ class _ClientFocusedPrinciplesSection extends StatelessWidget {
           SelectableText(
             'Great product design is not only about making beautiful screens. It is about understanding the business goal, the users, and the real problem behind the product. My design process focuses on creating digital experiences that are clear, useful, accessible, and ready to grow.',
             style: GoogleFonts.roboto(
-              color: Colors.white,
+              color: _kPhilosophyBodyInk,
               fontSize: bodySize,
               height: 1.55,
               fontWeight: FontWeight.w500,
@@ -1598,14 +1624,14 @@ class _ClientPrincipleCard extends StatelessWidget {
                     borderRadius: 999,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: ColorManager.accentGold.withValues(alpha: 0.12),
+                      color: _kPhilosophyIconInk.withValues(alpha: 0.10),
                       border: Border.all(
-                        color: ColorManager.accentGold.withValues(alpha: 0.34),
+                        color: _kPhilosophyIconInk.withValues(alpha: 0.34),
                       ),
                     ),
                     child: Icon(
                       principle.icon,
-                      color: ColorManager.accentGold,
+                      color: _kPhilosophyIconInk,
                       size: 21,
                     ),
                   ),

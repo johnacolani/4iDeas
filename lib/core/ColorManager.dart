@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 import 'package:four_ideas/core/home_warm_colors.dart';
@@ -156,7 +158,10 @@ class ColorManager {
                 ),
               ),
             ),
-            if (padding != null) Padding(padding: padding, child: child) else child,
+            if (padding != null)
+              Padding(padding: padding, child: child)
+            else
+              child,
           ],
         ),
       ),
@@ -201,7 +206,8 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.05),
         ],
       ),
-      border: Border.all(color: primaryTeal.withValues(alpha: 0.48), width: 1.5),
+      border:
+          Border.all(color: primaryTeal.withValues(alpha: 0.48), width: 1.5),
     );
   }
 
@@ -220,7 +226,8 @@ class ColorManager {
           const Color(0xFFFFFFFF).withValues(alpha: 0.05),
         ],
       ),
-      border: Border.all(color: accentCoral.withValues(alpha: 0.42), width: 1.5),
+      border:
+          Border.all(color: accentCoral.withValues(alpha: 0.42), width: 1.5),
     );
   }
 

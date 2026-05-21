@@ -243,7 +243,8 @@ class _ModernTopAppBar extends StatelessWidget {
                                 Expanded(
                                   child: Align(
                                     alignment: Alignment.centerLeft,
-                                    child: const HomeBrandInlineMark(compact: true),
+                                    child: const HomeBrandInlineMark(
+                                        compact: true),
                                   ),
                                 ),
                               ],
@@ -717,11 +718,15 @@ class _PrimaryDesktopNav extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Services',
-                                  style: textStyle.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
+                                Flexible(
+                                  child: Text(
+                                    'Services',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: textStyle.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                                 const Icon(
@@ -846,11 +851,15 @@ class _PrimaryDesktopNav extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Admin',
-                                  style: textStyle.copyWith(
-                                    color: AppColors.primaryGold,
-                                    fontWeight: FontWeight.w700,
+                                Flexible(
+                                  child: Text(
+                                    'Admin',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: textStyle.copyWith(
+                                      color: AppColors.primaryGold,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                                 Icon(

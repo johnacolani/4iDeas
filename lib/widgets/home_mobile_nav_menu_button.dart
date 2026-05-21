@@ -404,7 +404,15 @@ class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: labelStyle),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: labelStyle,
+                ),
+              ),
+              const SizedBox(width: 12),
               Icon(
                 expanded ? Icons.expand_less : Icons.expand_more,
                 color: chevronColor,

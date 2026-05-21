@@ -990,6 +990,21 @@ class PortfolioData {
                   'Defined design requirements for safe operations (preview, rollback, fallback), clear campaign states, and consistent conversational tone across contexts.',
             ),
             CaseStudySection(
+              title: 'Users, Business Goal, and Product Constraints',
+              content:
+                  '**Users:** returning app users encountering Rose Chat, internal operators managing seasonal messaging, and admins responsible for safe release behavior.\n\n'
+                  '**Business goal:** make the AI experience feel current and campaign-ready while reducing engineering dependency for every seasonal update.\n\n'
+                  '**Constraints:** campaigns needed to be previewable, reversible, brand-safe, and resilient when assets or campaign data were missing. The assistant still had to behave like Rose, not a disconnected marketing banner.',
+            ),
+            CaseStudySection(
+              title: 'Process, Iterations, and Design Decisions',
+              content:
+                  '**Early ideas:** a simple seasonal greeting, a hardcoded visual refresh, or a configurable campaign system. I chose the system approach because the business needed repeatable operations, not another one-off release.\n\n'
+                  '**Wireframes and flow decisions:** mapped first-run, returning-user, expired-campaign, fallback, and preview states so the campaign could be tested without confusing live users.\n\n'
+                  '**Design decisions:** keep campaign content contextual, keep the assistant interaction familiar, expose admin controls for timing and assets, and include safe defaults when configuration is incomplete.\n\n'
+                  '**Trade-off:** more upfront structure in Firestore and admin controls, but faster future campaigns and safer rollout.',
+            ),
+            CaseStudySection(
               title: 'System Architecture and Delivery Stack',
               content:
                   'Architected a configurable backend model using Firebase services to drive campaign behavior at runtime.\n\n'
@@ -997,7 +1012,8 @@ class PortfolioData {
                   '• Firebase Storage serves campaign-specific visual assets.\n'
                   '• Remote Config controls activation strategy and environment-safe rollout.\n'
                   '• Runtime fallback logic guarantees graceful defaults when campaigns are missing or invalid.\n\n'
-                  'This structure enabled scalable campaign orchestration across platforms with low operational overhead.',
+                  'This structure enabled scalable campaign orchestration across platforms with low operational overhead.\n\n'
+                  '**Technical implementation:** Flutter UI states, Firebase-backed campaign definitions, storage-hosted visual assets, runtime validation, preview mode, and defensive fallback rendering.',
             ),
             CaseStudySection(
               title: 'Conversational AI Design',
@@ -1051,6 +1067,13 @@ class PortfolioData {
                   '**Product lens:** Mobile-first execution with desktop-friendly oversight. The same entities (jobs, visits, assets) surface differently per role without forking the mental model.',
             ),
             CaseStudySection(
+              title: 'Business Goal and My Role',
+              content:
+                  '**Business goal:** create a repeatable service-operations product that could support multiple tenants without rebuilding the UX and codebase for each company.\n\n'
+                  '**My role:** product framing, user-role modeling, information architecture, workflow design, component/system thinking, Flutter implementation strategy, and design-system documentation.\n\n'
+                  '**Success criteria:** users should know what work needs attention, teams should share one operating vocabulary, and tenant-specific behavior should come from configuration rather than duplicated screens.',
+            ),
+            CaseStudySection(
               title: 'Multi-tenant SaaS model',
               content:
                   'Service Flow is designed as a **Multi-tenant SaaS**: one shared product serves many companies (tenants), while each tenant keeps isolated operational data, users, and configuration.\n\n'
@@ -1075,10 +1098,19 @@ class PortfolioData {
               imagePaths: serviceFlowFeaturedHeroPaths,
             ),
             CaseStudySection(
+              title: 'Process, Iterations, and Design Decisions',
+              content:
+                  '**Early ideas:** separate role dashboards, a universal job list, and tenant-specific forks. The final direction kept one shared job model with role-sensitive views.\n\n'
+                  '**Wireframes:** mapped dispatch, field execution, job detail, status updates, and tenant settings before visual design. This exposed where density helped desktop users and where it hurt mobile field users.\n\n'
+                  '**Before / after:** moved from fragmented service updates toward one timeline-centered workflow. Users no longer need to infer status from scattered screens.\n\n'
+                  '**Accessibility and trade-offs:** prioritized readable contrast, touch targets, predictable focus, and short field flows. The trade-off was a more disciplined component system, but it reduced long-term UI drift.',
+            ),
+            CaseStudySection(
               title: 'Design system',
               content:
                   'The ServiceFlow design system captures foundations (color, typography, spacing, elevation), components, and pattern guidance in a single scrollable document—ideal for handoff and long-term maintenance.\n\n'
-                  'Use the button to open the full HTML document in-app (web: same-origin; mobile: bundled asset).',
+                  'Use the button to open the full HTML document in-app (web: same-origin; mobile: bundled asset).\n\n'
+                  '**Outcome and technical implementation:** a Flutter-ready design language with documented tokens, reusable component decisions, and a multi-tenant IA that can scale without creating a bespoke product per client.',
               opensDesignSystemDoc: true,
             ),
           ],
@@ -1155,6 +1187,16 @@ class PortfolioData {
                   '**8. Accessibility.** Core flows aim at **WCAG 2.2 AA** discipline where it matters most for real users (contrast, focus, structure, error clarity), especially across mixed environments (office vs. field).',
             ),
             CaseStudySection(
+              title: 'Design process, iterations, and trade-offs',
+              content:
+                  '**Early ideas:** separate tools for sales, scheduling, installers, and clients were tempting because each role had different needs. The product direction became one connected system because the real business problem was handoff failure between roles.\n\n'
+                  '**Wireframes and workflow maps:** role dashboards, job status, client visibility, scheduler density, installer task flow, admin governance, and AI escalation were mapped together so each screen supported the same operational truth.\n\n'
+                  '**Before / after improvements:** before, project state lived in calls, texts, notes, and spreadsheets. After, status, assignments, history, and role-specific actions became visible in the product.\n\n'
+                  '**Design decisions:** dense dashboards for admins and schedulers, simplified mobile flows for installers, calm client-facing progress, clear permissions, safe destructive actions, and admin-controlled AI knowledge.\n\n'
+                  '**Accessibility thinking:** large field touch targets, readable hierarchy, contrast, clear error states, and reduced cognitive load for users with very different technical comfort.\n\n'
+                  '**Trade-off:** building one unified platform required more upfront IA and Firebase policy discipline, but it avoided long-term fragmentation and made cross-role visibility possible.',
+            ),
+            CaseStudySection(
               title: 'What I designed and built — key improvements',
               content:
                   'Four design principles drove every decision below — taken from how this business actually operates, not from best-practice slides:\n\n'
@@ -1207,7 +1249,7 @@ class PortfolioData {
               ],
             ),
             CaseStudySection(
-              title: 'Outcome, impact, and technologies',
+              title: 'Outcome, impact, and technical implementation',
               content: '**Operational outcomes (honest framing):**\n'
                   '• **Faster coordination between teams** — real-time state collapses round-trip communication.\n'
                   '• **Less manual communication** — repeat status questions decline; the product is the source of truth.\n'
@@ -1261,6 +1303,13 @@ class PortfolioData {
                   '**Personalization as a system.** User choices (seasons, emotions, holidays, fonts, colors) aren\'t decorative—they drive theme, typography, and content. One data model: what the user selected; the app reflects it everywhere.\n\n'
                   '**Multi-language and RTL.** Persian (Farsi) and Turkish with English; RTL layout and script. Visual preference selection had to work across languages without relying on long copy.\n\n'
                   '**Cross-platform.** iOS, Android, Web, desktop—same personalization logic, consistent expression across surfaces.',
+            ),
+            CaseStudySection(
+              title: 'Users, Business Goal, and My Role',
+              content:
+                  '**Users:** bilingual readers, Persian/Farsi and Turkish speakers, English learners, and people using scripture as a personal daily practice.\n\n'
+                  '**Business/product goal:** reduce onboarding friction while making the reading experience feel personal, culturally respectful, and emotionally appropriate.\n\n'
+                  '**My role:** product strategy, UX, personalization model, theme architecture, RTL/i18n design, Flutter implementation, and cross-platform polish.',
             ),
             CaseStudySection(
               title: 'Solution',
@@ -1367,6 +1416,14 @@ class PortfolioData {
               ],
             ),
             CaseStudySection(
+              title: 'Process, Iterations, and Design Decisions',
+              content:
+                  '**Early ideas:** ask users questions, collect preferences through forms, or let them visually choose the atmosphere they wanted. Visual choice won because it reduced effort and respected emotion.\n\n'
+                  '**Wireframes:** short onboarding paths for language, theme, season, emotion, font, and optional image import. The priority was progress without fatigue.\n\n'
+                  '**Before / after:** before, personalization would have required long forms and abstract settings. After, users shape the UI through concrete visual choices.\n\n'
+                  '**Design decisions:** image-based selection, culturally aware seasonal options, readable typography controls, RTL support, and a single preference model that drives the whole app.',
+            ),
+            CaseStudySection(
               title: 'Constraints & Trade-offs',
               content:
                   '• **Forms vs. visual choice** — Long forms drive abandonment. Trade-off: invest in visual preference design so onboarding is short and completable.\n'
@@ -1380,6 +1437,11 @@ class PortfolioData {
                   '**Onboarding** — Was: text forms, high abandonment. Now: visual preference selection; completion far above industry (~40% baseline); users report a personal, owned experience and strong engagement with themes.\n\n'
                   '**Experience** — Was: generic. Now: themes, fonts, seasons, and emotions chosen by the user; the app reflects their choices everywhere. Personalization as a system—one preference model, consistent expression.\n\n'
                   '**Reach** — Multi-platform (iOS, Android, Web, Linux, macOS, Windows). Free, no ads, no in-app purchases—spiritual content accessible to all.',
+            ),
+            CaseStudySection(
+              title: 'Technical Implementation',
+              content:
+                  'Built in Flutter with a shared preference model that drives theme, typography, language behavior, and content presentation across platforms. RTL layout support, image-based onboarding, adaptive UI, and persistent personalization keep the product consistent from first run through daily reading.',
             ),
           ],
         ),
