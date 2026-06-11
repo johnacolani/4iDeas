@@ -629,6 +629,9 @@ class _ClickableImage extends StatelessWidget {
     this.fitInsideContainer = false,
   });
 
+  bool get _isNetworkImage =>
+      imagePath.startsWith('http://') || imagePath.startsWith('https://');
+
   static Widget _errorPlaceholder(double w, double h) {
     return Container(
       width: w,
@@ -674,38 +677,38 @@ class _ClickableImage extends StatelessWidget {
       ),
     );
 
-    final Widget inner = fitInsideContainer
-        ? FittedBox(
-            fit: BoxFit.contain,
-            clipBehavior: Clip.hardEdge,
-            alignment: Alignment.center,
-            child: AdaptiveAssetImage(
-              imagePath,
-              width: imageWidth,
-              height: imageHeight,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                debugPrint('Failed to load image: $imagePath');
-                debugPrint('Error: $error');
-                return SizedBox(
-                  width: imageWidth,
-                  height: imageHeight,
-                  child: _errorPlaceholder(imageWidth, imageHeight),
-                );
-              },
-            ),
+    final Widget image = _isNetworkImage
+        ? Image.network(
+            imagePath,
+            width: imageWidth,
+            height: imageHeight,
+            fit: fitInsideContainer ? BoxFit.contain : fit,
+            errorBuilder: (context, error, stackTrace) {
+              debugPrint('Failed to load image: $imagePath');
+              debugPrint('Error: $error');
+              return _errorPlaceholder(imageWidth, imageHeight);
+            },
           )
         : AdaptiveAssetImage(
             imagePath,
             width: imageWidth,
             height: imageHeight,
-            fit: fit,
+            fit: fitInsideContainer ? BoxFit.contain : fit,
             errorBuilder: (context, error, stackTrace) {
               debugPrint('Failed to load image: $imagePath');
               debugPrint('Error: $error');
               return _errorPlaceholder(imageWidth, imageHeight);
             },
           );
+
+    final Widget inner = fitInsideContainer
+        ? FittedBox(
+            fit: BoxFit.contain,
+            clipBehavior: Clip.hardEdge,
+            alignment: Alignment.center,
+            child: image,
+          )
+        : image;
 
     return GestureDetector(
       onTap: onTap,
@@ -870,6 +873,9 @@ class _FullScreenImage extends StatelessWidget {
     required this.animation,
   });
 
+  bool get _isNetworkImage =>
+      imagePath.startsWith('http://') || imagePath.startsWith('https://');
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -884,41 +890,19 @@ class _FullScreenImage extends StatelessWidget {
                 child: InteractiveViewer(
                   minScale: 0.5,
                   maxScale: 4.0,
-                  child: AdaptiveAssetImage(
-                    imagePath,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        padding: EdgeInsets.all(40),
-                        decoration: BoxDecoration(
-                          color: HomeWarmColors.shellSurfaceSolid
-                              .withValues(alpha: 0.96),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: HomeWarmColors.portfolioWarmBorder,
-                          ),
+                  child: _isNetworkImage
+                      ? Image.network(
+                          imagePath,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _fullScreenError(),
+                        )
+                      : AdaptiveAssetImage(
+                          imagePath,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _fullScreenError(),
                         ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.image_not_supported,
-                              color: HomeWarmColors.iconLocation,
-                              size: 60,
-                            ),
-                            SizedBox(height: 16),
-                            SelectableText(
-                              'Image not found',
-                              style: GoogleFonts.roboto(
-                                color: ColorManager.portfolioTextBody,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
                 ),
               ),
             ),
@@ -942,6 +926,37 @@ class _FullScreenImage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _fullScreenError() {
+    return Container(
+      padding: EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: HomeWarmColors.portfolioWarmBorder,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.image_not_supported,
+            color: HomeWarmColors.iconLocation,
+            size: 60,
+          ),
+          SizedBox(height: 16),
+          SelectableText(
+            'Image not found',
+            style: GoogleFonts.roboto(
+              color: ColorManager.portfolioTextBody,
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }

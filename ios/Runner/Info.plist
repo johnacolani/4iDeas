@@ -34,6 +34,10 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Admins can take a photo to upload as portfolio content.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Admins can choose an image from the photo library to upload as portfolio content.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

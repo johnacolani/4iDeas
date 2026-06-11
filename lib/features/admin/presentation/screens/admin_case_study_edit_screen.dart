@@ -4,6 +4,7 @@ import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/features/admin/presentation/widgets/admin_image_url_field.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/case_study_content_service.dart';
 
@@ -251,10 +252,11 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                           maxLines: 5,
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                         ),
-                        _buildField(
+                        AdminImageUrlField(
                           controller: _heroImagePathController,
                           label: 'Featured card hero image (optional)',
-                          hint: 'assets/images/... or https://... (banner above the featured card title)',
+                          hint: 'Use Camera on mobile, or Gallery on any device',
+                          uploadFolder: 'case-study-heroes',
                           maxLines: 2,
                         ),
                         _buildField(
