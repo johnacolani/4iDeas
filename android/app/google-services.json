@@ -1,34 +1,49 @@
 {
   "project_info": {
-    "project_number": "68544054220",
-    "project_id": "my-web-page-ef286",
-    "storage_bucket": "my-web-page-ef286.firebasestorage.app"
+    "project_number": "262598981443",
+    "project_id": "icad-75d53",
+    "storage_bucket": "icad-75d53.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:68544054220:android:9ddee97ac1a357655d9369",
+        "mobilesdk_app_id": "1:262598981443:android:7dcd94055bc6f649baa1f6",
         "android_client_info": {
-          "package_name": "com.example.my_web_site"
+          "package_name": "com.johncolani.fluCad"
         }
       },
       "oauth_client": [
         {
-          "client_id": "68544054220-79l4f4aiijvh7ed0at19tp19c4bjsvm8.apps.googleusercontent.com",
+          "client_id": "262598981443-iovu4gbpv8fv6or8tvio9dalmq9pngfo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.johncolani.fluCad",
+            "certificate_hash": "edf8c23317025743a6e3a7f8a95f8dd7451d0c95"
+          }
+        },
+        {
+          "client_id": "262598981443-1ard8ufaadris4rsgus3oeqm8ole10p6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCvbkcpk4Y7FF1JLCpc3rJnKT1iz3Fg8MI"
+          "current_key": "AIzaSyAo27rBaZTxG7ndxfQTr-PtvZ7vWGDJwGE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "68544054220-79l4f4aiijvh7ed0at19tp19c4bjsvm8.apps.googleusercontent.com",
+              "client_id": "262598981443-1ard8ufaadris4rsgus3oeqm8ole10p6.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "262598981443-9nfgeriatqjfq46m1n7ig6n9pcf5csp9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.johncolani.fluCad"
+              }
             }
           ]
         }

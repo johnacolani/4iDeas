@@ -688,11 +688,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     // ---------- CONTROLLABLE GAPS (adjust these to control distance between sections) ----------
     final double gapAfterHero = isMobile ? 8.0 : 10.0;
     final double gapAfterProofBand = he * 0.03;
-    final double gapAfterDesignSystemCard = he * 0.03;
-    final double gapAfterDesignPhilosophy = he * 0.028;
     final double gapAfterProcess = he * 0.035;
     final double gapAfterAi = he * 0.035;
-    final double gapAfterCaseStudyStructure = he * 0.03;
+    final double gapAfterCaseStudyStructure = he * 0.035;
+    final double gapAfterDesignSystemCard = he * 0.03;
+    final double gapAfterDesignPhilosophy = he * 0.028;
     final double gapAfterFeaturedTitle = 16.0;
     final double gapBetweenCaseStudyCards = 30.0;
     final double gapAfterCaseStudies = he * 0.055;
@@ -794,24 +794,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               ),
                               SizedBox(height: gapAfterProofBand),
 
-                              // 2. My Own Design System card
-                              _DesignSystemHighlight(
-                                designSystemTitleSize:
-                                    isMobile ? 24 : (sectionTitleSize + 6),
-                                designSystemSubSize:
-                                    isMobile ? 14 : (bodySize - 1),
-                                bodySize: bodySize,
-                                isMobile: isMobile,
-                                onTapLink: () => _launchUrl(_designSystemUrl),
-                              ),
-                              SizedBox(height: gapAfterDesignSystemCard),
-
-                              // 3. Design Philosophy & Principles card
-                              _DesignPhilosophyCard(
-                                bodySize: bodySize,
-                                isMobile: isMobile,
-                              ),
-                              SizedBox(height: gapAfterDesignPhilosophy),
                               KeyedSubtree(
                                 key: _processKey,
                                 child: PortfolioIterationProcessSection(
@@ -836,6 +818,24 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 isMobile: isMobile,
                               ),
                               SizedBox(height: gapAfterCaseStudyStructure),
+
+                              // Product systems proof: design tokens, component rules, and implementation quality.
+                              _DesignSystemHighlight(
+                                designSystemTitleSize:
+                                    isMobile ? 24 : (sectionTitleSize + 6),
+                                designSystemSubSize:
+                                    isMobile ? 14 : (bodySize - 1),
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                                onTapLink: () => _launchUrl(_designSystemUrl),
+                              ),
+                              SizedBox(height: gapAfterDesignSystemCard),
+
+                              _DesignPhilosophyCard(
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                              ),
+                              SizedBox(height: gapAfterDesignPhilosophy),
                               _PortfolioSectionNav(
                                 bodySize: bodySize,
                                 isMobile: isMobile,
@@ -857,7 +857,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               KeyedSubtree(
                                 key: _featuredCaseStudiesKey,
                                 child: _SectionTitle(
-                                  title: 'Featured Case Studies',
+                                  title: 'Product Design Case Studies',
                                   sectionTitleSize: sectionTitleSize,
                                   goldGradient: true,
                                 ),
@@ -911,7 +911,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               KeyedSubtree(
                                 key: _appShowcaseKey,
                                 child: _SectionTitle(
-                                  title: 'Shipped Product Builds',
+                                  title: 'Shipped Flutter Product Builds',
                                   sectionTitleSize: sectionTitleSize,
                                 ),
                               ),

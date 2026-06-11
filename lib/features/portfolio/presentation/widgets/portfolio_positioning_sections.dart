@@ -26,7 +26,7 @@ class PortfolioPositioningHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double heroMinHeight =
-        (isMobile ? he * 0.38 : he * 0.40).clamp(300.0, 420.0);
+        (isMobile ? he * 0.44 : he * 0.46).clamp(340.0, 500.0);
     final double lottieHeight =
         (isMobile ? he * 0.12 : he * 0.14).clamp(92.0, 136.0);
     final double lottieWidth =
@@ -60,7 +60,7 @@ class PortfolioPositioningHero extends StatelessWidget {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 780),
                   child: SelectableText(
-                    'I solve product problems through UX strategy, interaction design, design systems, and shipped cross-platform Flutter products.',
+                    'I solve product problems and build the solution: UX strategy, interaction design, design systems, AI workflows, and shipped cross-platform Flutter products.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.albertSans(
                       color: ColorManager.portfolioTextTitle,
@@ -74,7 +74,7 @@ class PortfolioPositioningHero extends StatelessWidget {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 860),
                   child: SelectableText(
-                    'Industrial design background, real production apps, AI assistant workflows, admin tools, and product systems built all the way from early ideas to Firebase-hosted releases.',
+                    'My industrial design background shapes how I think about form, ergonomics, systems, constraints, and real-world use. The engineering side means those decisions survive contact with production.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.albertSans(
                       color: ColorManager.portfolioTextBody,
@@ -96,6 +96,38 @@ class PortfolioPositioningHero extends StatelessWidget {
                     _HeroChip('AI Product UX'),
                     _HeroChip('Flutter Execution'),
                   ],
+                ),
+                const SizedBox(height: 18),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool stacked = constraints.maxWidth < 720;
+                    final double itemWidth = stacked
+                        ? double.infinity
+                        : (constraints.maxWidth - 20) / 3;
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: const [
+                        _HeroProofMetric(
+                          value: '0 -> 1',
+                          label: 'Product framing to shipped release',
+                        ),
+                        _HeroProofMetric(
+                          value: 'AI',
+                          label: 'Assistant, support, and admin workflows',
+                        ),
+                        _HeroProofMetric(
+                          value: '6 platforms',
+                          label: 'iOS, Android, web, macOS, Windows, Linux',
+                        ),
+                      ]
+                          .map(
+                            (item) => SizedBox(width: itemWidth, child: item),
+                          )
+                          .toList(),
+                    );
+                  },
                 ),
                 Transform.translate(
                   offset: const Offset(0, -16),
@@ -155,23 +187,23 @@ class PortfolioProofBand extends StatelessWidget {
     final items = [
       _ProofItem(
         Icons.category_outlined,
-        'Industrial design roots',
-        'I bring form, ergonomics, systems, and material thinking into software decisions.',
+        'Industrial design lens',
+        'Form, ergonomics, constraints, affordances, and systems thinking translated into software.',
       ),
       _ProofItem(
         Icons.account_tree_outlined,
-        'Product systems',
-        'UX flows, roles, permissions, states, and design tokens are treated as one product architecture.',
+        'Product architecture',
+        'UX flows, roles, permissions, states, and design tokens treated as one product system.',
       ),
       _ProofItem(
         Icons.rocket_launch_outlined,
-        'Shipped products',
-        'Cross-platform Flutter releases across mobile, web, and desktop with Firebase-backed operations.',
+        'Shipped execution',
+        'Production Flutter releases across mobile, web, and desktop with Firebase-backed operations.',
       ),
       _ProofItem(
         Icons.smart_toy_outlined,
-        'AI workflows',
-        'Assistant UX, support escalation, knowledge-base governance, and admin tooling for AI operations.',
+        'AI product workflows',
+        'Assistant UX, support escalation, knowledge-base governance, and admin tooling.',
       ),
     ];
 
@@ -213,17 +245,23 @@ class PortfolioCaseStudyStructureSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const stages = [
-      'Problem',
-      'Users',
-      'Business goal',
-      'My role',
-      'Process',
-      'Iterations',
-      'Design decisions',
-      'Final solution',
-      'Outcome / impact',
-      'Technical implementation',
+    const groups = [
+      _FrameworkGroup(
+        'Frame',
+        ['Problem', 'Users', 'Business goal', 'My role'],
+      ),
+      _FrameworkGroup(
+        'Explore',
+        ['Early ideas', 'Wireframes', 'Iterations', 'Trade-offs'],
+      ),
+      _FrameworkGroup(
+        'Decide',
+        ['UX decisions', 'Design system', 'Accessibility', 'AI governance'],
+      ),
+      _FrameworkGroup(
+        'Ship',
+        ['Final solution', 'Outcome / impact', 'Technical implementation'],
+      ),
     ];
 
     return _PortfolioPanel(
@@ -245,7 +283,7 @@ class PortfolioCaseStudyStructureSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           SelectableText(
-            'Each major project now reads as a product-design narrative: what problem mattered, who it served, how the solution evolved, and how the final system shipped.',
+            'Each major project is structured as a product-design narrative: what problem mattered, who it served, how the solution evolved, why decisions were made, and how the final system shipped.',
             style: GoogleFonts.albertSans(
               color: ColorManager.portfolioTextBody,
               fontSize: bodySize,
@@ -254,10 +292,26 @@ class PortfolioCaseStudyStructureSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: stages.map((stage) => _OutlineChip(stage)).toList(),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final bool twoCols = constraints.maxWidth >= 760;
+              final double itemWidth =
+                  twoCols ? (constraints.maxWidth - 14) / 2 : double.infinity;
+              return Wrap(
+                spacing: 14,
+                runSpacing: 14,
+                children: [
+                  for (final group in groups)
+                    SizedBox(
+                      width: itemWidth,
+                      child: _FrameworkGroupTile(
+                        group: group,
+                        bodySize: bodySize,
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -282,15 +336,15 @@ class PortfolioIterationProcessSection extends StatelessWidget {
     final processItems = [
       _ProcessItem(
         'Early ideas',
-        'Start with product intent, user roles, and operational constraints before screen polish.',
+        'Start with product intent, role models, operational constraints, and what the user needs to accomplish.',
       ),
       _ProcessItem(
         'Wireframes',
-        'Sketch task paths, hierarchy, states, and navigation before investing in high-fidelity UI.',
+        'Map task paths, hierarchy, empty states, errors, and navigation before investing in high-fidelity UI.',
       ),
       _ProcessItem(
         'UX decisions',
-        'Reduce cognitive load, prioritize actions, and expose only the controls each role needs.',
+        'Reduce cognitive load, prioritize the next action, and expose only the controls each role needs.',
       ),
       _ProcessItem(
         'Before / after',
@@ -302,7 +356,7 @@ class PortfolioIterationProcessSection extends StatelessWidget {
       ),
       _ProcessItem(
         'Accessibility thinking',
-        'Contrast, focus states, readable density, large touch targets, error clarity, and field-use reality.',
+        'Contrast, focus states, readable density, touch targets, error clarity, and field-use reality.',
       ),
     ];
 
@@ -324,7 +378,7 @@ class PortfolioIterationProcessSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           SelectableText(
-            'My work moves between discovery, interaction design, prototype learning, implementation, and refinement. The advantage is continuity: the product thinking survives into the shipped build.',
+            'My process moves from discovery to interaction design, prototype learning, implementation, and refinement. The advantage is continuity: product thinking survives into the shipped build.',
             style: GoogleFonts.albertSans(
               color: ColorManager.portfolioTextBody,
               fontSize: bodySize,
@@ -377,11 +431,11 @@ class PortfolioAiProductSection extends StatelessWidget {
     final items = [
       _ProcessItem(
         'AI assistant concepts',
-        'Rose-style assistant experiences designed around user intent, tone, fallback, and escalation.',
+        'Rose-style assistant experiences designed around intent, tone, trust, fallback, and escalation.',
       ),
       _ProcessItem(
         'AI customer support workflow',
-        'Reduce repetitive questions while keeping humans in control of sensitive or uncertain answers.',
+        'Reduce repetitive questions while keeping humans in control of sensitive, unclear, or policy-heavy answers.',
       ),
       _ProcessItem(
         'AI knowledge base',
@@ -389,11 +443,11 @@ class PortfolioAiProductSection extends StatelessWidget {
       ),
       _ProcessItem(
         'AI-assisted admin tools',
-        'Conversation review, campaign controls, preview states, and operational dashboards for teams.',
+        'Conversation review, campaign controls, preview states, performance signals, and operational dashboards.',
       ),
       _ProcessItem(
         'Workflow improvement',
-        'AI is valuable when it shortens decisions, clarifies status, and gives the business safer scale.',
+        'AI is useful when it shortens decisions, clarifies status, reduces support load, and scales safely.',
       ),
     ];
 
@@ -539,6 +593,56 @@ class _HeroChip extends StatelessWidget {
   }
 }
 
+class _HeroProofMetric extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const _HeroProofMetric({
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.62),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: HomeWarmColors.portfolioWarmBorder),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SelectableText(
+              value,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.portfolioTextTitle,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                height: 1.05,
+              ),
+            ),
+            const SizedBox(height: 6),
+            SelectableText(
+              label,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.portfolioTextBody,
+                fontSize: 14,
+                height: 1.32,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _OutlineChip extends StatelessWidget {
   final String label;
 
@@ -561,6 +665,58 @@ class _OutlineChip extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w700,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FrameworkGroup {
+  final String title;
+  final List<String> stages;
+
+  const _FrameworkGroup(this.title, this.stages);
+}
+
+class _FrameworkGroupTile extends StatelessWidget {
+  final _FrameworkGroup group;
+  final double bodySize;
+
+  const _FrameworkGroupTile({
+    required this.group,
+    required this.bodySize,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.48),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: HomeWarmColors.portfolioWarmBorder),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SelectableText(
+              group.title,
+              style: GoogleFonts.albertSans(
+                color: ColorManager.portfolioTextTitle,
+                fontSize: bodySize + 1,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final stage in group.stages) _OutlineChip(stage),
+              ],
+            ),
+          ],
         ),
       ),
     );

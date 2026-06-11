@@ -13,7 +13,7 @@ class GlassTestScreen extends StatefulWidget {
 
 class _GlassTestScreenState extends State<GlassTestScreen> {
   String selectedPackage = 'none';
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,10 +51,14 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
                         Wrap(
                           spacing: 8,
                           children: [
-                            _buildPackageButton('none', 'Native BackdropFilter'),
-                            _buildPackageButton('liquid_glass_effect', 'liquid_glass_effect'),
-                            _buildPackageButton('oc_liquid_glass', 'oc_liquid_glass'),
-                            _buildPackageButton('liquid_glass_animation', 'liquid_glass_animation'),
+                            _buildPackageButton(
+                                'none', 'Native BackdropFilter'),
+                            _buildPackageButton(
+                                'liquid_glass_effect', 'liquid_glass_effect'),
+                            _buildPackageButton(
+                                'oc_liquid_glass', 'oc_liquid_glass'),
+                            _buildPackageButton('liquid_glass_animation',
+                                'liquid_glass_animation'),
                           ],
                         ),
                       ],
@@ -62,7 +66,7 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
                   ),
                 ),
               ),
-              
+
               // Glass effect test area
               Expanded(
                 child: Center(
@@ -115,10 +119,10 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
           width: 300,
           height: 200,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1.5,
             ),
           ),
@@ -154,7 +158,7 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
     //     ),
     //   ),
     // );
-    
+
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -188,7 +192,7 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
     //     ),
     //   ),
     // );
-    
+
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -222,7 +226,7 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
     //     ),
     //   ),
     // );
-    
+
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -240,4 +244,3 @@ class _GlassTestScreenState extends State<GlassTestScreen> {
     );
   }
 }
-
