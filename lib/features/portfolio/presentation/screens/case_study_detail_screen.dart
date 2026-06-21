@@ -1059,6 +1059,13 @@ class _SectionBlock extends StatelessWidget {
                   final bool isDesignSystem =
                       title == 'Design System (v3.0.11)';
                   final bool isSolutionSection = title == 'The Solution';
+                  final bool isFourIcadMobileGallery = caseStudyId == '4icad' &&
+                      (title == 'Designing CAD for Mobile Devices' ||
+                          title == 'Key UX Innovations' ||
+                          title == 'Product Features');
+                  final bool isFourIcadDesktopBuild = caseStudyId == '4icad' &&
+                      (title == 'Shipped Product Build' ||
+                          title == 'Shipped Product Builds');
                   // Firestore title typos still get correct layout if paths are under asd_app_adaptive.
                   final bool isAdaptivePlatformSection =
                       CaseStudySection.matchesAdaptivePlatformSection(
@@ -1091,6 +1098,15 @@ class _SectionBlock extends StatelessWidget {
                         imageWidth = imageHeight * aspect;
                       }
                     }
+                  } else if (isFourIcadDesktopBuild) {
+                    const double aspect = 2110 / 1548;
+                    crossAxisCount = 1;
+                    imageWidth = availableWidth;
+                    imageHeight = imageWidth / aspect;
+                    if (!isMobile && imageHeight > 560) {
+                      imageHeight = 560;
+                      imageWidth = imageHeight * aspect;
+                    }
                   } else if (isSolutionSection) {
                     crossAxisCount = isMobile
                         ? 2
@@ -1121,9 +1137,13 @@ class _SectionBlock extends StatelessWidget {
                   final bool showOneByOneCentered = isMobile &&
                       !isDesignSystem &&
                       !isSolutionSection &&
+                      !isFourIcadMobileGallery &&
+                      !isFourIcadDesktopBuild &&
                       !isAdaptivePlatformSection;
                   final bool hasDescriptions = sortedImages.any((img) =>
                       img.description != null && img.description!.isNotEmpty);
+                  final double captionReserveHeight =
+                      8 + (bodySize * 0.9 * 1.35 * 3) + 8;
 
                   Widget buildImageItem(
                     CaseStudyImage item, {
@@ -1137,8 +1157,7 @@ class _SectionBlock extends StatelessWidget {
                         item.path.startsWith('https://');
                     final BoxFit resolvedFit =
                         fit ?? (isNetwork ? BoxFit.contain : BoxFit.cover);
-                    final bool resolvedFitInside =
-                        fitInside ?? isNetwork;
+                    final bool resolvedFitInside = fitInside ?? isNetwork;
                     return _ImageWithCaption(
                       imagePath: item.path,
                       description: item.description,
@@ -1169,6 +1188,43 @@ class _SectionBlock extends StatelessWidget {
                           ),
                         );
                       }),
+                    );
+                  }
+
+                  if (isFourIcadDesktopBuild) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: List.generate(sortedImages.length, (index) {
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom:
+                                index < sortedImages.length - 1 ? spacing : 0,
+                          ),
+                          child: Center(
+                            child: buildImageItem(
+                              sortedImages[index],
+                              fit: BoxFit.contain,
+                              fitInside: true,
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  }
+
+                  if (isFourIcadMobileGallery) {
+                    final double galleryHeight =
+                        imageHeight + captionReserveHeight;
+                    return SizedBox(
+                      height: galleryHeight,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: sortedImages.length,
+                        separatorBuilder: (_, __) => SizedBox(width: spacing),
+                        itemBuilder: (context, index) {
+                          return buildImageItem(sortedImages[index]);
+                        },
+                      ),
                     );
                   }
 

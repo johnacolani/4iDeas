@@ -244,10 +244,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       if (byOrder != 0) return byOrder;
       // When order matches (e.g. legacy Firestore defaults), prefer featured static ids first.
       const tieBreak = {
-        'rose-chat-seasonal-campaign-engine': 0,
-        'service-flow': 1,
-        'asd': 2,
-        'twin-scriptures': 3,
+        '4icad': 0,
+        'asd': 1,
+        'service-flow': 2,
+        'rose-chat-seasonal-campaign-engine': 3,
+        'twin-scriptures': 4,
       };
       final ta = tieBreak[a.id] ?? 99;
       final tb = tieBreak[b.id] ?? 99;
@@ -1255,6 +1256,7 @@ Widget _portfolioFrostedGlassPanel({
   required EdgeInsetsGeometry padding,
   double borderRadius = 22,
   double borderWidth = 1,
+  Color? borderColor,
 }) {
   return ClipRRect(
     borderRadius: BorderRadius.circular(borderRadius),
@@ -1275,7 +1277,7 @@ Widget _portfolioFrostedGlassPanel({
             ],
           ),
           border: Border.all(
-            color: HomeWarmColors.portfolioWarmBorder,
+            color: borderColor ?? HomeWarmColors.portfolioWarmBorder,
             width: borderWidth,
           ),
         ),
@@ -1366,7 +1368,8 @@ class _DesignSystemHighlightState extends State<_DesignSystemHighlight>
               },
               child: _portfolioFrostedGlassPanel(
                 borderRadius: radius,
-                borderWidth: _kDesignSystemOrbitDotRadius,
+                borderWidth: 4,
+                borderColor: ColorManager.accentGoldDark,
                 padding: EdgeInsets.symmetric(
                   horizontal: widget.isMobile ? 20 : 28,
                   vertical: widget.isMobile ? 20 : 24,
@@ -1777,6 +1780,13 @@ class _FeaturedCaseStudiesShowcase extends StatelessWidget {
   });
 
   static const Map<String, List<String>> _featuredTagsById = {
+    '4icad': [
+      'Product Design',
+      'UX Design',
+      'Flutter',
+      'Cross Platform',
+      'CAD Software',
+    ],
     'rose-chat-seasonal-campaign-engine': [
       'Conversational AI',
       'Product Design',
@@ -1945,6 +1955,7 @@ class _FeaturedCaseStudyHeroStrip extends StatefulWidget {
 
   /// Case studies that use Twin-style multi-hero: contain + narrow tiles + gap.
   static const Set<String> _portraitMultiHeroCaseStudyIds = {
+    '4icad',
     'twin-scriptures',
     'asd',
     'rose-chat-seasonal-campaign-engine',

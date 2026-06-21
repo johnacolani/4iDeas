@@ -134,7 +134,8 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: ColorManager.accentGold.withValues(alpha: 0.62),
+                          color:
+                              ColorManager.accentGold.withValues(alpha: 0.62),
                           width: 1.5,
                         ),
                       ),
@@ -609,6 +610,34 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
         ),
       );
     }
+    if (app.id.toLowerCase() == '4icad') {
+      final existing = <String>{
+        if (app.webUrl != null) 'Web App',
+        if (app.macosUrl != null) 'macOS',
+        if (app.windowsUrl != null) 'Windows',
+        if (app.appStoreUrl != null) 'App Store',
+        if (app.playStoreUrl != null) 'Google Play',
+      };
+      void addComingSoon(String label, IconData icon) {
+        if (existing.contains(label)) return;
+        addChip(
+          _LinkChip(
+            label: '$label soon',
+            icon: icon,
+            onTap: null,
+            isMobile: isMobile,
+            isDarkSurface: isDarkSurface,
+            accentGold: accentGold,
+          ),
+        );
+      }
+
+      addComingSoon('Web App', Icons.language);
+      addComingSoon('macOS', Icons.laptop_mac);
+      addComingSoon('Windows', Icons.desktop_windows);
+      addComingSoon('App Store', Icons.apple);
+      addComingSoon('Google Play', Icons.android);
+    }
 
     if (chips.isEmpty) {
       return const SizedBox.shrink();
@@ -919,7 +948,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
 class _LinkChip extends StatefulWidget {
   final String label;
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool isMobile;
   final bool isDarkSurface;
   final Color accentGold;
@@ -949,14 +978,24 @@ class _LinkChipState extends State<_LinkChip> {
     final Color hoverTitleColor = ColorManager.portfolioTextTitle;
     final Color hoverBorderColor =
         ColorManager.accentGold.withValues(alpha: 0.58);
-    final Color buttonTitleColor =
-        (_isHovered || _isFocused) ? hoverTitleColor : baseTitleColor;
-    final Color buttonBorderColor =
-        (_isHovered || _isFocused) ? hoverBorderColor : baseBorderColor;
-    final Color chipBackground = (_isHovered || _isFocused)
-        ? widget.accentGold.withValues(alpha: 0.20)
-        : widget.accentGold.withValues(alpha: 0.14);
-    final String actionLabel = 'Open ${widget.label} for this app';
+    final Color buttonTitleColor = widget.onTap == null
+        ? baseTitleColor.withValues(alpha: 0.72)
+        : (_isHovered || _isFocused)
+            ? hoverTitleColor
+            : baseTitleColor;
+    final Color buttonBorderColor = widget.onTap == null
+        ? baseBorderColor.withValues(alpha: 0.72)
+        : (_isHovered || _isFocused)
+            ? hoverBorderColor
+            : baseBorderColor;
+    final Color chipBackground = widget.onTap == null
+        ? widget.accentGold.withValues(alpha: 0.08)
+        : (_isHovered || _isFocused)
+            ? widget.accentGold.withValues(alpha: 0.20)
+            : widget.accentGold.withValues(alpha: 0.14);
+    final String actionLabel = widget.onTap == null
+        ? '${widget.label} link coming soon'
+        : 'Open ${widget.label} for this app';
 
     return Tooltip(
       message: actionLabel,

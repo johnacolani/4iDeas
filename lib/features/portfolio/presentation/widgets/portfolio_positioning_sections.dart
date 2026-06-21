@@ -101,7 +101,7 @@ class PortfolioPositioningHero extends StatelessWidget {
                   offset: const Offset(0, -16),
                   child: ExcludeSemantics(
                     child: Opacity(
-                      opacity: 0.3,
+                      opacity: 0.46,
                       child: SizedBox(
                         width: lottieWidth,
                         height: lottieHeight,
@@ -113,8 +113,8 @@ class PortfolioPositioningHero extends StatelessWidget {
                               ValueDelegate.colorFilter(
                                 ['**'],
                                 value: ColorFilter.mode(
-                                  HomeWarmColors.iconLocation
-                                      .withValues(alpha: 0.9),
+                                  HomeWarmColors.textInk
+                                      .withValues(alpha: 0.92),
                                   BlendMode.srcATop,
                                 ),
                               ),
