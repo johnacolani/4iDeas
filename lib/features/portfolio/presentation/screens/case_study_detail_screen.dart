@@ -1127,9 +1127,18 @@ class _SectionBlock extends StatelessWidget {
 
                   Widget buildImageItem(
                     CaseStudyImage item, {
-                    BoxFit fit = BoxFit.cover,
-                    bool fitInside = false,
+                    BoxFit? fit,
+                    bool? fitInside,
                   }) {
+                    // Uploaded (network) images have arbitrary aspect ratios, so
+                    // show them complete inside the frame instead of cropping to
+                    // fill it. Static phone-screenshot assets keep cover.
+                    final bool isNetwork = item.path.startsWith('http://') ||
+                        item.path.startsWith('https://');
+                    final BoxFit resolvedFit =
+                        fit ?? (isNetwork ? BoxFit.contain : BoxFit.cover);
+                    final bool resolvedFitInside =
+                        fitInside ?? isNetwork;
                     return _ImageWithCaption(
                       imagePath: item.path,
                       description: item.description,
@@ -1137,8 +1146,8 @@ class _SectionBlock extends StatelessWidget {
                       imageHeight: imageHeight,
                       bodySize: bodySize,
                       onTap: () => onImageTap(item.path),
-                      imageFit: fit,
-                      imageFitInsideContainer: fitInside,
+                      imageFit: resolvedFit,
+                      imageFitInsideContainer: resolvedFitInside,
                     );
                   }
 
