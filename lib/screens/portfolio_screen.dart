@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -788,13 +789,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              PortfolioProofBand(
-                                bodySize: bodySize,
-                                isMobile: isMobile,
-                              ),
-                              SizedBox(height: gapAfterProofBand),
-
-                              // 2. My Own Design System card
+                              // 1. My Own Design System card (right after the hero)
                               _DesignSystemHighlight(
                                 designSystemTitleSize:
                                     isMobile ? 24 : (sectionTitleSize + 6),
@@ -805,6 +800,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 onTapLink: () => _launchUrl(_designSystemUrl),
                               ),
                               SizedBox(height: gapAfterDesignSystemCard),
+
+                              // 2. Proof band
+                              PortfolioProofBand(
+                                bodySize: bodySize,
+                                isMobile: isMobile,
+                              ),
+                              SizedBox(height: gapAfterProofBand),
 
                               // 3. Design Philosophy & Principles card
                               _DesignPhilosophyCard(
@@ -888,8 +890,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 isMobile: isMobile,
                                 bodySize: bodySize,
                                 gapBetweenCards: gapBetweenCaseStudyCards,
-                                onOpenCaseStudy: (id) => context
-                                    .go(AppRoutes.portfolioCaseStudyPath(id)),
+                                onOpenCaseStudy: (id) {
+                                  // Pass the already-loaded (Firestore-merged)
+                                  // case study so the detail screen shows the
+                                  // latest content, not just static data.
+                                  final cs = _displayCaseStudies
+                                      .where((c) => c.id == id)
+                                      .firstOrNull;
+                                  context.go(
+                                    AppRoutes.portfolioCaseStudyPath(id),
+                                    extra: cs,
+                                  );
+                                },
                                 showAdminActions: AdminService.isAdmin(),
                                 onEdit: AdminService.isAdmin()
                                     ? _navigateToEditCaseStudy
@@ -2085,6 +2097,9 @@ class _FeaturedCaseStudyHeroStripState
                             ? Image.network(
                                 path,
                                 fit: BoxFit.contain,
+                                webHtmlElementStrategy: kIsWeb
+                                    ? WebHtmlElementStrategy.prefer
+                                    : WebHtmlElementStrategy.never,
                                 errorBuilder: (_, __, ___) => _placeholder(420),
                               )
                             : Image.asset(
@@ -2450,6 +2465,9 @@ class _FeaturedCaseStudyHeroStripState
             width: w,
             height: side,
             alignment: Alignment.center,
+            webHtmlElementStrategy: kIsWeb
+                ? WebHtmlElementStrategy.prefer
+                : WebHtmlElementStrategy.never,
             errorBuilder: (_, __, ___) => _placeholder(side),
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;

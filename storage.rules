@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Case study images: anyone can read (they're shown in the public portfolio),
+    // only the signed-in admin may upload/overwrite/delete.
+    match /case_study_images/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == 'john.ace.colani@outlook.com';
+    }
+
+    // Everything else: deny by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

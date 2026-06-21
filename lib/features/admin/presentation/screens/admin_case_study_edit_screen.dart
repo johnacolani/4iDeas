@@ -6,6 +6,7 @@ import 'package:four_ideas/core/home_warm_colors.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/case_study_content_service.dart';
+import 'package:four_ideas/services/case_study_image_upload_service.dart';
 
 /// Add or edit a case study. [docId] null = add, non-null = edit.
 class AdminCaseStudyEditScreen extends StatefulWidget {
@@ -19,7 +20,8 @@ class AdminCaseStudyEditScreen extends StatefulWidget {
   });
 
   @override
-  State<AdminCaseStudyEditScreen> createState() => _AdminCaseStudyEditScreenState();
+  State<AdminCaseStudyEditScreen> createState() =>
+      _AdminCaseStudyEditScreenState();
 }
 
 class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
@@ -29,13 +31,20 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
   final _overviewController = TextEditingController();
   final _heroImagePathController = TextEditingController();
   final _designApproachController = TextEditingController();
+  final _problemSpaceController = TextEditingController();
+  final _myRoleController = TextEditingController();
+  final _impactController = TextEditingController();
+  final _platformsController = TextEditingController();
   final List<_SectionEditing> _sections = [];
   bool _saving = false;
   String? _error;
-  /// Preserved when the admin UI has no field for multi-hero paths (e.g. Twin Scriptures strip).
-  List<String>? _preservedHeroImagePaths;
+
+  /// Controllers currently running a gallery upload (so their button shows a spinner).
+  final Set<TextEditingController> _uploading = {};
 
   final CaseStudyContentService _service = CaseStudyContentService();
+  final CaseStudyImageUploadService _uploadService =
+      CaseStudyImageUploadService();
 
   @override
   void initState() {
@@ -45,10 +54,32 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
       _titleController.text = cs.title;
       _subtitleController.text = cs.subtitle;
       _overviewController.text = cs.overview;
-      _heroImagePathController.text = cs.heroImagePath ?? '';
-      _preservedHeroImagePaths = cs.heroImagePaths;
+      final heroPaths = cs.heroImagePaths;
+      if (heroPaths != null && heroPaths.isNotEmpty) {
+        // Multi-image hero strip: show one path per line so it can be edited.
+        _heroImagePathController.text = heroPaths.join('\n');
+      } else {
+        _heroImagePathController.text = cs.heroImagePath ?? '';
+      }
       _designApproachController.text = cs.designApproach ?? '';
       for (final s in cs.sections) {
+        final dedicated = _dedicatedSectionForTitle(s.title);
+        if (dedicated == _DedicatedCaseStudySection.problemSpace) {
+          _problemSpaceController.text = s.content;
+          continue;
+        }
+        if (dedicated == _DedicatedCaseStudySection.myRole) {
+          _myRoleController.text = s.content;
+          continue;
+        }
+        if (dedicated == _DedicatedCaseStudySection.impact) {
+          _impactController.text = s.content;
+          continue;
+        }
+        if (dedicated == _DedicatedCaseStudySection.platforms) {
+          _platformsController.text = s.content;
+          continue;
+        }
         _sections.add(_SectionEditing(
           title: TextEditingController(text: s.title),
           content: TextEditingController(text: s.content),
@@ -76,6 +107,10 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
     _overviewController.dispose();
     _heroImagePathController.dispose();
     _designApproachController.dispose();
+    _problemSpaceController.dispose();
+    _myRoleController.dispose();
+    _impactController.dispose();
+    _platformsController.dispose();
     for (final s in _sections) {
       s.title.dispose();
       s.content.dispose();
@@ -85,21 +120,98 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
   }
 
   List<CaseStudySection> _buildSections() {
-    return _sections.map((s) {
-      final paths = s.imagePaths.text.trim().isEmpty
-          ? null
-          : s.imagePaths.text.trim().split(RegExp(r'\n')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-      return CaseStudySection(
-        title: s.title.text.trim(),
-        content: s.content.text.trim(),
-        imagePaths: paths?.isEmpty == true ? null : paths,
-        images: null,
-      );
-    }).toList();
+    return [
+      ..._buildDedicatedSections(),
+      ..._sections.map((s) {
+        final title = s.title.text.trim();
+        final content = s.content.text.trim();
+        final imagePathsText = s.imagePaths.text.trim();
+        if (title.isEmpty && content.isEmpty && imagePathsText.isEmpty) {
+          return null;
+        }
+        final paths = s.imagePaths.text.trim().isEmpty
+            ? null
+            : s.imagePaths.text
+                .trim()
+                .split(RegExp(r'\n'))
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList();
+        return CaseStudySection(
+          title: title,
+          content: content,
+          imagePaths: paths?.isEmpty == true ? null : paths,
+          images: null,
+        );
+      }).whereType<CaseStudySection>(),
+    ];
+  }
+
+  List<CaseStudySection> _buildDedicatedSections() {
+    CaseStudySection? section(String title, TextEditingController controller) {
+      final content = controller.text.trim();
+      if (content.isEmpty) return null;
+      return CaseStudySection(title: title, content: content);
+    }
+
+    return [
+      section('Problem space', _problemSpaceController),
+      section('My role', _myRoleController),
+      section('Impact', _impactController),
+      section('Platforms', _platformsController),
+    ].whereType<CaseStudySection>().toList();
+  }
+
+  _DedicatedCaseStudySection? _dedicatedSectionForTitle(String rawTitle) {
+    final title = rawTitle.trim().toLowerCase();
+    if (title == 'problem space' ||
+        title == 'problem' ||
+        title == 'the problem before the app' ||
+        title == 'business problem and search intent') {
+      return _DedicatedCaseStudySection.problemSpace;
+    }
+    if (title == 'my role' ||
+        title == 'my role and responsibilities' ||
+        title == 'business goal and my role' ||
+        title == 'users, business goal, and my role') {
+      return _DedicatedCaseStudySection.myRole;
+    }
+    if (title == 'impact' ||
+        title == 'outcome & impact' ||
+        title == 'outcome and impact' ||
+        title == 'outcome and business impact') {
+      return _DedicatedCaseStudySection.impact;
+    }
+    if (title == 'platforms' ||
+        title == 'system architecture and delivery stack') {
+      return _DedicatedCaseStudySection.platforms;
+    }
+    return null;
+  }
+
+  String? _sectionTitleValidator(_SectionEditing section, String? value) {
+    final title = value?.trim() ?? '';
+    final hasContent = section.content.text.trim().isNotEmpty;
+    final hasImages = section.imagePaths.text.trim().isNotEmpty;
+    if (title.isEmpty && (hasContent || hasImages)) return 'Required';
+    return null;
+  }
+
+  String? _sectionContentValidator(_SectionEditing section, String? value) {
+    final content = value?.trim() ?? '';
+    final hasTitle = section.title.text.trim().isNotEmpty;
+    if (content.isEmpty && hasTitle) return 'Required';
+    return null;
   }
 
   PortfolioCaseStudy _buildCaseStudy() {
-    final hero = _heroImagePathController.text.trim();
+    // Hero field accepts one image path/URL per line. A single line renders as
+    // the single hero; two or more render as the horizontal hero strip.
+    final heroPaths = _heroImagePathController.text
+        .split(RegExp(r'\n'))
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
     return PortfolioCaseStudy(
       id: widget.docId ?? 'cs-${DateTime.now().millisecondsSinceEpoch}',
       title: _titleController.text.trim(),
@@ -108,8 +220,8 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
       designApproach: _designApproachController.text.trim().isEmpty
           ? null
           : _designApproachController.text.trim(),
-      heroImagePath: hero.isEmpty ? null : hero,
-      heroImagePaths: _preservedHeroImagePaths,
+      heroImagePath: heroPaths.isEmpty ? null : heroPaths.first,
+      heroImagePaths: heroPaths.length > 1 ? heroPaths : null,
       sections: _buildSections(),
     );
   }
@@ -126,7 +238,9 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
         await _service.updateCaseStudy(widget.docId!, cs);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Case study updated'), backgroundColor: Colors.green),
+            const SnackBar(
+                content: Text('Case study updated'),
+                backgroundColor: Colors.green),
           );
           Navigator.of(context).pop(true);
         }
@@ -134,7 +248,9 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
         await _service.setCaseStudyWithId(widget.initialCaseStudy!.id, cs);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Case study saved to cloud'), backgroundColor: Colors.green),
+            const SnackBar(
+                content: Text('Case study saved to cloud'),
+                backgroundColor: Colors.green),
           );
           Navigator.of(context).pop(true);
         }
@@ -142,7 +258,9 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
         await _service.addCaseStudy(cs);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Case study added'), backgroundColor: Colors.green),
+            const SnackBar(
+                content: Text('Case study added'),
+                backgroundColor: Colors.green),
           );
           Navigator.of(context).pop(true);
         }
@@ -175,6 +293,72 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
       _sections[index].imagePaths.dispose();
       _sections.removeAt(index);
     });
+  }
+
+  /// Pick image(s) from the gallery, upload to Storage, and append the resulting
+  /// URLs (one per line) to [controller] without clobbering existing entries.
+  Future<void> _pickAndAppendImages(TextEditingController controller) async {
+    if (_uploading.contains(controller)) return;
+    setState(() => _uploading.add(controller));
+    try {
+      final urls = await _uploadService.pickAndUploadImages();
+      if (!mounted) return;
+      if (urls.isNotEmpty) {
+        final existing = controller.text.trim();
+        controller.text =
+            existing.isEmpty ? urls.join('\n') : '$existing\n${urls.join('\n')}';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Added ${urls.length} image(s)'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Upload failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _uploading.remove(controller));
+    }
+  }
+
+  Widget _uploadButton(TextEditingController controller, String label) {
+    final busy = _uploading.contains(controller);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: OutlinedButton.icon(
+          onPressed: busy ? null : () => _pickAndAppendImages(controller),
+          icon: busy
+              ? const SizedBox(
+                  height: 16,
+                  width: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.photo_library_outlined, size: 18),
+          label: Text(
+            busy ? 'Uploading…' : label,
+            style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
+          ),
+          style: OutlinedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: ColorManager.orange,
+            side: const BorderSide(
+              color: ColorManager.orange,
+              width: 1.5,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -218,7 +402,8 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                               color: const Color(0xFFFEE2E2),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: const Color(0xFFDC2626).withValues(alpha: 0.35),
+                                color: const Color(0xFFDC2626)
+                                    .withValues(alpha: 0.35),
                               ),
                             ),
                             child: Text(
@@ -236,26 +421,37 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                           controller: _titleController,
                           label: 'Title',
                           hint: 'e.g. Absolute Stone Design (ASD)',
-                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
                         ),
                         _buildField(
                           controller: _subtitleController,
                           label: 'Subtitle',
                           hint: 'e.g. Multi-Role Operations Platform',
-                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
                         ),
                         _buildField(
                           controller: _overviewController,
                           label: 'Overview',
                           hint: 'Summary text for the card and detail',
                           maxLines: 5,
-                          validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Required'
+                              : null,
                         ),
                         _buildField(
                           controller: _heroImagePathController,
-                          label: 'Featured card hero image (optional)',
-                          hint: 'assets/images/... or https://... (banner above the featured card title)',
-                          maxLines: 2,
+                          label: 'Featured card hero image(s) (optional)',
+                          hint:
+                              'One per line. assets/images/... or https://... — add 2+ lines for a hero image strip.',
+                          maxLines: 6,
+                        ),
+                        _uploadButton(
+                          _heroImagePathController,
+                          'Upload hero image(s) from gallery',
                         ),
                         _buildField(
                           controller: _designApproachController,
@@ -265,7 +461,45 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Sections',
+                          'Case study story',
+                          style: GoogleFonts.roboto(
+                            color: HomeWarmColors.textInk,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildField(
+                          controller: _problemSpaceController,
+                          label: 'Problem space',
+                          hint:
+                              'What problem existed before the product, who felt it, and why it mattered.',
+                          maxLines: 5,
+                        ),
+                        _buildField(
+                          controller: _myRoleController,
+                          label: 'My Role',
+                          hint:
+                              'Your ownership, responsibilities, decisions, and collaboration scope.',
+                          maxLines: 5,
+                        ),
+                        _buildField(
+                          controller: _impactController,
+                          label: 'Impact',
+                          hint:
+                              'What changed after the work shipped: business, user, workflow, or product impact.',
+                          maxLines: 5,
+                        ),
+                        _buildField(
+                          controller: _platformsController,
+                          label: 'Platforms',
+                          hint:
+                              'iOS, Android, web, desktop, Firebase, APIs, or any platform/stack context.',
+                          maxLines: 4,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Additional sections',
                           style: GoogleFonts.roboto(
                             color: HomeWarmColors.textInk,
                             fontSize: 16,
@@ -282,7 +516,8 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                             margin: const EdgeInsets.only(bottom: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
-                              side: BorderSide(color: HomeWarmColors.drawerBorder),
+                              side: BorderSide(
+                                  color: HomeWarmColors.drawerBorder),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(12),
@@ -302,7 +537,8 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                       ),
                                       if (_sections.length > 1)
                                         IconButton(
-                                          icon: Icon(Icons.delete_outline, color: Colors.red, size: 22),
+                                          icon: Icon(Icons.delete_outline,
+                                              color: Colors.red, size: 22),
                                           onPressed: () => _removeSection(i),
                                         ),
                                     ],
@@ -311,20 +547,28 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                                     controller: s.title,
                                     label: 'Section title',
                                     hint: 'e.g. Problem Statement',
-                                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                                    validator: (v) =>
+                                        _sectionTitleValidator(s, v),
                                   ),
                                   _buildField(
                                     controller: s.content,
                                     label: 'Content',
                                     hint: 'Section body text',
                                     maxLines: 4,
-                                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                                    validator: (v) =>
+                                        _sectionContentValidator(s, v),
                                   ),
                                   _buildField(
                                     controller: s.imagePaths,
-                                    label: 'Image paths (one per line; add as many as you need for e.g. Adaptive Platform)',
-                                    hint: 'assets/images/asd_app_adaptive/asd-001.jpg',
+                                    label:
+                                        'Image paths (one per line; add as many as you need for e.g. Adaptive Platform)',
+                                    hint:
+                                        'assets/images/asd_app_adaptive/asd-001.jpg',
                                     maxLines: 12,
+                                  ),
+                                  _uploadButton(
+                                    s.imagePaths,
+                                    'Upload image(s) from gallery',
                                   ),
                                 ],
                               ),
@@ -333,16 +577,24 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                         }),
                         OutlinedButton.icon(
                           onPressed: _addSection,
-                          icon: Icon(Icons.add, size: 18, color: HomeWarmColors.sectionAccent),
+                          icon: const Icon(Icons.add, size: 18),
                           label: Text(
-                            'Add section',
+                            'Add Section',
                             style: GoogleFonts.roboto(
-                              color: HomeWarmColors.sectionAccent,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: HomeWarmColors.sectionAccent.withValues(alpha: 0.65)),
+                            backgroundColor: Colors.white,
+                            foregroundColor: ColorManager.orange,
+                            side: const BorderSide(
+                              color: ColorManager.orange,
+                              width: 1.5,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 14,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -357,11 +609,13 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
                               ? const SizedBox(
                                   height: 22,
                                   width: 22,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white),
                                 )
                               : Text(
                                   isEdit ? 'Update' : 'Add',
-                                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600),
                                 ),
                         ),
                       ],
@@ -414,7 +668,8 @@ class _AdminCaseStudyEditScreenState extends State<AdminCaseStudyEditScreen> {
             color: HomeWarmColors.eyebrowMuted,
             fontSize: 14,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: HomeWarmColors.drawerBorder),
             borderRadius: borderRadius,
@@ -451,4 +706,11 @@ class _SectionEditing {
     required this.content,
     required this.imagePaths,
   });
+}
+
+enum _DedicatedCaseStudySection {
+  problemSpace,
+  myRole,
+  impact,
+  platforms,
 }

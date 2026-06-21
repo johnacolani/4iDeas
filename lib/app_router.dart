@@ -7,6 +7,7 @@ import 'package:four_ideas/screens/about_us_screen.dart';
 import 'package:four_ideas/screens/order_here_screen.dart';
 import 'package:four_ideas/screens/contact_us_screen.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/services/case_study_content_service.dart';
 import 'package:four_ideas/data/content_articles_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/case_study_detail_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
@@ -126,17 +127,16 @@ GoRouter createAppRouter() {
         path: '${AppRoutes.portfolioCaseStudy}/:id',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          final found =
-              PortfolioData.caseStudies.where((c) => c.id == id).toList();
-          if (found.isEmpty) {
-            return Scaffold(
-              body: Center(
-                child: Text('Case study not found'),
-              ),
-            );
+          // 1. Prefer the case study passed in by the navigating screen — it is
+          //    already merged with Firestore, so admin edits show immediately.
+          final extra = state.extra;
+          if (extra is PortfolioCaseStudy) {
+            return CaseStudyDetailScreen(
+                caseStudy: extra.withAdaptiveBeforeDesignSystem());
           }
-          return CaseStudyDetailScreen(
-              caseStudy: found.first.withAdaptiveBeforeDesignSystem());
+          // 2. Deep link / page refresh: load from Firestore (newest content),
+          //    falling back to static data when the id isn't in Firestore.
+          return _CaseStudyByIdLoader(id: id);
         },
       ),
       GoRoute(
@@ -330,4 +330,40 @@ GoRouter createAppRouter() {
       ),
     ],
   );
+}
+
+/// Loads a case study by id when it wasn't passed via navigation (deep link or
+/// page refresh). Prefers Firestore so admin edits are reflected; falls back to
+/// static [PortfolioData] when the id isn't in Firestore.
+class _CaseStudyByIdLoader extends StatelessWidget {
+  const _CaseStudyByIdLoader({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    final staticMatch =
+        PortfolioData.caseStudies.where((c) => c.id == id).firstOrNull;
+
+    return FutureBuilder<PortfolioCaseStudy?>(
+      future: CaseStudyContentService().getCaseStudyById(id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            staticMatch == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final caseStudy = snapshot.data ?? staticMatch;
+        if (caseStudy == null) {
+          return const Scaffold(
+            body: Center(child: Text('Case study not found')),
+          );
+        }
+        return CaseStudyDetailScreen(
+          caseStudy: caseStudy.withAdaptiveBeforeDesignSystem(),
+        );
+      },
+    );
+  }
 }
