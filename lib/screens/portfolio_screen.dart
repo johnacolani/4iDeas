@@ -1989,7 +1989,19 @@ class _FeaturedCaseStudyHeroStripState
 
   bool get _usePortraitMultiHeroStrip =>
       _FeaturedCaseStudyHeroStrip._portraitMultiHeroCaseStudyIds
-          .contains(widget.caseStudyId);
+          .contains(widget.caseStudyId) ||
+      _hasNetworkHeroImages;
+
+  /// Uploaded (network) hero images have arbitrary aspect ratios, so show them
+  /// complete (contain + narrow tiles) like the curated multi-hero case studies,
+  /// instead of cropping to fill (cover).
+  bool get _hasNetworkHeroImages {
+    bool isNet(String? p) =>
+        p != null && (p.startsWith('http://') || p.startsWith('https://'));
+    if (isNet(widget.heroImagePath)) return true;
+    final paths = widget.heroImagePaths;
+    return paths != null && paths.any(isNet);
+  }
 
   bool get _enableHoverFx => !widget.isMobile;
 
