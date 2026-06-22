@@ -763,6 +763,8 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
     required Color accentGold,
     VoidCallback? onImageTap,
   }) {
+    final bool fillPreviewFrame = app.id.toLowerCase() == '4icad';
+    final BoxFit previewFit = fillPreviewFrame ? BoxFit.cover : BoxFit.contain;
     final Widget content = app.useComingSoonPlaceholder
         ? Container(
             color: ColorManager.blue.withValues(alpha: 0.2),
@@ -821,7 +823,7 @@ class _PortfolioAppCardState extends State<PortfolioAppCard> {
                   )
                 : _portfolioHeroImage(
                     app.imagePath!,
-                    fit: BoxFit.contain,
+                    fit: previewFit,
                   ))
             : _buildPlaceholder();
 
