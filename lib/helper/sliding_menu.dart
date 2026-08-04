@@ -375,6 +375,12 @@ class _SlidingMenuState extends State<SlidingMenu>
                                                       title: 'Admin – Contact inbox',
                                                       onPressed: () => _closeDrawerAndGo(AppRoutes.contact),
                                                     ),
+                                                    _buildMenuItem(
+                                                      index: 10,
+                                                      icon: Icons.privacy_tip_outlined,
+                                                      title: 'Admin – Privacy Policies',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.adminPrivacyPolicies),
+                                                    ),
                                                   ],
                                                 ],
                                               );

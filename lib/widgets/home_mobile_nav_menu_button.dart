@@ -23,7 +23,7 @@ class HomeNavMenuItems {
       icon: Icons.layers_outlined,
     ),
     (
-      label: 'Work',
+      label: 'Portfolio',
       route: AppRoutes.portfolio,
       icon: Icons.cases_outlined,
     ),
@@ -41,6 +41,11 @@ class HomeNavMenuItems {
       label: 'Blog',
       route: AppRoutes.insights,
       icon: Icons.article_outlined,
+    ),
+    (
+      label: 'Privacy Policies',
+      route: AppRoutes.privacyPolicies,
+      icon: Icons.privacy_tip_outlined,
     ),
   ];
 }
@@ -472,6 +477,16 @@ class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
               route: AppRoutes.contact,
               label: 'Contact inbox',
               icon: Icons.mark_chat_unread_outlined,
+            ),
+            const Divider(
+              height: 1,
+              thickness: 1,
+              color: _kPopupMenuDividerColor,
+            ),
+            hubSubRow(
+              route: AppRoutes.adminPrivacyPolicies,
+              label: 'Privacy policies',
+              icon: Icons.privacy_tip_outlined,
             ),
           ]
         : null;

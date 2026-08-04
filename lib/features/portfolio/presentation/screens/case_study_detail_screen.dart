@@ -278,6 +278,13 @@ class CaseStudyDetailScreen extends StatelessWidget {
                                 isMobile: isMobile,
                               ),
                             ],
+                            if (caseStudy.id == '4icad' && isMobile) ...[
+                              SizedBox(height: he * 0.025),
+                              _FourIcadMobileCommandDialogGuide(
+                                bodySize: bodySize,
+                                he: he,
+                              ),
+                            ],
                             ...caseStudy.sections.expand((s) => [
                                   SizedBox(height: he * 0.025),
                                   _SectionBlock(
@@ -1281,6 +1288,334 @@ class _SectionBlock extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _FourIcadMobileCommandDialogGuide extends StatelessWidget {
+  const _FourIcadMobileCommandDialogGuide({
+    required this.bodySize,
+    required this.he,
+  });
+
+  final double bodySize;
+  final double he;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _caseStudyLightPanelDecoration(
+        borderRadius: 18,
+        goldAccentBorder: true,
+        gradientColors: <Color>[
+          Colors.white.withValues(alpha: 0.92),
+          HomeWarmColors.bloomNorth.withValues(alpha: 0.62),
+          HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.96),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: ColorManager.accentGold.withValues(alpha: 0.18),
+                  border: Border.all(
+                    color: ColorManager.accentGoldDark.withValues(alpha: 0.55),
+                  ),
+                ),
+                child: Icon(
+                  Icons.touch_app_outlined,
+                  color: ColorManager.portfolioTextTitle,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ShaderMask(
+                  shaderCallback: (bounds) =>
+                      _goldGradient.createShader(bounds),
+                  blendMode: BlendMode.srcIn,
+                  child: Text(
+                    'Mobile Command Dialog',
+                    style: GoogleFonts.roboto(
+                      color: Colors.white,
+                      fontSize: bodySize + 4,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: he * 0.014),
+          SelectableText(
+            'On mobile, the Line and Polyline tools use a touch-first command dialog instead of a desktop-style command line.',
+            style: GoogleFonts.roboto(
+              color: ColorManager.portfolioTextBody,
+              fontSize: bodySize,
+              height: 1.55,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 14),
+          _FourIcadCommandDialogMockup(bodySize: bodySize),
+          const SizedBox(height: 14),
+          _FourIcadDialogPoint(
+            bodySize: bodySize,
+            title: 'Draw freely with End',
+            text:
+                'If the user taps End, they can continue drawing freely on the canvas and use the compact status bar as their guide for estimating the shape.',
+          ),
+          _FourIcadDialogPoint(
+            bodySize: bodySize,
+            title: 'Close after several lines with C',
+            text:
+                'If the user creates several connected line segments and wants to close the shape, they can tap C to close the current Line or Polyline path.',
+          ),
+          _FourIcadDialogPoint(
+            bodySize: bodySize,
+            title: 'Control direction with X/Y',
+            text:
+                'For axis-based drawing, the user can choose +X, -X, +Y, or -Y to continue in an exact horizontal or vertical direction.',
+          ),
+          _FourIcadDialogPoint(
+            bodySize: bodySize,
+            title: 'Use length and line angle',
+            text:
+                'When precision matters, the user can enter a line length with an angle, then apply that same guided workflow to both Line and Polyline commands.',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FourIcadCommandDialogMockup extends StatelessWidget {
+  const _FourIcadCommandDialogMockup({required this.bodySize});
+
+  final double bodySize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: HomeWarmColors.shellSurfaceSolid.withValues(alpha: 0.74),
+        border: Border.all(
+          color: ColorManager.accentGoldDark.withValues(alpha: 0.36),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              _FourIcadToolIcon(
+                icon: Icons.show_chart_rounded,
+                label: 'Line',
+                bodySize: bodySize,
+              ),
+              const SizedBox(width: 8),
+              _FourIcadToolIcon(
+                icon: Icons.polyline_rounded,
+                label: 'Polyline',
+                bodySize: bodySize,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: const [
+              Expanded(child: _FourIcadCommandButton(label: 'End point')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: 'C')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: const [
+              Expanded(child: _FourIcadCommandButton(label: '+X')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: '-X')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: '+Y')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: '-Y')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: const [
+              Expanded(child: _FourIcadCommandButton(label: 'Length')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: 'Angle')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: const [
+              Expanded(child: _FourIcadCommandButton(label: 'Enter')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: 'Del')),
+              SizedBox(width: 8),
+              Expanded(child: _FourIcadCommandButton(label: 'Done')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FourIcadToolIcon extends StatelessWidget {
+  const _FourIcadToolIcon({
+    required this.icon,
+    required this.label,
+    required this.bodySize,
+  });
+
+  final IconData icon;
+  final String label;
+  final double bodySize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: ColorManager.portfolioTextTitle.withValues(alpha: 0.08),
+          border: Border.all(
+            color: ColorManager.portfolioTextTitle.withValues(alpha: 0.18),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: ColorManager.portfolioTextTitle,
+              size: 18,
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.roboto(
+                  color: ColorManager.portfolioTextTitle,
+                  fontSize: bodySize - 1,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FourIcadCommandButton extends StatelessWidget {
+  const _FourIcadCommandButton({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: ColorManager.accentGold.withValues(alpha: 0.12),
+        border: Border.all(
+          color: ColorManager.accentGoldDark.withValues(alpha: 0.46),
+        ),
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.roboto(
+          color: ColorManager.portfolioTextTitle,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+class _FourIcadDialogPoint extends StatelessWidget {
+  const _FourIcadDialogPoint({
+    required this.bodySize,
+    required this.title,
+    required this.text,
+  });
+
+  final double bodySize;
+  final String title;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Icon(
+              Icons.check_circle_outline,
+              color: ColorManager.accentGoldDark,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: SelectableText.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$title: ',
+                    style: GoogleFonts.roboto(
+                      color: ColorManager.portfolioTextTitle,
+                      fontSize: bodySize,
+                      height: 1.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  TextSpan(
+                    text: text,
+                    style: GoogleFonts.roboto(
+                      color: ColorManager.portfolioTextBody,
+                      fontSize: bodySize,
+                      height: 1.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
