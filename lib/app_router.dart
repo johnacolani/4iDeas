@@ -31,6 +31,10 @@ import 'package:four_ideas/data/privacy_policy_data.dart';
 import 'package:four_ideas/screens/privacy_policy_list_screen.dart';
 import 'package:four_ideas/screens/privacy_policy_detail_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_privacy_policy_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_releases_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_product_orders_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_product_order_detail_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_promotion_codes_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_product_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_success_screen.dart';
 
@@ -344,6 +348,27 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.adminPrivacyPolicies,
         builder: (context, state) => const AdminPrivacyPolicyScreen(),
+      ),
+      // 4iCAD commerce admin. The order detail addresses its record by
+      // Checkout Session id in the path, so it survives a refresh — unlike the
+      // older `extra`-only admin detail routes.
+      GoRoute(
+        path: AppRoutes.adminReleases,
+        builder: (context, state) => const AdminReleasesScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.adminProductOrders}/:sessionId',
+        builder: (context, state) => AdminProductOrderDetailScreen(
+          sessionId: state.pathParameters['sessionId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.adminProductOrders,
+        builder: (context, state) => const AdminProductOrdersScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminPromotionCodes,
+        builder: (context, state) => const AdminPromotionCodesScreen(),
       ),
       GoRoute(
         path: AppRoutes.adminOrderDetail,

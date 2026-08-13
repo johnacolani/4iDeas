@@ -390,6 +390,24 @@ class _SlidingMenuState extends State<SlidingMenu>
                                                       title: 'Admin – Privacy Policies',
                                                       onPressed: () => _closeDrawerAndGo(AppRoutes.adminPrivacyPolicies),
                                                     ),
+                                                    _buildMenuItem(
+                                                      index: 11,
+                                                      icon: Icons.system_update_alt,
+                                                      title: 'Admin – 4iCAD releases',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.adminReleases),
+                                                    ),
+                                                    _buildMenuItem(
+                                                      index: 12,
+                                                      icon: Icons.receipt_long_outlined,
+                                                      title: 'Admin – 4iCAD orders',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.adminProductOrders),
+                                                    ),
+                                                    _buildMenuItem(
+                                                      index: 13,
+                                                      icon: Icons.local_offer_outlined,
+                                                      title: 'Admin – Promotion codes',
+                                                      onPressed: () => _closeDrawerAndGo(AppRoutes.adminPromotionCodes),
+                                                    ),
                                                   ],
                                                 ],
                                               );
