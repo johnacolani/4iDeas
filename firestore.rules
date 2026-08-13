@@ -6,11 +6,27 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isAdmin() {
+    // Admin authorization reads the verified ID token only. An `admin: true`
+    // custom claim is the intended mechanism; the email allowlist is a
+    // temporary fallback so the claim migration cannot lock the existing
+    // administrator out. Remove `hasLegacyAdminEmail()` and its use here once
+    // every admin account reports the claim.
+    // Uses token.get(...) with a default: reading a claim that is absent as a
+    // bare property raises an evaluation error rather than yielding false,
+    // which would deny a legitimate legacy admin during the migration.
+    function hasAdminClaim() {
+      return isSignedIn() && request.auth.token.get('admin', false) == true;
+    }
+
+    function hasLegacyAdminEmail() {
       return isSignedIn()
         && request.auth.token.email in [
           'john.ace.colani@outlook.com'
         ];
+    }
+
+    function isAdmin() {
+      return hasAdminClaim() || hasLegacyAdminEmail();
     }
 
     match /orders/{orderId} {
@@ -52,6 +68,73 @@ service cloud.firestore {
     match /privacy_policies/{docId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // 4iCAD commerce
+    //
+    // Principle: money and access are written only by Cloud Functions via the
+    // Admin SDK, which bypasses these rules. No client is ever granted write
+    // access to an order or an entitlement, not even an admin — a browser must
+    // not be able to mint access it did not pay for.
+    // ---------------------------------------------------------------
+
+    // Public product display data, including the Current release summary
+    // (version, size, checksum, notes). Deliberately carries no storage path.
+    // Written by the backend when a release is published.
+    match /products/{productKey} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Stripe Product/Price ids and other server-side product configuration.
+    // Never readable by a client — the browser must not be able to discover or
+    // influence which Price is charged.
+    match /product_config/{productKey} {
+      allow read, write: if false;
+    }
+
+    // Full release records, including the private installer storage path.
+    // Admins read them for the release history screen; only the backend writes.
+    match /releases/{releaseId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // A buyer may read their own orders; admins may read all. Nobody writes:
+    // order documents are created solely by the verified Stripe webhook.
+    match /product_orders/{sessionId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+
+    // Entitlements follow the same rule. This is the document that decides
+    // whether a download is authorized, so client writes are refused outright.
+    match /entitlements/{entitlementId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+
+    // Webhook idempotency records, Stripe customer mapping and download audit
+    // trail are backend-only bookkeeping with no client-facing use.
+    match /stripe_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /stripe_customers/{uid} {
+      allow read, write: if false;
+    }
+
+    match /download_audit/{entryId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /admin_claim_audit/{entryId} {
+      allow read: if isAdmin();
+      allow write: if false;
     }
 
     match /{document=**} {

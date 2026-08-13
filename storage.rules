@@ -2,11 +2,25 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    function isAdmin() {
+    // Reads the verified ID token only. The `admin: true` custom claim is the
+    // intended mechanism; the email allowlist is a temporary migration
+    // fallback and should be removed once every admin holds the claim.
+    // Uses token.get(...) with a default: reading a claim that is absent as a
+    // bare property raises an evaluation error rather than yielding false,
+    // which would deny a legitimate legacy admin during the migration.
+    function hasAdminClaim() {
+      return request.auth != null && request.auth.token.get('admin', false) == true;
+    }
+
+    function hasLegacyAdminEmail() {
       return request.auth != null
         && request.auth.token.email in [
           'john.ace.colani@outlook.com'
         ];
+    }
+
+    function isAdmin() {
+      return hasAdminClaim() || hasLegacyAdminEmail();
     }
 
     // Admin-uploaded images: public read, admin-only write, size/type limited.
@@ -22,6 +36,27 @@ service firebase.storage {
     match /case_study_images/{imageId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // Paid Windows installers.
+    //
+    // Read is denied to every client, including admins — there is deliberately
+    // no rule that grants it. The only way to obtain these bytes is a
+    // short-lived V4 signed URL issued by the getDownloadUrl Cloud Function
+    // after it has verified the caller's entitlement. That is what stops a
+    // paid installer from being reachable through a permanent shareable URL.
+    //
+    // Writes are admin-only and scoped to executables up to 500 MB, kept
+    // separate from the 10 MB image rules above so neither constrains the other.
+    match /releases/windows/{allPaths=**} {
+      allow read: if false;
+      allow write: if isAdmin()
+        && request.resource.size < 500 * 1024 * 1024
+        && (
+          request.resource.contentType == 'application/vnd.microsoft.portable-executable'
+          || request.resource.contentType == 'application/x-msdownload'
+          || request.resource.contentType == 'application/octet-stream'
+        );
     }
 
     // Everything else: deny by default.

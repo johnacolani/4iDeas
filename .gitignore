@@ -43,3 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets — never commit. Stripe keys live in Google Secret Manager and are
+# injected into Cloud Functions at runtime (see functions/src/core.ts).
+.env
+.env.*
+!.env.example
+*.local
+.runtimeconfig.json
+**/serviceAccountKey*.json
+firebase-debug.log
+firestore-debug.log
+storage-debug.log
+ui-debug.log
