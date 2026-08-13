@@ -309,6 +309,15 @@ class _SlidingMenuState extends State<SlidingMenu>
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+                                        // Our own product sits above the
+                                        // services/portfolio entries: it is a
+                                        // thing to buy, not a thing to browse.
+                                        _buildMenuItem(
+                                          index: 0,
+                                          icon: Icons.architecture,
+                                          title: '4iCAD',
+                                          onPressed: () => _closeDrawerAndGo(AppRoutes.fourICad),
+                                        ),
                                         _buildMenuItem(
                                           index: 0,
                                           icon: Icons.design_services,

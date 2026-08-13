@@ -31,6 +31,8 @@ import 'package:four_ideas/data/privacy_policy_data.dart';
 import 'package:four_ideas/screens/privacy_policy_list_screen.dart';
 import 'package:four_ideas/screens/privacy_policy_detail_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_privacy_policy_screen.dart';
+import 'package:four_ideas/features/commerce/presentation/screens/four_icad_product_screen.dart';
+import 'package:four_ideas/features/commerce/presentation/screens/four_icad_success_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -62,6 +64,18 @@ abstract class AppRoutes {
   static const String privacyPolicies = '/privacy';
   static String privacyPolicyPath(String slug) => '$privacyPolicies/$slug';
 
+  /// 4iCAD for Windows product and sales pages.
+  ///
+  /// A short, top-level slug matching the rest of the site (`/portfolio`,
+  /// `/services`, …) rather than a `/products/` namespace, because this is the
+  /// URL that goes on ads, QR codes and invoices. If more products are ever
+  /// sold, they take sibling slugs and `/products` becomes an index.
+  ///
+  /// There is deliberately no `/4icad/buy`: checkout is a redirect to Stripe's
+  /// hosted page, so Buy is an action rather than a route.
+  static const String fourICad = '/4icad';
+  static const String fourICadSuccess = '/4icad/success';
+
   /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
   static const String flutterAppDevelopment = '/flutter-app-development';
   static const String flutterMvpDevelopment = '/flutter-mvp-development';
@@ -89,6 +103,14 @@ abstract class AppRoutes {
   static const String adminOrders = '/admin/orders';
   static const String adminOrderDetail = '/admin/orders/detail';
   static const String adminPrivacyPolicies = '/admin/privacy';
+
+  /// 4iCAD commerce administration. Detail pages address releases and orders by
+  /// stable id in the path, so they survive a refresh.
+  static const String adminReleases = '/admin/4icad/releases';
+  static const String adminProductOrders = '/admin/4icad/orders';
+  static String adminProductOrderPath(String sessionId) =>
+      '$adminProductOrders/$sessionId';
+  static const String adminPromotionCodes = '/admin/4icad/promotions';
   static const String payment = '/payment';
   static const String contractView = '/contract-view';
 }
@@ -181,6 +203,21 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.qrCodeGenerator,
         builder: (context, state) => const QrCodeGeneratorScreen(),
+      ),
+      // 4iCAD commerce. Declared before the parameterised portfolio routes and
+      // resolved purely from the URL — no `state.extra` — so a pasted link, a
+      // refresh and a QR scan all render the same page.
+      GoRoute(
+        path: AppRoutes.fourICadSuccess,
+        builder: (context, state) => FourICadSuccessScreen(
+          sessionId: state.uri.queryParameters['session_id'],
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.fourICad,
+        builder: (context, state) => FourICadProductScreen(
+          checkoutCancelled: state.uri.queryParameters['checkout'] == 'cancelled',
+        ),
       ),
       GoRoute(
         path: AppRoutes.privacyPolicies,

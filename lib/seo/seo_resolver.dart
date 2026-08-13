@@ -136,6 +136,30 @@ import 'package:four_ideas/seo/seo_metadata.dart';
       AppRoutes.flutterWebAppDevelopment,
     );
   }
+  if (normalized == AppRoutes.fourICad) {
+    return (
+      const SeoMetadata(
+        title: '4iCAD for Windows — Professional Mobile-First CAD | 4iDeas',
+        description:
+            'Buy 4iCAD for Windows: touch-first drafting, precision snapping, DXF support, '
+            'image insertion, and cloud files. One-time purchase, free Windows updates, '
+            'or try the web app first.',
+        ogType: 'product',
+      ),
+      AppRoutes.fourICad,
+    );
+  }
+  if (normalized == AppRoutes.fourICadSuccess) {
+    // An order confirmation is per-customer and must never be indexed.
+    return (
+      const SeoMetadata(
+        title: 'Order confirmation | 4iDeas',
+        description: 'Your 4iCAD for Windows order confirmation.',
+        robots: 'noindex, nofollow',
+      ),
+      AppRoutes.fourICadSuccess,
+    );
+  }
   if (normalized == AppRoutes.caseStudies) {
     return (
       const SeoMetadata(

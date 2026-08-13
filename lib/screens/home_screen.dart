@@ -752,6 +752,17 @@ class _PrimaryDesktopNav extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Our own product, between Services and About. Uses slot 4 so
+                // the existing 0–3 underline mapping is untouched.
+                _NavUnderlineLink(
+                  label: '4iCAD',
+                  route: AppRoutes.fourICad,
+                  layerIndex: 4,
+                  selected: hi == 4,
+                  textStyle: textStyle,
+                  onNavTabHover: onNavTabHover,
+                  onNavTabHoverEnd: onNavTabHoverEnd,
+                ),
                 _NavUnderlineLink(
                   label: 'About',
                   route: AppRoutes.about,

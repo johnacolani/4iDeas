@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:four_ideas/services/admin_service.dart';
 import 'package:four_ideas/firebase_options.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:four_ideas/injection/injection_container.dart';
@@ -34,6 +36,15 @@ Future<void> _initializeAppServices() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Keep the cached `admin` custom claim in step with the signed-in session,
+    // so admin UI appears as soon as the token carries the claim.
+    FirebaseAuth.instance.idTokenChanges().listen((user) {
+      if (user == null) {
+        AdminService.clearCachedClaim();
+      } else {
+        AdminService.refreshAdminClaim(force: false);
+      }
+    });
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
     debugPrint('App will continue but authentication features may not work');

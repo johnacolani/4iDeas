@@ -41,8 +41,20 @@ class _LoginScreenState extends State<LoginScreen> {
     if (Navigator.of(context).canPop()) {
       context.pop();
     } else {
-      context.go(AppRoutes.home);
+      context.go(_destinationAfterAuth(context));
     }
+  }
+
+  /// Where to land once signed in. Supports `?redirect=/4icad` so a visitor who
+  /// signs in to buy returns to the product page instead of the home page.
+  ///
+  /// Only same-site absolute paths are honoured, so the parameter cannot be
+  /// used to bounce someone to another origin.
+  static String _destinationAfterAuth(BuildContext context) {
+    final raw = GoRouterState.of(context).uri.queryParameters['redirect'];
+    if (raw == null || raw.isEmpty) return AppRoutes.home;
+    if (!raw.startsWith('/') || raw.startsWith('//')) return AppRoutes.home;
+    return raw;
   }
 
   static List<Shadow> _titleShadows() => [
@@ -142,7 +154,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                         } else if (state is Authenticated) {
                                           final messenger =
                                               ScaffoldMessenger.of(context);
-                                          context.go(AppRoutes.home);
+                                          context.go(
+                                            _destinationAfterAuth(context),
+                                          );
                                           messenger.showSnackBar(
                                             SnackBar(
                                               content: Text(

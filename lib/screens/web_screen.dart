@@ -7,6 +7,7 @@ import '../core/home_warm_colors.dart';
 import '../core/widgets/platform_proof_chips.dart';
 import '../core/widgets/aws_backend_section.dart';
 import '../core/widgets/firebase_backend_section.dart';
+import '../core/widgets/four_icad_home_panel.dart';
 import '../core/widgets/modern_hero_section.dart';
 import '../core/widgets/home_qr_code_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
@@ -91,7 +92,19 @@ class _WebScreenState extends State<WebScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: isMobile ? 8 : 12),
+                        SizedBox(height: isMobile ? 18 : 26),
+                        // Our shipped product, directly under the hero and
+                        // above the agency pitch — the strongest slot on the page.
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 16 : 56,
+                          ),
+                          child: FourICadHomePanel(
+                            isMobile: isMobile,
+                            isTablet: isTablet,
+                          ),
+                        ),
+                        SizedBox(height: isMobile ? 26 : 38),
                         TrustBuildingHomeSections(
                           wi: wi,
                           isMobile: isMobile,
