@@ -12,6 +12,7 @@ import '../core/widgets/home_qr_code_section.dart';
 import '../core/widgets/seo_optimization_section.dart';
 import '../core/widgets/trust_home_sections.dart';
 import '../core/widgets/home_brand_footer_mark.dart';
+import '../core/widgets/home_footer_links.dart';
 
 class WebScreen extends StatefulWidget {
   const WebScreen({super.key});
@@ -157,6 +158,7 @@ class _WebScreenState extends State<WebScreen> {
                           bottomPadding: isMobile ? 32 : 48,
                           horizontalPadding: isMobile ? 12 : 24,
                         ),
+                        const HomeFooterLinks(),
                       ],
                     ),
                   ),

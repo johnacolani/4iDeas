@@ -401,8 +401,16 @@ class PortfolioData {
       'https://sites.google.com/view/senior-interaction-product-d/home';
   static const String githubProfile = 'https://github.com/johnhcolani';
 
-  /// App grid order matches list order. Showcase order (first five): ASD USA → 4iDeas Portfolio Website → My Own Design System → Service Flow → Twin Scriptures; then the rest.
+  /// App grid order matches list order. Showcase order starts with 4iCAD → ASD USA, then the remaining featured builds.
   static List<PortfolioApp> get apps => [
+        PortfolioApp(
+          id: '4icad',
+          name: '4iCAD',
+          description:
+              'Professional CAD designed mobile-first and shipped across iOS, Android, Windows, macOS, and Web. Touch-first drafting, guided commands, snapping, DXF support, image insertion, cloud files, and fabrication-oriented tools.',
+          imagePath: 'assets/images/4icad/shipped product builder.png',
+          caseStudyId: '4icad',
+        ),
         PortfolioApp(
           id: 'asdusa',
           name: 'ASD USA',
@@ -636,24 +644,24 @@ class PortfolioData {
     }
   }
 
-  /// App Showcase order (first five slots): **ASD** → **Service Flow** → **My Own Design System**
-  /// → **Twin Scriptures** → **4iDeas portfolio site**; then remaining apps. Senior-IC framing
-  /// puts production multi-role + multi-tenant work above meta self-promo and consumer apps.
+  /// App Showcase order starts with **4iCAD** → **ASD** → **Service Flow**.
+  /// Senior-IC framing puts production product builds above meta self-promo and consumer apps.
   static List<PortfolioApp> orderAppsForShowcase(List<PortfolioApp> apps) {
     int? showcaseSlot(PortfolioApp a) {
       final id = a.id.toLowerCase();
       final name = a.name.toLowerCase();
-      if (id == 'asdusa' || name.contains('asd usa')) return 0;
-      if (id == 'service-flow' || name.contains('service flow')) return 1;
+      if (id == '4icad' || name.contains('4icad')) return 0;
+      if (id == 'asdusa' || name.contains('asd usa')) return 1;
+      if (id == 'service-flow' || name.contains('service flow')) return 2;
       if (id == '4ideas-design-system' ||
           id == 'design_system' ||
           (name.contains('my own design system'))) {
-        return 2;
+        return 3;
       }
-      if (id == 'twin-scriptures') return 3;
+      if (id == 'twin-scriptures') return 4;
       if (id == 'my-web-site' ||
           (name.contains('4ideas') && name.contains('portfolio website'))) {
-        return 4;
+        return 5;
       }
       return null;
     }
@@ -948,9 +956,153 @@ class PortfolioData {
     'assets/images/service_flow/service_flow_09.png',
   ];
 
+  static const List<String> fourIcadMobileScreenshotPaths = <String>[
+    'assets/images/4icad/mob01.jpeg',
+    'assets/images/4icad/mob02.png',
+    'assets/images/4icad/mob03.jpeg',
+    'assets/images/4icad/mob04.png',
+    'assets/images/4icad/mob05.png',
+    'assets/images/4icad/mob06.png',
+    'assets/images/4icad/mob07.jpeg',
+    'assets/images/4icad/mob08.jpeg',
+    'assets/images/4icad/mob09.jpeg',
+    'assets/images/4icad/mob10.jpeg',
+    'assets/images/4icad/mob11.jpeg',
+    'assets/images/4icad/mob12.jpeg',
+    'assets/images/4icad/mob13.jpeg',
+    'assets/images/4icad/mob14.png',
+    'assets/images/4icad/mob15.jpeg',
+    'assets/images/4icad/mob16.jpeg',
+    'assets/images/4icad/mob17.jpeg',
+    'assets/images/4icad/mob18.jpeg',
+  ];
+
+  static const List<String> fourIcadDesktopScreenshotPaths = <String>[
+    'assets/images/4icad/shipped product builder.png',
+  ];
+
   /// Featured case studies are sorted by [PortfolioCaseStudy.order] ascending on the portfolio screen (lower = higher on the page).
   /// New featured study: add near the top here and give it the lowest `order` (e.g. 0); increase `order` on older studies if needed.
   static List<PortfolioCaseStudy> get caseStudies => [
+        PortfolioCaseStudy(
+          id: '4icad',
+          title: '4iCAD - Professional CAD Designed for Mobile First',
+          subtitle:
+              'Product Design, UX Design, and Flutter Engineering for a shipped cross-platform CAD product.',
+          overview:
+              '4iCAD is a cross-platform CAD application designed for professionals who need to create, edit, and share technical drawings from anywhere. Unlike traditional CAD software adapted from desktop environments, 4iCAD was designed mobile-first, providing an intuitive touch experience while maintaining professional drafting precision.',
+          designApproach:
+              'The product direction centered on one hard question: how do you make professional CAD usable on a six-inch device without reducing it to a toy? The answer was a touch-first drafting workflow with transparent command dialogs, guided steps, intelligent snapping, and cross-platform consistency across iOS, Android, Windows, macOS, and Web.',
+          heroImagePath: fourIcadMobileScreenshotPaths.first,
+          heroImagePaths: fourIcadMobileScreenshotPaths,
+          order: -10,
+          sections: [
+            CaseStudySection(
+              title: 'Overview',
+              content:
+                  '4iCAD was created to solve a common problem in the CAD industry: most drafting applications are designed for large monitors, keyboards, and mice. When moved to mobile devices, they become difficult to use because of small buttons, tiny keyboards, and desktop-oriented workflows.\n\n'
+                  'As both Product Designer and Developer, I redesigned the drafting experience specifically for mobile devices while maintaining the precision and flexibility expected from professional CAD software.\n\n'
+                  'The result is a cloud-connected CAD platform that runs on iOS, Android, Windows, macOS, and Web.',
+            ),
+            CaseStudySection(
+              title: 'Designing CAD for Mobile Devices',
+              content:
+                  'Most CAD applications treat mobile as a secondary platform. 4iCAD was designed differently.\n\n'
+                  'The primary design challenge was creating a professional drafting experience on a device that may only be six inches wide.\n\n'
+                  'Instead of forcing users to enter commands through small keyboards or complex menus, I designed an interactive command workflow built around transparent dialog panels and touch-first interactions.\n\n'
+                  'Each command guides users step-by-step while allowing them to continue seeing their drawing canvas.\n\n'
+                  'This approach significantly reduces cognitive load and makes CAD practical in the field where laptops and tablets are not always available.',
+              imagePaths: fourIcadMobileScreenshotPaths,
+            ),
+            CaseStudySection(
+              title: 'Design Challenges',
+              content: '**Mobile Precision**\n'
+                  'Enable professional drafting accuracy on mobile phones without requiring a hardware keyboard.\n\n'
+                  '**Touch First Experience**\n'
+                  'Replace desktop CAD workflows with interactive touch-driven commands and contextual dialogs.\n\n'
+                  '**Cross Platform Consistency**\n'
+                  'Maintain a consistent experience across iOS, Android, Windows, macOS, and Web while respecting platform conventions.',
+            ),
+            CaseStudySection(
+              title: 'Key UX Innovations',
+              content: '**Transparent Command Dialogs**\n'
+                  'Interactive dialogs remain visible without blocking the drawing canvas, allowing users to continue working while entering dimensions and options.\n\n'
+                  '**Multiple Drawing Methods**\n'
+                  'Lines can be created using direct touch input, endpoint snapping, X/Y Delta values, or Length and Angle calculations.\n\n'
+                  '**Guided Commands**\n'
+                  'Every command clearly explains what information is required next, reducing training time and user errors.\n\n'
+                  '**Mobile Optimized Input**\n'
+                  'Users rarely need to type complex commands or work with tiny phone keyboards.\n\n'
+                  '**Intelligent Snapping**\n'
+                  'OSNAP support includes Endpoint, Midpoint, Center, Intersection, Quadrant, and Perpendicular snapping.\n\n'
+                  '**Isometric Drafting**\n'
+                  'Users can quickly create isometric drawings using Top, Left, and Right planes with automatic isocircle generation.',
+              imagePaths: [
+                'assets/images/4icad/mob10.jpeg',
+                'assets/images/4icad/mob14.png',
+                'assets/images/4icad/mob16.jpeg',
+                'assets/images/4icad/mob18.jpeg',
+              ],
+            ),
+            CaseStudySection(
+              title: 'Product Features',
+              content: '• Line and Polyline Drawing\n'
+                  '• Arc Creation\n'
+                  '• Circle (Radius, 2 Point, 3 Point)\n'
+                  '• Polygon Drawing\n'
+                  '• Ellipse Drawing\n'
+                  '• Boundary Generation\n'
+                  '• Backsplash Creation\n'
+                  '• Center Line Placement\n'
+                  '• Image Insertion\n'
+                  '• DXF Support\n'
+                  '• Cloud File Storage\n'
+                  '• ZIP Export and Sharing',
+              imagePaths: [
+                'assets/images/4icad/mob02.png',
+                'assets/images/4icad/mob04.png',
+                'assets/images/4icad/mob05.png',
+                'assets/images/4icad/mob06.png',
+              ],
+            ),
+            CaseStudySection(
+              title: 'Shipped Product Builds',
+              content:
+                  '4iCAD is not a concept project or design exercise. It is a real product that has been designed, engineered, tested, and shipped across multiple platforms.\n\n'
+                  'The application currently supports professional drafting workflows including drawing creation, editing, snapping, layers, dimensions, cloud storage, DXF export, image insertion, and fabrication-oriented tools.\n\n'
+                  'Build availability is prepared for every supported platform. Store and download links will be added after final publishing.\n\n'
+                  '• iOS - App Store link coming soon\n'
+                  '• Android - Google Play link coming soon\n'
+                  '• Windows - Windows build link coming soon\n'
+                  '• macOS - macOS build link coming soon\n'
+                  '• Web - Web app link coming soon\n\n'
+                  'As the sole Product Designer and Developer, I was responsible for product strategy, user experience, interface design, architecture, implementation, testing, and deployment.',
+              imagePaths: fourIcadDesktopScreenshotPaths,
+            ),
+            CaseStudySection(
+              title: 'My Role',
+              content: '• Product Strategy\n'
+                  '• Product Design\n'
+                  '• User Research\n'
+                  '• UX Architecture\n'
+                  '• Interaction Design\n'
+                  '• Design System\n'
+                  '• Flutter Development\n'
+                  '• Cross Platform Engineering\n'
+                  '• Firebase Integration\n'
+                  '• Cloud Architecture\n'
+                  '• QA Testing\n'
+                  '• Product Ownership',
+            ),
+            CaseStudySection(
+              title: 'Outcome',
+              content:
+                  '4iCAD demonstrates how thoughtful product design can transform a traditionally desktop-oriented workflow into a practical mobile-first experience.\n\n'
+                  'By focusing on touch interactions, guided workflows, cloud collaboration, and cross-platform consistency, the product enables professionals to create and manage CAD drawings from virtually anywhere.\n\n'
+                  'This project represents the intersection of Product Design, Engineering, and industry-specific problem solving.',
+            ),
+          ],
+        ),
         PortfolioCaseStudy(
           id: 'rose-chat-seasonal-campaign-engine',
           title: 'Rose AI Seasonal and Holiday Celebration Campaign',

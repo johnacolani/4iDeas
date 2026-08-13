@@ -3,7 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-/// Asset image that decodes close to its rendered size.
+/// Portfolio image that decodes local assets close to their rendered size and
+/// renders uploaded network images in a web-friendly way.
 ///
 /// This reduces peak memory and frame jank from decoding oversized assets.
 class AdaptiveAssetImage extends StatelessWidget {
@@ -30,6 +31,22 @@ class AdaptiveAssetImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_isNetworkPath(assetPath)) {
+      return Image.network(
+        assetPath,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        gaplessPlayback: gaplessPlayback,
+        filterQuality: filterQuality,
+        webHtmlElementStrategy: kIsWeb
+            ? WebHtmlElementStrategy.prefer
+            : WebHtmlElementStrategy.never,
+        errorBuilder: errorBuilder,
+      );
+    }
+
     // Web decoders are more sensitive to resize hints and can throw noisy
     // layout/assert loops in some browsers. Keep web on default decoding path.
     final int? cacheWidthPx;
@@ -55,6 +72,10 @@ class AdaptiveAssetImage extends StatelessWidget {
       cacheHeight: cacheHeightPx,
       errorBuilder: errorBuilder,
     );
+  }
+
+  bool _isNetworkPath(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
   }
 
   int? _logicalToCachePx(double? logicalSize, double dpr) {

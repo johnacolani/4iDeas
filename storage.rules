@@ -9,6 +9,7 @@ service firebase.storage {
         ];
     }
 
+    // Admin-uploaded images: public read, admin-only write, size/type limited.
     match /admin_uploads/{allPaths=**} {
       allow read: if true;
       allow write: if isAdmin()
@@ -16,6 +17,14 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
+    // Case study images: anyone can read (they're shown in the public portfolio),
+    // only the signed-in admin may upload/overwrite/delete.
+    match /case_study_images/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else: deny by default.
     match /{allPaths=**} {
       allow read, write: if false;
     }

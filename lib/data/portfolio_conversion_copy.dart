@@ -22,31 +22,43 @@ class CaseStudyConversionPitch {
 
 /// Map [PortfolioCaseStudy.id] → pitch. Ids without an entry use subtitle + overview only.
 const Map<String, CaseStudyConversionPitch> kCaseStudyConversionPitchById = {
+  '4icad': CaseStudyConversionPitch(
+    businessContext:
+        'Professional CAD for mobile-first drafting in the field, without losing precision.',
+    myRole:
+        'Product strategy, UX design, Flutter engineering, Firebase, and cross-platform delivery.',
+    keyOutcome:
+        'A shipped CAD product built around guided touch workflows, cloud files, DXF, snapping, and desktop-grade drafting tools.',
+  ),
   'asd': CaseStudyConversionPitch(
     businessContext:
         'Stone fabrication and installation—coordination across sales, scheduling, field crews, and clients.',
-    myRole: 'End-to-end product design and Flutter engineering; Firebase; governed AI.',
+    myRole:
+        'End-to-end product design and Flutter engineering; Firebase; governed AI.',
     keyOutcome:
         'One operational system replaced phone-tag and spreadsheets—roles, permissions, and auditability in one place.',
   ),
   'service-flow': CaseStudyConversionPitch(
     businessContext:
         'Multi-tenant field-service SaaS—tenant isolation, roles, and configurable workflows under one product.',
-    myRole: 'Systems IA, UX, design system, and multi-tenant product structure with engineering.',
+    myRole:
+        'Systems IA, UX, design system, and multi-tenant product structure with engineering.',
     keyOutcome:
         'Shared platform without forking per customer—design spec stays shippable alongside code.',
   ),
   'twin-scriptures': CaseStudyConversionPitch(
     businessContext:
         'Bilingual scripture readers for study and language reinforcement—cultural and UX sensitivity mattered.',
-    myRole: 'Product and UX strategy, personalization model, Flutter across platforms.',
+    myRole:
+        'Product and UX strategy, personalization model, Flutter across platforms.',
     keyOutcome:
         'Visual onboarding replaced long forms; RTL/i18n and thematic UX as product architecture.',
   ),
   'rose-chat-seasonal-campaign-engine': CaseStudyConversionPitch(
     businessContext:
         'AI-facing consumer product—seasonal campaigns and backend-driven conversation at scale.',
-    myRole: 'Product UX for conversational flows, governance, and safe rollout patterns.',
+    myRole:
+        'Product UX for conversational flows, governance, and safe rollout patterns.',
     keyOutcome:
         'Shifted AI from one-off feature to configurable, previewable campaigns ops could run.',
   ),
@@ -67,40 +79,60 @@ class AppShowcasePitch {
 
 /// Map [PortfolioApp.id] → pitch. Cards without a pitch keep the long [description] only.
 const Map<String, AppShowcasePitch> kAppShowcasePitchById = {
+  '4icad': AppShowcasePitch(
+    businessContext:
+        'Professional CAD across mobile, desktop, and web with field-ready drafting workflows.',
+    myRole:
+        'Product strategy, UX design, Flutter engineering, Firebase, and release ownership.',
+    keyOutcome:
+        'Shipped platform coverage prepared for iOS, Android, Windows, macOS, and Web; links coming after publishing.',
+  ),
   'asdusa': AppShowcasePitch(
-    businessContext: 'Enterprise operations—multi-role dashboards and field reality, not a brochure app.',
+    businessContext:
+        'Enterprise operations—multi-role dashboards and field reality, not a brochure app.',
     myRole: 'Product design, Flutter, Firebase, AI product governance.',
-    keyOutcome: 'Shipped complexity: permissions, workflows, and adaptive UI across iOS, Android, web.',
+    keyOutcome:
+        'Shipped complexity: permissions, workflows, and adaptive UI across iOS, Android, web.',
   ),
   'service-flow': AppShowcasePitch(
-    businessContext: 'B2B SaaS for field and office teams—clarity under operational pressure.',
-    myRole: 'IA, UX/UI, living design system, tenancy-minded product structure.',
-    keyOutcome: 'One codebase and one spec story—reduced UI drift between tenants and roles.',
+    businessContext:
+        'B2B SaaS for field and office teams—clarity under operational pressure.',
+    myRole:
+        'IA, UX/UI, living design system, tenancy-minded product structure.',
+    keyOutcome:
+        'One codebase and one spec story—reduced UI drift between tenants and roles.',
   ),
   'twin-scriptures': AppShowcasePitch(
-    businessContext: 'Consumer spiritual product—personalization without hostile forms.',
+    businessContext:
+        'Consumer spiritual product—personalization without hostile forms.',
     myRole: 'UX, theming system, multi-language and RTL execution in Flutter.',
-    keyOutcome: 'Higher completion through “show, don’t ask” onboarding and coherent preferences.',
+    keyOutcome:
+        'Higher completion through “show, don’t ask” onboarding and coherent preferences.',
   ),
   '4ideas-design-system': AppShowcasePitch(
-    businessContext: 'Reusable UI foundations for real shipping—not only Figma plates.',
+    businessContext:
+        'Reusable UI foundations for real shipping—not only Figma plates.',
     myRole: 'Component library thinking, tokens, and Flutter-native patterns.',
-    keyOutcome: 'Faster, more consistent builds across products that share the same craft bar.',
+    keyOutcome:
+        'Faster, more consistent builds across products that share the same craft bar.',
   ),
   'my-web-site': AppShowcasePitch(
-    businessContext: 'This site—lead capture, portfolio depth, and professional first impression.',
+    businessContext:
+        'This site—lead capture, portfolio depth, and professional first impression.',
     myRole: 'Flutter Web, information architecture, and conversion-focused UX.',
-    keyOutcome: 'One stack for marketing + inquiry flow without a separate CMS sprawl.',
+    keyOutcome:
+        'One stack for marketing + inquiry flow without a separate CMS sprawl.',
   ),
   'great-t2s': AppShowcasePitch(
-    businessContext: 'Accessibility and learning—people who need text read aloud or language help.',
+    businessContext:
+        'Accessibility and learning—people who need text read aloud or language help.',
     myRole: 'Product UX for low cognitive load and trustworthy, calm UI.',
-    keyOutcome: 'Simple path from input to speech with minimal configuration anxiety.',
+    keyOutcome:
+        'Simple path from input to speech with minimal configuration anxiety.',
   ),
 };
 
 CaseStudyConversionPitch? caseStudyPitchForId(String id) =>
     kCaseStudyConversionPitchById[id];
 
-AppShowcasePitch? appShowcasePitchForId(String id) =>
-    kAppShowcasePitchById[id];
+AppShowcasePitch? appShowcasePitchForId(String id) => kAppShowcasePitchById[id];

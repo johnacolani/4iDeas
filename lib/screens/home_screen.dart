@@ -835,6 +835,16 @@ class _PrimaryDesktopNav extends StatelessWidget {
                             label: 'Contact inbox',
                             icon: Icons.mark_chat_unread_outlined,
                           ),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: _kPopupMenuDividerColor,
+                          ),
+                          row(
+                            route: AppRoutes.adminPrivacyPolicies,
+                            label: 'Privacy policies',
+                            icon: Icons.privacy_tip_outlined,
+                          ),
                         ],
                       );
                     },

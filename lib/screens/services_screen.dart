@@ -499,6 +499,24 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                                 ),
                                               ),
                                             ),
+                                            TextButton(
+                                              onPressed: () => context.go(
+                                                  AppRoutes.privacyPolicies),
+                                              child: Text(
+                                                'Privacy policies',
+                                                style: GoogleFonts.roboto(
+                                                  color: AppColors.primaryGold,
+                                                  fontWeight: FontWeight.w700,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor:
+                                                      AppColors
+                                                          .primaryGold
+                                                          .withValues(
+                                                              alpha: 0.5),
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ],

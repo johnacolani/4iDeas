@@ -7,6 +7,7 @@ import 'package:four_ideas/screens/about_us_screen.dart';
 import 'package:four_ideas/screens/order_here_screen.dart';
 import 'package:four_ideas/screens/contact_us_screen.dart';
 import 'package:four_ideas/data/portfolio_data.dart';
+import 'package:four_ideas/services/case_study_content_service.dart';
 import 'package:four_ideas/data/content_articles_data.dart';
 import 'package:four_ideas/features/portfolio/presentation/screens/case_study_detail_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/login_screen.dart';
@@ -26,6 +27,10 @@ import 'package:four_ideas/screens/local_richmond_landing_screen.dart';
 import 'package:four_ideas/screens/seo_topic_landing_screen.dart';
 import 'package:four_ideas/screens/case_studies_screen.dart';
 import 'package:four_ideas/screens/qr_code_generator_screen.dart';
+import 'package:four_ideas/data/privacy_policy_data.dart';
+import 'package:four_ideas/screens/privacy_policy_list_screen.dart';
+import 'package:four_ideas/screens/privacy_policy_detail_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_privacy_policy_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -50,6 +55,12 @@ abstract class AppRoutes {
   static String insightsArticlePath(String slug) => '$insights/$slug';
   static const String caseStudies = '/case-studies';
   static const String qrCodeGenerator = '/qr-code-generator';
+
+  /// Public list of app privacy policies, and per-app detail (`/privacy/:slug`).
+  /// Each policy has a unique slug (enforced on save), so URLs are clean and
+  /// stable, e.g. `/privacy/4icad`.
+  static const String privacyPolicies = '/privacy';
+  static String privacyPolicyPath(String slug) => '$privacyPolicies/$slug';
 
   /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
   static const String flutterAppDevelopment = '/flutter-app-development';
@@ -77,6 +88,7 @@ abstract class AppRoutes {
 
   static const String adminOrders = '/admin/orders';
   static const String adminOrderDetail = '/admin/orders/detail';
+  static const String adminPrivacyPolicies = '/admin/privacy';
   static const String payment = '/payment';
   static const String contractView = '/contract-view';
 }
@@ -126,17 +138,16 @@ GoRouter createAppRouter() {
         path: '${AppRoutes.portfolioCaseStudy}/:id',
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
-          final found =
-              PortfolioData.caseStudies.where((c) => c.id == id).toList();
-          if (found.isEmpty) {
-            return Scaffold(
-              body: Center(
-                child: Text('Case study not found'),
-              ),
-            );
+          // 1. Prefer the case study passed in by the navigating screen — it is
+          //    already merged with Firestore, so admin edits show immediately.
+          final extra = state.extra;
+          if (extra is PortfolioCaseStudy) {
+            return CaseStudyDetailScreen(
+                caseStudy: extra.withAdaptiveBeforeDesignSystem());
           }
-          return CaseStudyDetailScreen(
-              caseStudy: found.first.withAdaptiveBeforeDesignSystem());
+          // 2. Deep link / page refresh: load from Firestore (newest content),
+          //    falling back to static data when the id isn't in Firestore.
+          return _CaseStudyByIdLoader(id: id);
         },
       ),
       GoRoute(
@@ -170,6 +181,18 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.qrCodeGenerator,
         builder: (context, state) => const QrCodeGeneratorScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.privacyPolicies,
+        builder: (context, state) => const PrivacyPolicyListScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.privacyPolicies}/:slug',
+        builder: (context, state) => PrivacyPolicyDetailScreen(
+          slug: state.pathParameters['slug'] ?? '',
+          initialPolicy:
+              state.extra is PrivacyPolicy ? state.extra as PrivacyPolicy : null,
+        ),
       ),
       GoRoute(
         path: '${AppRoutes.insights}/:slug',
@@ -282,6 +305,10 @@ GoRouter createAppRouter() {
         builder: (context, state) => const AdminOrdersScreen(),
       ),
       GoRoute(
+        path: AppRoutes.adminPrivacyPolicies,
+        builder: (context, state) => const AdminPrivacyPolicyScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.adminOrderDetail,
         builder: (context, state) {
           final extra = state.extra is Map<String, dynamic>
@@ -330,4 +357,40 @@ GoRouter createAppRouter() {
       ),
     ],
   );
+}
+
+/// Loads a case study by id when it wasn't passed via navigation (deep link or
+/// page refresh). Prefers Firestore so admin edits are reflected; falls back to
+/// static [PortfolioData] when the id isn't in Firestore.
+class _CaseStudyByIdLoader extends StatelessWidget {
+  const _CaseStudyByIdLoader({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    final staticMatch =
+        PortfolioData.caseStudies.where((c) => c.id == id).firstOrNull;
+
+    return FutureBuilder<PortfolioCaseStudy?>(
+      future: CaseStudyContentService().getCaseStudyById(id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            staticMatch == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final caseStudy = snapshot.data ?? staticMatch;
+        if (caseStudy == null) {
+          return const Scaffold(
+            body: Center(child: Text('Case study not found')),
+          );
+        }
+        return CaseStudyDetailScreen(
+          caseStudy: caseStudy.withAdaptiveBeforeDesignSystem(),
+        );
+      },
+    );
+  }
 }

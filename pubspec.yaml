@@ -57,6 +57,8 @@ dependencies:
   flutter_svg: ^2.0.17
   qr_flutter: ^4.1.0
   web: ^1.1.1
+  flutter_markdown: ^0.7.4
+  file_picker: ^8.1.4
 
 dev_dependencies:
   flutter_test:
@@ -95,6 +97,7 @@ flutter:
     - assets/images/Clients/
     - assets/images/on_boarding_image/
     - assets/images/4ideas/
+    - assets/images/4icad/
     - assets/images/service_flow/
     - assets/images/seasonal UI/
     - assets/platforms/
