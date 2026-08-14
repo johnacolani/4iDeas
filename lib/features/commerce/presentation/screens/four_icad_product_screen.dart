@@ -166,28 +166,37 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                           _purchase.refreshVerificationStatus(context),
                       onTryWeb: () => launchTryWebApp(context, product.webAppUrl),
                     ),
-                    SizedBox(height: isMobile ? 34 : 52),
+                    // Generous gap after the hero so the artwork reads as the
+                    // end of that block rather than colliding with what follows.
+                    SizedBox(height: isMobile ? 48 : 76),
                     if (product.features.isNotEmpty) ...[
                       _SectionHeading(
                         label: 'What 4iCAD does',
                         isMobile: isMobile,
                       ),
-                      const SizedBox(height: 18),
+                      SizedBox(height: isMobile ? 16 : 20),
                       _FeatureGrid(
                         features: product.features,
                         isMobile: isMobile,
                         isTablet: isTablet,
                       ),
-                      SizedBox(height: isMobile ? 34 : 52),
+                      SizedBox(height: isMobile ? 40 : 60),
                     ],
+                    // Current release stands on its own below the hero, with a
+                    // heading outside the cards so it reads as a real section.
+                    _SectionHeading(
+                      label: 'Release and requirements',
+                      isMobile: isMobile,
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
                     _ReleaseAndSystem(
                       product: product,
                       isMobile: isMobile,
                       isTablet: isTablet,
                     ),
-                    SizedBox(height: isMobile ? 28 : 40),
+                    SizedBox(height: isMobile ? 32 : 44),
                     _SecurityNote(isMobile: isMobile),
-                    SizedBox(height: isMobile ? 26 : 38),
+                    SizedBox(height: isMobile ? 28 : 40),
                     _CaseStudyLink(isMobile: isMobile),
                   ],
                 ),
@@ -248,30 +257,36 @@ class _Hero extends StatelessWidget {
       onRefreshVerification: onRefreshVerification,
       onTryWeb: onTryWeb,
     );
-    // Stack on mobile and tablet (including Windows tablets in portrait), and
-    // sit side by side only when there is genuine room for both.
-    final stacked = isMobile || isTablet;
+    // Deliberately stacked at every breakpoint: pitch first, then the artwork
+    // full width beneath it.
+    //
+    // A two-column hero was tried first, but at the page's 1180px max width the
+    // image column resolves to roughly 435px — less than a third of the
+    // artwork's native 1536px — which renders the device mockups and platform
+    // icons unreadable. Full width keeps them legible, and the copy still reads
+    // as the lead because it comes first and the CTAs sit directly under it.
+    //
+    // On desktop the text is width-limited so headline and body hold a
+    // comfortable measure instead of stretching across the whole panel.
+    final measure = isMobile ? double.infinity : 760.0;
 
     return FourICadGlassPanel(
       goldBorder: true,
-      padding: EdgeInsets.all(isMobile ? 22 : 34),
-      child: stacked
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                copy,
-                SizedBox(height: isMobile ? 26 : 32),
-                const _ProductShot(),
-              ],
-            )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(flex: 6, child: copy),
-                const SizedBox(width: 40),
-                const Expanded(flex: 5, child: _ProductShot()),
-              ],
-            ),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 22 : 34,
+        vertical: isMobile ? 26 : 38,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: measure),
+            child: copy,
+          ),
+          SizedBox(height: isMobile ? 30 : (isTablet ? 36 : 44)),
+          _ProductShot(isMobile: isMobile),
+        ],
+      ),
     );
   }
 }
@@ -584,29 +599,72 @@ class _Actions extends StatelessWidget {
   }
 }
 
-/// The single strong product image, using a real shipped 4iCAD asset.
+/// The single 4iCAD promotional visual: the product running across every
+/// platform it ships on.
+///
+/// Rendered wide rather than in a narrow column, because the platform icons,
+/// device mockups and on-screen drawing detail have to stay legible. The
+/// artwork is 1536x1024, so the aspect ratio here matches it exactly and
+/// [BoxFit.contain] neither crops nor letterboxes it.
 class _ProductShot extends StatelessWidget {
-  const _ProductShot();
+  const _ProductShot({this.isMobile = false});
+
+  final bool isMobile;
+
+  /// Native aspect of hero_all_platforms.png (1536 x 1024).
+  static const double _aspect = 3 / 2;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-          color: Colors.black.withValues(alpha: 0.25),
-        ),
-        child: AspectRatio(
-          aspectRatio: 16 / 10,
-          child: Image.asset(
-            'assets/images/4icad/shipped product builder.png',
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const ColoredBox(
-              color: Color(0xFF0C1220),
-              child: Center(
-                child: Icon(Icons.design_services_outlined, size: 48, color: Colors.white24),
+    final radius = isMobile ? 14.0 : 18.0;
+
+    return Center(
+      child: ConstrainedBox(
+        // Stops the artwork ballooning on very wide desktops while still
+        // rendering close to its native width on a normal laptop.
+        constraints: const BoxConstraints(maxWidth: 1020),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius),
+            // A single soft gold bloom, echoing the panel border rather than
+            // adding a second decorative language.
+            boxShadow: [
+              BoxShadow(
+                color: ColorManager.accentGold.withValues(alpha: 0.10),
+                blurRadius: 40,
+                spreadRadius: -6,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(
+                  color: ColorManager.accentGold.withValues(alpha: 0.22),
+                ),
+                // The artwork's own background is dark navy, so this only shows
+                // in the hairline between border and image.
+                color: const Color(0xFF0B1020),
+              ),
+              child: AspectRatio(
+                aspectRatio: _aspect,
+                child: Image.asset(
+                  'assets/images/4icad/hero_all_platforms.png',
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.medium,
+                  semanticLabel:
+                      '4iCAD running on Windows desktop, laptop, tablet and phone',
+                  errorBuilder: (_, __, ___) => const ColoredBox(
+                    color: Color(0xFF0B1020),
+                    child: Center(
+                      child: Icon(Icons.design_services_outlined,
+                          size: 48, color: Colors.white24),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -620,6 +678,8 @@ class _ProductShot extends StatelessWidget {
 // Sections
 // ---------------------------------------------------------------------------
 
+/// Page-level section heading. Cards use [_CardHeading] so the two levels stay
+/// visually distinct.
 class _SectionHeading extends StatelessWidget {
   const _SectionHeading({required this.label, required this.isMobile});
 
@@ -634,6 +694,27 @@ class _SectionHeading extends StatelessWidget {
         fontSize: isMobile ? 21 : 26,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.3,
+        color: Colors.white,
+      ),
+    );
+  }
+}
+
+/// Title inside a card — one step down from [_SectionHeading].
+class _CardHeading extends StatelessWidget {
+  const _CardHeading({required this.label, required this.isMobile});
+
+  final String label;
+  final bool isMobile;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: GoogleFonts.roboto(
+        fontSize: isMobile ? 16.5 : 18,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.1,
         color: Colors.white,
       ),
     );
@@ -718,7 +799,7 @@ class _ReleaseAndSystem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeading(label: 'Current release', isMobile: isMobile),
+          _CardHeading(label: 'Current release', isMobile: isMobile),
           const SizedBox(height: 16),
           if (release == null)
             Text(
@@ -773,7 +854,7 @@ class _ReleaseAndSystem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeading(label: 'Runs on', isMobile: isMobile),
+          _CardHeading(label: 'Runs on', isMobile: isMobile),
           const SizedBox(height: 16),
           for (final requirement in product.windowsRequirements)
             Padding(
