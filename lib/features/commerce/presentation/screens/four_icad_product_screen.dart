@@ -98,19 +98,24 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
             stream: _commerce.watchProduct(),
             builder: (context, productSnap) {
               final product = productSnap.data ?? CommerceProduct.fourICadFallback();
+              // userChanges() rather than authStateChanges(): it also emits
+              // after user.reload(), so completing verification flips the page
+              // without a sign-out.
               return StreamBuilder<User?>(
-                stream: FirebaseAuth.instance.authStateChanges(),
+                stream: FirebaseAuth.instance.userChanges(),
                 builder: (context, authSnap) {
-                  final signedIn = authSnap.data != null;
+                  final user = authSnap.data;
+                  final signedIn = user != null;
                   return StreamBuilder<bool>(
                     stream: signedIn
                         ? _commerce.watchOwnership()
                         : Stream<bool>.value(false),
                     builder: (context, ownSnap) {
-                      final owns = ownSnap.data ?? false;
-                      final action = !signedIn
-                          ? PurchaseAction.signInToBuy
-                          : (owns ? PurchaseAction.download : PurchaseAction.buy);
+                      final action = resolvePurchaseAction(
+                        signedIn: signedIn,
+                        emailVerified: user?.emailVerified ?? false,
+                        owns: ownSnap.data ?? false,
+                      );
                       return _body(context, product, action, isMobile, isTablet);
                     },
                   );
@@ -155,6 +160,10 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                       onBuy: _onBuy,
                       onDownload: _onDownload,
                       onSignIn: () => _purchase.goSignIn(context),
+                      onResendVerification: () =>
+                          _purchase.resendVerificationEmail(context),
+                      onRefreshVerification: () =>
+                          _purchase.refreshVerificationStatus(context),
                       onTryWeb: () => launchTryWebApp(context, product.webAppUrl),
                     ),
                     SizedBox(height: isMobile ? 34 : 52),
@@ -206,6 +215,8 @@ class _Hero extends StatelessWidget {
     required this.onBuy,
     required this.onDownload,
     required this.onSignIn,
+    required this.onResendVerification,
+    required this.onRefreshVerification,
     required this.onTryWeb,
   });
 
@@ -218,6 +229,8 @@ class _Hero extends StatelessWidget {
   final VoidCallback onBuy;
   final VoidCallback onDownload;
   final VoidCallback onSignIn;
+  final VoidCallback onResendVerification;
+  final VoidCallback onRefreshVerification;
   final VoidCallback onTryWeb;
 
   @override
@@ -231,6 +244,8 @@ class _Hero extends StatelessWidget {
       onBuy: onBuy,
       onDownload: onDownload,
       onSignIn: onSignIn,
+      onResendVerification: onResendVerification,
+      onRefreshVerification: onRefreshVerification,
       onTryWeb: onTryWeb,
     );
     // Stack on mobile and tablet (including Windows tablets in portrait), and
@@ -271,6 +286,8 @@ class _HeroCopy extends StatelessWidget {
     required this.onBuy,
     required this.onDownload,
     required this.onSignIn,
+    required this.onResendVerification,
+    required this.onRefreshVerification,
     required this.onTryWeb,
   });
 
@@ -282,6 +299,8 @@ class _HeroCopy extends StatelessWidget {
   final VoidCallback onBuy;
   final VoidCallback onDownload;
   final VoidCallback onSignIn;
+  final VoidCallback onResendVerification;
+  final VoidCallback onRefreshVerification;
   final VoidCallback onTryWeb;
 
   @override
@@ -370,6 +389,8 @@ class _HeroCopy extends StatelessWidget {
           onBuy: onBuy,
           onDownload: onDownload,
           onSignIn: onSignIn,
+          onResendVerification: onResendVerification,
+          onRefreshVerification: onRefreshVerification,
           onTryWeb: onTryWeb,
         ),
         if (action == PurchaseAction.signInToBuy) ...[
@@ -384,7 +405,94 @@ class _HeroCopy extends StatelessWidget {
             ),
           ),
         ],
+        if (action == PurchaseAction.verifyEmail) ...[
+          const SizedBox(height: 18),
+          _VerifyEmailNotice(
+            isMobile: isMobile,
+            onResend: onResendVerification,
+            onRefresh: onRefreshVerification,
+          ),
+        ],
       ],
+    );
+  }
+}
+
+/// Explains why buying is unavailable and offers the two ways out, reusing the
+/// site's existing verification flow rather than a second one.
+class _VerifyEmailNotice extends StatelessWidget {
+  const _VerifyEmailNotice({
+    required this.isMobile,
+    required this.onResend,
+    required this.onRefresh,
+  });
+
+  final bool isMobile;
+  final VoidCallback onResend;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final email = FirebaseAuth.instance.currentUser?.email;
+
+    return FourICadGlassPanel(
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      borderRadius: 14,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.mark_email_unread_outlined,
+                  size: 19, color: ColorManager.accentGold),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Verify your email to purchase 4iCAD.',
+                  style: GoogleFonts.roboto(
+                    fontSize: isMobile ? 14.5 : 15.5,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            email == null
+                ? 'We sent a verification link when you signed up. Open it, then '
+                    'check again here.'
+                : 'We sent a verification link to $email. Open it, then check '
+                    'again here.',
+            style: GoogleFonts.roboto(
+              fontSize: 13.5,
+              height: 1.5,
+              color: Colors.white.withValues(alpha: 0.72),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 8,
+            children: [
+              TextButton.icon(
+                onPressed: onResend,
+                icon: const Icon(Icons.send_outlined, size: 17),
+                label: const Text('Resend email'),
+                style: TextButton.styleFrom(foregroundColor: ColorManager.accentGold),
+              ),
+              TextButton.icon(
+                onPressed: onRefresh,
+                icon: const Icon(Icons.refresh, size: 17),
+                label: const Text("I've verified — check again"),
+                style: TextButton.styleFrom(foregroundColor: Colors.white70),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -399,6 +507,8 @@ class _Actions extends StatelessWidget {
     required this.onBuy,
     required this.onDownload,
     required this.onSignIn,
+    required this.onResendVerification,
+    required this.onRefreshVerification,
     required this.onTryWeb,
   });
 
@@ -410,6 +520,8 @@ class _Actions extends StatelessWidget {
   final VoidCallback onBuy;
   final VoidCallback onDownload;
   final VoidCallback onSignIn;
+  final VoidCallback onResendVerification;
+  final VoidCallback onRefreshVerification;
   final VoidCallback onTryWeb;
 
   @override
@@ -436,6 +548,13 @@ class _Actions extends StatelessWidget {
           label: 'Sign in to buy',
           icon: Icons.lock_outline,
           onPressed: onSignIn,
+        ),
+      // Buying is blocked until the address is verified. The button leads to
+      // the fix rather than to a checkout the server would refuse.
+      PurchaseAction.verifyEmail => FourICadPrimaryButton(
+          label: 'Verify your email to purchase',
+          icon: Icons.mark_email_unread_outlined,
+          onPressed: onResendVerification,
         ),
     };
 

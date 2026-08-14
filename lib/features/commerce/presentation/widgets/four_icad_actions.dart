@@ -1,10 +1,15 @@
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
+import 'package:four_ideas/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:four_ideas/features/auth/presentation/bloc/auth_event.dart';
 import 'package:four_ideas/services/commerce_service.dart';
 
 /// What the purchase area should currently offer the visitor.
@@ -12,11 +17,37 @@ enum PurchaseAction {
   /// Signed out — sign in first, because v1 ties entitlement to a Firebase uid.
   signInToBuy,
 
-  /// Signed in, no entitlement.
+  /// Signed in, but the email address is not verified yet, so buying is blocked.
+  verifyEmail,
+
+  /// Signed in, verified, no entitlement.
   buy,
 
   /// Signed in and already owns it.
   download,
+}
+
+/// Decides what the purchase area offers, from the three facts that matter.
+///
+/// Mirrors the backend so the UI never promises something the server will
+/// refuse: `createCheckoutSession` requires a verified email, while
+/// `getDownloadUrl` requires only entitlement.
+///
+/// Ownership is therefore checked *before* verification: someone who has
+/// already paid keeps their download even if their address later becomes
+/// unverified. Entitlement, not verification, is the authority after purchase.
+///
+/// This is a courtesy layer — hiding the button is not the control. The server
+/// enforces both rules from the verified ID token regardless of what is shown.
+PurchaseAction resolvePurchaseAction({
+  required bool signedIn,
+  required bool emailVerified,
+  required bool owns,
+}) {
+  if (!signedIn) return PurchaseAction.signInToBuy;
+  if (owns) return PurchaseAction.download;
+  if (!emailVerified) return PurchaseAction.verifyEmail;
+  return PurchaseAction.buy;
 }
 
 /// The gold, high-emphasis primary action.
@@ -142,6 +173,44 @@ class FourICadPurchaseController {
     context.go('${AppRoutes.login}?redirect=${Uri.encodeComponent(AppRoutes.fourICad)}');
   }
 
+  /// Re-sends the verification email using the existing auth flow.
+  ///
+  /// Reuses `ResendEmailVerificationRequested` on [AuthBloc] rather than
+  /// touching FirebaseAuth here, so verification stays owned by one place.
+  void resendVerificationEmail(BuildContext context) {
+    context.read<AuthBloc>().add(const ResendEmailVerificationRequested());
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Verification email sent to '
+          '${FirebaseAuth.instance.currentUser?.email ?? 'your address'}.',
+        ),
+        backgroundColor: const Color(0xFF1B7F4B),
+      ),
+    );
+  }
+
+  /// Re-reads the Firebase user so a just-completed verification is picked up
+  /// without a full sign-out. `userChanges()` emits once the reload lands.
+  Future<void> refreshVerificationStatus(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    await user.reload();
+    await user.getIdToken(true);
+    if (!context.mounted) return;
+    final verified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          verified
+              ? 'Email verified. You can buy 4iCAD now.'
+              : 'Still unverified. Open the link in your inbox, then check again.',
+        ),
+        backgroundColor: verified ? const Color(0xFF1B7F4B) : null,
+      ),
+    );
+  }
+
   /// Starts Stripe Checkout and hands off to the hosted page.
   Future<void> startCheckout(BuildContext context) async {
     try {
@@ -167,9 +236,28 @@ class FourICadPurchaseController {
   }
 
   String _checkoutMessage(Object e) {
+    // The server distinguishes "not verified" from "not on sale" via a details
+    // marker, so the two failed-precondition cases don't get the same message.
+    if (e is FirebaseFunctionsException) {
+      final reason = e.details is Map ? (e.details as Map)['reason'] : null;
+      if (reason == 'email_not_verified') {
+        return 'Verify your email address before purchasing 4iCAD.';
+      }
+      switch (e.code) {
+        case 'already-exists':
+          return 'You already own 4iCAD for Windows. Reload the page to download it.';
+        case 'failed-precondition':
+          return '4iCAD for Windows is not on sale yet. Please check back shortly.';
+        case 'unauthenticated':
+          return 'Sign in to continue to checkout.';
+      }
+    }
     final text = e.toString();
     if (text.contains('already-exists')) {
       return 'You already own 4iCAD for Windows. Reload the page to download it.';
+    }
+    if (text.contains('email_not_verified')) {
+      return 'Verify your email address before purchasing 4iCAD.';
     }
     if (text.contains('failed-precondition')) {
       return '4iCAD for Windows is not on sale yet. Please check back shortly.';

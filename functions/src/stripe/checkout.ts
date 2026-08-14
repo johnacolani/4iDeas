@@ -7,7 +7,7 @@ import {
   STRIPE_SECRET_KEY,
   db,
   hasEntitlement,
-  requireAuth,
+  requireVerifiedAuth,
   stripeClient,
 } from "../core";
 
@@ -22,7 +22,10 @@ import {
 export const createCheckoutSession = onCall(
   {region: "us-central1", secrets: [STRIPE_SECRET_KEY]},
   async (req) => {
-    const {uid, email} = requireAuth(req);
+    // A purchase requires a verified email address. Enforced here from the
+    // verified ID token, not in the UI, so hiding the button is a courtesy
+    // rather than the control.
+    const {uid, email} = requireVerifiedAuth(req);
 
     // Only this product exists in v1; reject anything else rather than trusting input.
     const productKey = String(req.data?.productKey ?? PRODUCT_KEY);

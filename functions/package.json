@@ -2,14 +2,17 @@
   "name": "four-ideas-functions",
   "description": "Trusted server-side layer for 4iCAD commerce (Stripe checkout, entitlements, protected downloads).",
   "private": true,
-  "engines": { "node": "22" },
+  "engines": {
+    "node": "22"
+  },
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "npm run build && node --test \"test/**/*.test.js\""
   },
   "dependencies": {
     "firebase-admin": "^13.0.2",

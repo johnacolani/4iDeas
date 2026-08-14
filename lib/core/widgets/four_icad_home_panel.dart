@@ -35,14 +35,22 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
       stream: _commerce.watchProduct(),
       builder: (context, snap) {
         final product = snap.data ?? CommerceProduct.fourICadFallback();
+        // userChanges() also emits after user.reload(), so the panel reflects a
+        // completed verification without requiring a sign-out.
         return StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
+          stream: FirebaseAuth.instance.userChanges(),
           builder: (context, authSnap) {
-            final signedIn = authSnap.data != null;
+            final user = authSnap.data;
+            final signedIn = user != null;
             return StreamBuilder<bool>(
               stream: signedIn ? _commerce.watchOwnership() : Stream<bool>.value(false),
               builder: (context, ownSnap) {
-                return _panel(context, product, ownSnap.data ?? false);
+                final action = resolvePurchaseAction(
+                  signedIn: signedIn,
+                  emailVerified: user?.emailVerified ?? false,
+                  owns: ownSnap.data ?? false,
+                );
+                return _panel(context, product, action);
               },
             );
           },
@@ -51,7 +59,8 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
     );
   }
 
-  Widget _panel(BuildContext context, CommerceProduct product, bool owns) {
+  Widget _panel(BuildContext context, CommerceProduct product, PurchaseAction action) {
+    final owns = action == PurchaseAction.download;
     final isMobile = widget.isMobile;
     final stacked = isMobile || widget.isTablet;
     final release = product.currentRelease;
@@ -112,7 +121,7 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
           ],
         ),
         SizedBox(height: isMobile ? 20 : 26),
-        _actions(context, product, owns, hasWebApp, isMobile),
+        _actions(context, product, action, hasWebApp, isMobile),
       ],
     );
 
@@ -163,16 +172,25 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
   Widget _actions(
     BuildContext context,
     CommerceProduct product,
-    bool owns,
+    PurchaseAction action,
     bool hasWebApp,
     bool isMobile,
   ) {
-    // Both actions navigate to /4icad rather than starting checkout inline, so
-    // the home page stays a shop window and the product page stays the place
-    // where a purchase decision is made.
+    // Every action navigates to /4icad rather than acting inline, so the home
+    // page stays a shop window and the product page stays where a purchase
+    // decision — and the verification prompt — actually lives.
+    final (label, icon) = switch (action) {
+      PurchaseAction.download => ('Download for Windows', Icons.download),
+      PurchaseAction.buy => ('Buy for Windows', Icons.shopping_cart_outlined),
+      PurchaseAction.signInToBuy => ('Buy for Windows', Icons.shopping_cart_outlined),
+      // Never show a purchase-ready state to an unverified account.
+      PurchaseAction.verifyEmail =>
+        ('Verify your email to purchase', Icons.mark_email_unread_outlined),
+    };
+
     final primary = FourICadPrimaryButton(
-      label: owns ? 'Download for Windows' : 'Buy for Windows',
-      icon: owns ? Icons.download : Icons.shopping_cart_outlined,
+      label: label,
+      icon: icon,
       compact: true,
       onPressed: () => context.go(AppRoutes.fourICad),
     );
