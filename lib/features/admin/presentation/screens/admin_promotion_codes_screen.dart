@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:four_ideas/core/ColorManager.dart';
@@ -25,6 +26,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
   final CommerceAdminService _service = CommerceAdminService();
   final _codeController = TextEditingController();
   final _maxRedemptionsController = TextEditingController();
+  final _noteController = TextEditingController();
 
   /// The only tiers the backend accepts.
   static const List<int> _tiers = [10, 30, 50, 70, 100];
@@ -32,6 +34,12 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
   int _percentOff = 10;
   DateTime? _expiresAt;
   bool _firstTimeOnly = false;
+
+  /// Generated codes are single-use by default: a code handed to one person
+  /// should stop working once that person has used it, which is what makes the
+  /// list below meaningful.
+  int _count = 5;
+  bool _generate = true;
 
   List<PromotionCodeView>? _codes;
   bool _loading = true;
@@ -50,6 +58,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
   void dispose() {
     _codeController.dispose();
     _maxRedemptionsController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -84,7 +93,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
 
   Future<void> _create() async {
     final code = _codeController.text.trim().toUpperCase();
-    if (!RegExp(r'^[A-Z0-9_-]{3,40}$').hasMatch(code)) {
+    if (!_generate && !RegExp(r'^[A-Z0-9_-]{3,40}$').hasMatch(code)) {
       setState(() => _error = 'Use 3–40 characters: letters, digits, - or _.');
       return;
     }
@@ -97,6 +106,9 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
         return;
       }
     }
+    // Generated codes are for handing out one by one, so they default to
+    // single-use unless the admin deliberately says otherwise.
+    if (_generate) maxRedemptions ??= 1;
 
     setState(() {
       _creating = true;
@@ -104,23 +116,30 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
     });
 
     try {
-      await _service.createPromotionCode(
-        code: code,
+      final created = await _service.createPromotionCodes(
+        code: _generate ? null : code,
+        count: _generate ? _count : 1,
         percentOff: _percentOff,
         maxRedemptions: maxRedemptions,
         expiresAt: _expiresAt,
         firstTimeOnly: _firstTimeOnly,
+        note: _noteController.text,
       );
       if (!mounted) return;
       setState(() {
         _creating = false;
         _maxRedemptionsController.clear();
+        _noteController.clear();
         _expiresAt = null;
         _firstTimeOnly = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Created $code in Stripe.'),
+          content: Text(
+            created.length == 1
+                ? 'Created ${created.first.code} in Stripe.'
+                : 'Created ${created.length} codes in Stripe.',
+          ),
           backgroundColor: const Color(0xFF1B7F4B),
         ),
       );
@@ -132,6 +151,18 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
         _error = _message(e, 'Could not create the promotion code.');
       });
     }
+  }
+
+  /// Puts a code on the clipboard so it can be pasted into a message or email.
+  Future<void> _copy(PromotionCodeView code) async {
+    await Clipboard.setData(ClipboardData(text: code.code));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Copied ${code.code}.'),
+        backgroundColor: const Color(0xFF1B7F4B),
+      ),
+    );
   }
 
   Future<void> _toggle(PromotionCodeView code) async {
@@ -248,8 +279,9 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Creates a real Stripe Coupon and Promotion Code scoped to 4iCAD. '
-            'Customers enter the code on the Stripe checkout page.',
+            'Creates real Stripe Coupons and Promotion Codes scoped to 4iCAD. '
+            'Generate a batch to hand out one at a time — each is single-use, so '
+            'it shows as USED here the moment a customer redeems it.',
             style: GoogleFonts.roboto(
               fontSize: 13.5,
               height: 1.5,
@@ -290,12 +322,88 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
             ],
           ),
           const SizedBox(height: 18),
-          _field(_codeController, 'Customer-facing code', 'e.g. 4ICAD10', enabled: !_creating),
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(
+                value: true,
+                icon: Icon(Icons.auto_awesome, size: 17),
+                label: Text('Generate codes'),
+              ),
+              ButtonSegment(
+                value: false,
+                icon: Icon(Icons.edit_outlined, size: 17),
+                label: Text('Name one myself'),
+              ),
+            ],
+            selected: {_generate},
+            onSelectionChanged:
+                _creating ? null : (s) => setState(() => _generate = s.first),
+            style: SegmentedButton.styleFrom(
+              foregroundColor: Colors.white70,
+              selectedForegroundColor: const Color(0xFF1A1305),
+              selectedBackgroundColor: ColorManager.accentGold,
+              side: BorderSide(color: Colors.white.withValues(alpha: 0.24)),
+            ),
+          ),
+          const SizedBox(height: 18),
+          if (_generate) ...[
+            Text(
+              'How many',
+              style: GoogleFonts.roboto(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 9,
+              runSpacing: 9,
+              children: [
+                for (final n in const [1, 5, 10, 20])
+                  ChoiceChip(
+                    label: Text('$n'),
+                    selected: _count == n,
+                    onSelected: _creating ? null : (_) => setState(() => _count = n),
+                    labelStyle: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w700,
+                      color: _count == n ? const Color(0xFF1A1305) : Colors.white70,
+                    ),
+                    selectedColor: ColorManager.accentGold,
+                    backgroundColor: Colors.white.withValues(alpha: 0.07),
+                    side: BorderSide(
+                      color: _count == n
+                          ? ColorManager.accentGold
+                          : Colors.white.withValues(alpha: 0.2),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Codes look like 4ICAD$_percentOff-K7QF2P. Nothing is emailed — '
+              'copy one from the list and send it however you like.',
+              style: GoogleFonts.roboto(
+                fontSize: 12.5,
+                height: 1.45,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+          ] else
+            _field(_codeController, 'Customer-facing code', 'e.g. 4ICAD10',
+                enabled: !_creating),
+          const SizedBox(height: 14),
+          _field(
+            _noteController,
+            'Note (optional)',
+            'Who is this batch for? e.g. Trade show, Acme Ltd',
+            enabled: !_creating,
+          ),
           const SizedBox(height: 14),
           _field(
             _maxRedemptionsController,
             'Maximum redemptions (optional)',
-            'Leave blank for unlimited',
+            _generate ? 'Blank means single-use' : 'Leave blank for unlimited',
             enabled: !_creating,
             keyboardType: TextInputType.number,
           ),
@@ -356,8 +464,10 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
           ],
           const SizedBox(height: 18),
           FourICadPrimaryButton(
-            label: 'Create in Stripe',
-            icon: Icons.local_offer_outlined,
+            label: _generate
+                ? (_count == 1 ? 'Generate 1 code' : 'Generate $_count codes')
+                : 'Create in Stripe',
+            icon: _generate ? Icons.auto_awesome : Icons.local_offer_outlined,
             busy: _creating,
             onPressed: _create,
           ),
@@ -438,9 +548,18 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
         ),
       );
     }
+    // Spendable codes first: the stock you can still hand out is the thing you
+    // came here for, and spent ones are history.
+    final sorted = [...codes]..sort((a, b) {
+        if (a.isSpent != b.isSpent) return a.isSpent ? 1 : -1;
+        final ad = a.createdAt, bd = b.createdAt;
+        if (ad == null || bd == null) return 0;
+        return bd.compareTo(ad);
+      });
+
     return Column(
       children: [
-        for (final code in codes)
+        for (final code in sorted)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: FourICadGlassPanel(
@@ -457,15 +576,28 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                           style: GoogleFonts.robotoMono(
                             fontSize: isMobile ? 15 : 17,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            // A spent code is greyed so the stock still in play
+                            // reads at a glance.
+                            color: code.isSpent ? Colors.white54 : Colors.white,
+                            decoration: code.isUsed ? TextDecoration.lineThrough : null,
+                            decorationColor: Colors.white38,
                           ),
                         ),
                       ),
-                      Switch(
-                        value: code.active,
-                        onChanged: (_) => _toggle(code),
-                        activeThumbColor: ColorManager.accentGold,
+                      IconButton(
+                        onPressed: () => _copy(code),
+                        icon: const Icon(Icons.copy_all_outlined, size: 18),
+                        color: Colors.white70,
+                        tooltip: 'Copy code',
                       ),
+                      // Only a still-spendable code can be switched off. A used
+                      // one is finished, and the toggle would imply otherwise.
+                      if (!code.isUsed)
+                        Switch(
+                          value: code.active,
+                          onChanged: (_) => _toggle(code),
+                          activeThumbColor: ColorManager.accentGold,
+                        ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -473,12 +605,12 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
+                      _statusChip(code.status),
                       if (code.percentOff != null)
                         FourICadMetaChip(
                           label: '${code.percentOff!.toInt()}% off',
-                          emphasise: true,
+                          emphasise: !code.isSpent,
                         ),
-                      FourICadMetaChip(label: code.active ? 'ACTIVE' : 'INACTIVE'),
                       FourICadMetaChip(
                         label: code.maxRedemptions == null
                             ? '${code.timesRedeemed} redeemed'
@@ -486,19 +618,113 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                       ),
                       if (code.expiresAt != null)
                         FourICadMetaChip(
-                          label: 'Expires ${code.expiresAt!.day}/'
-                              '${code.expiresAt!.month}/${code.expiresAt!.year}',
+                          label: 'Expires ${_date(code.expiresAt!)}',
                           icon: Icons.event,
                         ),
                       if (code.firstTimeOnly)
                         const FourICadMetaChip(label: 'FIRST-TIME ONLY'),
                     ],
                   ),
+                  if (code.note != null && code.note!.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.sticky_note_2_outlined,
+                            size: 15, color: Colors.white38),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            code.note!,
+                            style: GoogleFonts.roboto(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (code.redeemedBy != null) _redeemedLine(code, isMobile),
                 ],
               ),
             ),
           ),
       ],
     );
+  }
+
+  /// Who spent the code, joined from the order the Stripe webhook wrote. This
+  /// is the only place the two halves meet: Stripe counts the redemption, our
+  /// order record knows the person behind it.
+  Widget _redeemedLine(PromotionCodeView code, bool isMobile) {
+    final r = code.redeemedBy!;
+    final who = r.email ?? r.uid ?? 'a customer';
+    final when = r.at == null ? null : _date(r.at!);
+    final saved = (r.amountDiscount ?? 0) > 0 && r.currency != null
+        ? ' · saved ${_money(r.amountDiscount!, r.currency!)}'
+        : '';
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.person_outline, size: 16, color: Color(0xFF67C79B)),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                'Used by $who${when == null ? '' : ' on $when'}$saved',
+                style: GoogleFonts.roboto(
+                  fontSize: isMobile ? 13 : 13.5,
+                  height: 1.4,
+                  color: Colors.white.withValues(alpha: 0.82),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _statusChip(PromotionCodeStatus status) {
+    final (label, color) = switch (status) {
+      PromotionCodeStatus.active => ('AVAILABLE', const Color(0xFF67C79B)),
+      PromotionCodeStatus.used => ('USED', const Color(0xFFE98D82)),
+      PromotionCodeStatus.expired => ('EXPIRED', const Color(0xFFE8B14C)),
+      PromotionCodeStatus.disabled => ('DISABLED', Colors.white54),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.6)),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.robotoMono(
+          fontSize: 11.5,
+          letterSpacing: 1.1,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  static String _date(DateTime d) => '${d.day}/${d.month}/${d.year}';
+
+  static String _money(int minor, String currency) {
+    final amount = (minor / 100).toStringAsFixed(2);
+    return currency.toLowerCase() == 'usd' ? '\$$amount' : '$amount ${currency.toUpperCase()}';
   }
 }

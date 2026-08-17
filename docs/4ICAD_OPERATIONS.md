@@ -51,13 +51,46 @@ Admin routes are all URL-addressable, so they can be bookmarked:
 
 **Where:** admin menu → Promotion codes, or `/admin/4icad/promotions`.
 
-**How:** pick a tier chip (10 / 30 / 50 / 70 / 100 %), set the customer-facing
-code, optionally cap redemptions, set an expiry, or restrict to first-time
-customers, then **Create in Stripe**. The screen lists live codes with their
-redemption counts and an active/inactive switch.
+### Keeping a stock of codes to hand out
 
-**To give one client a private discount:** create a code with **maximum
-redemptions = 1** and send them that code.
+1. Pick a tier chip (10 / 30 / 50 / 70 / 100 %).
+2. Leave the mode on **Generate codes** and choose how many (1, 5, 10 or 20;
+   the backend caps a batch at 20).
+3. Optionally add a **note** — "Trade show", "Acme Ltd" — which is stored on the
+   code in Stripe and shown in the list, so you can tell later what a batch was
+   for.
+4. Press **Generate**. Codes come out as `4ICAD50-K7QF2P`: the tier stays
+   legible and the suffix avoids O/0 and I/1, because these get read aloud and
+   typed by hand.
+
+Generated codes are **single-use by default** (max redemptions 1) — that is what
+makes the list meaningful. Copy one with the button beside it and send it
+however you like; the app deliberately sends no email.
+
+Switch the mode to **Name one myself** for a public campaign code like
+`4ICAD10`, where the same code is meant to circulate.
+
+### Telling who used what
+
+The list is the ledger. Each code carries a status badge, derived live from
+Stripe rather than stored anywhere:
+
+| Badge | Meaning |
+| --- | --- |
+| `AVAILABLE` | Still spendable — safe to hand out |
+| `USED` | Every redemption spent. For a single-use code, a customer redeemed it |
+| `EXPIRED` | Past its expiry date, and nobody used it in time |
+| `DISABLED` | Switched off by an admin |
+
+A used code is greyed and struck through, its toggle disappears (it is
+finished), and it sinks below the codes still in play. Underneath it, a green
+line names **who spent it** — email, date and the amount they saved — joined
+from the order the Stripe webhook wrote. That join is the only way to answer
+"who used this code": Stripe counts the redemption, our order record knows the
+person behind it.
+
+If a code shows `USED` but no name, the webhook has not landed yet, or the order
+predates the code's id being recorded.
 
 Notes that matter:
 
