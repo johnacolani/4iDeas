@@ -117,6 +117,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // The 48-hour web-app trial anchor. A visitor may read their own window so
+    // the page can show a live countdown, but writes are refused outright: the
+    // start time is the whole control, so a browser that could write it could
+    // grant itself an unlimited trial.
+    match /web_trials/{uid} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
+      allow write: if false;
+    }
+
     // Webhook idempotency records, Stripe customer mapping and download audit
     // trail are backend-only bookkeeping with no client-facing use.
     match /stripe_events/{eventId} {

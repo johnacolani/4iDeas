@@ -136,6 +136,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (user != null) {
         await user.reload();
         final updatedUser = _firebaseAuth.currentUser!;
+        // reload() refreshes the local User but leaves the cached ID token
+        // alone, so its `email_verified` claim can stay false for up to an
+        // hour after verification. Backend guards read that claim, so re-mint
+        // the token here — otherwise the UI unlocks actions the server refuses.
+        if (updatedUser.emailVerified) {
+          await updatedUser.getIdToken(true);
+        }
         return UserModel.fromFirebaseUser(updatedUser);
       } else {
         throw 'No user is currently signed in.';

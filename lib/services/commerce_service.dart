@@ -53,6 +53,7 @@ class CommerceService {
   static const String _products = 'products';
   static const String _entitlements = 'entitlements';
   static const String _productOrders = 'product_orders';
+  static const String _webTrials = 'web_trials';
 
   static String _entitlementId(String uid, String productKey) => '${uid}__$productKey';
 
@@ -110,6 +111,46 @@ class CommerceService {
         .snapshots()
         .map((doc) => doc.exists && doc.data()?['active'] == true)
         .handleError((_) => false);
+  }
+
+  /// Live view of the signed-in visitor's 48-hour web-app trial.
+  ///
+  /// Reads `web_trials/{uid}`, which only the backend writes, so the countdown
+  /// shown here is the same anchor the trial is enforced against. Returns
+  /// "not started" when signed out — the clock is account-bound, so there is
+  /// nothing to show until someone signs in.
+  Stream<WebTrial> watchWebTrial() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return Stream<WebTrial>.value(const WebTrial.notStarted());
+    return _firestore
+        .collection(_webTrials)
+        .doc(uid)
+        .snapshots()
+        .map((doc) => WebTrial.fromMap(doc.data()))
+        .handleError((_) => const WebTrial.notStarted());
+  }
+
+  /// Starts — or resumes — the web-app trial and returns where to send the user.
+  ///
+  /// The 48-hour window, the token and the destination URL are all resolved
+  /// server-side; the client sends nothing but the product key and cannot
+  /// influence how long access lasts.
+  Future<WebTrialLaunch> startWebTrial([String productKey = kFourICadWindowsKey]) async {
+    final result = await _functions
+        .httpsCallable('startWebTrial')
+        .call<Map<String, dynamic>>({'productKey': productKey});
+    final data = result.data;
+    final expiresAt = (data['expiresAt'] as num?)?.toInt();
+    return WebTrialLaunch(
+      status: switch (data['status'] as String?) {
+        'owned' => WebTrialStatus.owned,
+        'active' => WebTrialStatus.active,
+        'expired' => WebTrialStatus.expired,
+        _ => WebTrialStatus.notStarted,
+      },
+      launchUrl: data['launchUrl'] as String?,
+      expiresAt: expiresAt == null ? null : DateTime.fromMillisecondsSinceEpoch(expiresAt),
+    );
   }
 
   /// The signed-in user's own purchases, newest first.

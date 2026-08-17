@@ -87,6 +87,9 @@ beforeEach(async () => {
     await setDoc(doc(db, "entitlements", ENT_OWNED), {
       uid: OWNER_UID, productKey: PRODUCT, active: true,
     });
+    await setDoc(doc(db, "web_trials", OWNER_UID), {
+      uid: OWNER_UID, productKey: PRODUCT, startedAt: new Date(), launchCount: 1,
+    });
     await setDoc(doc(db, "stripe_events", "evt_1"), {status: "processed"});
     await setDoc(doc(db, "stripe_customers", OWNER_UID), {customerId: "cus_123"});
     await setDoc(doc(db, "download_audit", "dl1"), {uid: OWNER_UID});
@@ -203,6 +206,38 @@ describe("entitlements — the access decision", () => {
   test("even an admin cannot mint an entitlement from the browser", async () => {
     await assertFails(setDoc(doc(admin().firestore(), "entitlements", `${OTHER_UID}__${PRODUCT}`), {
       uid: OTHER_UID, productKey: PRODUCT, active: true,
+    }));
+  });
+});
+
+describe("web_trials — the 48-hour clock", () => {
+  test("a visitor may read their own trial window for the countdown", async () => {
+    const snap = await assertSucceeds(
+      getDoc(doc(owner().firestore(), "web_trials", OWNER_UID))
+    );
+    assert.strictEqual(snap.data().launchCount, 1);
+  });
+
+  test("nobody may read someone else's trial", async () => {
+    await assertFails(getDoc(doc(other().firestore(), "web_trials", OWNER_UID)));
+    await assertFails(getDoc(doc(anon().firestore(), "web_trials", OWNER_UID)));
+  });
+
+  test("a visitor cannot start their own clock", async () => {
+    await assertFails(setDoc(doc(other().firestore(), "web_trials", OTHER_UID), {
+      uid: OTHER_UID, productKey: PRODUCT, startedAt: new Date(),
+    }));
+  });
+
+  test("a visitor cannot push their start time forward to extend the trial", async () => {
+    await assertFails(setDoc(doc(owner().firestore(), "web_trials", OWNER_UID), {
+      uid: OWNER_UID, productKey: PRODUCT, startedAt: new Date(),
+    }));
+  });
+
+  test("not even an admin may write a trial window from the browser", async () => {
+    await assertFails(setDoc(doc(admin().firestore(), "web_trials", OTHER_UID), {
+      uid: OTHER_UID, startedAt: new Date(),
     }));
   });
 });

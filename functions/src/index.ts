@@ -3,7 +3,8 @@
  *
  * Everything that decides money or access lives here, never in the Flutter Web
  * client: the Stripe secret key, the price, promotion-code validity, webhook
- * verification, entitlement grants, and installer download authorization.
+ * verification, entitlement grants, installer download authorization, and the
+ * 48-hour web-app trial window.
  */
 
 export {bootstrapAdminClaim, setAdminClaim, listAdmins} from "./adminops/claims";
@@ -11,4 +12,5 @@ export {createCheckoutSession} from "./stripe/checkout";
 export {stripeWebhook} from "./stripe/webhook";
 export {createPromotionCode, listPromotionCodes, setPromotionCodeActive} from "./stripe/promotions";
 export {getPurchaseStatus, getDownloadUrl} from "./downloads/download";
+export {startWebTrial, verifyWebTrial} from "./trials/web-trial";
 export {publishRelease, setCurrentRelease, onReleaseUploaded} from "./releases/releases";

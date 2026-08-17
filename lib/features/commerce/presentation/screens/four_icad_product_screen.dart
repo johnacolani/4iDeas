@@ -8,7 +8,6 @@ import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_actions.dart';
-import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/commerce_service.dart';
 
 /// The public 4iCAD for Windows product page at `/4icad`.
@@ -33,6 +32,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
 
   bool _startingCheckout = false;
   bool _downloading = false;
+  bool _openingWebApp = false;
   bool _cancelNoticeShown = false;
 
   @override
@@ -55,6 +55,12 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     setState(() => _startingCheckout = true);
     await _purchase.startCheckout(context);
     if (mounted) setState(() => _startingCheckout = false);
+  }
+
+  Future<void> _onTryWeb() async {
+    setState(() => _openingWebApp = true);
+    await _purchase.tryWebApp(context);
+    if (mounted) setState(() => _openingWebApp = false);
   }
 
   Future<void> _onDownload() async {
@@ -82,6 +88,16 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        // An explicit leading button rather than the automatic one: this page
+        // is routinely arrived at cold — a pasted URL, a QR scan, an ad click —
+        // and in those cases there is no history to pop, so Flutter renders no
+        // back arrow at all and the visitor is stranded.
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back to home',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go(AppRoutes.home),
+        ),
         title: Text(
           '4iCAD for Windows',
           style: GoogleFonts.roboto(
@@ -93,7 +109,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
       ),
       body: Stack(
         children: [
-          const AppBackground(),
+          const _CadGradientBackground(),
           StreamBuilder<CommerceProduct>(
             stream: _commerce.watchProduct(),
             builder: (context, productSnap) {
@@ -116,7 +132,37 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                         emailVerified: user?.emailVerified ?? false,
                         owns: ownSnap.data ?? false,
                       );
-                      return _body(context, product, action, isMobile, isTablet);
+                      // The trial window is account-bound, so it only has
+                      // meaning once someone is signed in.
+                      return StreamBuilder<WebTrial>(
+                        stream: signedIn
+                            ? _commerce.watchWebTrial()
+                            : Stream<WebTrial>.value(const WebTrial.notStarted()),
+                        builder: (context, trialSnap) {
+                          final trial =
+                              trialSnap.data ?? const WebTrial.notStarted();
+                          final owns = action == PurchaseAction.download;
+                          return Stack(
+                            children: [
+                              _body(context, product, action, trial, isMobile,
+                                  isTablet),
+                              // Floats above the scrolling page so the clock
+                              // stays visible wherever the visitor has scrolled
+                              // to. Owners never see it — they are not on one.
+                              if (!owns && (trial.isActive || trial.isExpired))
+                                Positioned(
+                                  right: isMobile ? 14 : 24,
+                                  bottom: isMobile ? 14 : 24,
+                                  child: FourICadTrialCounter(
+                                    trial: trial,
+                                    compact: isMobile,
+                                    onPressed: _openingWebApp ? null : _onTryWeb,
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   );
                 },
@@ -132,6 +178,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     BuildContext context,
     CommerceProduct product,
     PurchaseAction action,
+    WebTrial trial,
     bool isMobile,
     bool isTablet,
   ) {
@@ -153,10 +200,12 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                     _Hero(
                       product: product,
                       action: action,
+                      trial: trial,
                       isMobile: isMobile,
                       isTablet: isTablet,
                       startingCheckout: _startingCheckout,
                       downloading: _downloading,
+                      openingWebApp: _openingWebApp,
                       onBuy: _onBuy,
                       onDownload: _onDownload,
                       onSignIn: () => _purchase.goSignIn(context),
@@ -164,7 +213,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                           _purchase.resendVerificationEmail(context),
                       onRefreshVerification: () =>
                           _purchase.refreshVerificationStatus(context),
-                      onTryWeb: () => launchTryWebApp(context, product.webAppUrl),
+                      onTryWeb: _onTryWeb,
                     ),
                     // Generous gap after the hero so the artwork reads as the
                     // end of that block rather than colliding with what follows.
@@ -210,6 +259,45 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
 }
 
 // ---------------------------------------------------------------------------
+// Background
+// ---------------------------------------------------------------------------
+
+/// Flat navy gradient behind the whole 4iCAD page.
+///
+/// The shared [AppBackground] artwork is deliberately not used here: the hero
+/// image (`hero_all_platforms.png`) carries its own deep-navy radial glow, and
+/// two competing backdrops read as a seam around the artwork. These stops are
+/// sampled from that image, so the panel edge dissolves into the page instead
+/// of framing it.
+class _CadGradientBackground extends StatelessWidget {
+  const _CadGradientBackground();
+
+  /// Sampled from hero_all_platforms.png: the lit centre, the mid navy falloff
+  /// and the near-black corners.
+  static const Color _glow = Color(0xFF14406B);
+  static const Color _mid = Color(0xFF0A2440);
+  static const Color _deep = Color(0xFF041022);
+  static const Color _edge = Color(0xFF01040E);
+
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          // Slightly above centre so the brightest part of the page sits
+          // behind the hero rather than behind the footer links.
+          center: Alignment(0, -0.25),
+          radius: 1.15,
+          colors: [_glow, _mid, _deep, _edge],
+          stops: [0.0, 0.38, 0.72, 1.0],
+        ),
+      ),
+      child: SizedBox.expand(),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Hero
 // ---------------------------------------------------------------------------
 
@@ -217,10 +305,12 @@ class _Hero extends StatelessWidget {
   const _Hero({
     required this.product,
     required this.action,
+    required this.trial,
     required this.isMobile,
     required this.isTablet,
     required this.startingCheckout,
     required this.downloading,
+    required this.openingWebApp,
     required this.onBuy,
     required this.onDownload,
     required this.onSignIn,
@@ -231,10 +321,12 @@ class _Hero extends StatelessWidget {
 
   final CommerceProduct product;
   final PurchaseAction action;
+  final WebTrial trial;
   final bool isMobile;
   final bool isTablet;
   final bool startingCheckout;
   final bool downloading;
+  final bool openingWebApp;
   final VoidCallback onBuy;
   final VoidCallback onDownload;
   final VoidCallback onSignIn;
@@ -247,9 +339,11 @@ class _Hero extends StatelessWidget {
     final copy = _HeroCopy(
       product: product,
       action: action,
+      trial: trial,
       isMobile: isMobile,
       startingCheckout: startingCheckout,
       downloading: downloading,
+      openingWebApp: openingWebApp,
       onBuy: onBuy,
       onDownload: onDownload,
       onSignIn: onSignIn,
@@ -295,9 +389,11 @@ class _HeroCopy extends StatelessWidget {
   const _HeroCopy({
     required this.product,
     required this.action,
+    required this.trial,
     required this.isMobile,
     required this.startingCheckout,
     required this.downloading,
+    required this.openingWebApp,
     required this.onBuy,
     required this.onDownload,
     required this.onSignIn,
@@ -308,9 +404,11 @@ class _HeroCopy extends StatelessWidget {
 
   final CommerceProduct product;
   final PurchaseAction action;
+  final WebTrial trial;
   final bool isMobile;
   final bool startingCheckout;
   final bool downloading;
+  final bool openingWebApp;
   final VoidCallback onBuy;
   final VoidCallback onDownload;
   final VoidCallback onSignIn;
@@ -398,9 +496,11 @@ class _HeroCopy extends StatelessWidget {
         _Actions(
           product: product,
           action: action,
+          trial: trial,
           isMobile: isMobile,
           startingCheckout: startingCheckout,
           downloading: downloading,
+          openingWebApp: openingWebApp,
           onBuy: onBuy,
           onDownload: onDownload,
           onSignIn: onSignIn,
@@ -408,6 +508,38 @@ class _HeroCopy extends StatelessWidget {
           onRefreshVerification: onRefreshVerification,
           onTryWeb: onTryWeb,
         ),
+        // Explains the trial button's state in words, so "Web trial ended" is
+        // never the only thing telling someone why they lost access.
+        if (!owns && (trial.isActive || trial.isExpired)) ...[
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                trial.isExpired ? Icons.lock_clock : Icons.timelapse,
+                size: 17,
+                color: trial.isExpired
+                    ? const Color(0xFFE98D82)
+                    : ColorManager.accentGold,
+              ),
+              const SizedBox(width: 9),
+              Flexible(
+                child: Text(
+                  trial.isExpired
+                      ? 'Your free 48-hour web trial has ended. Buy 4iCAD for '
+                          'permanent access on every platform.'
+                      : 'Free web trial: ${trial.remainingLabel ?? 'ending shortly'} '
+                          'of your 48 hours.',
+                  style: GoogleFonts.roboto(
+                    fontSize: 13.5,
+                    height: 1.5,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
         if (action == PurchaseAction.signInToBuy) ...[
           const SizedBox(height: 14),
           Text(
@@ -516,9 +648,11 @@ class _Actions extends StatelessWidget {
   const _Actions({
     required this.product,
     required this.action,
+    required this.trial,
     required this.isMobile,
     required this.startingCheckout,
     required this.downloading,
+    required this.openingWebApp,
     required this.onBuy,
     required this.onDownload,
     required this.onSignIn,
@@ -529,9 +663,11 @@ class _Actions extends StatelessWidget {
 
   final CommerceProduct product;
   final PurchaseAction action;
+  final WebTrial trial;
   final bool isMobile;
   final bool startingCheckout;
   final bool downloading;
+  final bool openingWebApp;
   final VoidCallback onBuy;
   final VoidCallback onDownload;
   final VoidCallback onSignIn;
@@ -574,9 +710,10 @@ class _Actions extends StatelessWidget {
     };
 
     final ghost = hasWebApp
-        ? FourICadGhostButton(
-            label: 'Try Web App',
-            icon: Icons.public,
+        ? FourICadWebTrialButton(
+            trial: trial,
+            owns: action == PurchaseAction.download,
+            busy: openingWebApp,
             onPressed: onTryWeb,
           )
         : null;

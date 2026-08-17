@@ -99,4 +99,43 @@ void main() {
       expect(seen, containsAll(PurchaseAction.values));
     });
   });
+
+  group('trial countdown formatting', () {
+    test('shows hours, minutes and seconds while hours remain', () {
+      expect(
+        FourICadTrialCounter.formatRemaining(
+          const Duration(hours: 47, minutes: 12, seconds: 3),
+        ),
+        '47:12:03',
+      );
+    });
+
+    test('drops to minutes and seconds inside the final hour', () {
+      expect(
+        FourICadTrialCounter.formatRemaining(const Duration(minutes: 12, seconds: 3)),
+        '12:03',
+      );
+      expect(
+        FourICadTrialCounter.formatRemaining(const Duration(seconds: 9)),
+        '00:09',
+      );
+    });
+
+    test('pads every field so the counter does not jitter as it ticks', () {
+      expect(
+        FourICadTrialCounter.formatRemaining(
+          const Duration(hours: 1, minutes: 2, seconds: 3),
+        ),
+        '01:02:03',
+      );
+    });
+
+    test('never counts into negatives when the window closes between ticks', () {
+      expect(FourICadTrialCounter.formatRemaining(Duration.zero), '00:00');
+      expect(
+        FourICadTrialCounter.formatRemaining(const Duration(seconds: -30)),
+        '00:00',
+      );
+    });
+  });
 }

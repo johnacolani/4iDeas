@@ -28,6 +28,19 @@ class FourICadHomePanel extends StatefulWidget {
 
 class _FourICadHomePanelState extends State<FourICadHomePanel> {
   final CommerceService _commerce = CommerceService();
+  late final FourICadPurchaseController _purchase =
+      FourICadPurchaseController(service: _commerce);
+
+  bool _openingWebApp = false;
+
+  /// Launching the web app is the one action this panel performs itself — every
+  /// other button routes to /4icad. The trial belongs to the account, not to the
+  /// page, so starting it from here is the same act as starting it there.
+  Future<void> _onTryWeb() async {
+    setState(() => _openingWebApp = true);
+    await _purchase.tryWebApp(context);
+    if (mounted) setState(() => _openingWebApp = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +63,19 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
                   emailVerified: user?.emailVerified ?? false,
                   owns: ownSnap.data ?? false,
                 );
-                return _panel(context, product, action);
+                // The trial countdown is account-bound, so a signed-out
+                // visitor simply sees the offer rather than a stale window.
+                return StreamBuilder<WebTrial>(
+                  stream: signedIn
+                      ? _commerce.watchWebTrial()
+                      : Stream<WebTrial>.value(const WebTrial.notStarted()),
+                  builder: (context, trialSnap) => _panel(
+                    context,
+                    product,
+                    action,
+                    trialSnap.data ?? const WebTrial.notStarted(),
+                  ),
+                );
               },
             );
           },
@@ -59,7 +84,12 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
     );
   }
 
-  Widget _panel(BuildContext context, CommerceProduct product, PurchaseAction action) {
+  Widget _panel(
+    BuildContext context,
+    CommerceProduct product,
+    PurchaseAction action,
+    WebTrial trial,
+  ) {
     final owns = action == PurchaseAction.download;
     final isMobile = widget.isMobile;
     final stacked = isMobile || widget.isTablet;
@@ -121,7 +151,7 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
           ],
         ),
         SizedBox(height: isMobile ? 20 : 26),
-        _actions(context, product, action, hasWebApp, isMobile),
+        _actions(context, product, action, trial, hasWebApp, isMobile),
       ],
     );
 
@@ -173,6 +203,7 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
     BuildContext context,
     CommerceProduct product,
     PurchaseAction action,
+    WebTrial trial,
     bool hasWebApp,
     bool isMobile,
   ) {
@@ -196,11 +227,12 @@ class _FourICadHomePanelState extends State<FourICadHomePanel> {
     );
 
     final ghost = hasWebApp
-        ? FourICadGhostButton(
-            label: 'Try Web App',
-            icon: Icons.public,
+        ? FourICadWebTrialButton(
+            trial: trial,
+            owns: action == PurchaseAction.download,
+            busy: _openingWebApp,
             compact: true,
-            onPressed: () => launchTryWebApp(context, product.webAppUrl),
+            onPressed: _onTryWeb,
           )
         : null;
 

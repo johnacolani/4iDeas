@@ -30,9 +30,19 @@ export {FieldValue};
  * Set them with:
  *   firebase functions:secrets:set STRIPE_SECRET_KEY
  *   firebase functions:secrets:set STRIPE_WEBHOOK_SECRET
+ *   firebase functions:secrets:set WEB_TRIAL_SIGNING_KEY
  */
 export const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 export const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+
+/**
+ * HMAC key for 4iCAD web-app trial tokens.
+ *
+ * Only this backend ever holds it: the web app verifies a token by calling
+ * `verifyWebTrial`, never by checking a signature itself. Any long random
+ * string works — e.g. `openssl rand -base64 48`.
+ */
+export const WEB_TRIAL_SIGNING_KEY = defineSecret("WEB_TRIAL_SIGNING_KEY");
 
 /** The one product this version sells. */
 export const PRODUCT_KEY = "4icad_windows";
@@ -49,6 +59,7 @@ export const COL = {
   productOrders: "product_orders",
   entitlements: "entitlements",
   stripeEvents: "stripe_events",
+  webTrials: "web_trials",
 } as const;
 
 /** Storage prefix for private release binaries. Never publicly readable. */

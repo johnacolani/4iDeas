@@ -142,6 +142,99 @@ class CommerceProduct {
       );
 }
 
+/// Where a visitor stands with the 48-hour 4iCAD web-app trial.
+enum WebTrialStatus {
+  /// Never launched the web app, so the clock has not started.
+  notStarted,
+
+  /// Inside the 48-hour window.
+  active,
+
+  /// The window has elapsed, or an admin revoked it.
+  expired,
+
+  /// Owns 4iCAD, so no trial applies.
+  owned,
+}
+
+/// The signed-in visitor's trial window, read from `web_trials/{uid}`.
+///
+/// The document is written only by the backend — a browser that could write its
+/// own `startedAt` could grant itself an endless trial — so everything here is
+/// display state derived from a server-anchored start time.
+class WebTrial {
+  const WebTrial({
+    required this.status,
+    this.startedAt,
+    this.expiresAt,
+  });
+
+  const WebTrial.notStarted() : this(status: WebTrialStatus.notStarted);
+  const WebTrial.owned() : this(status: WebTrialStatus.owned);
+
+  final WebTrialStatus status;
+  final DateTime? startedAt;
+  final DateTime? expiresAt;
+
+  /// The trial length the backend enforces. Mirrored here only for copy.
+  static const Duration window = Duration(hours: 48);
+
+  bool get isActive => status == WebTrialStatus.active;
+  bool get isExpired => status == WebTrialStatus.expired;
+  bool get canLaunch => status != WebTrialStatus.expired;
+
+  /// Time left, floored at zero. Null when no window applies (owner, or unstarted).
+  Duration? remaining([DateTime? now]) {
+    final end = expiresAt;
+    if (end == null) return null;
+    final left = end.difference(now ?? DateTime.now());
+    return left.isNegative ? Duration.zero : left;
+  }
+
+  /// Coarse countdown for a button label — `41h left`, `35m left`.
+  ///
+  /// Deliberately never shows seconds: the page does not tick, so a precise
+  /// figure would be a stale one.
+  String? get remainingLabel {
+    final left = remaining();
+    if (left == null || left == Duration.zero) return null;
+    if (left.inHours >= 1) return '${left.inHours}h left';
+    return '${left.inMinutes.clamp(1, 59)}m left';
+  }
+
+  /// Builds trial state from the stored document.
+  ///
+  /// Expiry is decided from the timestamps rather than from a stored flag, so
+  /// a window that lapses while the page is open reads as expired without the
+  /// backend having to write anything.
+  factory WebTrial.fromMap(Map<String, dynamic>? map, {DateTime? now}) {
+    if (map == null) return const WebTrial.notStarted();
+    final startedAt = (map['startedAt'] as Timestamp?)?.toDate();
+    if (startedAt == null) return const WebTrial.notStarted();
+    final expiresAt = (map['expiresAt'] as Timestamp?)?.toDate() ?? startedAt.add(window);
+    final revoked = map['revoked'] as bool? ?? false;
+    final elapsed = !(now ?? DateTime.now()).isBefore(expiresAt);
+    return WebTrial(
+      status: revoked || elapsed ? WebTrialStatus.expired : WebTrialStatus.active,
+      startedAt: startedAt,
+      expiresAt: expiresAt,
+    );
+  }
+}
+
+/// What the backend said when a launch was requested.
+class WebTrialLaunch {
+  const WebTrialLaunch({required this.status, this.launchUrl, this.expiresAt});
+
+  final WebTrialStatus status;
+
+  /// The web-app URL with a signed access token attached. Null when refused.
+  final String? launchUrl;
+  final DateTime? expiresAt;
+
+  bool get granted => launchUrl != null && launchUrl!.isNotEmpty;
+}
+
 /// A completed (or attempted) product purchase. Written only by the webhook.
 class ProductOrder {
   const ProductOrder({

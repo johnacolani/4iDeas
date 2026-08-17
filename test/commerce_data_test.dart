@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:four_ideas/data/commerce_data.dart';
 
@@ -116,6 +117,118 @@ void main() {
     test('uses a sensible name when the document omits one', () {
       final product = CommerceProduct.fromMap(kFourICadWindowsKey, {'displayName': '  '});
       expect(product.displayName, '4iCAD for Windows');
+    });
+  });
+
+  group('WebTrial', () {
+    // The document is written only by the backend; these cover how the page
+    // reads a window it cannot influence.
+    Map<String, dynamic> doc(DateTime startedAt, {DateTime? expiresAt, bool? revoked}) => {
+          'startedAt': Timestamp.fromDate(startedAt),
+          if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt),
+          if (revoked != null) 'revoked': revoked,
+        };
+
+    test('is not started when no document exists yet', () {
+      expect(WebTrial.fromMap(null).status, WebTrialStatus.notStarted);
+      expect(const WebTrial.notStarted().canLaunch, isTrue);
+    });
+
+    test('treats a document without a start time as not started', () {
+      expect(WebTrial.fromMap({'uid': 'u1'}).status, WebTrialStatus.notStarted);
+    });
+
+    test('is active inside the 48-hour window', () {
+      final now = DateTime(2026, 8, 17, 12);
+      final trial = WebTrial.fromMap(
+        doc(now.subtract(const Duration(hours: 7))),
+        now: now,
+      );
+      expect(trial.status, WebTrialStatus.active);
+      expect(trial.remaining(now), const Duration(hours: 41));
+    });
+
+    test('expires once the window elapses, without the backend writing anything', () {
+      final now = DateTime(2026, 8, 17, 12);
+      final trial = WebTrial.fromMap(
+        doc(now.subtract(const Duration(hours: 49))),
+        now: now,
+      );
+      expect(trial.status, WebTrialStatus.expired);
+      expect(trial.canLaunch, isFalse);
+      expect(trial.remaining(now), Duration.zero);
+    });
+
+    test('expires exactly at the boundary, not a moment after', () {
+      final now = DateTime(2026, 8, 17, 12);
+      expect(
+        WebTrial.fromMap(doc(now.subtract(WebTrial.window)), now: now).status,
+        WebTrialStatus.expired,
+      );
+      expect(
+        WebTrial.fromMap(
+          doc(now.subtract(WebTrial.window - const Duration(minutes: 1))),
+          now: now,
+        ).status,
+        WebTrialStatus.active,
+      );
+    });
+
+    test('honours a revoked flag even while the window is open', () {
+      final now = DateTime(2026, 8, 17, 12);
+      final trial = WebTrial.fromMap(
+        doc(now.subtract(const Duration(hours: 1)), revoked: true),
+        now: now,
+      );
+      expect(trial.status, WebTrialStatus.expired);
+    });
+
+    test('derives the end from the stored expiry when the backend supplies one', () {
+      final now = DateTime(2026, 8, 17, 12);
+      final trial = WebTrial.fromMap(
+        doc(
+          now.subtract(const Duration(hours: 40)),
+          expiresAt: now.add(const Duration(hours: 2)),
+        ),
+        now: now,
+      );
+      expect(trial.status, WebTrialStatus.active);
+      expect(trial.remaining(now), const Duration(hours: 2));
+    });
+
+    test('labels the countdown coarsely, never in seconds', () {
+      final now = DateTime(2026, 8, 17, 12);
+      final hours = WebTrial(
+        status: WebTrialStatus.active,
+        startedAt: now,
+        expiresAt: DateTime.now().add(const Duration(hours: 5, minutes: 30)),
+      );
+      expect(hours.remainingLabel, '5h left');
+
+      final minutes = WebTrial(
+        status: WebTrialStatus.active,
+        startedAt: now,
+        expiresAt: DateTime.now().add(const Duration(minutes: 20)),
+      );
+      expect(minutes.remainingLabel, '20m left');
+
+      const owner = WebTrial.owned();
+      expect(owner.remainingLabel, isNull);
+      expect(owner.canLaunch, isTrue);
+    });
+  });
+
+  group('WebTrialLaunch', () {
+    test('is granted only when the backend returned a URL', () {
+      const granted = WebTrialLaunch(
+        status: WebTrialStatus.active,
+        launchUrl: 'https://icad-75d53.web.app/?trial=t',
+      );
+      expect(granted.granted, isTrue);
+
+      const refused = WebTrialLaunch(status: WebTrialStatus.expired);
+      expect(refused.granted, isFalse);
+      expect(const WebTrialLaunch(status: WebTrialStatus.active, launchUrl: '').granted, isFalse);
     });
   });
 
