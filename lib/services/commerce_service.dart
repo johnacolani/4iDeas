@@ -113,6 +113,40 @@ class CommerceService {
         .handleError((_) => false);
   }
 
+  /// The platform grid, with any per-platform overrides from Firestore applied.
+  ///
+  /// The in-code list is the source of truth for what exists; a `products/{key}`
+  /// document can move one platform on sale, attach an App Store link, or push
+  /// it back to "coming soon" — no release needed. A platform with no document
+  /// keeps its declared default.
+  Stream<List<FourICadPlatform>> watchPlatforms() {
+    return _firestore.collection(_products).snapshots().map((snap) {
+      final byId = {for (final doc in snap.docs) doc.id: doc.data()};
+      return [
+        for (final platform in kFourICadPlatforms)
+          platform.key == null ? platform : platform.applyOverride(byId[platform.key]),
+      ];
+    }).handleError((_) => kFourICadPlatforms);
+  }
+
+  /// Which of [keys] the signed-in visitor owns, so a platform they have
+  /// already bought stops offering itself.
+  Stream<Set<String>> watchOwnedProducts(List<String> keys) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || keys.isEmpty) return Stream<Set<String>>.value(const {});
+    return _firestore
+        .collection(_entitlements)
+        .where('uid', isEqualTo: uid)
+        .snapshots()
+        .map((snap) => snap.docs
+            .where((d) => d.data()['active'] == true)
+            .map((d) => d.data()['productKey'] as String?)
+            .whereType<String>()
+            .where(keys.contains)
+            .toSet())
+        .handleError((_) => <String>{});
+  }
+
   /// Live view of the signed-in visitor's 48-hour web-app trial.
   ///
   /// Reads `web_trials/{uid}`, which only the backend writes, so the countdown

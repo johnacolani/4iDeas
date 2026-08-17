@@ -5,6 +5,7 @@ import {
   COL,
   FieldValue,
   PRODUCT_KEY,
+  WEB_PRODUCT_KEY,
   WEB_TRIAL_SIGNING_KEY,
   db,
   hasEntitlement,
@@ -56,6 +57,21 @@ interface TrialDoc {
   revoked?: boolean;
 }
 
+/**
+ * Whether the caller has bought their way out of the trial.
+ *
+ * Either product counts: someone who bought the browser build obviously has
+ * unlimited web access, and a Windows buyer keeps the web build as part of the
+ * purchase they already made rather than being put back on a countdown.
+ */
+async function ownsWebAccess(uid: string): Promise<boolean> {
+  const [web, windows] = await Promise.all([
+    hasEntitlement(uid, WEB_PRODUCT_KEY),
+    hasEntitlement(uid, PRODUCT_KEY),
+  ]);
+  return web || windows;
+}
+
 /** Reads the configured web-app URL. Server-side only, never client-supplied. */
 async function webAppUrl(productKey: string): Promise<string> {
   const snap = await db.collection(COL.products).doc(productKey).get();
@@ -87,7 +103,7 @@ export const startWebTrial = onCall(
     const target = await webAppUrl(productKey);
 
     // Owning the product outranks any trial state, including an elapsed one.
-    if (await hasEntitlement(uid, productKey)) {
+    if (await ownsWebAccess(uid)) {
       const exp = Math.floor((now + OWNER_TOKEN_TTL_MS) / 1000);
       const token = signTrialToken(
         {v: 1, kind: "owner", uid, productKey, iat: Math.floor(now / 1000), exp},
@@ -222,10 +238,10 @@ export const verifyWebTrial = onRequest(
       return;
     }
 
-    const {uid, kind, productKey} = check.payload;
+    const {uid, kind} = check.payload;
 
     if (kind === "owner") {
-      const owns = await hasEntitlement(uid, productKey);
+      const owns = await ownsWebAccess(uid);
       res.status(200).json(
         owns ?
           {valid: true, access: "owner", uid, expiresAt: check.payload.exp * 1000, remainingMs: null} :
@@ -236,7 +252,7 @@ export const verifyWebTrial = onRequest(
 
     // A trial holder who has since bought the product keeps access regardless
     // of the window.
-    if (await hasEntitlement(uid, productKey)) {
+    if (await ownsWebAccess(uid)) {
       res.status(200).json({
         valid: true,
         access: "owner",

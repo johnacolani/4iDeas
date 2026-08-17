@@ -1,7 +1,143 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart' show IconData, Icons;
 
-/// The single product this version of the site sells.
+/// The Windows desktop build — the product with a download behind it.
 const String kFourICadWindowsKey = '4icad_windows';
+
+/// The browser build, sold separately from the Windows installer.
+const String kFourICadWebKey = '4icad_web';
+
+/// How a platform can currently be obtained.
+enum PlatformAvailability {
+  /// Buyable here and now through Stripe Checkout.
+  buy,
+
+  /// Sold through Apple or Google, so the link leaves the site.
+  store,
+
+  /// Not for sale yet, but usable on the 48-hour trial.
+  trial,
+
+  /// Announced, not shippable.
+  comingSoon,
+}
+
+/// One row in the "every platform" grid on the 4iCAD page.
+///
+/// Availability is deliberately declared per platform rather than inferred from
+/// whether a price happens to exist: a half-configured product must read as
+/// "coming soon", never as a Buy button that fails at checkout.
+class FourICadPlatform {
+  const FourICadPlatform({
+    required this.key,
+    required this.label,
+    required this.icon,
+    required this.availability,
+    this.storeUrl,
+    this.note,
+  });
+
+  /// Product key for the platforms that are sold; null for the rest.
+  final String? key;
+  final String label;
+  final IconData icon;
+  final PlatformAvailability availability;
+
+  /// Apple/Google listing, once there is one.
+  final String? storeUrl;
+  final String? note;
+
+  bool get isSellable => availability == PlatformAvailability.buy && key != null;
+
+  FourICadPlatform copyWith({
+    PlatformAvailability? availability,
+    String? storeUrl,
+    String? note,
+  }) {
+    return FourICadPlatform(
+      key: key,
+      label: label,
+      icon: icon,
+      availability: availability ?? this.availability,
+      storeUrl: storeUrl ?? this.storeUrl,
+      note: note ?? this.note,
+    );
+  }
+
+  /// Applies an override from `products/{key}`, so a platform can go on sale —
+  /// or gain a store link — by writing one document, with no code change.
+  ///
+  /// Only an explicit `platformStatus` moves a platform; a product document
+  /// that merely exists never promotes one, because the Stripe Price lives in
+  /// server-only config that the browser cannot see.
+  FourICadPlatform applyOverride(Map<String, dynamic>? map) {
+    if (map == null) return this;
+    final storeUrl = (map['storeUrl'] as String?)?.trim();
+    final status = switch ((map['platformStatus'] as String?)?.trim()) {
+      'buy' => PlatformAvailability.buy,
+      'store' => PlatformAvailability.store,
+      'trial' => PlatformAvailability.trial,
+      'soon' => PlatformAvailability.comingSoon,
+      _ => null,
+    };
+    return copyWith(
+      // A store link implies the store, so a link alone is enough to open one.
+      availability: status ?? (storeUrl != null && storeUrl.isNotEmpty
+          ? PlatformAvailability.store
+          : null),
+      storeUrl: storeUrl != null && storeUrl.isNotEmpty ? storeUrl : null,
+      note: (map['platformNote'] as String?)?.trim(),
+    );
+  }
+}
+
+/// Every platform 4iCAD is announced on, in the order the hero artwork shows
+/// them. Windows and the browser build are sellable today; the rest are honest
+/// about not being ready.
+const List<FourICadPlatform> kFourICadPlatforms = [
+  FourICadPlatform(
+    key: kFourICadWindowsKey,
+    label: 'Windows',
+    icon: Icons.desktop_windows_outlined,
+    availability: PlatformAvailability.buy,
+    note: 'Windows 10 & 11, 64-bit',
+  ),
+  FourICadPlatform(
+    key: kFourICadWebKey,
+    label: 'Web',
+    icon: Icons.public,
+    availability: PlatformAvailability.trial,
+    note: 'Runs in any modern browser',
+  ),
+  FourICadPlatform(
+    key: null,
+    label: 'iOS',
+    icon: Icons.phone_iphone,
+    availability: PlatformAvailability.comingSoon,
+    note: 'iPhone and iPad',
+  ),
+  FourICadPlatform(
+    key: null,
+    label: 'Android',
+    icon: Icons.android,
+    availability: PlatformAvailability.comingSoon,
+    note: 'Phones and tablets',
+  ),
+  FourICadPlatform(
+    key: null,
+    label: 'macOS',
+    icon: Icons.laptop_mac,
+    availability: PlatformAvailability.comingSoon,
+    note: 'Apple silicon and Intel',
+  ),
+  FourICadPlatform(
+    key: null,
+    label: 'Linux',
+    icon: Icons.terminal,
+    availability: PlatformAvailability.comingSoon,
+    note: 'Desktop distributions',
+  ),
+];
 
 /// Public-safe snapshot of the Current Windows release, denormalised onto the
 /// product document by the backend. Deliberately carries no storage path — the

@@ -34,6 +34,7 @@ import 'package:four_ideas/features/admin/presentation/screens/admin_privacy_pol
 import 'package:four_ideas/features/admin/presentation/screens/admin_releases_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_product_orders_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_product_order_detail_screen.dart';
+import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_promotion_codes_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_product_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_success_screen.dart';
@@ -215,6 +216,10 @@ GoRouter createAppRouter() {
         path: AppRoutes.fourICadSuccess,
         builder: (context, state) => FourICadSuccessScreen(
           sessionId: state.uri.queryParameters['session_id'],
+          // Stripe returns the platform that was bought, so the page confirms
+          // that entitlement rather than assuming Windows.
+          productKey:
+              state.uri.queryParameters['product'] ?? kFourICadWindowsKey,
         ),
       ),
       GoRoute(

@@ -3,6 +3,7 @@ import {logger} from "firebase-functions";
 import {
   COL,
   PRODUCT_KEY,
+  SELLABLE_PRODUCT_KEYS,
   SITE_ORIGIN,
   STRIPE_SECRET_KEY,
   db,
@@ -27,9 +28,11 @@ export const createCheckoutSession = onCall(
     // rather than the control.
     const {uid, email} = requireVerifiedAuth(req);
 
-    // Only this product exists in v1; reject anything else rather than trusting input.
+    // Only known products can be bought; reject anything else rather than
+    // trusting input. A key that is listed but not configured falls through to
+    // the "not available yet" branch below, never to a broken checkout.
     const productKey = String(req.data?.productKey ?? PRODUCT_KEY);
-    if (productKey !== PRODUCT_KEY) {
+    if (!SELLABLE_PRODUCT_KEYS.includes(productKey)) {
       throw new HttpsError("invalid-argument", "Unknown product.");
     }
 
@@ -75,7 +78,10 @@ export const createCheckoutSession = onCall(
       // Stripe renders and validates the promotion-code field itself. No
       // discount arithmetic ever happens in our code or in the browser.
       allow_promotion_codes: true,
-      success_url: `${SITE_ORIGIN}/4icad/success?session_id={CHECKOUT_SESSION_ID}`,
+      // The product travels in the return URL so the confirmation page checks
+      // the entitlement that was actually bought, not always the Windows one.
+      success_url:
+        `${SITE_ORIGIN}/4icad/success?session_id={CHECKOUT_SESSION_ID}&product=${productKey}`,
       cancel_url: `${SITE_ORIGIN}/4icad?checkout=cancelled`,
       client_reference_id: uid,
       metadata: {firebaseUid: uid, productKey},

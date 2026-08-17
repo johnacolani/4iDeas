@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
+import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_actions.dart';
 import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/commerce_service.dart';
@@ -20,10 +21,19 @@ import 'package:four_ideas/services/commerce_service.dart';
 /// webhook can write. Because the redirect frequently beats the webhook, a
 /// verified-but-unwritten purchase is reported as "processing" and polled.
 class FourICadSuccessScreen extends StatefulWidget {
-  const FourICadSuccessScreen({super.key, this.sessionId});
+  const FourICadSuccessScreen({
+    super.key,
+    this.sessionId,
+    this.productKey = kFourICadWindowsKey,
+  });
 
   /// Read from the query string, so a refresh re-resolves identically.
   final String? sessionId;
+
+  /// Which platform was bought. Stripe carries it back in the return URL, so
+  /// the page confirms the entitlement that was actually purchased rather than
+  /// always checking the Windows one.
+  final String productKey;
 
   @override
   State<FourICadSuccessScreen> createState() => _FourICadSuccessScreenState();
@@ -39,6 +49,11 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
   Timer? _poll;
   int _attempts = 0;
   bool _downloading = false;
+  bool _openingWebApp = false;
+
+  /// The browser build has no installer, so its confirmation offers the app
+  /// itself rather than a download.
+  bool get _isWeb => widget.productKey == kFourICadWebKey;
 
   static const int _maxAttempts = 10;
   static const Duration _pollInterval = Duration(seconds: 3);
@@ -61,7 +76,10 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
       return;
     }
     try {
-      final state = await _commerce.getPurchaseStatus(sessionId: widget.sessionId);
+      final state = await _commerce.getPurchaseStatus(
+        sessionId: widget.sessionId,
+        productKey: widget.productKey,
+      );
       if (!mounted) return;
       setState(() {
         _state = state;
@@ -79,6 +97,12 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
       if (!mounted) return;
       setState(() => _error = 'Could not confirm your purchase right now.');
     }
+  }
+
+  Future<void> _openWeb() async {
+    setState(() => _openingWebApp = true);
+    await _purchase.tryWebApp(context);
+    if (mounted) setState(() => _openingWebApp = false);
   }
 
   Future<void> _download() async {
@@ -182,18 +206,32 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
       PurchaseState.entitled => _panel(
           icon: Icons.check_circle_outline,
           iconColor: const Color(0xFF67C79B),
-          title: 'Thank you — 4iCAD for Windows is yours',
-          body: 'Your purchase is confirmed and linked to your account. You can '
-              'download the current version now, and any future Windows release '
-              'without buying again.',
+          title: _isWeb
+              ? 'Thank you — 4iCAD for the web is yours'
+              : 'Thank you — 4iCAD for Windows is yours',
+          body: _isWeb
+              ? 'Your purchase is confirmed and linked to your account. The web '
+                  'app is yours with no time limit — open it from any browser '
+                  'you are signed in on.'
+              : 'Your purchase is confirmed and linked to your account. You can '
+                  'download the current version now, and any future Windows release '
+                  'without buying again.',
           isMobile: isMobile,
           actions: [
-            FourICadPrimaryButton(
-              label: 'Download for Windows',
-              icon: Icons.download,
-              busy: _downloading,
-              onPressed: _download,
-            ),
+            if (_isWeb)
+              FourICadPrimaryButton(
+                label: 'Open the web app',
+                icon: Icons.public,
+                busy: _openingWebApp,
+                onPressed: _openWeb,
+              )
+            else
+              FourICadPrimaryButton(
+                label: 'Download for Windows',
+                icon: Icons.download,
+                busy: _downloading,
+                onPressed: _download,
+              ),
             FourICadGhostButton(
               label: 'Product page',
               icon: Icons.open_in_new,

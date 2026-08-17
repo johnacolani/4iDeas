@@ -141,7 +141,65 @@ Notes that matter:
 
 ---
 
-## 3. What a buyer gets, and how
+## 3. Platforms, and putting a new one on sale
+
+The 4iCAD page carries a **Choose your platform** grid — Windows, Web, iOS,
+Android, macOS, Linux — matching the promise the hero artwork makes. Each tile
+says plainly what can be done today: **Buy**, **Open store**, **Try free — 48h**,
+or **Coming very soon**. A platform the visitor already owns says so instead of
+selling itself again.
+
+Two things must both be true before a platform can be bought:
+
+1. Its key is in `SELLABLE_PRODUCT_KEYS` (`functions/src/core.ts`) — an
+   allowlist, so a typo or a probing client cannot reach a half-configured
+   product.
+2. `product_config/{key}` holds a `stripePriceId`. This collection is
+   server-only; no browser can read or influence which Price is charged.
+
+The tile itself is driven by `products/{key}.platformStatus`, which a browser
+*can* read:
+
+| Value | Tile shows |
+| --- | --- |
+| `buy` | Buy button, straight into Stripe Checkout |
+| `store` | Open store — needs `storeUrl` |
+| `trial` | Try free — 48 hours |
+| `soon` | Coming very soon (the default for unreleased platforms) |
+
+A `storeUrl` alone is enough to open a store, so adding an App Store or Play
+listing later is one field on one document — no release needed.
+
+Note the deliberate asymmetry: a product document **cannot promote a platform on
+its own**, however complete it looks. Only an explicit `platformStatus` does
+that. The reason is that the Stripe Price lives in server-only config the
+browser cannot see, so "a product doc exists" is not evidence anything can
+actually be charged — and a Buy button that fails at checkout is worse than an
+honest "coming soon".
+
+### Selling the web build
+
+Windows is configured and selling. To switch the Web tile from *Try free* to
+*Buy*:
+
+1. Create a Price for the browser build in Stripe.
+2. Write `product_config/4icad_web` with `{stripePriceId: "price_…", active: true}`.
+3. Set `platformStatus: "buy"` on `products/4icad_web`.
+
+Entitlements are per platform, so a web buyer gets `4icad_web` and a Windows
+buyer gets `4icad_windows`. Either one counts as ownership for the web app: a
+Windows buyer keeps unlimited browser access as part of the purchase they
+already made, rather than being put back on the 48-hour clock.
+
+### Selling iOS, Android or macOS
+
+Those go through Apple and Google, not Stripe. When a listing exists, put its
+URL in `products/{key}.storeUrl` and the tile becomes a store link. Nothing else
+changes — no Stripe Price, no entitlement, because the store handles the sale.
+
+---
+
+## 4. What a buyer gets, and how
 
 1. They press Buy → `createCheckoutSession` → Stripe's hosted checkout.
 2. Stripe returns them to `/4icad/success?session_id=…`. **That page proves
@@ -177,7 +235,7 @@ buyer who later changed to an unverified address.
 
 ---
 
-## 4. Publishing a release — do this before selling
+## 5. Publishing a release — do this before selling
 
 **If no release is marked Current, buyers see "No Windows release has been
 published yet" and the download button is disabled — they have paid and cannot
@@ -195,7 +253,7 @@ reach a browser.
 
 ---
 
-## 5. The 48-hour web trial
+## 6. The 48-hour web trial
 
 A visitor presses **Try Web App**, signs in, and gets 48 hours in the 4iCAD web
 app. The window is anchored server-side to their Firebase uid on first launch,
@@ -230,7 +288,7 @@ incognito window, which is strictly weaker.
 
 ---
 
-## 6. Deploying
+## 7. Deploying
 
 ```bash
 # Functions (all, or name them individually)
@@ -274,7 +332,7 @@ their window, because the window lives in Firestore rather than in the token.
 
 ---
 
-## 7. Tests
+## 8. Tests
 
 Three suites, all runnable locally:
 
@@ -290,7 +348,7 @@ the server would refuse, and never blocks something it would allow.
 
 ---
 
-## 8. Conventions worth keeping
+## 9. Conventions worth keeping
 
 - **Never trust the browser for price, discount, entitlement or trial length.**
   The client sends a product key and nothing else.

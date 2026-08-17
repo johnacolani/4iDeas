@@ -120,6 +120,73 @@ void main() {
     });
   });
 
+  group('platform grid', () {
+    FourICadPlatform byLabel(String label) =>
+        kFourICadPlatforms.firstWhere((p) => p.label == label);
+
+    test('covers every platform the hero artwork promises', () {
+      expect(
+        kFourICadPlatforms.map((p) => p.label),
+        containsAll(['Windows', 'Web', 'iOS', 'Android', 'macOS', 'Linux']),
+      );
+    });
+
+    test('only the platforms that can actually be delivered carry a key', () {
+      expect(byLabel('Windows').key, kFourICadWindowsKey);
+      expect(byLabel('Web').key, kFourICadWebKey);
+      for (final label in ['iOS', 'Android', 'macOS', 'Linux']) {
+        expect(byLabel(label).key, isNull, reason: '$label has nothing to sell yet');
+        expect(byLabel(label).availability, PlatformAvailability.comingSoon);
+        expect(byLabel(label).isSellable, isFalse);
+      }
+    });
+
+    test('a platform with no override keeps its declared default', () {
+      expect(byLabel('iOS').applyOverride(null).availability,
+          PlatformAvailability.comingSoon);
+      expect(byLabel('Windows').applyOverride(const {}).availability,
+          PlatformAvailability.buy);
+    });
+
+    test('a product document alone never promotes a platform', () {
+      // The Stripe Price lives in server-only config the browser cannot read,
+      // so an existing product doc must not be taken as "ready to sell".
+      final ios = byLabel('iOS').applyOverride(const {
+        'displayName': '4iCAD for iOS',
+        'active': true,
+        'priceAmountMinor': 4900,
+      });
+      expect(ios.availability, PlatformAvailability.comingSoon);
+    });
+
+    test('an explicit status puts a platform on sale without a new build', () {
+      final macos = byLabel('macOS').applyOverride(const {'platformStatus': 'buy'});
+      expect(macos.availability, PlatformAvailability.buy);
+      // Still not sellable: nothing to charge for without a product key.
+      expect(macos.isSellable, isFalse);
+    });
+
+    test('a store link opens the store, even with no status set', () {
+      final android = byLabel('Android').applyOverride(const {
+        'storeUrl': 'https://play.google.com/store/apps/details?id=com.fourideas.icad',
+      });
+      expect(android.availability, PlatformAvailability.store);
+      expect(android.storeUrl, contains('play.google.com'));
+    });
+
+    test('an empty store link is ignored rather than opening nothing', () {
+      final ios = byLabel('iOS').applyOverride(const {'storeUrl': '   '});
+      expect(ios.availability, PlatformAvailability.comingSoon);
+      expect(ios.storeUrl, isNull);
+    });
+
+    test('a platform can be pushed back to coming soon', () {
+      final windows = byLabel('Windows').applyOverride(const {'platformStatus': 'soon'});
+      expect(windows.availability, PlatformAvailability.comingSoon);
+      expect(windows.isSellable, isFalse);
+    });
+  });
+
   group('WebTrial', () {
     // The document is written only by the backend; these cover how the page
     // reads a window it cannot influence.

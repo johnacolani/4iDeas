@@ -427,10 +427,17 @@ class FourICadPurchaseController {
   }
 
   /// Starts Stripe Checkout and hands off to the hosted page.
-  Future<void> startCheckout(BuildContext context) async {
+  ///
+  /// [productKey] selects the platform being bought. The server still decides
+  /// the price and refuses anything it has no configuration for, so passing a
+  /// key here chooses a product, never a cost.
+  Future<void> startCheckout(
+    BuildContext context, {
+    String productKey = kFourICadWindowsKey,
+  }) async {
     try {
       await _refreshVerificationClaim();
-      final url = await _service.createCheckoutSession();
+      final url = await _service.createCheckoutSession(productKey);
       final uri = Uri.parse(url);
       // Same tab: Stripe returns the buyer to /4icad/success afterwards.
       await launchUrl(uri, webOnlyWindowName: '_self', mode: LaunchMode.platformDefault);

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_actions.dart';
+import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_platform_grid.dart';
 import 'package:four_ideas/services/commerce_service.dart';
 
 /// The public 4iCAD for Windows product page at `/4icad`.
@@ -33,6 +35,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
   bool _startingCheckout = false;
   bool _downloading = false;
   bool _openingWebApp = false;
+  String? _buyingKey;
   bool _cancelNoticeShown = false;
 
   @override
@@ -55,6 +58,22 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     setState(() => _startingCheckout = true);
     await _purchase.startCheckout(context);
     if (mounted) setState(() => _startingCheckout = false);
+  }
+
+  /// Buys a specific platform from the grid. Windows goes through the same
+  /// path as the hero button; the others carry their own product key.
+  Future<void> _onBuyPlatform(FourICadPlatform platform) async {
+    final key = platform.key;
+    if (key == null) return;
+    setState(() => _buyingKey = key);
+    await _purchase.startCheckout(context, productKey: key);
+    if (mounted) setState(() => _buyingKey = null);
+  }
+
+  Future<void> _onStore(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Future<void> _onTryWeb() async {
@@ -212,6 +231,45 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                     // Generous gap after the hero so the artwork reads as the
                     // end of that block rather than colliding with what follows.
                     SizedBox(height: isMobile ? 48 : 76),
+                    _SectionHeading(
+                      label: 'Choose your platform',
+                      isMobile: isMobile,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'One licence per platform. Windows and the browser build '
+                      'are on sale now; the rest are close behind.',
+                      style: GoogleFonts.roboto(
+                        fontSize: isMobile ? 14 : 15,
+                        height: 1.5,
+                        color: Colors.white.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+                    // Streams so a platform can go on sale, or gain a store
+                    // link, without shipping a new build.
+                    StreamBuilder<List<FourICadPlatform>>(
+                      stream: _commerce.watchPlatforms(),
+                      builder: (context, platformSnap) {
+                        final platforms = platformSnap.data ?? kFourICadPlatforms;
+                        return StreamBuilder<Set<String>>(
+                          stream: _commerce.watchOwnedProducts(
+                            [kFourICadWindowsKey, kFourICadWebKey],
+                          ),
+                          builder: (context, ownedSnap) => FourICadPlatformGrid(
+                            platforms: platforms,
+                            isMobile: isMobile,
+                            isTablet: isTablet,
+                            owned: ownedSnap.data ?? const {},
+                            busyKey: _buyingKey,
+                            onBuy: _onBuyPlatform,
+                            onTry: _onTryWeb,
+                            onStore: _onStore,
+                          ),
+                        );
+                      },
+                    ),
+                    SizedBox(height: isMobile ? 40 : 60),
                     if (product.features.isNotEmpty) ...[
                       _SectionHeading(
                         label: 'What 4iCAD does',
