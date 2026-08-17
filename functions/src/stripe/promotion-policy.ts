@@ -54,6 +54,45 @@ export type StatusInput = Pick<
   "active" | "times_redeemed" | "max_redemptions" | "expires_at"
 >;
 
+/** How many spendable codes each tier should hold. */
+export const STOCK_PER_TIER = 5;
+
+export interface TierStock {
+  percentOff: number;
+  available: number;
+  used: number;
+  /** Expired or switched off — neither spendable nor spent. */
+  unusable: number;
+  /** How many to create to bring the tier back up to target. */
+  missing: number;
+}
+
+/**
+ * Summarises the stock an admin has left to hand out, per tier.
+ *
+ * "Available" deliberately counts only codes that can still be spent right now:
+ * an expired or disabled code is neither something to send someone nor evidence
+ * that a customer used one, so it is reported separately rather than padding
+ * either figure.
+ */
+export function summariseStock(
+  codes: Array<{percentOff: number | null; status: CodeStatus}>,
+  target: number = STOCK_PER_TIER
+): TierStock[] {
+  return ALLOWED_PERCENTS.map((percentOff) => {
+    const mine = codes.filter((c) => c.percentOff === percentOff);
+    const available = mine.filter((c) => c.status === "active").length;
+    const used = mine.filter((c) => c.status === "used").length;
+    return {
+      percentOff,
+      available,
+      used,
+      unusable: mine.length - available - used,
+      missing: Math.max(0, target - available),
+    };
+  });
+}
+
 export function codeStatus(promo: StatusInput, nowMs: number): CodeStatus {
   const spent =
     promo.max_redemptions !== null &&

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
@@ -41,9 +42,10 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
   int _count = 5;
   bool _generate = true;
 
-  List<PromotionCodeView>? _codes;
+  PromotionBoard? _board;
   bool _loading = true;
   bool _creating = false;
+  bool _restocking = false;
   String? _error;
   String? _listError;
 
@@ -68,8 +70,8 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
       _listError = null;
     });
     try {
-      final codes = await _service.listPromotionCodes();
-      if (mounted) setState(() => _codes = codes);
+      final board = await _service.listPromotionCodes();
+      if (mounted) setState(() => _board = board);
     } catch (e) {
       if (mounted) {
         setState(() => _listError = _message(e, 'Could not load promotion codes from Stripe.'));
@@ -153,6 +155,149 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
     }
   }
 
+  /// Brings every tier back to five spendable codes.
+  Future<void> _restock() async {
+    setState(() => _restocking = true);
+    try {
+      final created = await _service.restockPromotionCodes();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            created == 0
+                ? 'Every tier already has five codes.'
+                : 'Created $created code${created == 1 ? '' : 's'}.',
+          ),
+          backgroundColor: const Color(0xFF1B7F4B),
+        ),
+      );
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_message(e, 'Could not top up the codes.')),
+          backgroundColor: const Color(0xFF9B3A31),
+        ),
+      );
+    }
+    if (mounted) setState(() => _restocking = false);
+  }
+
+  /// Records the recipient, then opens a pre-written email in the admin's own
+  /// mail app.
+  ///
+  /// Deliberately not sent by the server: the site has no mail infrastructure,
+  /// and a message that arrives from your own address is more likely to be read
+  /// — and to be replied to — than one from a no-reply sender. The recipient is
+  /// recorded either way, so the list can show who was given what.
+  Future<void> _send(PromotionCodeView code) async {
+    final controller = TextEditingController(text: code.sentTo ?? '');
+    final email = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF0B1428),
+        title: Text(
+          'Send ${code.code}',
+          style: GoogleFonts.roboto(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Opens your email app with the code written out. The address is '
+              'recorded here so you can see who it went to.',
+              style: GoogleFonts.roboto(
+                fontSize: 13.5,
+                height: 1.45,
+                color: Colors.white.withValues(alpha: 0.65),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              keyboardType: TextInputType.emailAddress,
+              style: const TextStyle(color: Colors.white),
+              onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+              decoration: InputDecoration(
+                hintText: 'customer@example.com',
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.05),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            icon: const Icon(Icons.mail_outline, size: 17),
+            label: const Text('Compose email'),
+            style: FilledButton.styleFrom(
+              backgroundColor: ColorManager.accentGold,
+              foregroundColor: const Color(0xFF1A1305),
+            ),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (email == null || email.isEmpty || !mounted) return;
+
+    try {
+      await _service.assignPromotionCode(id: code.id, sentTo: email);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_message(e, 'Could not record the recipient.')),
+          backgroundColor: const Color(0xFF9B3A31),
+        ),
+      );
+      return;
+    }
+
+    final percent = code.percentOff?.toInt();
+    final subject = Uri.encodeComponent(
+      'Your ${percent == null ? '' : '$percent% '}discount code for 4iCAD',
+    );
+    final body = Uri.encodeComponent(
+      'Hello,\n\n'
+      'Here is your discount code for 4iCAD for Windows:\n\n'
+      '    ${code.code}\n\n'
+      'To use it, go to https://4ideasapp.com/4icad, sign in and press Buy. '
+      'On the payment page, choose "Add promotion code" and enter the code '
+      'above — the discount is applied before you pay.\n\n'
+      'The code works once.\n\n'
+      'Thank you,\n4iDeas',
+    );
+    final launched = await launchUrl(
+      Uri.parse('mailto:$email?subject=$subject&body=$body'),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!mounted) return;
+    if (!launched) {
+      // No mail client is a normal state on a kiosk or a fresh browser, so fall
+      // back to the clipboard rather than losing the work.
+      await Clipboard.setData(ClipboardData(text: code.code));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No email app available. The code is on your clipboard.'),
+        ),
+      );
+    }
+    await _load();
+  }
+
   /// Puts a code on the clipboard so it can be pasted into a message or email.
   Future<void> _copy(PromotionCodeView code) async {
     await Clipboard.setData(ClipboardData(text: code.code));
@@ -228,6 +373,8 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _stockCard(isMobile),
+                        const SizedBox(height: 20),
                         _createCard(isMobile),
                         const SizedBox(height: 26),
                         Row(
@@ -255,6 +402,138 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                   ),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The screen's headline answer: how many codes are left to give away in each
+  /// tier, and how many customers have spent one.
+  Widget _stockCard(bool isMobile) {
+    final stock = _board?.stock ?? const <TierStock>[];
+    final short = stock.where((t) => t.missing > 0).length;
+
+    return FourICadGlassPanel(
+      goldBorder: true,
+      padding: EdgeInsets.all(isMobile ? 20 : 26),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Code stock',
+                  style: GoogleFonts.roboto(
+                    fontSize: isMobile ? 18 : 21,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              if (_board != null)
+                Text(
+                  '${_board!.totalAvailable} available · ${_board!.totalUsed} used',
+                  style: GoogleFonts.roboto(
+                    fontSize: 13.5,
+                    color: Colors.white.withValues(alpha: 0.6),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Five single-use codes per discount. Send one to a customer and it '
+            'moves to used the moment they redeem it at checkout.',
+            style: GoogleFonts.roboto(
+              fontSize: 13.5,
+              height: 1.5,
+              color: Colors.white.withValues(alpha: 0.65),
+            ),
+          ),
+          const SizedBox(height: 18),
+          if (_loading && _board == null)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator(color: ColorManager.accentGold)),
+            )
+          else
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [for (final tier in stock) _tierTile(tier, isMobile)],
+            ),
+          const SizedBox(height: 18),
+          FourICadPrimaryButton(
+            label: short == 0 ? 'All tiers full' : 'Top up to 5 per discount',
+            icon: Icons.inventory_2_outlined,
+            busy: _restocking,
+            // Nothing to do when every tier is full, and a button that mints
+            // nothing would only teach the admin to distrust it.
+            onPressed: short == 0 ? null : _restock,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tierTile(TierStock tier, bool isMobile) {
+    final low = tier.available == 0;
+    return Container(
+      width: isMobile ? double.infinity : 150,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: low
+              ? const Color(0xFFE98D82).withValues(alpha: 0.5)
+              : Colors.white.withValues(alpha: 0.16),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${tier.percentOff}% off',
+            style: GoogleFonts.roboto(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w700,
+              color: ColorManager.accentGold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '${tier.available}',
+                style: GoogleFonts.robotoMono(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: low ? const Color(0xFFE98D82) : Colors.white,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                'available',
+                style: GoogleFonts.roboto(
+                  fontSize: 12.5,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '${tier.used} used'
+            '${tier.unusable > 0 ? ' · ${tier.unusable} expired' : ''}',
+            style: GoogleFonts.roboto(
+              fontSize: 12.5,
+              color: Colors.white.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -539,7 +818,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
         ),
       );
     }
-    final codes = _codes ?? const <PromotionCodeView>[];
+    final codes = _board?.codes ?? const <PromotionCodeView>[];
     if (codes.isEmpty) {
       return FourICadGlassPanel(
         child: Text(
@@ -590,6 +869,14 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                         color: Colors.white70,
                         tooltip: 'Copy code',
                       ),
+                      // Sending a spent code would only confuse its recipient.
+                      if (!code.isSpent)
+                        IconButton(
+                          onPressed: () => _send(code),
+                          icon: const Icon(Icons.mail_outline, size: 19),
+                          color: ColorManager.accentGold,
+                          tooltip: 'Send by email',
+                        ),
                       // Only a still-spendable code can be switched off. A used
                       // one is finished, and the toggle would imply otherwise.
                       if (!code.isUsed)
@@ -625,6 +912,26 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
                         const FourICadMetaChip(label: 'FIRST-TIME ONLY'),
                     ],
                   ),
+                  if (code.sentTo != null && code.sentTo!.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.outgoing_mail, size: 15, color: Colors.white38),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Sent to ${code.sentTo}'
+                            '${code.sentAt == null ? '' : ' on ${_date(code.sentAt!)}'}',
+                            style: GoogleFonts.roboto(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   if (code.note != null && code.note!.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     Row(

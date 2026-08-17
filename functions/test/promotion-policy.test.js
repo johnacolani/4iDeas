@@ -14,9 +14,11 @@ const {
   ALLOWED_PERCENTS,
   MAX_BATCH,
   CODE_PATTERN,
+  STOCK_PER_TIER,
   codeStatus,
   generateCode,
   isAllowedPercent,
+  summariseStock,
 } = require("../lib/stripe/promotion-policy");
 
 const NOW = 1_760_000_000_000;
@@ -63,6 +65,68 @@ describe("generated codes", () => {
     for (let i = 0; i < MAX_BATCH * 50; i++) seen.add(generateCode(30));
     // 32^6 possibilities; a collision in 1000 draws would signal a broken RNG.
     assert.strictEqual(seen.size, MAX_BATCH * 50);
+  });
+});
+
+describe("summariseStock", () => {
+  const tier = (stock, percentOff) => stock.find((t) => t.percentOff === percentOff);
+
+  test("reports every tier, including ones with no codes at all", () => {
+    const stock = summariseStock([]);
+    assert.strictEqual(stock.length, ALLOWED_PERCENTS.length);
+    for (const t of stock) {
+      assert.strictEqual(t.available, 0);
+      assert.strictEqual(t.used, 0);
+      assert.strictEqual(t.missing, STOCK_PER_TIER, "an empty tier needs a full restock");
+    }
+  });
+
+  test("counts what is left to hand out and what customers have spent", () => {
+    const stock = summariseStock([
+      {percentOff: 10, status: "active"},
+      {percentOff: 10, status: "active"},
+      {percentOff: 10, status: "used"},
+      {percentOff: 50, status: "used"},
+    ]);
+    assert.deepStrictEqual(
+      {...tier(stock, 10)},
+      {percentOff: 10, available: 2, used: 1, unusable: 0, missing: 3}
+    );
+    assert.deepStrictEqual(
+      {...tier(stock, 50)},
+      {percentOff: 50, available: 0, used: 1, unusable: 0, missing: 5}
+    );
+  });
+
+  test("a used code does not count as stock — it must be replaced", () => {
+    const spent = Array.from({length: 5}, () => ({percentOff: 30, status: "used"}));
+    assert.strictEqual(tier(summariseStock(spent), 30).missing, 5);
+  });
+
+  test("expired and disabled codes count as neither available nor used", () => {
+    const stock = summariseStock([
+      {percentOff: 70, status: "active"},
+      {percentOff: 70, status: "expired"},
+      {percentOff: 70, status: "disabled"},
+    ]);
+    const t = tier(stock, 70);
+    assert.strictEqual(t.available, 1);
+    assert.strictEqual(t.used, 0);
+    assert.strictEqual(t.unusable, 2);
+    assert.strictEqual(t.missing, 4);
+  });
+
+  test("a full tier needs nothing, and restocking it again is a no-op", () => {
+    const full = Array.from({length: 5}, () => ({percentOff: 100, status: "active"}));
+    assert.strictEqual(tier(summariseStock(full), 100).missing, 0);
+    // Over-full (an admin also created some by hand) must not go negative.
+    const extra = [...full, {percentOff: 100, status: "active"}];
+    assert.strictEqual(tier(summariseStock(extra), 100).missing, 0);
+  });
+
+  test("ignores codes from outside the approved tiers", () => {
+    const stock = summariseStock([{percentOff: 25, status: "active"}]);
+    assert.strictEqual(stock.every((t) => t.available === 0), true);
   });
 });
 

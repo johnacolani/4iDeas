@@ -7,9 +7,11 @@ import {
   ALLOWED_PERCENTS,
   CODE_PATTERN,
   MAX_BATCH,
+  STOCK_PER_TIER,
   codeStatus,
   generateCode,
   isAllowedPercent,
+  summariseStock,
 } from "./promotion-policy";
 
 /**
@@ -183,9 +185,118 @@ export const listPromotionCodes = onCall(
         firstTimeOnly: p.restrictions?.first_time_transaction ?? false,
         note: p.metadata?.note ?? null,
         issuedBy: p.metadata?.issuedBy ?? null,
+        sentTo: p.metadata?.sentTo ?? null,
+        sentAt: p.metadata?.sentAt ? Number(p.metadata.sentAt) : null,
         redeemedBy: redemptions[i],
       })),
+      // The counts the admin screen leads with: how many of each tier are left
+      // to give away, and how many customers have spent one.
+      stock: summariseStock(
+        list.data.map((p) => ({
+          percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,
+          status: codeStatus(p, now),
+        }))
+      ),
     };
+  }
+);
+
+/**
+ * Tops every tier back up to five spendable codes.
+ *
+ * This is the stock an admin hands out one at a time, so the useful operation
+ * is "make sure I have five of each again", not "create one more". Idempotent:
+ * a tier that already holds five is left alone, so pressing the button twice
+ * does not mint ten.
+ */
+export const restockPromotionCodes = onCall(
+  {region: "us-central1", secrets: [STRIPE_SECRET_KEY]},
+  async (req) => {
+    const {email: adminEmail} = requireAdmin(req);
+    const target = req.data?.target ? Number(req.data.target) : STOCK_PER_TIER;
+    if (!Number.isInteger(target) || target < 1 || target > MAX_BATCH) {
+      throw new HttpsError("invalid-argument", `Keep between 1 and ${MAX_BATCH} codes per tier.`);
+    }
+
+    const stripe = stripeClient();
+    const now = Date.now();
+
+    const existing = await stripe.promotionCodes.list({limit: 100, expand: ["data.coupon"]});
+    const stock = summariseStock(
+      existing.data.map((p) => ({
+        percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,
+        status: codeStatus(p, now),
+      })),
+      target
+    );
+
+    const cfg = await db.collection(COL.productConfig).doc(PRODUCT_KEY).get();
+    const stripeProductId = cfg.data()?.stripeProductId as string | undefined;
+
+    let created = 0;
+    for (const tier of stock) {
+      if (tier.missing < 1) continue;
+
+      // One coupon per top-up carries the discount; its codes point at it.
+      const coupon = await stripe.coupons.create({
+        percent_off: tier.percentOff,
+        duration: "once",
+        name: `${tier.percentOff}% off 4iCAD for Windows`,
+        ...(stripeProductId ? {applies_to: {products: [stripeProductId]}} : {}),
+        metadata: {productKey: PRODUCT_KEY, createdBy: "4ideasapp-admin"},
+      });
+
+      for (let i = 0; i < tier.missing; i++) {
+        try {
+          await stripe.promotionCodes.create({
+            coupon: coupon.id,
+            code: generateCode(tier.percentOff),
+            active: true,
+            // Single-use: a code handed to one person must stop working once
+            // that person has used it, or the counts here mean nothing.
+            max_redemptions: 1,
+            metadata: {
+              productKey: PRODUCT_KEY,
+              ...(adminEmail ? {issuedBy: adminEmail} : {}),
+            },
+          });
+          created++;
+        } catch (err) {
+          // A collision on the random suffix is not worth failing the restock.
+          logger.warn("promotion code creation skipped", {percentOff: tier.percentOff});
+        }
+      }
+    }
+
+    logger.info("promotion stock topped up", {created, target});
+    return {created, target};
+  }
+);
+
+/**
+ * Records who a code was sent to.
+ *
+ * Kept on the Stripe promotion code itself rather than in a second database, so
+ * the recipient travels with the code and cannot drift out of sync with it.
+ * This does not restrict redemption — it is a label, so the admin can see who
+ * was given what, and later compare it with who actually spent it.
+ */
+export const assignPromotionCode = onCall(
+  {region: "us-central1", secrets: [STRIPE_SECRET_KEY]},
+  async (req) => {
+    requireAdmin(req);
+    const id = String(req.data?.id ?? "");
+    const email = String(req.data?.sentTo ?? "").trim().toLowerCase();
+    if (!id) throw new HttpsError("invalid-argument", "A promotion code id is required.");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      throw new HttpsError("invalid-argument", "Enter a valid email address.");
+    }
+
+    const promo = await stripeClient().promotionCodes.update(id, {
+      metadata: {sentTo: email, sentAt: String(Date.now())},
+    });
+    logger.info("promotion code assigned", {id, code: promo.code});
+    return {id: promo.id, code: promo.code, sentTo: email};
   }
 );
 

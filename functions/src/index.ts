@@ -10,7 +10,13 @@
 export {bootstrapAdminClaim, setAdminClaim, listAdmins} from "./adminops/claims";
 export {createCheckoutSession} from "./stripe/checkout";
 export {stripeWebhook} from "./stripe/webhook";
-export {createPromotionCode, listPromotionCodes, setPromotionCodeActive} from "./stripe/promotions";
+export {
+  createPromotionCode,
+  listPromotionCodes,
+  setPromotionCodeActive,
+  restockPromotionCodes,
+  assignPromotionCode,
+} from "./stripe/promotions";
 export {getPurchaseStatus, getDownloadUrl} from "./downloads/download";
 export {startWebTrial, verifyWebTrial} from "./trials/web-trial";
 export {publishRelease, setCurrentRelease, onReleaseUploaded} from "./releases/releases";

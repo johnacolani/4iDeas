@@ -51,24 +51,52 @@ Admin routes are all URL-addressable, so they can be bookmarked:
 
 **Where:** admin menu → Promotion codes, or `/admin/4icad/promotions`.
 
-### Keeping a stock of codes to hand out
+### Where the codes live, and why
 
-1. Pick a tier chip (10 / 30 / 50 / 70 / 100 %).
-2. Leave the mode on **Generate codes** and choose how many (1, 5, 10 or 20;
-   the backend caps a batch at 20).
-3. Optionally add a **note** — "Trade show", "Acme Ltd" — which is stored on the
-   code in Stripe and shown in the list, so you can tell later what a batch was
-   for.
-4. Press **Generate**. Codes come out as `4ICAD50-K7QF2P`: the tier stays
-   legible and the suffix avoids O/0 and I/1, because these get read aloud and
-   typed by hand.
+Codes are generated, tracked and sent **entirely from the admin screen** — you
+never open the Stripe dashboard. They are nonetheless registered with Stripe,
+because Stripe's checkout page only accepts codes it knows about; a code held
+only in our database would be rejected as invalid when the customer typed it.
+Think of Stripe as the register, and this screen as the control panel.
 
-Generated codes are **single-use by default** (max redemptions 1) — that is what
-makes the list meaningful. Copy one with the button beside it and send it
-however you like; the app deliberately sends no email.
+### The stock: five codes per discount
 
-Switch the mode to **Name one myself** for a public campaign code like
-`4ICAD10`, where the same code is meant to circulate.
+The top card is the answer to "what do I have left to give away". Each tier
+shows how many codes are **available** and how many customers have **used** one,
+with expired or disabled codes counted separately so they pad neither figure.
+
+Press **Top up to 5 per discount** to bring every tier back to five. It is
+idempotent — a full tier is left alone — so it is safe to press whenever the
+stock looks low. Codes come out as `4ICAD50-K7QF2P`: the tier stays legible and
+the suffix avoids O/0 and I/1, because these get read aloud and typed by hand.
+
+Restocked codes are always **single-use**. That is what makes the counts mean
+anything: one code, one customer, and it flips to used the moment they redeem it.
+
+### Sending one to a customer
+
+Press the ✉ button on any available code, enter their address, and the app:
+
+1. records the recipient against the code, and
+2. opens **your own mail app** with the message written out — the code, where to
+   go, and how to enter it at checkout.
+
+Nothing is sent by our servers: the site has no mail infrastructure, and a
+message from your own address is likelier to be read and replied to than one
+from a no-reply sender. The recipient is recorded either way, so the row then
+reads "Sent to alice@example.com" — and later, when they buy, "Used by
+alice@example.com" underneath it. Comparing those two lines is how you spot a
+code that was forwarded on.
+
+If no mail app is available (a fresh browser, a kiosk), the code goes to the
+clipboard instead and the recipient is still recorded.
+
+### One-off and campaign codes
+
+The card below the stock still creates codes by hand: switch to **Name one
+myself** for a public campaign code like `4ICAD10` meant to circulate, or
+generate an ad-hoc batch with its own note, expiry, redemption cap, or
+first-time-customer restriction.
 
 ### Telling who used what
 

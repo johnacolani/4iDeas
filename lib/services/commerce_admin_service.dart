@@ -56,6 +56,50 @@ class PromotionRedemption {
   }
 }
 
+/// How much stock one discount tier has left, as the backend counts it.
+class TierStock {
+  const TierStock({
+    required this.percentOff,
+    required this.available,
+    required this.used,
+    this.unusable = 0,
+    this.missing = 0,
+  });
+
+  final int percentOff;
+
+  /// Codes still spendable — the ones there are left to give away.
+  final int available;
+
+  /// Codes a customer has redeemed.
+  final int used;
+
+  /// Expired or switched off: neither stock nor evidence of a sale.
+  final int unusable;
+
+  /// How many to create to bring this tier back to target.
+  final int missing;
+
+  factory TierStock.fromMap(Map<String, dynamic> map) => TierStock(
+        percentOff: (map['percentOff'] as num?)?.toInt() ?? 0,
+        available: (map['available'] as num?)?.toInt() ?? 0,
+        used: (map['used'] as num?)?.toInt() ?? 0,
+        unusable: (map['unusable'] as num?)?.toInt() ?? 0,
+        missing: (map['missing'] as num?)?.toInt() ?? 0,
+      );
+}
+
+/// The promotion screen's whole picture: the codes, and the per-tier counts.
+class PromotionBoard {
+  const PromotionBoard({this.codes = const [], this.stock = const []});
+
+  final List<PromotionCodeView> codes;
+  final List<TierStock> stock;
+
+  int get totalAvailable => stock.fold(0, (running, t) => running + t.available);
+  int get totalUsed => stock.fold(0, (running, t) => running + t.used);
+}
+
 class PromotionCodeView {
   const PromotionCodeView({
     required this.id,
@@ -70,6 +114,8 @@ class PromotionCodeView {
     this.firstTimeOnly = false,
     this.note,
     this.issuedBy,
+    this.sentTo,
+    this.sentAt,
     this.redeemedBy,
   });
 
@@ -88,6 +134,12 @@ class PromotionCodeView {
   /// is meant for.
   final String? note;
   final String? issuedBy;
+
+  /// Who the admin recorded sending it to. A label, not a restriction: anyone
+  /// holding the code can spend it, which is why [redeemedBy] is worth
+  /// comparing against this.
+  final String? sentTo;
+  final DateTime? sentAt;
   final PromotionRedemption? redeemedBy;
 
   /// True once the code can no longer be spent, for any reason.
@@ -118,6 +170,10 @@ class PromotionCodeView {
       firstTimeOnly: map['firstTimeOnly'] as bool? ?? false,
       note: map['note'] as String?,
       issuedBy: map['issuedBy'] as String?,
+      sentTo: map['sentTo'] as String?,
+      sentAt: (map['sentAt'] as num?) == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch((map['sentAt'] as num).toInt()),
       redeemedBy: PromotionRedemption.fromMap(
         (map['redeemedBy'] as Map?)?.cast<String, dynamic>(),
       ),
@@ -166,14 +222,40 @@ class CommerceAdminService {
     }
   }
 
-  Future<List<PromotionCodeView>> listPromotionCodes() async {
+  Future<PromotionBoard> listPromotionCodes() async {
     final result =
         await _functions.httpsCallable('listPromotionCodes').call<Map<String, dynamic>>();
     final codes = (result.data['codes'] as List?) ?? const [];
-    return codes
-        .whereType<Map>()
-        .map((m) => PromotionCodeView.fromMap(m.cast<String, dynamic>()))
-        .toList();
+    final stock = (result.data['stock'] as List?) ?? const [];
+    return PromotionBoard(
+      codes: codes
+          .whereType<Map>()
+          .map((m) => PromotionCodeView.fromMap(m.cast<String, dynamic>()))
+          .toList(),
+      stock: stock
+          .whereType<Map>()
+          .map((m) => TierStock.fromMap(m.cast<String, dynamic>()))
+          .toList(),
+    );
+  }
+
+  /// Brings every tier back up to five spendable codes.
+  ///
+  /// Idempotent — a tier that is already full is left alone — so this is safe
+  /// to press whenever the stock looks low. Returns how many were created.
+  Future<int> restockPromotionCodes() async {
+    final result =
+        await _functions.httpsCallable('restockPromotionCodes').call<Map<String, dynamic>>();
+    return (result.data['created'] as num?)?.toInt() ?? 0;
+  }
+
+  /// Records who a code was sent to, so the screen can show it later beside
+  /// whoever actually redeemed it.
+  Future<void> assignPromotionCode({required String id, required String sentTo}) async {
+    await _functions.httpsCallable('assignPromotionCode').call<Map<String, dynamic>>({
+      'id': id,
+      'sentTo': sentTo.trim(),
+    });
   }
 
   /// Creates real Stripe Coupon + Promotion Code pairs.
