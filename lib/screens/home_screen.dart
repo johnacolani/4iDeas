@@ -817,6 +817,9 @@ class _PrimaryDesktopNav extends StatelessWidget {
                         );
                       }
 
+                      // Rendered from the shared list so this menu and the
+                      // mobile one can never disagree about what an admin can
+                      // reach.
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -826,36 +829,18 @@ class _PrimaryDesktopNav extends StatelessWidget {
                             label: 'Profile',
                             icon: Icons.person_outline,
                           ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: _kPopupMenuDividerColor,
-                          ),
-                          row(
-                            route: AppRoutes.adminOrders,
-                            label: 'Admin orders',
-                            icon: Icons.admin_panel_settings_outlined,
-                          ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: _kPopupMenuDividerColor,
-                          ),
-                          row(
-                            route: AppRoutes.contact,
-                            label: 'Contact inbox',
-                            icon: Icons.mark_chat_unread_outlined,
-                          ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: _kPopupMenuDividerColor,
-                          ),
-                          row(
-                            route: AppRoutes.adminPrivacyPolicies,
-                            label: 'Privacy policies',
-                            icon: Icons.privacy_tip_outlined,
-                          ),
+                          for (final item in HomeNavMenuItems.adminItems) ...[
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: _kPopupMenuDividerColor,
+                            ),
+                            row(
+                              route: item.route,
+                              label: item.label,
+                              icon: item.icon,
+                            ),
+                          ],
                         ],
                       );
                     },

@@ -48,6 +48,51 @@ class HomeNavMenuItems {
       icon: Icons.privacy_tip_outlined,
     ),
   ];
+
+  /// Every admin destination, in one place.
+  ///
+  /// The desktop header menu and this mobile menu both render from this list.
+  /// They used to hold their own copies, which is how the 4iCAD screens ended
+  /// up reachable only by typing their URLs: a screen was added to the router
+  /// and to a third menu that no longer exists, and neither of the two real
+  /// menus learned about it. Adding a route here now surfaces it everywhere —
+  /// web, iOS and Android — because all three run this same code.
+  ///
+  /// Profile is deliberately not in this list: it is shown to every signed-in
+  /// visitor, admin or not, and each menu places it differently.
+  static final List<({String label, String route, IconData icon})> adminItems =
+      <({String label, String route, IconData icon})>[
+    (
+      label: 'Admin orders',
+      route: AppRoutes.adminOrders,
+      icon: Icons.admin_panel_settings_outlined,
+    ),
+    (
+      label: 'Contact inbox',
+      route: AppRoutes.contact,
+      icon: Icons.mark_chat_unread_outlined,
+    ),
+    (
+      label: 'Privacy policies',
+      route: AppRoutes.adminPrivacyPolicies,
+      icon: Icons.privacy_tip_outlined,
+    ),
+    (
+      label: '4iCAD releases',
+      route: AppRoutes.adminReleases,
+      icon: Icons.system_update_alt,
+    ),
+    (
+      label: '4iCAD orders',
+      route: AppRoutes.adminProductOrders,
+      icon: Icons.receipt_long_outlined,
+    ),
+    (
+      label: 'Promotion codes',
+      route: AppRoutes.adminPromotionCodes,
+      icon: Icons.local_offer_outlined,
+    ),
+  ];
 }
 
 const LinearGradient _kNavIconGoldGradient = LinearGradient(
@@ -458,36 +503,14 @@ class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
               label: 'Profile',
               icon: Icons.person_outline,
             ),
-            const Divider(
-              height: 1,
-              thickness: 1,
-              color: _kPopupMenuDividerColor,
-            ),
-            hubSubRow(
-              route: AppRoutes.adminOrders,
-              label: 'Admin orders',
-              icon: Icons.admin_panel_settings_outlined,
-            ),
-            const Divider(
-              height: 1,
-              thickness: 1,
-              color: _kPopupMenuDividerColor,
-            ),
-            hubSubRow(
-              route: AppRoutes.contact,
-              label: 'Contact inbox',
-              icon: Icons.mark_chat_unread_outlined,
-            ),
-            const Divider(
-              height: 1,
-              thickness: 1,
-              color: _kPopupMenuDividerColor,
-            ),
-            hubSubRow(
-              route: AppRoutes.adminPrivacyPolicies,
-              label: 'Privacy policies',
-              icon: Icons.privacy_tip_outlined,
-            ),
+            for (final item in HomeNavMenuItems.adminItems) ...[
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: _kPopupMenuDividerColor,
+              ),
+              hubSubRow(route: item.route, label: item.label, icon: item.icon),
+            ],
           ]
         : null;
 

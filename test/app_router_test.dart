@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:four_ideas/app_router.dart';
+import 'package:four_ideas/widgets/home_mobile_nav_menu_button.dart';
 
 /// Route configuration tests.
 ///
@@ -30,6 +31,24 @@ void main() {
       final paths = _declaredPaths(createAppRouter());
       expect(paths, contains('/4icad'));
       expect(paths, contains('/4icad/success'));
+    });
+
+    test('every admin menu entry points at a route that exists', () {
+      // The admin menus were previously three hand-maintained copies, and the
+      // 4iCAD screens ended up in a menu that was never mounted — reachable
+      // only by typing their URLs. One list feeds the menus now; this asserts
+      // it can never point somewhere the router does not serve.
+      final paths = _declaredPaths(createAppRouter());
+      for (final item in HomeNavMenuItems.adminItems) {
+        expect(paths, contains(item.route), reason: '"${item.label}" is a dead link');
+      }
+    });
+
+    test('the admin menu reaches every 4iCAD admin screen', () {
+      final routes = HomeNavMenuItems.adminItems.map((i) => i.route);
+      expect(routes, contains(AppRoutes.adminPromotionCodes));
+      expect(routes, contains(AppRoutes.adminProductOrders));
+      expect(routes, contains(AppRoutes.adminReleases));
     });
 
     test('no /4icad/buy route exists — buying is an action, not a page', () {
