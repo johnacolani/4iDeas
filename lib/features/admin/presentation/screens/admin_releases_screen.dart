@@ -201,6 +201,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        leading: FrostedAppBar.backLeading(context),
         title: Text(
           '4iCAD releases',
           style: GoogleFonts.roboto(

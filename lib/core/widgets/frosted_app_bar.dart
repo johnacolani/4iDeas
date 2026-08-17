@@ -3,7 +3,9 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
 
@@ -21,6 +23,28 @@ abstract final class FrostedAppBar {
       left: p.left,
       right: p.right,
       bottom: p.bottom,
+    );
+  }
+
+  /// A back button that still works when there is nothing to go back to.
+  ///
+  /// Every admin screen is addressable by URL, so it is regularly opened cold —
+  /// a pasted link, a bookmark, a refresh. In that case the navigator stack is
+  /// empty, `automaticallyImplyLeading` renders no arrow at all, and the only
+  /// way out is the browser's own back button (or, in the iOS and Android
+  /// builds, nothing whatsoever). This falls back to a route instead.
+  ///
+  /// Pass [fallback] as the screen one level up: a detail page returns to its
+  /// list, a top-level page returns home.
+  static Widget backLeading(
+    BuildContext context, {
+    String fallback = AppRoutes.home,
+    String tooltip = 'Back',
+  }) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      tooltip: tooltip,
+      onPressed: () => context.canPop() ? context.pop() : context.go(fallback),
     );
   }
 

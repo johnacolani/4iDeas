@@ -25,6 +25,10 @@ class AdminAccessDenied extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        // Reaching this screen usually means following an admin link while
+        // signed in as somebody else, so the way out matters more here than
+        // anywhere: without it a cold deep link leaves no arrow at all.
+        leading: FrostedAppBar.backLeading(context),
         title: Text(
           title,
           style: GoogleFonts.roboto(

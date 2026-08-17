@@ -172,6 +172,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        leading: FrostedAppBar.backLeading(context),
         title: Text(
           'Promotion codes',
           style: GoogleFonts.roboto(

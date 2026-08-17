@@ -37,6 +37,7 @@ class _AdminProductOrdersScreenState extends State<AdminProductOrdersScreen> {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        leading: FrostedAppBar.backLeading(context),
         title: Text(
           '4iCAD orders',
           style: GoogleFonts.roboto(

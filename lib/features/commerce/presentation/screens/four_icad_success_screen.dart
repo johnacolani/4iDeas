@@ -95,6 +95,13 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        // Stripe lands the buyer here directly, so there is never anything to
+        // pop. Back means the product page, where their download now lives.
+        leading: FrostedAppBar.backLeading(
+          context,
+          fallback: AppRoutes.fourICad,
+          tooltip: 'Back to 4iCAD',
+        ),
         title: Text(
           'Order confirmation',
           style: GoogleFonts.roboto(

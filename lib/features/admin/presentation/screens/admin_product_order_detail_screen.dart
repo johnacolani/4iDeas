@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/widgets/frosted_app_bar.dart';
 import 'package:four_ideas/data/commerce_data.dart';
@@ -89,6 +90,13 @@ class _AdminProductOrderDetailScreenState extends State<AdminProductOrderDetailS
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
+        // Opened by id from the orders list, and just as often from a pasted
+        // link, so it falls back to the list rather than to home.
+        leading: FrostedAppBar.backLeading(
+          context,
+          fallback: AppRoutes.adminProductOrders,
+          tooltip: 'Back to 4iCAD orders',
+        ),
         title: Text(
           'Order detail',
           style: GoogleFonts.roboto(

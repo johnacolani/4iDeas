@@ -88,16 +88,10 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
       extendBodyBehindAppBar: true,
       appBar: FrostedAppBar.darkNavy(
         iconTheme: const IconThemeData(color: ColorManager.accentGold),
-        // An explicit leading button rather than the automatic one: this page
-        // is routinely arrived at cold — a pasted URL, a QR scan, an ad click —
-        // and in those cases there is no history to pop, so Flutter renders no
-        // back arrow at all and the visitor is stranded.
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Back to home',
-          onPressed: () =>
-              context.canPop() ? context.pop() : context.go(AppRoutes.home),
-        ),
+        // Explicit rather than automatic: this page is routinely arrived at
+        // cold — a pasted URL, a QR scan, an ad click — and there is then no
+        // history to pop, so Flutter renders no back arrow at all.
+        leading: FrostedAppBar.backLeading(context, tooltip: 'Back to home'),
         title: Text(
           '4iCAD for Windows',
           style: GoogleFonts.roboto(
