@@ -530,6 +530,7 @@ class FourICadPurchaseController {
   }
 
   String _webTrialMessage(Object e) {
+    if (_looksOffline(e)) return _offlineMessage;
     final text = e.toString();
     if (text.contains('unauthenticated')) {
       return 'Sign in to start your free 48-hour web trial.';
@@ -552,7 +553,32 @@ class FourICadPurchaseController {
     }
   }
 
+  /// True when the call never reached the server.
+  ///
+  /// Worth separating from a refusal: a dropped connection and a rejected
+  /// request produce the same generic failure otherwise, and "please try again"
+  /// is unhelpful advice for someone whose wifi is down. The transport reports
+  /// this as `unavailable`/`deadline-exceeded`, or as `internal` carrying a
+  /// fetch error, depending on platform.
+  static bool _looksOffline(Object e) {
+    if (e is FirebaseFunctionsException) {
+      if (e.code == 'unavailable' || e.code == 'deadline-exceeded') return true;
+      if (e.code != 'internal') return false;
+    }
+    final text = e.toString().toLowerCase();
+    return text.contains('failed to fetch') ||
+        text.contains('networkerror') ||
+        text.contains('network error') ||
+        text.contains('clientexception') ||
+        text.contains('socketexception') ||
+        text.contains('err_internet_disconnected');
+  }
+
+  static const String _offlineMessage =
+      'You appear to be offline. Check your connection and try again.';
+
   String _checkoutMessage(Object e) {
+    if (_looksOffline(e)) return _offlineMessage;
     // The server distinguishes "not verified" from "not on sale" via a details
     // marker, so the two failed-precondition cases don't get the same message.
     if (e is FirebaseFunctionsException) {
@@ -586,6 +612,7 @@ class FourICadPurchaseController {
   }
 
   String _downloadMessage(Object e) {
+    if (_looksOffline(e)) return _offlineMessage;
     final text = e.toString();
     if (text.contains('permission-denied')) {
       return 'This account does not own 4iCAD for Windows.';
