@@ -118,14 +118,8 @@ class _PlatformTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                platform.icon,
-                size: 22,
-                // A platform that cannot be had yet is stated quietly, so the
-                // two that can be bought carry the page's only gold.
-                color: soon ? Colors.white38 : ColorManager.accentGold,
-              ),
-              const SizedBox(width: 11),
+              _PlatformLogo(platform: platform, dimmed: soon),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   platform.label,
@@ -228,6 +222,74 @@ class _QuietState extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// One platform logo, drawn to a consistent visual weight.
+///
+/// The source files are all different — 640px to 2400px, some square, some
+/// portrait — so uniformity cannot come from the assets. It comes from here: a
+/// fixed square box, [BoxFit.contain] so nothing is stretched or cropped, and a
+/// tinted plate behind so a dark logo (Apple's, the penguin's outline) still
+/// reads against the dark panel.
+class _PlatformLogo extends StatelessWidget {
+  const _PlatformLogo({required this.platform, required this.dimmed});
+
+  final FourICadPlatform platform;
+
+  /// Coming-soon platforms are stated quietly, so the ones that can be acted
+  /// on keep the visual weight.
+  final bool dimmed;
+
+  static const double _box = 40;
+  static const double _logo = 26;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = platform.logoAsset;
+
+    return Container(
+      width: _box,
+      height: _box,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: dimmed ? 0.05 : 0.09),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(
+          color: dimmed
+              ? Colors.white.withValues(alpha: 0.10)
+              : ColorManager.accentGold.withValues(alpha: 0.28),
+        ),
+      ),
+      child: Center(
+        child: SizedBox(
+          width: _logo,
+          height: _logo,
+          child: asset == null
+              ? Icon(
+                  platform.icon,
+                  size: 21,
+                  color: dimmed ? Colors.white38 : ColorManager.accentGold,
+                )
+              : Opacity(
+                  opacity: dimmed ? 0.55 : 1,
+                  child: Image.asset(
+                    asset,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.medium,
+                    semanticLabel: platform.label,
+                    // A missing or corrupt asset must not leave an empty box —
+                    // the glyph carries the same meaning.
+                    errorBuilder: (_, __, ___) => Icon(
+                      platform.icon,
+                      size: 21,
+                      color: dimmed ? Colors.white38 : ColorManager.accentGold,
+                    ),
+                  ),
+                ),
+        ),
       ),
     );
   }

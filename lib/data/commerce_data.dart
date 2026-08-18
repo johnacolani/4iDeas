@@ -33,6 +33,7 @@ class FourICadPlatform {
     required this.label,
     required this.icon,
     required this.availability,
+    this.logoAsset,
     this.storeUrl,
     this.note,
   });
@@ -40,7 +41,14 @@ class FourICadPlatform {
   /// Product key for the platforms that are sold; null for the rest.
   final String? key;
   final String label;
+
+  /// Fallback glyph, used if the logo asset is missing at runtime.
   final IconData icon;
+
+  /// The platform's own logo. The source files differ in both size and aspect
+  /// ratio, so they are always drawn inside a fixed square box with
+  /// [BoxFit.contain] — that, not the file, is what makes them look uniform.
+  final String? logoAsset;
   final PlatformAvailability availability;
 
   /// Apple/Google listing, once there is one.
@@ -58,6 +66,7 @@ class FourICadPlatform {
       key: key,
       label: label,
       icon: icon,
+      logoAsset: logoAsset,
       availability: availability ?? this.availability,
       storeUrl: storeUrl ?? this.storeUrl,
       note: note ?? this.note,
@@ -98,6 +107,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
   FourICadPlatform(
     key: kFourICadWindowsKey,
     label: 'Windows',
+    logoAsset: 'assets/icons/Windows_logo.png',
     icon: Icons.desktop_windows_outlined,
     availability: PlatformAvailability.buy,
     note: 'Windows 10 & 11, 64-bit',
@@ -105,6 +115,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
   FourICadPlatform(
     key: kFourICadWebKey,
     label: 'Web',
+    logoAsset: 'assets/icons/web_logo.png',
     icon: Icons.public,
     availability: PlatformAvailability.trial,
     note: 'Runs in any modern browser',
@@ -112,6 +123,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
   FourICadPlatform(
     key: null,
     label: 'iOS',
+    logoAsset: 'assets/icons/ios-logo.png',
     icon: Icons.phone_iphone,
     availability: PlatformAvailability.comingSoon,
     note: 'iPhone and iPad',
@@ -119,6 +131,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
   FourICadPlatform(
     key: null,
     label: 'Android',
+    logoAsset: 'assets/icons/android-logo.png',
     icon: Icons.android,
     availability: PlatformAvailability.comingSoon,
     note: 'Phones and tablets',
@@ -126,6 +139,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
   FourICadPlatform(
     key: null,
     label: 'macOS',
+    logoAsset: 'assets/icons/macOS_logo.png',
     icon: Icons.laptop_mac,
     availability: PlatformAvailability.comingSoon,
     note: 'Apple silicon and Intel',
@@ -133,6 +147,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
   FourICadPlatform(
     key: null,
     label: 'Linux',
+    logoAsset: 'assets/icons/Linux-logo.png',
     icon: Icons.terminal,
     availability: PlatformAvailability.comingSoon,
     note: 'Desktop distributions',

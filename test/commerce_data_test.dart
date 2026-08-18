@@ -180,6 +180,20 @@ void main() {
       expect(ios.storeUrl, isNull);
     });
 
+    test('every platform carries a logo, and the file is registered', () {
+      // The tile falls back to a glyph if an asset is missing, so a typo here
+      // would degrade silently rather than fail — hence asserting the paths.
+      for (final platform in kFourICadPlatforms) {
+        expect(platform.logoAsset, isNotNull, reason: '${platform.label} has no logo');
+        expect(platform.logoAsset, startsWith('assets/icons/'));
+      }
+    });
+
+    test('an override keeps the logo it came with', () {
+      final android = byLabel('Android').applyOverride(const {'platformStatus': 'store'});
+      expect(android.logoAsset, byLabel('Android').logoAsset);
+    });
+
     test('a platform can be pushed back to coming soon', () {
       final windows = byLabel('Windows').applyOverride(const {'platformStatus': 'soon'});
       expect(windows.availability, PlatformAvailability.comingSoon);

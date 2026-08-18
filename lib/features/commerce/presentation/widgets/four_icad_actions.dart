@@ -570,16 +570,30 @@ class FourICadPurchaseController {
 
 /// Small gold-on-dark chip used for version and price metadata.
 class FourICadMetaChip extends StatelessWidget {
-  const FourICadMetaChip({super.key, required this.label, this.icon, this.emphasise = false});
+  const FourICadMetaChip({
+    super.key,
+    required this.label,
+    this.icon,
+    this.emphasise = false,
+    this.large = false,
+  });
 
   final String label;
   final IconData? icon;
   final bool emphasise;
 
+  /// Renders the chip a fifth larger. Used for the price, which is the one
+  /// piece of metadata a visitor is actually looking for.
+  final bool large;
+
   @override
   Widget build(BuildContext context) {
+    const scale = 1.2;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: large ? 12 * scale : 12,
+        vertical: large ? 6 * scale : 6,
+      ),
       decoration: BoxDecoration(
         color: emphasise
             ? ColorManager.accentGold.withValues(alpha: 0.16)
@@ -595,13 +609,17 @@ class FourICadMetaChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 14, color: emphasise ? ColorManager.accentGold : Colors.white70),
+            Icon(
+              icon,
+              size: large ? 14 * scale : 14,
+              color: emphasise ? ColorManager.accentGold : Colors.white70,
+            ),
             const SizedBox(width: 6),
           ],
           Text(
             label,
             style: GoogleFonts.robotoMono(
-              fontSize: 12.5,
+              fontSize: large ? 12.5 * scale : 12.5,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.3,
               color: emphasise ? ColorManager.accentGold : Colors.white70,

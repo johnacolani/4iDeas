@@ -187,6 +187,59 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     );
   }
 
+  /// The platform chooser, built here so its streams stay with the screen and
+  /// the hero only has to place it.
+  Widget _platformSection(bool isMobile, bool isTablet) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Choose your platform',
+          style: GoogleFonts.roboto(
+            fontSize: isMobile ? 19 : 22,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'One licence per platform. Windows and the browser build are on sale '
+          'now; the rest are close behind.',
+          style: GoogleFonts.roboto(
+            fontSize: isMobile ? 13.5 : 14.5,
+            height: 1.5,
+            color: Colors.white.withValues(alpha: 0.7),
+          ),
+        ),
+        SizedBox(height: isMobile ? 14 : 18),
+        // Streams so a platform can go on sale, or gain a store link, without
+        // shipping a new build.
+        StreamBuilder<List<FourICadPlatform>>(
+          stream: _commerce.watchPlatforms(),
+          builder: (context, platformSnap) {
+            final platforms = platformSnap.data ?? kFourICadPlatforms;
+            return StreamBuilder<Set<String>>(
+              stream: _commerce.watchOwnedProducts(
+                const [kFourICadWindowsKey, kFourICadWebKey],
+              ),
+              builder: (context, ownedSnap) => FourICadPlatformGrid(
+                platforms: platforms,
+                isMobile: isMobile,
+                isTablet: isTablet,
+                owned: ownedSnap.data ?? const {},
+                busyKey: _buyingKey,
+                onBuy: _onBuyPlatform,
+                onTry: _onTryWeb,
+                onStore: _onStore,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _body(
     BuildContext context,
     CommerceProduct product,
@@ -214,6 +267,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                       product: product,
                       action: action,
                       trial: trial,
+                      platforms: _platformSection(isMobile, isTablet),
                       isMobile: isMobile,
                       isTablet: isTablet,
                       startingCheckout: _startingCheckout,
@@ -231,45 +285,6 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                     // Generous gap after the hero so the artwork reads as the
                     // end of that block rather than colliding with what follows.
                     SizedBox(height: isMobile ? 48 : 76),
-                    _SectionHeading(
-                      label: 'Choose your platform',
-                      isMobile: isMobile,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'One licence per platform. Windows and the browser build '
-                      'are on sale now; the rest are close behind.',
-                      style: GoogleFonts.roboto(
-                        fontSize: isMobile ? 14 : 15,
-                        height: 1.5,
-                        color: Colors.white.withValues(alpha: 0.7),
-                      ),
-                    ),
-                    SizedBox(height: isMobile ? 16 : 20),
-                    // Streams so a platform can go on sale, or gain a store
-                    // link, without shipping a new build.
-                    StreamBuilder<List<FourICadPlatform>>(
-                      stream: _commerce.watchPlatforms(),
-                      builder: (context, platformSnap) {
-                        final platforms = platformSnap.data ?? kFourICadPlatforms;
-                        return StreamBuilder<Set<String>>(
-                          stream: _commerce.watchOwnedProducts(
-                            [kFourICadWindowsKey, kFourICadWebKey],
-                          ),
-                          builder: (context, ownedSnap) => FourICadPlatformGrid(
-                            platforms: platforms,
-                            isMobile: isMobile,
-                            isTablet: isTablet,
-                            owned: ownedSnap.data ?? const {},
-                            busyKey: _buyingKey,
-                            onBuy: _onBuyPlatform,
-                            onTry: _onTryWeb,
-                            onStore: _onStore,
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: isMobile ? 40 : 60),
                     if (product.features.isNotEmpty) ...[
                       _SectionHeading(
                         label: 'What 4iCAD does',
@@ -358,6 +373,7 @@ class _Hero extends StatelessWidget {
     required this.product,
     required this.action,
     required this.trial,
+    required this.platforms,
     required this.isMobile,
     required this.isTablet,
     required this.startingCheckout,
@@ -374,6 +390,9 @@ class _Hero extends StatelessWidget {
   final CommerceProduct product;
   final PurchaseAction action;
   final WebTrial trial;
+
+  /// The platform chooser, placed directly under the price.
+  final Widget platforms;
   final bool isMobile;
   final bool isTablet;
   final bool startingCheckout;
@@ -388,7 +407,8 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final copy = _HeroCopy(
+    _HeroCopy part(_HeroPart which) => _HeroCopy(
+      part: which,
       product: product,
       action: action,
       trial: trial,
@@ -427,7 +447,17 @@ class _Hero extends StatelessWidget {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: measure),
-            child: copy,
+            child: part(_HeroPart.pitch),
+          ),
+          // Straight after the price: "what does it cost" and "which one do I
+          // want" are the same decision. Full width rather than inside the
+          // text measure, so three tiles have room to breathe.
+          SizedBox(height: isMobile ? 26 : 32),
+          platforms,
+          SizedBox(height: isMobile ? 26 : 32),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: measure),
+            child: part(_HeroPart.actions),
           ),
           SizedBox(height: isMobile ? 30 : (isTablet ? 36 : 44)),
           _ProductShot(isMobile: isMobile),
@@ -437,8 +467,16 @@ class _Hero extends StatelessWidget {
   }
 }
 
+/// Which half of the hero copy to render.
+///
+/// The two are separated so the platform grid can sit between them: the pitch
+/// and the price hold a comfortable reading measure, the grid spans the panel,
+/// and the calls to action follow underneath.
+enum _HeroPart { pitch, actions }
+
 class _HeroCopy extends StatelessWidget {
   const _HeroCopy({
+    required this.part,
     required this.product,
     required this.action,
     required this.trial,
@@ -454,6 +492,7 @@ class _HeroCopy extends StatelessWidget {
     required this.onTryWeb,
   });
 
+  final _HeroPart part;
   final CommerceProduct product;
   final PurchaseAction action;
   final WebTrial trial;
@@ -470,9 +509,13 @@ class _HeroCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final owns = action == PurchaseAction.download;
+    return part == _HeroPart.pitch ? _pitch(owns) : _actions(context, owns);
+  }
+
+  Widget _pitch(bool owns) {
     final release = product.currentRelease;
     final price = product.formattedPrice;
-    final owns = action == PurchaseAction.download;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,6 +555,7 @@ class _HeroCopy extends StatelessWidget {
         Wrap(
           spacing: 10,
           runSpacing: 10,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             if (release != null)
               FourICadMetaChip(
@@ -519,14 +563,28 @@ class _HeroCopy extends StatelessWidget {
                 icon: Icons.verified_outlined,
                 emphasise: true,
               ),
+            // The price is what a visitor is actually looking for, so it is
+            // rendered a fifth larger than the metadata around it.
             if (price != null && !owns)
-              FourICadMetaChip(label: '$price one-time', icon: Icons.sell_outlined),
+              FourICadMetaChip(
+                label: '$price one-time',
+                icon: Icons.sell_outlined,
+                emphasise: true,
+                large: true,
+              ),
             if (release?.formattedSize != null)
               FourICadMetaChip(label: release!.formattedSize!, icon: Icons.download_outlined),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget _actions(BuildContext context, bool owns) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         if (owns) ...[
-          const SizedBox(height: 18),
           Row(
             children: [
               const Icon(Icons.check_circle, color: Color(0xFF67C79B), size: 18),
@@ -544,7 +602,7 @@ class _HeroCopy extends StatelessWidget {
             ],
           ),
         ],
-        SizedBox(height: isMobile ? 24 : 30),
+        SizedBox(height: owns ? (isMobile ? 18 : 22) : 0),
         _Actions(
           product: product,
           action: action,
