@@ -484,6 +484,47 @@ class FourICadPurchaseController {
     }
   }
 
+  /// Buys one platform, sending a visitor who cannot buy yet to the step that
+  /// unblocks them rather than to an error.
+  ///
+  /// The hero button has always done this, because it renders from
+  /// [resolvePurchaseAction] and never says "Buy" to someone who is signed
+  /// out. The platform tiles called checkout directly, so a signed-out visitor
+  /// got a snackbar refusal from the server instead of the sign-in page — the
+  /// server was right to refuse, but being told off is not a next step. This
+  /// mirrors the web-trial flow, which got it right.
+  Future<void> buyPlatform(BuildContext context, String productKey, String label) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign in to buy 4iCAD for $label.')),
+      );
+      goSignIn(context);
+      return;
+    }
+
+    // A purchase needs a verified address, and the server enforces it. Offer
+    // the fix here rather than letting checkout refuse them.
+    await _refreshVerificationClaim();
+    if (!context.mounted) return;
+    if (FirebaseAuth.instance.currentUser?.emailVerified == false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Verify your email to buy 4iCAD. We have sent a link to '
+            '${user.email ?? 'your address'}.',
+          ),
+          backgroundColor: const Color(0xFF9B3A31),
+        ),
+      );
+      resendVerificationEmail(context);
+      return;
+    }
+
+    await startCheckout(context, productKey: productKey);
+  }
+
   /// Opens the 4iCAD web app for a trial, if the visitor still has one.
   ///
   /// The 48-hour window is account-bound, so this requires signing in first —
@@ -753,11 +794,13 @@ class FourICadGlassPanel extends StatelessWidget {
                 _fillBottom.withValues(alpha: 0.94),
               ],
             ),
+            // A light grey rim, not a whisper: at 10% the edge disappeared
+            // against the dark fill and the cards read as one soft mass.
             border: Border.all(
               color: goldBorder
-                  ? ColorManager.accentGold.withValues(alpha: 0.42)
-                  : Colors.white.withValues(alpha: 0.10),
-              width: goldBorder ? 1.4 : 1,
+                  ? ColorManager.accentGold.withValues(alpha: 0.55)
+                  : Colors.white.withValues(alpha: 0.30),
+              width: goldBorder ? 1.5 : 1.2,
             ),
           ),
           child: Stack(

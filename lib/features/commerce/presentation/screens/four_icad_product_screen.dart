@@ -32,7 +32,6 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
   late final FourICadPurchaseController _purchase =
       FourICadPurchaseController(service: _commerce);
 
-  bool _startingCheckout = false;
   bool _downloading = false;
   bool _openingWebApp = false;
   String? _buyingKey;
@@ -54,19 +53,13 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     }
   }
 
-  Future<void> _onBuy() async {
-    setState(() => _startingCheckout = true);
-    await _purchase.startCheckout(context);
-    if (mounted) setState(() => _startingCheckout = false);
-  }
-
   /// Buys a specific platform from the grid. Windows goes through the same
   /// path as the hero button; the others carry their own product key.
   Future<void> _onBuyPlatform(FourICadPlatform platform) async {
     final key = platform.key;
     if (key == null) return;
     setState(() => _buyingKey = key);
-    await _purchase.startCheckout(context, productKey: key);
+    await _purchase.buyPlatform(context, key, platform.label);
     if (mounted) setState(() => _buyingKey = null);
   }
 
@@ -190,7 +183,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
 
   /// The platform chooser, built here so its streams stay with the screen and
   /// the hero only has to place it.
-  Widget _platformSection(bool isMobile, bool isTablet) {
+  Widget _platformSection(bool isMobile, bool isTablet, bool signedIn) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -228,9 +221,12 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                 platforms: platforms,
                 isMobile: isMobile,
                 isTablet: isTablet,
+                signedIn: signedIn,
+                downloading: _downloading,
                 owned: ownedSnap.data ?? const {},
                 busyKey: _buyingKey,
                 onBuy: _onBuyPlatform,
+                onDownload: _onDownload,
                 onTry: _onTryWeb,
                 onStore: _onStore,
               ),
@@ -268,20 +264,19 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                       product: product,
                       action: action,
                       trial: trial,
-                      platforms: _platformSection(isMobile, isTablet),
+                      // signInToBuy is precisely the signed-out state, so the
+                      // tiles and the hero button can never disagree about it.
+                      platforms: _platformSection(
+                        isMobile,
+                        isTablet,
+                        action != PurchaseAction.signInToBuy,
+                      ),
                       isMobile: isMobile,
                       isTablet: isTablet,
-                      startingCheckout: _startingCheckout,
-                      downloading: _downloading,
-                      openingWebApp: _openingWebApp,
-                      onBuy: _onBuy,
-                      onDownload: _onDownload,
-                      onSignIn: () => _purchase.goSignIn(context),
                       onResendVerification: () =>
                           _purchase.resendVerificationEmail(context),
                       onRefreshVerification: () =>
                           _purchase.refreshVerificationStatus(context),
-                      onTryWeb: _onTryWeb,
                     ),
                     // Generous gap after the hero so the artwork reads as the
                     // end of that block rather than colliding with what follows.
@@ -411,15 +406,8 @@ class _Hero extends StatelessWidget {
     required this.platforms,
     required this.isMobile,
     required this.isTablet,
-    required this.startingCheckout,
-    required this.downloading,
-    required this.openingWebApp,
-    required this.onBuy,
-    required this.onDownload,
-    required this.onSignIn,
     required this.onResendVerification,
     required this.onRefreshVerification,
-    required this.onTryWeb,
   });
 
   final CommerceProduct product;
@@ -430,15 +418,8 @@ class _Hero extends StatelessWidget {
   final Widget platforms;
   final bool isMobile;
   final bool isTablet;
-  final bool startingCheckout;
-  final bool downloading;
-  final bool openingWebApp;
-  final VoidCallback onBuy;
-  final VoidCallback onDownload;
-  final VoidCallback onSignIn;
   final VoidCallback onResendVerification;
   final VoidCallback onRefreshVerification;
-  final VoidCallback onTryWeb;
 
   @override
   Widget build(BuildContext context) {
@@ -448,15 +429,8 @@ class _Hero extends StatelessWidget {
       action: action,
       trial: trial,
       isMobile: isMobile,
-      startingCheckout: startingCheckout,
-      downloading: downloading,
-      openingWebApp: openingWebApp,
-      onBuy: onBuy,
-      onDownload: onDownload,
-      onSignIn: onSignIn,
       onResendVerification: onResendVerification,
       onRefreshVerification: onRefreshVerification,
-      onTryWeb: onTryWeb,
     );
     // Deliberately stacked at every breakpoint: pitch first, then the artwork
     // full width beneath it.
@@ -669,15 +643,8 @@ class _HeroCopy extends StatelessWidget {
     required this.action,
     required this.trial,
     required this.isMobile,
-    required this.startingCheckout,
-    required this.downloading,
-    required this.openingWebApp,
-    required this.onBuy,
-    required this.onDownload,
-    required this.onSignIn,
     required this.onResendVerification,
     required this.onRefreshVerification,
-    required this.onTryWeb,
   });
 
   final _HeroPart part;
@@ -685,15 +652,8 @@ class _HeroCopy extends StatelessWidget {
   final PurchaseAction action;
   final WebTrial trial;
   final bool isMobile;
-  final bool startingCheckout;
-  final bool downloading;
-  final bool openingWebApp;
-  final VoidCallback onBuy;
-  final VoidCallback onDownload;
-  final VoidCallback onSignIn;
   final VoidCallback onResendVerification;
   final VoidCallback onRefreshVerification;
-  final VoidCallback onTryWeb;
 
   @override
   Widget build(BuildContext context) {
@@ -815,22 +775,9 @@ class _HeroCopy extends StatelessWidget {
             ],
           ),
         ],
-        SizedBox(height: owns ? (isMobile ? 18 : 22) : 0),
-        _Actions(
-          product: product,
-          action: action,
-          trial: trial,
-          isMobile: isMobile,
-          startingCheckout: startingCheckout,
-          downloading: downloading,
-          openingWebApp: openingWebApp,
-          onBuy: onBuy,
-          onDownload: onDownload,
-          onSignIn: onSignIn,
-          onResendVerification: onResendVerification,
-          onRefreshVerification: onRefreshVerification,
-          onTryWeb: onTryWeb,
-        ),
+        // No buttons here any more: every platform tile above carries its own
+        // action, and a second Buy/Try pair underneath asked the same question
+        // twice without saying which platform it meant.
         // Explains the trial button's state in words, so "Web trial ended" is
         // never the only thing telling someone why they lost access.
         if (!owns && (trial.isActive || trial.isExpired)) ...[
@@ -963,98 +910,6 @@ class _VerifyEmailNotice extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Actions extends StatelessWidget {
-  const _Actions({
-    required this.product,
-    required this.action,
-    required this.trial,
-    required this.isMobile,
-    required this.startingCheckout,
-    required this.downloading,
-    required this.openingWebApp,
-    required this.onBuy,
-    required this.onDownload,
-    required this.onSignIn,
-    required this.onResendVerification,
-    required this.onRefreshVerification,
-    required this.onTryWeb,
-  });
-
-  final CommerceProduct product;
-  final PurchaseAction action;
-  final WebTrial trial;
-  final bool isMobile;
-  final bool startingCheckout;
-  final bool downloading;
-  final bool openingWebApp;
-  final VoidCallback onBuy;
-  final VoidCallback onDownload;
-  final VoidCallback onSignIn;
-  final VoidCallback onResendVerification;
-  final VoidCallback onRefreshVerification;
-  final VoidCallback onTryWeb;
-
-  @override
-  Widget build(BuildContext context) {
-    final release = product.currentRelease;
-    final hasWebApp = (product.webAppUrl ?? '').isNotEmpty;
-
-    final Widget primary = switch (action) {
-      PurchaseAction.download => FourICadPrimaryButton(
-          label: release == null
-              ? 'Download for Windows'
-              : 'Download ${release.version} for Windows',
-          icon: Icons.download,
-          busy: downloading,
-          onPressed: release == null ? null : onDownload,
-        ),
-      PurchaseAction.buy => FourICadPrimaryButton(
-          label: 'Buy for Windows',
-          icon: Icons.shopping_cart_outlined,
-          busy: startingCheckout,
-          onPressed: product.active ? onBuy : null,
-        ),
-      PurchaseAction.signInToBuy => FourICadPrimaryButton(
-          label: 'Sign in to buy',
-          icon: Icons.lock_outline,
-          onPressed: onSignIn,
-        ),
-      // Buying is blocked until the address is verified. The button leads to
-      // the fix rather than to a checkout the server would refuse.
-      PurchaseAction.verifyEmail => FourICadPrimaryButton(
-          label: 'Verify your email to purchase',
-          icon: Icons.mark_email_unread_outlined,
-          onPressed: onResendVerification,
-        ),
-    };
-
-    final ghost = hasWebApp
-        ? FourICadWebTrialButton(
-            trial: trial,
-            owns: action == PurchaseAction.download,
-            busy: openingWebApp,
-            onPressed: onTryWeb,
-          )
-        : null;
-
-    if (isMobile) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          primary,
-          if (ghost != null) ...[const SizedBox(height: 12), ghost],
-        ],
-      );
-    }
-    return Wrap(
-      spacing: 14,
-      runSpacing: 12,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [primary, if (ghost != null) ghost],
     );
   }
 }

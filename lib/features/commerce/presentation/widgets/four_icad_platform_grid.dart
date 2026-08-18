@@ -21,6 +21,9 @@ class FourICadPlatformGrid extends StatelessWidget {
     required this.onBuy,
     required this.onTry,
     required this.onStore,
+    required this.onDownload,
+    required this.signedIn,
+    this.downloading = false,
     this.owned = const {},
     this.busyKey,
   });
@@ -37,6 +40,15 @@ class FourICadPlatformGrid extends StatelessWidget {
 
   /// Opens an App Store / Play listing.
   final void Function(String url) onStore;
+
+  /// Fetches the installer for a platform the visitor owns. The tile is the
+  /// only place a purchase is acted on, so it has to serve owners too.
+  final VoidCallback onDownload;
+  final bool downloading;
+
+  /// Whether anyone is signed in. A tile must not offer "Buy" to a visitor the
+  /// server would refuse — it offers the sign-in step instead.
+  final bool signedIn;
 
   /// Product keys the visitor already owns, so those tiles stop selling.
   final Set<String> owned;
@@ -64,6 +76,9 @@ class FourICadPlatformGrid extends StatelessWidget {
                 child: _PlatformTile(
                   platform: platform,
                   isMobile: isMobile,
+                  signedIn: signedIn,
+                  downloading: downloading,
+                  onDownload: onDownload,
                   owns: platform.key != null && owned.contains(platform.key),
                   busy: platform.key != null && platform.key == busyKey,
                   onBuy: () => onBuy(platform),
@@ -82,6 +97,9 @@ class _PlatformTile extends StatefulWidget {
   const _PlatformTile({
     required this.platform,
     required this.isMobile,
+    required this.signedIn,
+    required this.downloading,
+    required this.onDownload,
     required this.owns,
     required this.busy,
     required this.onBuy,
@@ -91,6 +109,9 @@ class _PlatformTile extends StatefulWidget {
 
   final FourICadPlatform platform;
   final bool isMobile;
+  final bool signedIn;
+  final bool downloading;
+  final VoidCallback onDownload;
   final bool owns;
   final bool busy;
   final VoidCallback onBuy;
@@ -113,8 +134,18 @@ class _PlatformTileState extends State<_PlatformTile> {
     final soon = platform.availability == PlatformAvailability.comingSoon;
 
     final (String label, IconData icon, VoidCallback? action) = switch (platform.availability) {
+      // Owning a platform turns its tile into the way to use it: the installer
+      // for Windows, the app itself for the browser build.
+      _ when owns && platform.key == kFourICadWindowsKey =>
+        ('Download', Icons.download, widget.onDownload),
+      _ when owns && platform.key == kFourICadWebKey =>
+        ('Open web app', Icons.public, widget.onTry),
       _ when owns => ('You own this', Icons.check_circle_outline, null),
-      PlatformAvailability.buy => ('Buy', Icons.shopping_cart_outlined, widget.onBuy),
+      // Says the truthful next step. "Buy" to a signed-out visitor is a
+      // promise the server will refuse.
+      PlatformAvailability.buy => widget.signedIn
+          ? ('Buy', Icons.shopping_cart_outlined, widget.onBuy)
+          : ('Sign in to buy', Icons.lock_outline, widget.onBuy),
       PlatformAvailability.store => (
           'Open store',
           Icons.open_in_new,
@@ -211,12 +242,13 @@ class _PlatformTileState extends State<_PlatformTile> {
             width: double.infinity,
             child: action == null
                 ? _QuietState(label: label, icon: icon)
-                : (platform.availability == PlatformAvailability.buy
+                : (platform.availability == PlatformAvailability.buy ||
+                        (owns && platform.key == kFourICadWindowsKey)
                     ? FourICadPrimaryButton(
                         label: label,
                         icon: icon,
                         compact: true,
-                        busy: busy,
+                        busy: busy || (owns && widget.downloading),
                         onPressed: action,
                       )
                     : FourICadGhostButton(
