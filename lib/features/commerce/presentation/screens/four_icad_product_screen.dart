@@ -112,7 +112,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
         // history to pop, so Flutter renders no back arrow at all.
         leading: FrostedAppBar.backLeading(context, tooltip: 'Back to home'),
         title: Text(
-          '4iCAD for Windows',
+          // The page sells six platforms; naming one in the bar contradicts it.
+          '4iCAD',
           style: GoogleFonts.roboto(
             color: Colors.white,
             fontSize: isMobile ? 18 : 21,
@@ -329,37 +330,71 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
 // Background
 // ---------------------------------------------------------------------------
 
-/// Flat navy gradient behind the whole 4iCAD page.
+/// Navy depth behind the whole 4iCAD page.
 ///
 /// The shared [AppBackground] artwork is deliberately not used here: the hero
-/// image (`hero_all_platforms.png`) carries its own deep-navy radial glow, and
-/// two competing backdrops read as a seam around the artwork. These stops are
-/// sampled from that image, so the panel edge dissolves into the page instead
-/// of framing it.
+/// image carries its own deep-navy glow, and two competing backdrops read as a
+/// seam around the artwork.
+///
+/// Three layers rather than one gradient. A single broad glow lit the whole
+/// page evenly, which flattened it and left the panels looking washed out; this
+/// keeps light where the content is and lets the edges fall away.
 class _CadGradientBackground extends StatelessWidget {
   const _CadGradientBackground();
 
   /// Sampled from hero_all_platforms.png: the lit centre, the mid navy falloff
   /// and the near-black corners.
-  static const Color _glow = Color(0xFF14406B);
-  static const Color _mid = Color(0xFF0A2440);
-  static const Color _deep = Color(0xFF041022);
-  static const Color _edge = Color(0xFF01040E);
+  static const Color _glow = Color(0xFF123A63);
+  static const Color _mid = Color(0xFF08203A);
+  static const Color _deep = Color(0xFF030C18);
+  static const Color _edge = Color(0xFF01040B);
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          // Slightly above centre so the brightest part of the page sits
-          // behind the hero rather than behind the footer links.
-          center: Alignment(0, -0.25),
-          radius: 1.15,
-          colors: [_glow, _mid, _deep, _edge],
-          stops: [0.0, 0.38, 0.72, 1.0],
+    return const Stack(
+      fit: StackFit.expand,
+      children: [
+        // 1. The bed: near-black, so nothing on the page competes with it.
+        ColoredBox(color: _edge),
+
+        // 2. The glow, tightened and lifted so the brightest area sits behind
+        //    the hero rather than spreading across the whole page.
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(-0.15, -0.55),
+              radius: 0.95,
+              colors: [_glow, _mid, _deep, Color(0x0001040B)],
+              stops: [0.0, 0.32, 0.68, 1.0],
+            ),
+          ),
         ),
-      ),
-      child: SizedBox.expand(),
+
+        // 3. A warm gold breath at the same focus — barely visible on its own,
+        //    but it ties the page to the accent colour the buttons use.
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0.55, -0.75),
+              radius: 0.8,
+              colors: [Color(0x14C9A96E), Color(0x00C9A96E)],
+            ),
+          ),
+        ),
+
+        // 4. Vignette. Darkening the corners is what makes the centre read as
+        //    lit rather than the whole screen reading as pale.
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment.center,
+              radius: 1.1,
+              colors: [Color(0x00000000), Color(0x66000000)],
+              stops: [0.55, 1.0],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -445,10 +480,25 @@ class _Hero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: measure),
-            child: part(_HeroPart.pitch),
-          ),
+          if (isMobile)
+            part(_HeroPart.pitch)
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: measure),
+                    child: part(_HeroPart.pitch),
+                  ),
+                ),
+                const SizedBox(width: 36),
+                _PriceCard(
+                  product: product,
+                  owns: action == PurchaseAction.download,
+                ),
+              ],
+            ),
           // Straight after the price: "what does it cost" and "which one do I
           // want" are the same decision. Full width rather than inside the
           // text measure, so three tiles have room to breathe.
@@ -463,6 +513,144 @@ class _Hero extends StatelessWidget {
           _ProductShot(isMobile: isMobile),
         ],
       ),
+    );
+  }
+}
+
+/// The price, given the weight it deserves.
+///
+/// On desktop the pitch holds a 760px reading measure, which left a wide empty
+/// band down the right of the hero. Putting the price there fills it and makes
+/// the number the second thing read after the product name — as a block, not a
+/// chip lost among metadata.
+class _PriceCard extends StatelessWidget {
+  const _PriceCard({required this.product, required this.owns});
+
+  final CommerceProduct product;
+  final bool owns;
+
+  @override
+  Widget build(BuildContext context) {
+    final price = product.formattedPrice;
+    final release = product.currentRelease;
+
+    return Container(
+      width: 250,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ColorManager.accentGold.withValues(alpha: 0.14),
+            ColorManager.accentGold.withValues(alpha: 0.03),
+          ],
+        ),
+        border: Border.all(color: ColorManager.accentGold.withValues(alpha: 0.34)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (owns)
+            Row(
+              children: [
+                const Icon(Icons.verified, size: 19, color: Color(0xFF67C79B)),
+                const SizedBox(width: 8),
+                Text(
+                  'You own this',
+                  style: GoogleFonts.roboto(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF67C79B),
+                  ),
+                ),
+              ],
+            )
+          else if (price != null) ...[
+            Text(
+              'ONE-TIME',
+              style: GoogleFonts.robotoMono(
+                fontSize: 10.5,
+                letterSpacing: 1.8,
+                fontWeight: FontWeight.w700,
+                color: ColorManager.accentGold.withValues(alpha: 0.85),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              price,
+              style: GoogleFonts.roboto(
+                fontSize: 38,
+                height: 1,
+                letterSpacing: -1.2,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'No subscription. Updates included.',
+              style: GoogleFonts.roboto(
+                fontSize: 12.5,
+                height: 1.4,
+                color: Colors.white.withValues(alpha: 0.66),
+              ),
+            ),
+          ] else
+            Text(
+              'Pricing announced shortly',
+              style: GoogleFonts.roboto(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w600,
+                color: Colors.white.withValues(alpha: 0.8),
+              ),
+            ),
+          if (release != null) ...[
+            const SizedBox(height: 16),
+            Divider(color: Colors.white.withValues(alpha: 0.12), height: 1),
+            const SizedBox(height: 14),
+            _PriceMetaLine(
+              icon: Icons.verified_outlined,
+              label: 'Version ${release.version}',
+            ),
+            if (release.formattedSize != null) ...[
+              const SizedBox(height: 8),
+              _PriceMetaLine(
+                icon: Icons.download_outlined,
+                label: release.formattedSize!,
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PriceMetaLine extends StatelessWidget {
+  const _PriceMetaLine({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: ColorManager.accentGold.withValues(alpha: 0.8)),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            label,
+            style: GoogleFonts.roboto(
+              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.78),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -520,39 +708,64 @@ class _HeroCopy extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'WINDOWS DESKTOP BUILD',
-          style: GoogleFonts.robotoMono(
-            fontSize: isMobile ? 11 : 12,
-            letterSpacing: 2.2,
-            fontWeight: FontWeight.w600,
-            color: ColorManager.accentGold,
-          ),
+        Row(
+          children: [
+            Container(
+              width: 26,
+              height: 2,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                gradient: LinearGradient(
+                  colors: [
+                    ColorManager.accentGold,
+                    ColorManager.accentGold.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'ONE CAD · ALL PLATFORMS',
+              style: GoogleFonts.robotoMono(
+                fontSize: isMobile ? 10.5 : 11.5,
+                letterSpacing: 2.4,
+                fontWeight: FontWeight.w700,
+                color: ColorManager.accentGold,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
+        // Larger and tighter than before: at this size the name is the anchor
+        // of the page, and the negative tracking keeps it from sprawling.
         Text(
           product.displayName,
           style: GoogleFonts.roboto(
-            fontSize: isMobile ? 32 : 44,
-            height: 1.06,
-            letterSpacing: -0.8,
+            fontSize: isMobile ? 36 : 52,
+            height: 1.02,
+            letterSpacing: -1.4,
             fontWeight: FontWeight.w800,
             color: Colors.white,
           ),
         ),
         if (product.tagline != null) ...[
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(
             product.tagline!,
             style: GoogleFonts.roboto(
-              fontSize: isMobile ? 15.5 : 17.5,
-              height: 1.5,
-              color: Colors.white.withValues(alpha: 0.82),
+              fontSize: isMobile ? 16 : 18.5,
+              height: 1.55,
+              // Brighter than the old 0.82: on the darker panel this is the
+              // difference between "quiet" and "washed out".
+              color: Colors.white.withValues(alpha: 0.88),
             ),
           ),
         ],
-        const SizedBox(height: 20),
-        Wrap(
+        const SizedBox(height: 24),
+        // Desktop lifts this into the price card beside the pitch; stacked
+        // narrow layouts keep it inline, where there is no void to fill.
+        if (isMobile)
+          Wrap(
           spacing: 10,
           runSpacing: 10,
           crossAxisAlignment: WrapCrossAlignment.center,

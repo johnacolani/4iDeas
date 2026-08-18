@@ -70,35 +70,73 @@ class FourICadPrimaryButton extends StatelessWidget {
   final bool busy;
   final bool compact;
 
+  /// Brushed gold rather than a flat fill: a single tone at this size reads as
+  /// a pale slab, where a light-to-deep gradient with a warm glow beneath it
+  /// reads as a raised, pressable surface.
+  static const Color _goldLight = Color(0xFFDCC086);
+  static const Color _goldDeep = Color(0xFFB2914F);
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: compact ? 48 : 54,
-      child: ElevatedButton.icon(
-        onPressed: busy ? null : onPressed,
-        icon: busy
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              )
-            : Icon(icon, size: compact ? 19 : 21),
-        label: Text(
-          busy ? 'Working…' : label,
-          style: GoogleFonts.roboto(
-            fontSize: compact ? 15 : 16.5,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.2,
-          ),
+    final enabled = onPressed != null && !busy;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: enabled
+              ? const [_goldLight, _goldDeep]
+              : [
+                  _goldLight.withValues(alpha: 0.4),
+                  _goldDeep.withValues(alpha: 0.4),
+                ],
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: ColorManager.accentGold,
-          foregroundColor: const Color(0xFF1A1305),
-          disabledBackgroundColor: ColorManager.accentGold.withValues(alpha: 0.45),
-          disabledForegroundColor: const Color(0xFF1A1305).withValues(alpha: 0.6),
-          elevation: 0,
-          padding: EdgeInsets.symmetric(horizontal: compact ? 20 : 26),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        boxShadow: enabled
+            ? [
+                BoxShadow(
+                  color: ColorManager.accentGold.withValues(alpha: 0.30),
+                  blurRadius: 22,
+                  spreadRadius: -8,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : const [],
+      ),
+      child: SizedBox(
+        height: compact ? 48 : 54,
+        child: ElevatedButton.icon(
+          onPressed: busy ? null : onPressed,
+          icon: busy
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Color(0xFF1A1305),
+                  ),
+                )
+              : Icon(icon, size: compact ? 19 : 21),
+          label: Text(
+            busy ? 'Working…' : label,
+            style: GoogleFonts.roboto(
+              fontSize: compact ? 15 : 16.5,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            // The gradient above is the surface; the button paints only ink.
+            backgroundColor: Colors.transparent,
+            disabledBackgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: const Color(0xFF1A1305),
+            disabledForegroundColor: const Color(0xFF1A1305).withValues(alpha: 0.55),
+            elevation: 0,
+            padding: EdgeInsets.symmetric(horizontal: compact ? 20 : 26),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         ),
       ),
     );
@@ -646,31 +684,82 @@ class FourICadGlassPanel extends StatelessWidget {
   final double borderRadius;
   final bool goldBorder;
 
+  /// Deep glass, not a white veil.
+  ///
+  /// A translucent *white* fill over a navy page lifts the panel toward the
+  /// background and greys everything inside it — the whole screen reads hazy
+  /// and low-contrast. Tinting downward instead, toward near-black navy, sinks
+  /// the panel below the page so white text and gold accents gain the contrast
+  /// they were losing. The single light rim along the top edge is what still
+  /// reads as glass.
+  static const Color _fillTop = Color(0xFF0C1A2E);
+  static const Color _fillBottom = Color(0xFF060E1A);
+
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Container(
-        width: double.infinity,
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(borderRadius),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withValues(alpha: 0.10),
-              Colors.white.withValues(alpha: 0.04),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius),
+        // Lifts the panel off the page. Without it, a dark panel on a dark
+        // background has only its border to separate the two.
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: goldBorder ? 0.45 : 0.32),
+            blurRadius: goldBorder ? 34 : 22,
+            spreadRadius: -8,
+            offset: Offset(0, goldBorder ? 16 : 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                _fillTop.withValues(alpha: 0.88),
+                _fillBottom.withValues(alpha: 0.94),
+              ],
+            ),
+            border: Border.all(
+              color: goldBorder
+                  ? ColorManager.accentGold.withValues(alpha: 0.42)
+                  : Colors.white.withValues(alpha: 0.10),
+              width: goldBorder ? 1.4 : 1,
+            ),
+          ),
+          child: Stack(
+            children: [
+              // The glass highlight: a single hairline catching light along the
+              // top edge, fading out within a few pixels.
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    height: 1.2,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0),
+                          Colors.white.withValues(alpha: goldBorder ? 0.28 : 0.16),
+                          Colors.white.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child,
             ],
           ),
-          border: Border.all(
-            color: goldBorder
-                ? ColorManager.accentGold.withValues(alpha: 0.55)
-                : Colors.white.withValues(alpha: 0.16),
-            width: goldBorder ? 1.6 : 1,
-          ),
         ),
-        child: child,
       ),
     );
   }

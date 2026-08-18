@@ -54,10 +54,13 @@ class FourICadPlatformGrid extends StatelessWidget {
         return Wrap(
           spacing: gap,
           runSpacing: gap,
+          // Equal heights across a row: a note that wraps to two lines would
+          // otherwise leave its neighbours short and the row ragged.
           children: [
             for (final platform in platforms)
               SizedBox(
                 width: width,
+                height: isMobile ? null : 186,
                 child: _PlatformTile(
                   platform: platform,
                   isMobile: isMobile,
@@ -75,7 +78,7 @@ class FourICadPlatformGrid extends StatelessWidget {
   }
 }
 
-class _PlatformTile extends StatelessWidget {
+class _PlatformTile extends StatefulWidget {
   const _PlatformTile({
     required this.platform,
     required this.isMobile,
@@ -95,24 +98,63 @@ class _PlatformTile extends StatelessWidget {
   final void Function(String url) onStore;
 
   @override
+  State<_PlatformTile> createState() => _PlatformTileState();
+}
+
+class _PlatformTileState extends State<_PlatformTile> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
+    final platform = widget.platform;
+    final isMobile = widget.isMobile;
+    final owns = widget.owns;
+    final busy = widget.busy;
     final soon = platform.availability == PlatformAvailability.comingSoon;
 
     final (String label, IconData icon, VoidCallback? action) = switch (platform.availability) {
       _ when owns => ('You own this', Icons.check_circle_outline, null),
-      PlatformAvailability.buy => ('Buy', Icons.shopping_cart_outlined, onBuy),
+      PlatformAvailability.buy => ('Buy', Icons.shopping_cart_outlined, widget.onBuy),
       PlatformAvailability.store => (
           'Open store',
           Icons.open_in_new,
-          platform.storeUrl == null ? null : () => onStore(platform.storeUrl!),
+          platform.storeUrl == null ? null : () => widget.onStore(platform.storeUrl!),
         ),
-      PlatformAvailability.trial => ('Try free — 48h', Icons.timelapse, onTry),
+      PlatformAvailability.trial => ('Try free — 48h', Icons.timelapse, widget.onTry),
       PlatformAvailability.comingSoon => ('Coming very soon', Icons.schedule, null),
     };
 
-    return FourICadGlassPanel(
+    final interactive = action != null;
+
+    return MouseRegion(
+      cursor: interactive ? SystemMouseCursors.click : MouseCursor.defer,
+      onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
+      onExit: interactive ? (_) => setState(() => _hovered = false) : null,
+      child: AnimatedSlide(
+        // A couple of pixels is enough to say "this one responds"; more would
+        // make a six-tile grid restless.
+        offset: _hovered ? const Offset(0, -0.012) : Offset.zero,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: _hovered
+                ? [
+                    BoxShadow(
+                      color: ColorManager.accentGold.withValues(alpha: 0.16),
+                      blurRadius: 26,
+                      spreadRadius: -6,
+                      offset: const Offset(0, 10),
+                    ),
+                  ]
+                : const [],
+          ),
+          child: FourICadGlassPanel(
       padding: EdgeInsets.all(isMobile ? 18 : 20),
       borderRadius: 14,
+      goldBorder: _hovered && interactive,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -161,7 +203,10 @@ class _PlatformTile extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 16),
+          // Pins the action to the bottom so a row of tiles aligns. Only where
+          // the tile has a fixed height — on mobile the column is unbounded and
+          // a flexible child would throw.
+          if (!isMobile) const Spacer() else const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: action == null
@@ -182,6 +227,9 @@ class _PlatformTile extends StatelessWidget {
                       )),
           ),
         ],
+      ),
+          ),
+        ),
       ),
     );
   }
