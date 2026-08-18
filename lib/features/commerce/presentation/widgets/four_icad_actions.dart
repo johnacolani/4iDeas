@@ -479,7 +479,8 @@ class FourICadPurchaseController {
       final uri = Uri.parse(url);
       // Same tab: Stripe returns the buyer to /4icad/success afterwards.
       await launchUrl(uri, webOnlyWindowName: '_self', mode: LaunchMode.platformDefault);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      _logClientFailure('checkout', e, stackTrace);
       if (context.mounted) _showError(context, _checkoutMessage(e));
     }
   }
@@ -565,7 +566,8 @@ class FourICadPurchaseController {
       if (!ok && context.mounted) {
         _showError(context, 'Could not open the web app.');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      _logClientFailure('web trial', e, stackTrace);
       if (context.mounted) _showError(context, _webTrialMessage(e));
     }
   }
@@ -617,6 +619,24 @@ class FourICadPurchaseController {
 
   static const String _offlineMessage =
       'You appear to be offline. Check your connection and try again.';
+
+  /// Keep production failures observable in browser DevTools without logging
+  /// credentials, Stripe URLs, or signed web-trial URLs.
+  static void _logClientFailure(
+    String operation,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    if (error is FirebaseFunctionsException) {
+      debugPrint(
+        '4iCAD $operation failed: Firebase Functions '
+        'code=${error.code}, message=${error.message}, details=${error.details}',
+      );
+    } else {
+      debugPrint('4iCAD $operation failed: ${error.runtimeType}: $error');
+    }
+    debugPrintStack(label: '4iCAD $operation stack trace', stackTrace: stackTrace);
+  }
 
   String _checkoutMessage(Object e) {
     if (_looksOffline(e)) return _offlineMessage;
