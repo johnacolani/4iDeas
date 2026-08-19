@@ -157,49 +157,59 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                   final signedIn = user != null;
                   return StreamBuilder<bool>(
                     stream: signedIn
-                        ? _commerce.watchOwnership()
+                        ? _commerce.watchOwnership(kFourICadWindowsKey)
                         : Stream<bool>.value(false),
-                    builder: (context, ownSnap) {
+                    builder: (context, windowsOwnSnap) {
+                      final windowsOwns = windowsOwnSnap.data ?? false;
                       final action = resolvePurchaseAction(
                         signedIn: signedIn,
                         emailVerified: user?.emailVerified ?? false,
-                        owns: ownSnap.data ?? false,
+                        owns: windowsOwns,
                       );
-                      // The trial window is account-bound, so it only has
-                      // meaning once someone is signed in.
-                      return StreamBuilder<WebTrial>(
+                      return StreamBuilder<bool>(
                         stream: signedIn
-                            ? _commerce.watchWebTrial()
-                            : Stream<WebTrial>.value(
-                                const WebTrial.notStarted()),
-                        builder: (context, trialSnap) {
-                          final trial =
-                              trialSnap.data ?? const WebTrial.notStarted();
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (mounted) {
-                              _scheduleTrialExpiry(trial);
-                            }
-                          });
-                          final owns = action == PurchaseAction.download;
-                          return Stack(
-                            children: [
-                              _body(context, product, action, trial, isMobile,
-                                  isTablet),
-                              // Floats above the scrolling page so the clock
-                              // stays visible wherever the visitor has scrolled
-                              // to. Owners never see it — they are not on one.
-                              if (!owns && (trial.isActive || trial.isExpired))
-                                Positioned(
-                                  right: isMobile ? 14 : 24,
-                                  bottom: isMobile ? 14 : 24,
-                                  child: FourICadTrialCounter(
-                                    trial: trial,
-                                    compact: isMobile,
-                                    onPressed:
-                                        _openingWebApp ? null : _onTryWeb,
-                                  ),
-                                ),
-                            ],
+                            ? _commerce.watchOwnership(kFourICadWebKey)
+                            : Stream<bool>.value(false),
+                        builder: (context, webOwnSnap) {
+                          final webOwns = webOwnSnap.data ?? false;
+                          // The trial window is account-bound, so it only has
+                          // meaning once someone is signed in.
+                          return StreamBuilder<WebTrial>(
+                            stream: signedIn
+                                ? _commerce.watchWebTrial()
+                                : Stream<WebTrial>.value(
+                                    const WebTrial.notStarted()),
+                            builder: (context, trialSnap) {
+                              final trial =
+                                  trialSnap.data ?? const WebTrial.notStarted();
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  _scheduleTrialExpiry(trial);
+                                }
+                              });
+                              return Stack(
+                                children: [
+                                  _body(context, product, action, trial,
+                                      webOwns, isMobile, isTablet),
+                                  // Floats above the scrolling page so the
+                                  // Web clock stays visible wherever the
+                                  // visitor has scrolled. Only Web ownership
+                                  // suppresses it; Windows is independent.
+                                  if (!webOwns &&
+                                      (trial.isActive || trial.isExpired))
+                                    Positioned(
+                                      right: isMobile ? 14 : 24,
+                                      bottom: isMobile ? 14 : 24,
+                                      child: FourICadTrialCounter(
+                                        trial: trial,
+                                        compact: isMobile,
+                                        onPressed:
+                                            _openingWebApp ? null : _onTryWeb,
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
                           );
                         },
                       );
@@ -278,6 +288,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     CommerceProduct product,
     PurchaseAction action,
     WebTrial trial,
+    bool webOwns,
     bool isMobile,
     bool isTablet,
   ) {
@@ -301,6 +312,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                       product: product,
                       action: action,
                       trial: trial,
+                      webOwns: webOwns,
                       // signInToBuy is precisely the signed-out state, so the
                       // tiles and the hero button can never disagree about it.
                       platforms: _platformSection(
@@ -441,6 +453,7 @@ class _Hero extends StatelessWidget {
     required this.product,
     required this.action,
     required this.trial,
+    required this.webOwns,
     required this.platforms,
     required this.isMobile,
     required this.isTablet,
@@ -451,6 +464,7 @@ class _Hero extends StatelessWidget {
   final CommerceProduct product;
   final PurchaseAction action;
   final WebTrial trial;
+  final bool webOwns;
 
   /// The platform chooser, placed directly under the price.
   final Widget platforms;
@@ -466,6 +480,7 @@ class _Hero extends StatelessWidget {
           product: product,
           action: action,
           trial: trial,
+          webOwns: webOwns,
           isMobile: isMobile,
           onResendVerification: onResendVerification,
           onRefreshVerification: onRefreshVerification,
@@ -682,6 +697,7 @@ class _HeroCopy extends StatelessWidget {
     required this.product,
     required this.action,
     required this.trial,
+    required this.webOwns,
     required this.isMobile,
     required this.onResendVerification,
     required this.onRefreshVerification,
@@ -691,17 +707,20 @@ class _HeroCopy extends StatelessWidget {
   final CommerceProduct product;
   final PurchaseAction action;
   final WebTrial trial;
+  final bool webOwns;
   final bool isMobile;
   final VoidCallback onResendVerification;
   final VoidCallback onRefreshVerification;
 
   @override
   Widget build(BuildContext context) {
-    final owns = action == PurchaseAction.download;
-    return part == _HeroPart.pitch ? _pitch(owns) : _actions(context, owns);
+    final windowsOwns = action == PurchaseAction.download;
+    return part == _HeroPart.pitch
+        ? _pitch(windowsOwns)
+        : _actions(context, windowsOwns);
   }
 
-  Widget _pitch(bool owns) {
+  Widget _pitch(bool windowsOwns) {
     final release = product.currentRelease;
     final price = product.formattedPrice;
 
@@ -778,7 +797,7 @@ class _HeroCopy extends StatelessWidget {
                 ),
               // The price is what a visitor is actually looking for, so it is
               // rendered a fifth larger than the metadata around it.
-              if (price != null && !owns)
+              if (price != null && !windowsOwns)
                 FourICadMetaChip(
                   label: '$price one-time',
                   icon: Icons.sell_outlined,
@@ -795,11 +814,11 @@ class _HeroCopy extends StatelessWidget {
     );
   }
 
-  Widget _actions(BuildContext context, bool owns) {
+  Widget _actions(BuildContext context, bool windowsOwns) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (owns) ...[
+        if (windowsOwns) ...[
           Row(
             children: [
               const Icon(Icons.check_circle,
@@ -823,7 +842,7 @@ class _HeroCopy extends StatelessWidget {
         // twice without saying which platform it meant.
         // Explains the trial button's state in words, so "Web trial ended" is
         // never the only thing telling someone why they lost access.
-        if (!owns && (trial.isActive || trial.isExpired)) ...[
+        if (!webOwns && (trial.isActive || trial.isExpired)) ...[
           const SizedBox(height: 14),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
