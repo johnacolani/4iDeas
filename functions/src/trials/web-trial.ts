@@ -1,10 +1,9 @@
-import {onCall, onRequest, HttpsError} from "firebase-functions/v2/https";
-import {logger} from "firebase-functions";
-import {Timestamp} from "firebase-admin/firestore";
+import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions";
+import { Timestamp } from "firebase-admin/firestore";
 import {
   COL,
   FieldValue,
-  PRODUCT_KEY,
   WEB_PRODUCT_KEY,
   WEB_TRIAL_SIGNING_KEY,
   db,
@@ -60,23 +59,20 @@ interface TrialDoc {
 /**
  * Whether the caller has bought their way out of the trial.
  *
- * Either product counts: someone who bought the browser build obviously has
- * unlimited web access, and a Windows buyer keeps the web build as part of the
- * purchase they already made rather than being put back on a countdown.
+ * Web is sold independently, so only a Web entitlement grants permanent
+ * browser access. Windows ownership does not bypass the Web trial.
  */
 async function ownsWebAccess(uid: string): Promise<boolean> {
-  const [web, windows] = await Promise.all([
-    hasEntitlement(uid, WEB_PRODUCT_KEY),
-    hasEntitlement(uid, PRODUCT_KEY),
-  ]);
-  return web || windows;
+  return hasEntitlement(uid, WEB_PRODUCT_KEY);
 }
 
 /** Reads the configured web-app URL. Server-side only, never client-supplied. */
 async function webAppUrl(productKey: string): Promise<string> {
   const snap = await db.collection(COL.products).doc(productKey).get();
   const configured = (snap.data()?.webAppUrl as string | undefined)?.trim();
-  return configured && configured.length > 0 ? configured : FALLBACK_WEB_APP_URL;
+  return configured && configured.length > 0
+    ? configured
+    : FALLBACK_WEB_APP_URL;
 }
 
 /**
@@ -90,11 +86,11 @@ async function webAppUrl(productKey: string): Promise<string> {
  * they receive is not on a countdown.
  */
 export const startWebTrial = onCall(
-  {region: "us-central1", secrets: [WEB_TRIAL_SIGNING_KEY]},
+  { region: "us-central1", secrets: [WEB_TRIAL_SIGNING_KEY] },
   async (req) => {
-    const {uid, email} = requireAuth(req);
-    const productKey = String(req.data?.productKey ?? PRODUCT_KEY);
-    if (productKey !== PRODUCT_KEY) {
+    const { uid, email } = requireAuth(req);
+    const productKey = String(req.data?.productKey ?? WEB_PRODUCT_KEY);
+    if (productKey !== WEB_PRODUCT_KEY) {
       throw new HttpsError("invalid-argument", "Unknown product.");
     }
 
@@ -106,8 +102,15 @@ export const startWebTrial = onCall(
     if (await ownsWebAccess(uid)) {
       const exp = Math.floor((now + OWNER_TOKEN_TTL_MS) / 1000);
       const token = signTrialToken(
-        {v: 1, kind: "owner", uid, productKey, iat: Math.floor(now / 1000), exp},
-        secret
+        {
+          v: 1,
+          kind: "owner",
+          uid,
+          productKey,
+          iat: Math.floor(now / 1000),
+          exp,
+        },
+        secret,
       );
       return {
         status: "owned",
@@ -134,7 +137,7 @@ export const startWebTrial = onCall(
             lastLaunchedAt: FieldValue.serverTimestamp(),
             launchCount: FieldValue.increment(1),
           },
-          {merge: true}
+          { merge: true },
         );
         return started;
       }
@@ -156,7 +159,7 @@ export const startWebTrial = onCall(
           lastLaunchedAt: FieldValue.serverTimestamp(),
           createdAt: FieldValue.serverTimestamp(),
         },
-        {merge: true}
+        { merge: true },
       );
       return now;
     });
@@ -165,7 +168,11 @@ export const startWebTrial = onCall(
     const revoked = (await ref.get()).data()?.revoked === true;
 
     if (window.expired || revoked) {
-      logger.info("web trial refused", {uid, revoked, expired: window.expired});
+      logger.info("web trial refused", {
+        uid,
+        revoked,
+        expired: window.expired,
+      });
       return {
         status: "expired",
         launchUrl: null,
@@ -185,10 +192,10 @@ export const startWebTrial = onCall(
         iat: Math.floor(now / 1000),
         exp: Math.floor(window.expiresAtMs / 1000),
       },
-      secret
+      secret,
     );
 
-    logger.info("web trial launched", {uid, remainingMs: window.remainingMs});
+    logger.info("web trial launched", { uid, remainingMs: window.remainingMs });
     return {
       status: "active",
       launchUrl: buildLaunchUrl(target, token),
@@ -196,7 +203,7 @@ export const startWebTrial = onCall(
       expiresAt: window.expiresAtMs,
       remainingMs: window.remainingMs,
     };
-  }
+  },
 );
 
 /**
@@ -214,18 +221,22 @@ export const startWebTrial = onCall(
  * GET /verifyWebTrial?token=...   or   POST {"token": "..."}
  */
 export const verifyWebTrial = onRequest(
-  {region: "us-central1", secrets: [WEB_TRIAL_SIGNING_KEY], cors: VERIFY_ALLOWED_ORIGINS},
+  {
+    region: "us-central1",
+    secrets: [WEB_TRIAL_SIGNING_KEY],
+    cors: VERIFY_ALLOWED_ORIGINS,
+  },
   async (req, res) => {
     if (req.method !== "GET" && req.method !== "POST") {
-      res.status(405).json({valid: false, reason: "method_not_allowed"});
+      res.status(405).json({ valid: false, reason: "method_not_allowed" });
       return;
     }
 
     const token = String(
-      (req.method === "GET" ? req.query?.token : req.body?.token) ?? ""
+      (req.method === "GET" ? req.query?.token : req.body?.token) ?? "",
     );
     if (!token) {
-      res.status(400).json({valid: false, reason: "malformed"});
+      res.status(400).json({ valid: false, reason: "malformed" });
       return;
     }
 
@@ -234,18 +245,24 @@ export const verifyWebTrial = onRequest(
     if (!check.valid) {
       // 200, not 401: this is a legitimate answer to a legitimate question, and
       // the web app should render "trial ended" rather than treat it as a fault.
-      res.status(200).json({valid: false, reason: check.reason});
+      res.status(200).json({ valid: false, reason: check.reason });
       return;
     }
 
-    const {uid, kind} = check.payload;
+    const { uid, kind } = check.payload;
 
     if (kind === "owner") {
       const owns = await ownsWebAccess(uid);
       res.status(200).json(
-        owns ?
-          {valid: true, access: "owner", uid, expiresAt: check.payload.exp * 1000, remainingMs: null} :
-          {valid: false, reason: "unknown_user"}
+        owns
+          ? {
+              valid: true,
+              access: "owner",
+              uid,
+              expiresAt: check.payload.exp * 1000,
+              remainingMs: null,
+            }
+          : { valid: false, reason: "unknown_user" },
       );
       return;
     }
@@ -267,13 +284,17 @@ export const verifyWebTrial = onRequest(
     const doc = snap.data() as TrialDoc | undefined;
     const startedAt = doc?.startedAt?.toMillis();
     if (!snap.exists || startedAt === undefined || doc?.revoked === true) {
-      res.status(200).json({valid: false, reason: "unknown_user"});
+      res.status(200).json({ valid: false, reason: "unknown_user" });
       return;
     }
 
     const window = trialWindow(startedAt, now);
     if (window.expired) {
-      res.status(200).json({valid: false, reason: "trial_expired", expiresAt: window.expiresAtMs});
+      res.status(200).json({
+        valid: false,
+        reason: "trial_expired",
+        expiresAt: window.expiresAtMs,
+      });
       return;
     }
 
@@ -284,5 +305,5 @@ export const verifyWebTrial = onRequest(
       expiresAt: window.expiresAtMs,
       remainingMs: window.remainingMs,
     });
-  }
+  },
 );

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +37,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
   bool _downloading = false;
   bool _openingWebApp = false;
   String? _buyingKey;
+  Timer? _trialExpiryTimer;
   bool _cancelNoticeShown = false;
 
   @override
@@ -51,6 +54,27 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
         );
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _trialExpiryTimer?.cancel();
+    super.dispose();
+  }
+
+  void _scheduleTrialExpiry(WebTrial trial) {
+    _trialExpiryTimer?.cancel();
+
+    final remaining = trial.remaining();
+    if (remaining == null || remaining == Duration.zero) {
+      return;
+    }
+
+    _trialExpiryTimer = Timer(remaining, () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   /// Buys a specific platform from the grid. Windows goes through the same
@@ -83,7 +107,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     if (grant != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Downloading 4iCAD ${grant.version ?? ''} for Windows.'.trim()),
+          content: Text(
+              'Downloading 4iCAD ${grant.version ?? ''} for Windows.'.trim()),
           backgroundColor: const Color(0xFF1B7F4B),
         ),
       );
@@ -120,7 +145,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
           StreamBuilder<CommerceProduct>(
             stream: _commerce.watchProduct(),
             builder: (context, productSnap) {
-              final product = productSnap.data ?? CommerceProduct.fourICadFallback();
+              final product =
+                  productSnap.data ?? CommerceProduct.fourICadFallback();
               // userChanges() rather than authStateChanges(): it also emits
               // after user.reload(), so completing verification flips the page
               // without a sign-out.
@@ -144,10 +170,16 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                       return StreamBuilder<WebTrial>(
                         stream: signedIn
                             ? _commerce.watchWebTrial()
-                            : Stream<WebTrial>.value(const WebTrial.notStarted()),
+                            : Stream<WebTrial>.value(
+                                const WebTrial.notStarted()),
                         builder: (context, trialSnap) {
                           final trial =
                               trialSnap.data ?? const WebTrial.notStarted();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              _scheduleTrialExpiry(trial);
+                            }
+                          });
                           final owns = action == PurchaseAction.download;
                           return Stack(
                             children: [
@@ -163,7 +195,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                                   child: FourICadTrialCounter(
                                     trial: trial,
                                     compact: isMobile,
-                                    onPressed: _openingWebApp ? null : _onTryWeb,
+                                    onPressed:
+                                        _openingWebApp ? null : _onTryWeb,
                                   ),
                                 ),
                             ],
@@ -183,7 +216,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
 
   /// The platform chooser, built here so its streams stay with the screen and
   /// the hero only has to place it.
-  Widget _platformSection(bool isMobile, bool isTablet, bool signedIn) {
+  Widget _platformSection(
+      bool isMobile, bool isTablet, bool signedIn, WebTrial trial) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -222,6 +256,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                 isMobile: isMobile,
                 isTablet: isTablet,
                 signedIn: signedIn,
+                webTrialExpired:
+                    trial.isExpired || trial.remaining() == Duration.zero,
                 downloading: _downloading,
                 owned: ownedSnap.data ?? const {},
                 busyKey: _buyingKey,
@@ -256,7 +292,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1180),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(horizontal, isMobile ? 16 : 28, horizontal, 64),
+                padding: EdgeInsets.fromLTRB(
+                    horizontal, isMobile ? 16 : 28, horizontal, 64),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -270,6 +307,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                         isMobile,
                         isTablet,
                         action != PurchaseAction.signInToBuy,
+                        trial,
                       ),
                       isMobile: isMobile,
                       isTablet: isTablet,
@@ -424,14 +462,14 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _HeroCopy part(_HeroPart which) => _HeroCopy(
-      part: which,
-      product: product,
-      action: action,
-      trial: trial,
-      isMobile: isMobile,
-      onResendVerification: onResendVerification,
-      onRefreshVerification: onRefreshVerification,
-    );
+          part: which,
+          product: product,
+          action: action,
+          trial: trial,
+          isMobile: isMobile,
+          onResendVerification: onResendVerification,
+          onRefreshVerification: onRefreshVerification,
+        );
     // Deliberately stacked at every breakpoint: pitch first, then the artwork
     // full width beneath it.
     //
@@ -521,7 +559,8 @@ class _PriceCard extends StatelessWidget {
             ColorManager.accentGold.withValues(alpha: 0.03),
           ],
         ),
-        border: Border.all(color: ColorManager.accentGold.withValues(alpha: 0.34)),
+        border:
+            Border.all(color: ColorManager.accentGold.withValues(alpha: 0.34)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,7 +652,8 @@ class _PriceMetaLine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: ColorManager.accentGold.withValues(alpha: 0.8)),
+        Icon(icon,
+            size: 14, color: ColorManager.accentGold.withValues(alpha: 0.8)),
         const SizedBox(width: 8),
         Flexible(
           child: Text(
@@ -726,29 +766,31 @@ class _HeroCopy extends StatelessWidget {
         // narrow layouts keep it inline, where there is no void to fill.
         if (isMobile)
           Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            if (release != null)
-              FourICadMetaChip(
-                label: 'Latest Windows Version: ${release.version}',
-                icon: Icons.verified_outlined,
-                emphasise: true,
-              ),
-            // The price is what a visitor is actually looking for, so it is
-            // rendered a fifth larger than the metadata around it.
-            if (price != null && !owns)
-              FourICadMetaChip(
-                label: '$price one-time',
-                icon: Icons.sell_outlined,
-                emphasise: true,
-                large: true,
-              ),
-            if (release?.formattedSize != null)
-              FourICadMetaChip(label: release!.formattedSize!, icon: Icons.download_outlined),
-          ],
-        ),
+            spacing: 10,
+            runSpacing: 10,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (release != null)
+                FourICadMetaChip(
+                  label: 'Latest Windows Version: ${release.version}',
+                  icon: Icons.verified_outlined,
+                  emphasise: true,
+                ),
+              // The price is what a visitor is actually looking for, so it is
+              // rendered a fifth larger than the metadata around it.
+              if (price != null && !owns)
+                FourICadMetaChip(
+                  label: '$price one-time',
+                  icon: Icons.sell_outlined,
+                  emphasise: true,
+                  large: true,
+                ),
+              if (release?.formattedSize != null)
+                FourICadMetaChip(
+                    label: release!.formattedSize!,
+                    icon: Icons.download_outlined),
+            ],
+          ),
       ],
     );
   }
@@ -760,7 +802,8 @@ class _HeroCopy extends StatelessWidget {
         if (owns) ...[
           Row(
             children: [
-              const Icon(Icons.check_circle, color: Color(0xFF67C79B), size: 18),
+              const Icon(Icons.check_circle,
+                  color: Color(0xFF67C79B), size: 18),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
@@ -796,8 +839,8 @@ class _HeroCopy extends StatelessWidget {
               Flexible(
                 child: Text(
                   trial.isExpired
-                      ? 'Your free 48-hour web trial has ended. Buy 4iCAD for '
-                          'permanent access on every platform.'
+                      ? 'Your free 48-hour web trial has ended. Buy 4iCAD Web for '
+                          'permanent browser access.'
                       : 'Free web trial: ${trial.remainingLabel ?? 'ending shortly'} '
                           'of your 48 hours.',
                   style: GoogleFonts.roboto(
@@ -898,7 +941,8 @@ class _VerifyEmailNotice extends StatelessWidget {
                 onPressed: onResend,
                 icon: const Icon(Icons.send_outlined, size: 17),
                 label: const Text('Resend email'),
-                style: TextButton.styleFrom(foregroundColor: ColorManager.accentGold),
+                style: TextButton.styleFrom(
+                    foregroundColor: ColorManager.accentGold),
               ),
               TextButton.icon(
                 onPressed: onRefresh,
@@ -1063,14 +1107,16 @@ class _FeatureGrid extends StatelessWidget {
               SizedBox(
                 width: itemWidth,
                 child: FourICadGlassPanel(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                   borderRadius: 14,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(top: 2),
-                        child: Icon(Icons.check, size: 17, color: ColorManager.accentGold),
+                        child: Icon(Icons.check,
+                            size: 17, color: ColorManager.accentGold),
                       ),
                       const SizedBox(width: 11),
                       Expanded(
@@ -1128,7 +1174,8 @@ class _ReleaseAndSystem extends StatelessWidget {
           else ...[
             _KeyValue(label: 'Version', value: release.version),
             if (release.publishedAt != null)
-              _KeyValue(label: 'Published', value: _formatDate(release.publishedAt!)),
+              _KeyValue(
+                  label: 'Published', value: _formatDate(release.publishedAt!)),
             if (release.formattedSize != null)
               _KeyValue(label: 'Download size', value: release.formattedSize!),
             if (release.sha256 != null && release.sha256!.isNotEmpty)
@@ -1228,8 +1275,18 @@ class _ReleaseAndSystem extends StatelessWidget {
 
   static String _formatDate(DateTime d) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
@@ -1298,7 +1355,8 @@ class _SecurityNote extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.lock_outline, size: 20, color: ColorManager.accentGold),
+          const Icon(Icons.lock_outline,
+              size: 20, color: ColorManager.accentGold),
           const SizedBox(width: 14),
           Expanded(
             child: Text(

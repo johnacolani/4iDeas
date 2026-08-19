@@ -23,6 +23,7 @@ class FourICadPlatformGrid extends StatelessWidget {
     required this.onStore,
     required this.onDownload,
     required this.signedIn,
+    required this.webTrialExpired,
     this.downloading = false,
     this.owned = const {},
     this.busyKey,
@@ -31,6 +32,7 @@ class FourICadPlatformGrid extends StatelessWidget {
   final List<FourICadPlatform> platforms;
   final bool isMobile;
   final bool isTablet;
+  final bool webTrialExpired;
 
   /// Starts checkout for a sellable platform.
   final void Function(FourICadPlatform platform) onBuy;
@@ -84,6 +86,7 @@ class FourICadPlatformGrid extends StatelessWidget {
                   onBuy: () => onBuy(platform),
                   onTry: onTry,
                   onStore: onStore,
+                  webTrialExpired: webTrialExpired,
                 ),
               ),
           ],
@@ -105,6 +108,7 @@ class _PlatformTile extends StatefulWidget {
     required this.onBuy,
     required this.onTry,
     required this.onStore,
+    required this.webTrialExpired,
   });
 
   final FourICadPlatform platform;
@@ -117,6 +121,7 @@ class _PlatformTile extends StatefulWidget {
   final VoidCallback onBuy;
   final VoidCallback onTry;
   final void Function(String url) onStore;
+  final bool webTrialExpired;
 
   @override
   State<_PlatformTile> createState() => _PlatformTileState();
@@ -133,13 +138,20 @@ class _PlatformTileState extends State<_PlatformTile> {
     final busy = widget.busy;
     final soon = platform.availability == PlatformAvailability.comingSoon;
 
-    final (String label, IconData icon, VoidCallback? action) = switch (platform.availability) {
+    final (String label, IconData icon, VoidCallback? action) =
+        switch (platform.availability) {
       // Owning a platform turns its tile into the way to use it: the installer
       // for Windows, the app itself for the browser build.
-      _ when owns && platform.key == kFourICadWindowsKey =>
-        ('Download', Icons.download, widget.onDownload),
-      _ when owns && platform.key == kFourICadWebKey =>
-        ('Open web app', Icons.public, widget.onTry),
+      _ when owns && platform.key == kFourICadWindowsKey => (
+          'Download',
+          Icons.download,
+          widget.onDownload
+        ),
+      _ when owns && platform.key == kFourICadWebKey => (
+          'Open web app',
+          Icons.public,
+          widget.onTry
+        ),
       _ when owns => ('You own this', Icons.check_circle_outline, null),
       // Says the truthful next step. "Buy" to a signed-out visitor is a
       // promise the server will refuse.
@@ -149,10 +161,26 @@ class _PlatformTileState extends State<_PlatformTile> {
       PlatformAvailability.store => (
           'Open store',
           Icons.open_in_new,
-          platform.storeUrl == null ? null : () => widget.onStore(platform.storeUrl!),
+          platform.storeUrl == null
+              ? null
+              : () => widget.onStore(platform.storeUrl!),
         ),
-      PlatformAvailability.trial => ('Try free — 48h', Icons.timelapse, widget.onTry),
-      PlatformAvailability.comingSoon => ('Coming very soon', Icons.schedule, null),
+      PlatformAvailability.trial => widget.webTrialExpired
+          ? (
+              'Buy Web',
+              Icons.shopping_cart_outlined,
+              widget.onBuy,
+            )
+          : (
+              'Try free — 48h',
+              Icons.timelapse,
+              widget.onTry,
+            ),
+      PlatformAvailability.comingSoon => (
+          'Coming very soon',
+          Icons.schedule,
+          null
+        ),
     };
 
     final interactive = action != null;
@@ -183,83 +211,87 @@ class _PlatformTileState extends State<_PlatformTile> {
                 : const [],
           ),
           child: FourICadGlassPanel(
-      padding: EdgeInsets.all(isMobile ? 18 : 20),
-      borderRadius: 14,
-      goldBorder: _hovered && interactive,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _PlatformLogo(platform: platform, dimmed: soon),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  platform.label,
-                  style: GoogleFonts.roboto(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: soon ? Colors.white70 : Colors.white,
-                  ),
+            padding: EdgeInsets.all(isMobile ? 18 : 20),
+            borderRadius: 14,
+            goldBorder: _hovered && interactive,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _PlatformLogo(platform: platform, dimmed: soon),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        platform.label,
+                        style: GoogleFonts.roboto(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: soon ? Colors.white70 : Colors.white,
+                        ),
+                      ),
+                    ),
+                    if (soon)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 9, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.07),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.16)),
+                        ),
+                        child: Text(
+                          'SOON',
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 10.5,
+                            letterSpacing: 1.1,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white54,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-              if (soon)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.07),
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-                  ),
-                  child: Text(
-                    'SOON',
-                    style: GoogleFonts.robotoMono(
-                      fontSize: 10.5,
-                      letterSpacing: 1.1,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white54,
+                if (platform.note != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    platform.note!,
+                    style: GoogleFonts.roboto(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: Colors.white.withValues(alpha: soon ? 0.45 : 0.7),
                     ),
                   ),
+                ],
+                // Pins the action to the bottom so a row of tiles aligns. Only where
+                // the tile has a fixed height — on mobile the column is unbounded and
+                // a flexible child would throw.
+                if (!isMobile) const Spacer() else const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: action == null
+                      ? _QuietState(label: label, icon: icon)
+                      : (platform.availability == PlatformAvailability.buy ||
+                              (platform.key == kFourICadWebKey &&
+                                  widget.webTrialExpired) ||
+                              (owns && platform.key == kFourICadWindowsKey)
+                          ? FourICadPrimaryButton(
+                              label: label,
+                              icon: icon,
+                              compact: true,
+                              busy: busy || (owns && widget.downloading),
+                              onPressed: action,
+                            )
+                          : FourICadGhostButton(
+                              label: label,
+                              icon: icon,
+                              compact: true,
+                              onPressed: action,
+                            )),
                 ),
-            ],
-          ),
-          if (platform.note != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              platform.note!,
-              style: GoogleFonts.roboto(
-                fontSize: 13,
-                height: 1.4,
-                color: Colors.white.withValues(alpha: soon ? 0.45 : 0.7),
-              ),
+              ],
             ),
-          ],
-          // Pins the action to the bottom so a row of tiles aligns. Only where
-          // the tile has a fixed height — on mobile the column is unbounded and
-          // a flexible child would throw.
-          if (!isMobile) const Spacer() else const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: action == null
-                ? _QuietState(label: label, icon: icon)
-                : (platform.availability == PlatformAvailability.buy ||
-                        (owns && platform.key == kFourICadWindowsKey)
-                    ? FourICadPrimaryButton(
-                        label: label,
-                        icon: icon,
-                        compact: true,
-                        busy: busy || (owns && widget.downloading),
-                        onPressed: action,
-                      )
-                    : FourICadGhostButton(
-                        label: label,
-                        icon: icon,
-                        compact: true,
-                        onPressed: action,
-                      )),
-          ),
-        ],
-      ),
           ),
         ),
       ),
@@ -306,7 +338,6 @@ class _QuietState extends StatelessWidget {
     );
   }
 }
-
 
 /// One platform logo, drawn to a consistent visual weight.
 ///

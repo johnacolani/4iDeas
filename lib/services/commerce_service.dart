@@ -44,7 +44,8 @@ class DownloadGrant {
 /// entitlement logic. It asks the server and renders the answer.
 class CommerceService {
   CommerceService({FirebaseFunctions? functions, FirebaseFirestore? firestore})
-      : _functions = functions ?? FirebaseFunctions.instanceFor(region: 'us-central1'),
+      : _functions =
+            functions ?? FirebaseFunctions.instanceFor(region: 'us-central1'),
         _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFunctions _functions;
@@ -55,11 +56,13 @@ class CommerceService {
   static const String _productOrders = 'product_orders';
   static const String _webTrials = 'web_trials';
 
-  static String _entitlementId(String uid, String productKey) => '${uid}__$productKey';
+  static String _entitlementId(String uid, String productKey) =>
+      '${uid}__$productKey';
 
   /// Public product display data, including the Current release version.
   /// Falls back to truthful static defaults if the document does not exist yet.
-  Future<CommerceProduct> getProduct([String productKey = kFourICadWindowsKey]) async {
+  Future<CommerceProduct> getProduct(
+      [String productKey = kFourICadWindowsKey]) async {
     try {
       final doc = await _firestore.collection(_products).doc(productKey).get();
       final data = doc.data();
@@ -74,10 +77,17 @@ class CommerceService {
 
   /// Live product stream so the page reflects a newly published version without
   /// a manual refresh.
-  Stream<CommerceProduct> watchProduct([String productKey = kFourICadWindowsKey]) {
-    return _firestore.collection(_products).doc(productKey).snapshots().map((doc) {
+  Stream<CommerceProduct> watchProduct(
+      [String productKey = kFourICadWindowsKey]) {
+    return _firestore
+        .collection(_products)
+        .doc(productKey)
+        .snapshots()
+        .map((doc) {
       final data = doc.data();
-      if (doc.exists && data != null) return CommerceProduct.fromMap(doc.id, data);
+      if (doc.exists && data != null) {
+        return CommerceProduct.fromMap(doc.id, data);
+      }
       return CommerceProduct.fourICadFallback();
     }).handleError((_) => CommerceProduct.fourICadFallback());
   }
@@ -124,7 +134,9 @@ class CommerceService {
       final byId = {for (final doc in snap.docs) doc.id: doc.data()};
       return [
         for (final platform in kFourICadPlatforms)
-          platform.key == null ? platform : platform.applyOverride(byId[platform.key]),
+          platform.key == null
+              ? platform
+              : platform.applyOverride(byId[platform.key]),
       ];
     }).handleError((_) => kFourICadPlatforms);
   }
@@ -169,7 +181,8 @@ class CommerceService {
   /// The 48-hour window, the token and the destination URL are all resolved
   /// server-side; the client sends nothing but the product key and cannot
   /// influence how long access lasts.
-  Future<WebTrialLaunch> startWebTrial([String productKey = kFourICadWindowsKey]) async {
+  Future<WebTrialLaunch> startWebTrial(
+      [String productKey = kFourICadWebKey]) async {
     final result = await _functions
         .httpsCallable('startWebTrial')
         .call<Map<String, dynamic>>({'productKey': productKey});
@@ -183,7 +196,9 @@ class CommerceService {
         _ => WebTrialStatus.notStarted,
       },
       launchUrl: data['launchUrl'] as String?,
-      expiresAt: expiresAt == null ? null : DateTime.fromMillisecondsSinceEpoch(expiresAt),
+      expiresAt: expiresAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(expiresAt),
     );
   }
 
@@ -196,7 +211,8 @@ class CommerceService {
           .collection(_productOrders)
           .where('uid', isEqualTo: uid)
           .get();
-      final orders = snap.docs.map((d) => ProductOrder.fromMap(d.id, d.data())).toList();
+      final orders =
+          snap.docs.map((d) => ProductOrder.fromMap(d.id, d.data())).toList();
       orders.sort((a, b) {
         final ad = a.purchasedAt, bd = b.purchasedAt;
         if (ad == null && bd == null) return 0;
@@ -213,7 +229,8 @@ class CommerceService {
   /// Starts Stripe Checkout. Returns the hosted Checkout URL to redirect to.
   ///
   /// No amount is sent — the server resolves the Price.
-  Future<String> createCheckoutSession([String productKey = kFourICadWindowsKey]) async {
+  Future<String> createCheckoutSession(
+      [String productKey = kFourICadWindowsKey]) async {
     final result = await _functions
         .httpsCallable('createCheckoutSession')
         .call<Map<String, dynamic>>({'productKey': productKey});
@@ -250,14 +267,16 @@ class CommerceService {
   ///
   /// Throws a [FirebaseFunctionsException] with code `permission-denied` when
   /// the caller has no entitlement.
-  Future<DownloadGrant> getDownloadUrl([String productKey = kFourICadWindowsKey]) async {
+  Future<DownloadGrant> getDownloadUrl(
+      [String productKey = kFourICadWindowsKey]) async {
     final result = await _functions
         .httpsCallable('getDownloadUrl')
         .call<Map<String, dynamic>>({'productKey': productKey});
     final data = result.data;
     return DownloadGrant(
       url: data['url'] as String,
-      expiresAt: DateTime.fromMillisecondsSinceEpoch((data['expiresAt'] as num).toInt()),
+      expiresAt: DateTime.fromMillisecondsSinceEpoch(
+          (data['expiresAt'] as num).toInt()),
       version: data['version'] as String?,
       fileName: data['fileName'] as String?,
       fileSizeBytes: (data['fileSizeBytes'] as num?)?.toInt(),
