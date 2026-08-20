@@ -754,14 +754,76 @@ class _PrimaryDesktopNav extends StatelessWidget {
                 ),
                 // Our own product, between Services and About. Uses slot 4 so
                 // the existing 0–3 underline mapping is untouched.
-                _NavUnderlineLink(
-                  label: '4iCAD',
-                  route: AppRoutes.fourICad,
-                  layerIndex: 4,
-                  selected: hi == 4,
-                  textStyle: textStyle,
-                  onNavTabHover: onNavTabHover,
-                  onNavTabHoverEnd: onNavTabHoverEnd,
+                _DesktopHoverNavDropdown(
+                  triggerLabel: 'Open products menu',
+                  menuMinWidth: 310,
+                  menuBuilder: (ctx, close) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var i = 0;
+                          i < HomeNavMenuItems.productItems.length;
+                          i++) ...[
+                        if (i > 0)
+                          const Divider(
+                            height: 1,
+                            color: _kPopupMenuDividerColor,
+                          ),
+                        InkWell(
+                          onTap: () {
+                            close();
+                            ctx.go(HomeNavMenuItems.productItems[i].route);
+                          },
+                          child: Padding(
+                            padding: _kDesktopPopupMenuItemPadding,
+                            child: Row(
+                              children: [
+                                _NavGoldIcon(
+                                  HomeNavMenuItems.productItems[i].icon,
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      HomeNavMenuItems.productItems[i].label,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      HomeNavMenuItems.productItems[i].subtitle,
+                                      style: const TextStyle(
+                                        color: Colors.white60,
+                                        fontSize: 12.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  trigger: TextButton.icon(
+                    onPressed: () => context.go(AppRoutes.products),
+                    label: Text(
+                      'Products',
+                      style: textStyle.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    iconAlignment: IconAlignment.end,
+                    icon:
+                        const Icon(Icons.arrow_drop_down, color: Colors.white),
+                  ),
                 ),
                 _NavUnderlineLink(
                   label: 'About',

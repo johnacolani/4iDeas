@@ -6,13 +6,16 @@ import 'package:four_ideas/seo/seo_metadata.dart';
 /// Resolves [SeoMetadata] and canonical path for the current [Uri] (path + query not used for duplicate content).
 (SeoMetadata meta, String canonicalPath) resolveSeoForUri(Uri uri) {
   final path = uri.path.isEmpty ? '/' : uri.path;
-  final normalized = path.length > 1 && path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+  final normalized = path.length > 1 && path.endsWith('/')
+      ? path.substring(0, path.length - 1)
+      : path;
 
   // —— Landing pages (search-intent) ——
   if (normalized == AppRoutes.flutterDeveloperVirginia) {
     return (
       const SeoMetadata(
-        title: 'Flutter Developer in Virginia | MVP, Product Design, Firebase | 4iDeas',
+        title:
+            'Flutter Developer in Virginia | MVP, Product Design, Firebase | 4iDeas',
         description:
             'Virginia-based Flutter developer for startups and businesses: product design, MVP app development, '
             'Firebase integration, and accountable delivery across iOS, Android, and web.',
@@ -23,7 +26,8 @@ import 'package:four_ideas/seo/seo_metadata.dart';
   if (normalized == AppRoutes.flutterDeveloperRichmondVa) {
     return (
       const SeoMetadata(
-        title: 'Flutter Developer in Richmond, VA | Virginia & US App Help | 4iDeas',
+        title:
+            'Flutter Developer in Richmond, VA | Virginia & US App Help | 4iDeas',
         description:
             'Richmond‑based Flutter developer and product designer for Virginia businesses and US teams: '
             'MVP builds, Flutter + Firebase, iOS, Android, and web—clear scope and one accountable delivery path.',
@@ -45,7 +49,8 @@ import 'package:four_ideas/seo/seo_metadata.dart';
   if (normalized == AppRoutes.productDesignFlutterEngineering) {
     return (
       const SeoMetadata(
-        title: 'Product Design + Flutter Engineering | Designer‑Developer | 4iDeas',
+        title:
+            'Product Design + Flutter Engineering | Designer‑Developer | 4iDeas',
         description:
             'Hire a product designer who ships in Flutter: UX/UI, design systems, Firebase integration, '
             'and production code for iOS, Android, and web—aligned with US client expectations.',
@@ -56,7 +61,8 @@ import 'package:four_ideas/seo/seo_metadata.dart';
   if (normalized == AppRoutes.firebaseAppDevelopmentServices) {
     return (
       const SeoMetadata(
-        title: 'Firebase App Development Services | Flutter + Firebase Experts | 4iDeas',
+        title:
+            'Firebase App Development Services | Flutter + Firebase Experts | 4iDeas',
         description:
             'Firebase app development services for production products: Auth, Firestore, Cloud Functions, Hosting, '
             'and analytics for Flutter-based MVPs and business apps.',
@@ -149,6 +155,27 @@ import 'package:four_ideas/seo/seo_metadata.dart';
       AppRoutes.fourICad,
     );
   }
+  if (normalized == AppRoutes.products) {
+    return (
+      const SeoMetadata(
+        title: 'Software Products for Design & Development | 4iDeas',
+        description:
+            'Explore 4iCAD and 4iInstaller, software from 4iDeas for practical design, engineering, and Flutter development workflows.',
+      ),
+      AppRoutes.products,
+    );
+  }
+  if (normalized == AppRoutes.fourIInstaller) {
+    return (
+      const SeoMetadata(
+        title: '4iInstaller – Windows Installer Builder for Flutter | 4iDeas',
+        description:
+            'Build Windows setup executables for Flutter desktop applications with 4iInstaller, a free reusable developer tool from 4iDeas.',
+        ogType: 'product',
+      ),
+      AppRoutes.fourIInstaller,
+    );
+  }
   if (normalized == AppRoutes.fourICadSuccess) {
     // An order confirmation is per-customer and must never be indexed.
     return (
@@ -173,7 +200,8 @@ import 'package:four_ideas/seo/seo_metadata.dart';
   if (normalized == '/portfolio') {
     return (
       const SeoMetadata(
-        title: 'Portfolio — Flutter Apps, Case Studies & Product Design | 4iDeas',
+        title:
+            'Portfolio — Flutter Apps, Case Studies & Product Design | 4iDeas',
         description:
             'Case studies and shipped Flutter products: business constraints, role, outcomes, and links to live apps. '
             'See product design plus engineering proof—not a screenshot gallery.',
@@ -263,31 +291,38 @@ import 'package:four_ideas/seo/seo_metadata.dart';
       if (cs != null) {
         final defaultTitle = '${cs.title} — Case Study | 4iDeas';
         final defaultDesc = SeoMetadata.clipDescription(
-          '${cs.subtitle} ${cs.overview}'.replaceAll(RegExp(r'\s+'), ' ').trim(),
+          '${cs.subtitle} ${cs.overview}'
+              .replaceAll(RegExp(r'\s+'), ' ')
+              .trim(),
         );
         final perCaseMeta = <String, SeoMetadata>{
           'asd': const SeoMetadata(
-            title: 'Absolute Stone Design Case Study | Flutter + Firebase Operations Platform | 4iDeas',
+            title:
+                'Absolute Stone Design Case Study | Flutter + Firebase Operations Platform | 4iDeas',
             description:
                 'Enterprise Flutter + Firebase case study: multi-role operations platform for admin, sales, scheduler, installer, and client workflows with governed AI and adaptive cross-platform UX.',
           ),
           'service-flow': const SeoMetadata(
-            title: 'Service Flow Case Study | Multi-tenant SaaS UX + Flutter Product System | 4iDeas',
+            title:
+                'Service Flow Case Study | Multi-tenant SaaS UX + Flutter Product System | 4iDeas',
             description:
                 'Multi-tenant SaaS case study for field service operations: role-based workflows, tenant-safe UX, design system strategy, and product decisions for scalable Flutter delivery.',
           ),
           'twin-scriptures': const SeoMetadata(
-            title: 'Twin Scriptures Case Study | Personalized Spiritual App UX | Flutter | 4iDeas',
+            title:
+                'Twin Scriptures Case Study | Personalized Spiritual App UX | Flutter | 4iDeas',
             description:
                 'Consumer Flutter app case study covering bilingual scripture reading, RTL UX, visual personalization onboarding, and product design decisions that improved completion and engagement.',
           ),
           'rose-chat-seasonal-campaign-engine': const SeoMetadata(
-            title: 'Rose AI Seasonal and Holiday Celebration Campaign Case Study | Conversational AI Product Design | 4iDeas',
+            title:
+                'Rose AI Seasonal and Holiday Celebration Campaign Case Study | Conversational AI Product Design | 4iDeas',
             description:
                 'AI product design case study: backend-driven seasonal campaign system with safe rollout controls, dynamic conversational UX, preview modes, and governed operations.',
           ),
         };
-        final meta = perCaseMeta[id] ?? SeoMetadata(title: defaultTitle, description: defaultDesc);
+        final meta = perCaseMeta[id] ??
+            SeoMetadata(title: defaultTitle, description: defaultDesc);
         return (
           meta,
           '/portfolio/case-study/$id',
@@ -340,7 +375,9 @@ import 'package:four_ideas/seo/seo_metadata.dart';
       '/signup',
     );
   }
-  if (normalized == '/forgot-password' || normalized == '/email-verification' || normalized == '/profile') {
+  if (normalized == '/forgot-password' ||
+      normalized == '/email-verification' ||
+      normalized == '/profile') {
     return (
       const SeoMetadata(
         title: 'Account | 4iDeas',
@@ -350,7 +387,9 @@ import 'package:four_ideas/seo/seo_metadata.dart';
       normalized,
     );
   }
-  if (normalized.startsWith('/admin') || normalized == '/payment' || normalized == '/contract-view') {
+  if (normalized.startsWith('/admin') ||
+      normalized == '/payment' ||
+      normalized == '/contract-view') {
     return (
       const SeoMetadata(
         title: 'Restricted Area | 4iDeas',

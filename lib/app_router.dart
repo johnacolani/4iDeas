@@ -38,6 +38,8 @@ import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_promotion_codes_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_product_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_success_screen.dart';
+import 'package:four_ideas/screens/products_screen.dart';
+import 'package:four_ideas/screens/four_i_installer_screen.dart';
 
 /// App route paths. Use these when calling context.go() or context.push().
 /// Design: all screen navigation goes through GoRouter for consistency and deep linking.
@@ -80,6 +82,8 @@ abstract class AppRoutes {
   /// hosted page, so Buy is an action rather than a route.
   static const String fourICad = '/4icad';
   static const String fourICadSuccess = '/4icad/success';
+  static const String products = '/products';
+  static const String fourIInstaller = '/4iinstaller';
 
   /// SEO / search-intent landing pages (also listed in `web/sitemap.xml`).
   static const String flutterAppDevelopment = '/flutter-app-development';
@@ -225,8 +229,17 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.fourICad,
         builder: (context, state) => FourICadProductScreen(
-          checkoutCancelled: state.uri.queryParameters['checkout'] == 'cancelled',
+          checkoutCancelled:
+              state.uri.queryParameters['checkout'] == 'cancelled',
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.products,
+        builder: (context, state) => const ProductsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.fourIInstaller,
+        builder: (context, state) => const FourIInstallerScreen(),
       ),
       GoRoute(
         path: AppRoutes.privacyPolicies,
@@ -236,8 +249,9 @@ GoRouter createAppRouter() {
         path: '${AppRoutes.privacyPolicies}/:slug',
         builder: (context, state) => PrivacyPolicyDetailScreen(
           slug: state.pathParameters['slug'] ?? '',
-          initialPolicy:
-              state.extra is PrivacyPolicy ? state.extra as PrivacyPolicy : null,
+          initialPolicy: state.extra is PrivacyPolicy
+              ? state.extra as PrivacyPolicy
+              : null,
         ),
       ),
       GoRoute(

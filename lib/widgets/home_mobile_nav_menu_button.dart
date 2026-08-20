@@ -49,6 +49,22 @@ class HomeNavMenuItems {
     ),
   ];
 
+  static final productItems =
+      <({String label, String subtitle, String route, IconData icon})>[
+    (
+      label: '4iCAD',
+      subtitle: 'Cross-platform CAD',
+      route: AppRoutes.fourICad,
+      icon: Icons.architecture_outlined,
+    ),
+    (
+      label: '4iInstaller',
+      subtitle: 'Flutter Windows installer builder',
+      route: AppRoutes.fourIInstaller,
+      icon: Icons.install_desktop_outlined,
+    ),
+  ];
+
   /// Every admin destination, in one place.
   ///
   /// The desktop header menu and this mobile menu both render from this list.
@@ -325,6 +341,7 @@ class _MobileNavDropdownBody extends StatefulWidget {
 
 class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
   bool _servicesExpanded = false;
+  bool _productsExpanded = false;
   bool _accountExpanded = false;
 
   static const EdgeInsets _rowPadding =
@@ -336,14 +353,30 @@ class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
   void _toggleServices() {
     setState(() {
       _servicesExpanded = !_servicesExpanded;
-      if (_servicesExpanded) _accountExpanded = false;
+      if (_servicesExpanded) {
+        _productsExpanded = false;
+        _accountExpanded = false;
+      }
+    });
+  }
+
+  void _toggleProducts() {
+    setState(() {
+      _productsExpanded = !_productsExpanded;
+      if (_productsExpanded) {
+        _servicesExpanded = false;
+        _accountExpanded = false;
+      }
     });
   }
 
   void _toggleAccount() {
     setState(() {
       _accountExpanded = !_accountExpanded;
-      if (_accountExpanded) _servicesExpanded = false;
+      if (_accountExpanded) {
+        _servicesExpanded = false;
+        _productsExpanded = false;
+      }
     });
   }
 
@@ -496,6 +529,22 @@ class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
       ],
     ];
 
+    final productSubmenuItems = <Widget>[
+      hubSubRow(
+        route: AppRoutes.products,
+        label: 'Products overview',
+        icon: Icons.apps_outlined,
+      ),
+      for (final item in HomeNavMenuItems.productItems) ...[
+        const Divider(height: 1, thickness: 1, color: _kPopupMenuDividerColor),
+        hubSubRow(
+          route: item.route,
+          label: '${item.label}\n${item.subtitle}',
+          icon: item.icon,
+        ),
+      ],
+    ];
+
     final List<Widget>? adminSubmenuItems = signedIn && showAdmin
         ? <Widget>[
             hubSubRow(
@@ -551,6 +600,19 @@ class _MobileNavDropdownBodyState extends State<_MobileNavDropdownBody> {
             onTap: _toggleServices,
           ),
           if (_servicesExpanded) ...servicesSubmenuItems,
+        ],
+      ),
+      const Divider(height: 1, thickness: 1, color: _kPopupMenuDividerColor),
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          expandableHeader(
+            label: 'Products',
+            expanded: _productsExpanded,
+            onTap: _toggleProducts,
+          ),
+          if (_productsExpanded) ...productSubmenuItems,
         ],
       ),
       const Divider(height: 1, thickness: 1, color: _kPopupMenuDividerColor),

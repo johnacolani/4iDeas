@@ -26,6 +26,22 @@ List<String> _declaredPaths(GoRouter router) {
 }
 
 void main() {
+  group('product routes', () {
+    test('overview and 4iInstaller deep links are declared', () {
+      final paths = _declaredPaths(createAppRouter());
+      expect(paths, contains(AppRoutes.products));
+      expect(paths, contains(AppRoutes.fourIInstaller));
+    });
+
+    test('every Products menu item points at a declared route', () {
+      final paths = _declaredPaths(createAppRouter());
+      for (final item in HomeNavMenuItems.productItems) {
+        expect(paths, contains(item.route),
+            reason: '"${item.label}" is a dead link');
+      }
+    });
+  });
+
   group('4iCAD commerce routes', () {
     test('the product and success routes are declared', () {
       final paths = _declaredPaths(createAppRouter());
@@ -40,7 +56,8 @@ void main() {
       // it can never point somewhere the router does not serve.
       final paths = _declaredPaths(createAppRouter());
       for (final item in HomeNavMenuItems.adminItems) {
-        expect(paths, contains(item.route), reason: '"${item.label}" is a dead link');
+        expect(paths, contains(item.route),
+            reason: '"${item.label}" is a dead link');
       }
     });
 
@@ -73,10 +90,12 @@ void main() {
           '/admin/4icad/orders/cs_test_123');
     });
 
-    test('the product route is a short top-level slug, not a nested namespace', () {
+    test('the product route is a short top-level slug, not a nested namespace',
+        () {
       // This URL goes on ads, QR codes and invoices, so its shape is a
       // deliberate decision worth pinning.
-      expect(AppRoutes.fourICad.split('/').where((s) => s.isNotEmpty).length, 1);
+      expect(
+          AppRoutes.fourICad.split('/').where((s) => s.isNotEmpty).length, 1);
     });
   });
 
