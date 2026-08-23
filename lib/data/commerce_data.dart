@@ -7,6 +7,9 @@ const String kFourICadWindowsKey = '4icad_windows';
 /// The browser build, sold separately from the Windows installer.
 const String kFourICadWebKey = '4icad_web';
 
+/// The Linux desktop build, sold with protected package downloads.
+const String kFourICadLinuxKey = '4icad_linux';
+
 /// How a platform can currently be obtained.
 enum PlatformAvailability {
   /// Buyable here and now through Stripe Checkout.
@@ -55,7 +58,8 @@ class FourICadPlatform {
   final String? storeUrl;
   final String? note;
 
-  bool get isSellable => availability == PlatformAvailability.buy && key != null;
+  bool get isSellable =>
+      availability == PlatformAvailability.buy && key != null;
 
   FourICadPlatform copyWith({
     PlatformAvailability? availability,
@@ -91,9 +95,10 @@ class FourICadPlatform {
     };
     return copyWith(
       // A store link implies the store, so a link alone is enough to open one.
-      availability: status ?? (storeUrl != null && storeUrl.isNotEmpty
-          ? PlatformAvailability.store
-          : null),
+      availability: status ??
+          (storeUrl != null && storeUrl.isNotEmpty
+              ? PlatformAvailability.store
+              : null),
       storeUrl: storeUrl != null && storeUrl.isNotEmpty ? storeUrl : null,
       note: (map['platformNote'] as String?)?.trim(),
     );
@@ -145,12 +150,12 @@ const List<FourICadPlatform> kFourICadPlatforms = [
     note: 'Apple silicon and Intel',
   ),
   FourICadPlatform(
-    key: null,
+    key: kFourICadLinuxKey,
     label: 'Linux',
     logoAsset: 'assets/icons/Linux-logo.png',
     icon: Icons.terminal,
     availability: PlatformAvailability.comingSoon,
-    note: 'Desktop distributions',
+    note: 'AppImage, Debian package, or archive',
   ),
 ];
 
@@ -262,11 +267,13 @@ class CommerceProduct {
       priceAmountMinor: (map['priceAmountMinor'] as num?)?.toInt(),
       priceCurrency: map['priceCurrency'] as String?,
       webAppUrl: (map['webAppUrl'] as String?)?.trim(),
-      features: (map['features'] as List?)?.whereType<String>().toList() ?? const [],
+      features:
+          (map['features'] as List?)?.whereType<String>().toList() ?? const [],
       windowsRequirements:
-          (map['windowsRequirements'] as List?)?.whereType<String>().toList() ?? const [],
-      currentRelease:
-          ReleaseSummary.fromMap((map['currentRelease'] as Map?)?.cast<String, dynamic>()),
+          (map['windowsRequirements'] as List?)?.whereType<String>().toList() ??
+              const [],
+      currentRelease: ReleaseSummary.fromMap(
+          (map['currentRelease'] as Map?)?.cast<String, dynamic>()),
     );
   }
 
@@ -276,7 +283,8 @@ class CommerceProduct {
   static CommerceProduct fourICadFallback() => const CommerceProduct(
         productKey: kFourICadWindowsKey,
         displayName: '4iCAD for Windows',
-        tagline: 'Professional CAD, designed mobile-first and shipped to the desktop.',
+        tagline:
+            'Professional CAD, designed mobile-first and shipped to the desktop.',
         webAppUrl: 'https://icad-75d53.web.app',
         features: [
           'Touch-first drafting with precision snapping',
@@ -291,6 +299,28 @@ class CommerceProduct {
           'Desktop, laptop, and Windows tablet',
         ],
       );
+
+  /// Product-specific fallback keeps an unconfigured Linux document from
+  /// displaying Windows copy while Stripe remains the authority for pricing.
+  static CommerceProduct fallbackFor(String productKey) {
+    if (productKey == kFourICadLinuxKey) {
+      return const CommerceProduct(
+        productKey: kFourICadLinuxKey,
+        displayName: '4iCAD for Linux',
+        tagline: 'Professional CAD for the Linux desktop.',
+        features: [
+          'Touch-first drafting with precision snapping',
+          'Guided commands for common drafting operations',
+          'DXF support and cloud-connected files',
+        ],
+        windowsRequirements: [
+          '64-bit Linux desktop',
+          'AppImage, Debian package, or compressed archive',
+        ],
+      );
+    }
+    return fourICadFallback();
+  }
 }
 
 /// Where a visitor stands with the 48-hour 4iCAD web-app trial.
@@ -362,11 +392,13 @@ class WebTrial {
     if (map == null) return const WebTrial.notStarted();
     final startedAt = (map['startedAt'] as Timestamp?)?.toDate();
     if (startedAt == null) return const WebTrial.notStarted();
-    final expiresAt = (map['expiresAt'] as Timestamp?)?.toDate() ?? startedAt.add(window);
+    final expiresAt =
+        (map['expiresAt'] as Timestamp?)?.toDate() ?? startedAt.add(window);
     final revoked = map['revoked'] as bool? ?? false;
     final elapsed = !(now ?? DateTime.now()).isBefore(expiresAt);
     return WebTrial(
-      status: revoked || elapsed ? WebTrialStatus.expired : WebTrialStatus.active,
+      status:
+          revoked || elapsed ? WebTrialStatus.expired : WebTrialStatus.active,
       startedAt: startedAt,
       expiresAt: expiresAt,
     );

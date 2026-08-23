@@ -54,6 +54,8 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
   /// The browser build has no installer, so its confirmation offers the app
   /// itself rather than a download.
   bool get _isWeb => widget.productKey == kFourICadWebKey;
+  bool get _isLinux => widget.productKey == kFourICadLinuxKey;
+  String get _platformLabel => _isLinux ? 'Linux' : 'Windows';
 
   static const int _maxAttempts = 10;
   static const Duration _pollInterval = Duration(seconds: 3);
@@ -107,7 +109,11 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
 
   Future<void> _download() async {
     setState(() => _downloading = true);
-    await _purchase.download(context);
+    await _purchase.download(
+      context,
+      productKey: widget.productKey,
+      platformLabel: _platformLabel,
+    );
     if (mounted) setState(() => _downloading = false);
   }
 
@@ -145,8 +151,8 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 640),
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        isMobile ? 20 : 32, isMobile ? 24 : 40, isMobile ? 20 : 32, 60),
+                    padding: EdgeInsets.fromLTRB(isMobile ? 20 : 32,
+                        isMobile ? 24 : 40, isMobile ? 20 : 32, 60),
                     child: StreamBuilder<User?>(
                       stream: FirebaseAuth.instance.authStateChanges(),
                       builder: (context, snap) {
@@ -192,7 +198,8 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
             'shortly. You can also check the product page.',
         isMobile: isMobile,
         actions: [
-          FourICadPrimaryButton(label: 'Try again', icon: Icons.refresh, onPressed: _check),
+          FourICadPrimaryButton(
+              label: 'Try again', icon: Icons.refresh, onPressed: _check),
           FourICadGhostButton(
             label: 'Back to 4iCAD',
             icon: Icons.arrow_back,
@@ -208,13 +215,13 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
           iconColor: const Color(0xFF67C79B),
           title: _isWeb
               ? 'Thank you — 4iCAD for the web is yours'
-              : 'Thank you — 4iCAD for Windows is yours',
+              : 'Thank you — 4iCAD for $_platformLabel is yours',
           body: _isWeb
               ? 'Your purchase is confirmed and linked to your account. The web '
                   'app is yours with no time limit — open it from any browser '
                   'you are signed in on.'
               : 'Your purchase is confirmed and linked to your account. You can '
-                  'download the current version now, and any future Windows release '
+                  'download the current version now, and any future $_platformLabel release '
                   'without buying again.',
           isMobile: isMobile,
           actions: [
@@ -227,7 +234,7 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
               )
             else
               FourICadPrimaryButton(
-                label: 'Download for Windows',
+                label: 'Download for $_platformLabel',
                 icon: Icons.download,
                 busy: _downloading,
                 onPressed: _download,
@@ -289,7 +296,8 @@ class _FourICadSuccessScreenState extends State<FourICadSuccessScreen> {
         ),
       null => const Padding(
           padding: EdgeInsets.symmetric(vertical: 80),
-          child: Center(child: CircularProgressIndicator(color: ColorManager.accentGold)),
+          child: Center(
+              child: CircularProgressIndicator(color: ColorManager.accentGold)),
         ),
     };
   }

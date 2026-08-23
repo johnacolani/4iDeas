@@ -6,7 +6,38 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:four_ideas/data/commerce_data.dart';
 
-/// A Windows installer the admin picked but has not uploaded yet.
+enum ReleaseTarget {
+  windows(
+    label: 'Windows',
+    productKey: kFourICadWindowsKey,
+    storagePrefix: 'releases/windows',
+    extensions: ['exe'],
+  ),
+  linux(
+    label: 'Linux',
+    productKey: kFourICadLinuxKey,
+    storagePrefix: 'releases/linux',
+    extensions: ['appimage', 'deb', 'tar.gz'],
+  );
+
+  const ReleaseTarget({
+    required this.label,
+    required this.productKey,
+    required this.storagePrefix,
+    required this.extensions,
+  });
+
+  final String label;
+  final String productKey;
+  final String storagePrefix;
+  final List<String> extensions;
+
+  String get filePrompt => this == ReleaseTarget.windows
+      ? '4iCAD Setup (.exe)'
+      : 'Linux package (.AppImage, .deb, or .tar.gz)';
+}
+
+/// A desktop package the admin picked but has not uploaded yet.
 class PickedInstaller {
   const PickedInstaller({required this.fileName, required this.bytes});
 
@@ -27,7 +58,7 @@ class PickedInstaller {
   }
 }
 
-/// Admin operations for 4iCAD Windows releases.
+/// Admin operations for protected 4iCAD Windows and Linux releases.
 ///
 /// Uploads go to a private Storage prefix that clients cannot read; the
 /// download URL is never fetched here. Publishing and rollback are delegated to
@@ -40,7 +71,8 @@ class ReleaseAdminService {
     FirebaseFunctions? functions,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _storage = storage ?? FirebaseStorage.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
+        _functions =
+            functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
@@ -48,19 +80,19 @@ class ReleaseAdminService {
 
   static const String _releases = 'releases';
 
-  /// Private Storage prefix. Mirrors `RELEASE_PREFIX` in the backend.
+  /// Legacy Windows prefix retained for callers and existing documentation.
   static const String releasePrefix = 'releases/windows';
 
   /// Refuse anything larger than this before a byte is uploaded.
   static const int maxInstallerBytes = 500 * 1024 * 1024; // 500 MB
 
-  /// Lets the admin choose a `.exe`. Returns null if they cancel.
+  /// Lets the admin choose a package valid for [target].
   ///
   /// Uses `withData` because Flutter Web has no file path to stream from.
-  Future<PickedInstaller?> pickInstaller() async {
+  Future<PickedInstaller?> pickInstaller(ReleaseTarget target) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: const ['exe'],
+      allowedExtensions: target.extensions,
       withData: true,
       allowMultiple: false,
     );
@@ -71,8 +103,10 @@ class ReleaseAdminService {
     if (bytes == null) {
       throw StateError('Could not read the selected file.');
     }
-    if (!file.name.toLowerCase().endsWith('.exe')) {
-      throw StateError('Choose a Windows .exe installer.');
+    final lowerName = file.name.toLowerCase();
+    if (!target.extensions
+        .any((extension) => lowerName.endsWith('.$extension'))) {
+      throw StateError('Choose ${target.filePrompt}.');
     }
     if (bytes.isEmpty) {
       throw StateError('That file is empty.');
@@ -87,19 +121,35 @@ class ReleaseAdminService {
   /// from 0.0 to 1.0. Returns the storage object path — never a download URL.
   Future<String> uploadInstaller({
     required PickedInstaller installer,
+    required ReleaseTarget target,
     required String version,
     required void Function(double progress) onProgress,
   }) async {
-    final safeVersion = version.trim().replaceAll(RegExp(r'[^0-9A-Za-z._-]'), '-');
-    final safeName = installer.fileName.replaceAll(RegExp(r'[^0-9A-Za-z._-]'), '-');
-    final path = '$releasePrefix/$safeVersion/$safeName';
+    final safeVersion =
+        version.trim().replaceAll(RegExp(r'[^0-9A-Za-z._-]'), '-');
+    final safeName =
+        installer.fileName.replaceAll(RegExp(r'[^0-9A-Za-z._-]'), '-');
+    final path = '${target.storagePrefix}/$safeVersion/$safeName';
+
+    final contentType = switch (safeName.toLowerCase()) {
+      final name when name.endsWith('.exe') =>
+        'application/vnd.microsoft.portable-executable',
+      final name when name.endsWith('.deb') =>
+        'application/vnd.debian.binary-package',
+      final name when name.endsWith('.tar.gz') => 'application/gzip',
+      _ => 'application/octet-stream',
+    };
 
     final task = _storage.ref().child(path).putData(
           installer.bytes,
           SettableMetadata(
-            contentType: 'application/vnd.microsoft.portable-executable',
+            contentType: contentType,
             cacheControl: 'private, max-age=0, no-store',
-            customMetadata: {'version': version.trim()},
+            customMetadata: {
+              'version': version.trim(),
+              'platform': target.name,
+              'productKey': target.productKey,
+            },
           ),
         );
 
@@ -143,20 +193,24 @@ class ReleaseAdminService {
   /// the same operation; no binary is ever deleted.
   Future<void> setCurrentRelease(String releaseId,
       {String productKey = kFourICadWindowsKey}) async {
-    await _functions.httpsCallable('setCurrentRelease').call<Map<String, dynamic>>({
+    await _functions
+        .httpsCallable('setCurrentRelease')
+        .call<Map<String, dynamic>>({
       'releaseId': releaseId,
       'productKey': productKey,
     });
   }
 
   /// Full release history, newest first. Admin-only by Firestore rules.
-  Stream<List<ReleaseRecord>> watchReleases({String productKey = kFourICadWindowsKey}) {
+  Stream<List<ReleaseRecord>> watchReleases(
+      {String productKey = kFourICadWindowsKey}) {
     return _firestore
         .collection(_releases)
         .where('productKey', isEqualTo: productKey)
         .snapshots()
         .map((snap) {
-      final list = snap.docs.map((d) => ReleaseRecord.fromMap(d.id, d.data())).toList();
+      final list =
+          snap.docs.map((d) => ReleaseRecord.fromMap(d.id, d.data())).toList();
       list.sort((a, b) {
         final ad = a.publishedAt, bd = b.publishedAt;
         if (ad == null && bd == null) return 0;

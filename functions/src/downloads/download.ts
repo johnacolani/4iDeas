@@ -3,6 +3,7 @@ import {logger} from "firebase-functions";
 import type Stripe from "stripe";
 import {
   COL,
+  DOWNLOADABLE_PRODUCTS,
   FieldValue,
   PRODUCT_KEY,
   STRIPE_SECRET_KEY,
@@ -77,7 +78,7 @@ export const getPurchaseStatus = onCall(
 );
 
 /**
- * Issues a short-lived, authorized download link for the Current Windows release.
+ * Issues a short-lived, authorized link for the product's Current desktop release.
  *
  * The installer object itself is never publicly readable — Storage rules deny
  * client reads on the release prefix outright. The only way to obtain bytes is
@@ -88,6 +89,10 @@ export const getPurchaseStatus = onCall(
 export const getDownloadUrl = onCall({region: "us-central1"}, async (req) => {
   const {uid, email} = requireAuth(req);
   const productKey = String(req.data?.productKey ?? PRODUCT_KEY);
+  const downloadable = DOWNLOADABLE_PRODUCTS[productKey];
+  if (!downloadable) {
+    throw new HttpsError("invalid-argument", "This product has no downloadable release.");
+  }
 
   const entSnap = await db
     .collection(COL.entitlements)
@@ -112,13 +117,16 @@ export const getDownloadUrl = onCall({region: "us-central1"}, async (req) => {
   const releaseQuery = await db
     .collection(COL.releases)
     .where("productKey", "==", productKey)
-    .where("platform", "==", "windows")
+    .where("platform", "==", downloadable.platform)
     .where("isCurrent", "==", true)
     .limit(1)
     .get();
 
   if (releaseQuery.empty) {
-    throw new HttpsError("not-found", "No Windows release has been published yet.");
+    throw new HttpsError(
+      "not-found",
+      `No ${downloadable.platform} release has been published yet.`
+    );
   }
 
   const release = releaseQuery.docs[0];
@@ -140,13 +148,14 @@ export const getDownloadUrl = onCall({region: "us-central1"}, async (req) => {
     version: "v4",
     action: "read",
     expires,
-    promptSaveAs: (data.originalFileName as string) ?? "4iCAD_Setup.exe",
+    promptSaveAs: (data.originalFileName as string) ?? downloadable.defaultFileName,
   });
 
   await db.collection("download_audit").add({
     uid,
     email,
     productKey,
+    platform: downloadable.platform,
     releaseId: release.id,
     version: data.version ?? null,
     storagePath,

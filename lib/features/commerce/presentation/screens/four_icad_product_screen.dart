@@ -14,7 +14,7 @@ import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_acti
 import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_platform_grid.dart';
 import 'package:four_ideas/services/commerce_service.dart';
 
-/// The public 4iCAD for Windows product page at `/4icad`.
+/// The public cross-platform 4iCAD product page at `/4icad`.
 ///
 /// Everything on this page is loaded by route, never passed through
 /// `state.extra`, so a pasted URL, a refresh, a QR scan and an ad click all
@@ -34,7 +34,7 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
   late final FourICadPurchaseController _purchase =
       FourICadPurchaseController(service: _commerce);
 
-  bool _downloading = false;
+  String? _downloadingKey;
   bool _openingWebApp = false;
   String? _buyingKey;
   Timer? _trialExpiryTimer;
@@ -99,16 +99,23 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     if (mounted) setState(() => _openingWebApp = false);
   }
 
-  Future<void> _onDownload() async {
-    setState(() => _downloading = true);
-    final grant = await _purchase.download(context);
+  Future<void> _onDownload(FourICadPlatform platform) async {
+    final productKey = platform.key;
+    if (productKey == null) return;
+    setState(() => _downloadingKey = productKey);
+    final grant = await _purchase.download(
+      context,
+      productKey: productKey,
+      platformLabel: platform.label,
+    );
     if (!mounted) return;
-    setState(() => _downloading = false);
+    setState(() => _downloadingKey = null);
     if (grant != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Downloading 4iCAD ${grant.version ?? ''} for Windows.'.trim()),
+              'Downloading 4iCAD ${grant.version ?? ''} for ${platform.label}.'
+                  .trim()),
           backgroundColor: const Color(0xFF1B7F4B),
         ),
       );
@@ -242,8 +249,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
         ),
         const SizedBox(height: 6),
         Text(
-          'One licence per platform. Windows and the browser build are on sale '
-          'now; the rest are close behind.',
+          'One licence per platform. Windows, Linux, and the browser build are '
+          'available separately; mobile and macOS releases are close behind.',
           style: GoogleFonts.roboto(
             fontSize: isMobile ? 13.5 : 14.5,
             height: 1.5,
@@ -259,7 +266,11 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
             final platforms = platformSnap.data ?? kFourICadPlatforms;
             return StreamBuilder<Set<String>>(
               stream: _commerce.watchOwnedProducts(
-                const [kFourICadWindowsKey, kFourICadWebKey],
+                const [
+                  kFourICadWindowsKey,
+                  kFourICadWebKey,
+                  kFourICadLinuxKey,
+                ],
               ),
               builder: (context, ownedSnap) => FourICadPlatformGrid(
                 platforms: platforms,
@@ -268,7 +279,8 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
                 signedIn: signedIn,
                 webTrialExpired:
                     trial.isExpired || trial.remaining() == Duration.zero,
-                downloading: _downloading,
+                downloading: (platform) =>
+                    platform.key != null && platform.key == _downloadingKey,
                 owned: ownedSnap.data ?? const {},
                 busyKey: _buyingKey,
                 onBuy: _onBuyPlatform,

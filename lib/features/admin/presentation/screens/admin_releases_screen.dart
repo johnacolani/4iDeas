@@ -11,7 +11,7 @@ import 'package:four_ideas/helper/app_background.dart';
 import 'package:four_ideas/services/admin_service.dart';
 import 'package:four_ideas/services/release_admin_service.dart';
 
-/// Admin screen for publishing and managing 4iCAD Windows releases.
+/// Admin screen for publishing and managing protected 4iCAD desktop releases.
 ///
 /// Uploads go straight to a private Storage prefix; this screen never asks for
 /// a download URL. Publishing, the single-Current invariant and rollback are
@@ -29,6 +29,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
   final _notesController = TextEditingController();
 
   PickedInstaller? _picked;
+  ReleaseTarget _target = ReleaseTarget.windows;
   bool _makeCurrent = true;
   bool _busy = false;
   double _progress = 0;
@@ -45,7 +46,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
   Future<void> _pick() async {
     setState(() => _error = null);
     try {
-      final picked = await _service.pickInstaller();
+      final picked = await _service.pickInstaller(_target);
       if (picked != null && mounted) setState(() => _picked = picked);
     } catch (e) {
       if (mounted) setState(() => _error = e is StateError ? e.message : '$e');
@@ -53,7 +54,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
   }
 
   String? _validate() {
-    if (_picked == null) return 'Choose a Windows .exe installer.';
+    if (_picked == null) return 'Choose ${_target.filePrompt}.';
     final version = _versionController.text.trim();
     if (version.isEmpty) return 'Enter a version, for example 1.0.8.';
     if (!RegExp(r'^\d+(\.\d+){1,3}(-[0-9A-Za-z.-]+)?$').hasMatch(version)) {
@@ -83,6 +84,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
 
       final storagePath = await _service.uploadInstaller(
         installer: installer,
+        target: _target,
         version: version,
         onProgress: (p) {
           if (mounted) setState(() => _progress = p);
@@ -98,6 +100,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
         releaseNotes: _notesController.text.trim(),
         fileSizeBytes: installer.sizeBytes,
         makeCurrent: _makeCurrent,
+        productKey: _target.productKey,
       );
 
       if (!mounted) return;
@@ -111,7 +114,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Published 4iCAD $version for Windows.'),
+          content: Text('Published 4iCAD $version for ${_target.label}.'),
           backgroundColor: const Color(0xFF1B7F4B),
         ),
       );
@@ -136,7 +139,8 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
     if (text.contains('invalid-argument')) {
       return 'The release details were rejected: check the version and notes.';
     }
-    if (text.contains('unauthorized') || text.contains('storage/unauthorized')) {
+    if (text.contains('unauthorized') ||
+        text.contains('storage/unauthorized')) {
       return 'Upload denied by Storage rules. Confirm your admin access.';
     }
     return 'Could not publish the release. Please try again.';
@@ -152,7 +156,8 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
         content: Text(
           'Customers will download ${release.version} from now on. No previous '
           'installer is deleted, so you can switch back at any time.',
-          style: GoogleFonts.roboto(color: Colors.white70, fontSize: 14.5, height: 1.5),
+          style: GoogleFonts.roboto(
+              color: Colors.white70, fontSize: 14.5, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -161,8 +166,10 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(backgroundColor: ColorManager.accentGold),
-            child: const Text('Make current', style: TextStyle(color: Color(0xFF1A1305))),
+            style: FilledButton.styleFrom(
+                backgroundColor: ColorManager.accentGold),
+            child: const Text('Make current',
+                style: TextStyle(color: Color(0xFF1A1305))),
           ),
         ],
       ),
@@ -170,7 +177,13 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
     if (confirmed != true) return;
 
     try {
-      await _service.setCurrentRelease(release.id);
+      final target = release.platform == ReleaseTarget.linux.name
+          ? ReleaseTarget.linux
+          : ReleaseTarget.windows;
+      await _service.setCurrentRelease(
+        release.id,
+        productKey: target.productKey,
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -259,7 +272,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Publish a new Windows release',
+            'Publish a new ${_target.label} release',
             style: GoogleFonts.roboto(
               fontSize: isMobile ? 18 : 21,
               fontWeight: FontWeight.w700,
@@ -278,19 +291,53 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
           ),
           const SizedBox(height: 20),
 
+          DropdownButtonFormField<ReleaseTarget>(
+            initialValue: _target,
+            dropdownColor: const Color(0xFF101827),
+            decoration: InputDecoration(
+              labelText: 'Platform',
+              labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+              filled: true,
+              fillColor: Colors.white.withValues(alpha: 0.05),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            style: const TextStyle(color: Colors.white),
+            items: [
+              for (final target in ReleaseTarget.values)
+                DropdownMenuItem(value: target, child: Text(target.label)),
+            ],
+            onChanged: _busy
+                ? null
+                : (target) {
+                    if (target == null) return;
+                    setState(() {
+                      _target = target;
+                      _picked = null;
+                      _error = null;
+                    });
+                  },
+          ),
+          const SizedBox(height: 16),
+
           // File picker
           OutlinedButton.icon(
             onPressed: _busy ? null : _pick,
             icon: const Icon(Icons.upload_file, size: 19),
             label: Text(
-              _picked == null ? 'Choose 4iCAD Setup (.exe)' : 'Choose a different file',
+              _picked == null
+                  ? 'Choose ${_target.filePrompt}'
+                  : 'Choose a different file',
               style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withValues(alpha: 0.4), width: 1.3),
+              side: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.4), width: 1.3),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           ),
           if (_picked != null) ...[
@@ -332,7 +379,8 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
           const SizedBox(height: 6),
           CheckboxListTile(
             value: _makeCurrent,
-            onChanged: _busy ? null : (v) => setState(() => _makeCurrent = v ?? true),
+            onChanged:
+                _busy ? null : (v) => setState(() => _makeCurrent = v ?? true),
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
             activeColor: ColorManager.accentGold,
@@ -360,17 +408,21 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(999),
               child: LinearProgressIndicator(
-                value: _stage != null && _stage!.startsWith('Uploading') ? _progress : null,
+                value: _stage != null && _stage!.startsWith('Uploading')
+                    ? _progress
+                    : null,
                 minHeight: 8,
                 backgroundColor: Colors.white.withValues(alpha: 0.1),
-                valueColor: const AlwaysStoppedAnimation(ColorManager.accentGold),
+                valueColor:
+                    const AlwaysStoppedAnimation(ColorManager.accentGold),
               ),
             ),
             if (_stage != null && _stage!.startsWith('Uploading')) ...[
               const SizedBox(height: 6),
               Text(
                 '${(_progress * 100).toStringAsFixed(0)}%',
-                style: GoogleFonts.robotoMono(color: Colors.white60, fontSize: 12),
+                style:
+                    GoogleFonts.robotoMono(color: Colors.white60, fontSize: 12),
               ),
             ],
           ],
@@ -382,17 +434,21 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFF9B3A31).withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF9B3A31).withValues(alpha: 0.5)),
+                border: Border.all(
+                    color: const Color(0xFF9B3A31).withValues(alpha: 0.5)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Color(0xFFE98D82), size: 19),
+                  const Icon(Icons.error_outline,
+                      color: Color(0xFFE98D82), size: 19),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       _error!,
                       style: GoogleFonts.roboto(
-                          color: const Color(0xFFE98D82), fontSize: 13.5, height: 1.45),
+                          color: const Color(0xFFE98D82),
+                          fontSize: 13.5,
+                          height: 1.45),
                     ),
                   ),
                 ],
@@ -443,15 +499,18 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
             fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.28)),
+              borderSide:
+                  BorderSide(color: Colors.white.withValues(alpha: 0.28)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.28)),
+              borderSide:
+                  BorderSide(color: Colors.white.withValues(alpha: 0.28)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: ColorManager.accentGold, width: 1.6),
+              borderSide:
+                  const BorderSide(color: ColorManager.accentGold, width: 1.6),
             ),
           ),
         ),
@@ -461,7 +520,7 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
 
   Widget _history(bool isMobile) {
     return StreamBuilder<List<ReleaseRecord>>(
-      stream: _service.watchReleases(),
+      stream: _service.watchReleases(productKey: _target.productKey),
       builder: (context, snap) {
         if (snap.hasError) {
           return FourICadGlassPanel(
@@ -474,14 +533,16 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
         if (!snap.hasData) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: CircularProgressIndicator(color: ColorManager.accentGold)),
+            child: Center(
+                child:
+                    CircularProgressIndicator(color: ColorManager.accentGold)),
           );
         }
         final releases = snap.data!;
         if (releases.isEmpty) {
           return FourICadGlassPanel(
             child: Text(
-              'No releases yet. Publish the first Windows build above.',
+              'No releases yet. Publish the first ${_target.label} build above.',
               style: GoogleFonts.roboto(color: Colors.white70, fontSize: 14),
             ),
           );
@@ -590,7 +651,8 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
                   side: BorderSide(
                     color: ColorManager.accentGold.withValues(alpha: 0.6),
                   ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9)),
                 ),
               ),
             ),
@@ -602,8 +664,18 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
 
   static String _formatDate(DateTime d) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }

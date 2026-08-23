@@ -24,7 +24,7 @@ class FourICadPlatformGrid extends StatelessWidget {
     required this.onDownload,
     required this.signedIn,
     required this.webTrialExpired,
-    this.downloading = false,
+    required this.downloading,
     this.owned = const {},
     this.busyKey,
   });
@@ -45,8 +45,8 @@ class FourICadPlatformGrid extends StatelessWidget {
 
   /// Fetches the installer for a platform the visitor owns. The tile is the
   /// only place a purchase is acted on, so it has to serve owners too.
-  final VoidCallback onDownload;
-  final bool downloading;
+  final void Function(FourICadPlatform platform) onDownload;
+  final bool Function(FourICadPlatform platform) downloading;
 
   /// Whether anyone is signed in. A tile must not offer "Buy" to a visitor the
   /// server would refuse — it offers the sign-in step instead.
@@ -79,8 +79,8 @@ class FourICadPlatformGrid extends StatelessWidget {
                   platform: platform,
                   isMobile: isMobile,
                   signedIn: signedIn,
-                  downloading: downloading,
-                  onDownload: onDownload,
+                  downloading: downloading(platform),
+                  onDownload: () => onDownload(platform),
                   owns: platform.key != null && owned.contains(platform.key),
                   busy: platform.key != null && platform.key == busyKey,
                   onBuy: () => onBuy(platform),
@@ -142,11 +142,11 @@ class _PlatformTileState extends State<_PlatformTile> {
         switch (platform.availability) {
       // Owning a platform turns its tile into the way to use it: the installer
       // for Windows, the app itself for the browser build.
-      _ when owns && platform.key == kFourICadWindowsKey => (
-          'Download',
-          Icons.download,
-          widget.onDownload
-        ),
+      _
+          when owns &&
+              (platform.key == kFourICadWindowsKey ||
+                  platform.key == kFourICadLinuxKey) =>
+        ('Download', Icons.download, widget.onDownload),
       _ when owns && platform.key == kFourICadWebKey => (
           'Open web app',
           Icons.public,

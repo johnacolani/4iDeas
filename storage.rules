@@ -59,6 +59,21 @@ service firebase.storage {
         );
     }
 
+    // Linux release packages use the same private, entitlement-gated download
+    // architecture as Windows. Clients can upload only as admins and can never
+    // read binaries directly; signed URLs are issued by Cloud Functions.
+    match /releases/linux/{allPaths=**} {
+      allow read: if false;
+      allow write: if isAdmin()
+        && request.resource.size < 500 * 1024 * 1024
+        && (
+          request.resource.contentType == 'application/octet-stream'
+          || request.resource.contentType == 'application/vnd.debian.binary-package'
+          || request.resource.contentType == 'application/gzip'
+          || request.resource.contentType == 'application/x-gzip'
+        );
+    }
+
     // Everything else: deny by default.
     match /{allPaths=**} {
       allow read, write: if false;

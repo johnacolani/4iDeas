@@ -5,6 +5,16 @@ import {getAuth} from "firebase-admin/auth";
 import {defineSecret} from "firebase-functions/params";
 import Stripe from "stripe";
 
+export {
+  DOWNLOADABLE_PRODUCTS,
+  LINUX_PRODUCT_KEY,
+  PRODUCT_KEY,
+  RELEASE_PREFIX,
+  SELLABLE_PRODUCT_KEYS,
+  WEB_PRODUCT_KEY,
+} from "./product-catalog";
+export type {DownloadPlatform, DownloadableProduct} from "./product-catalog";
+
 // Authorization guards live in their own side-effect-free module so they can be
 // unit tested without initialising the Admin SDK. Re-exported here so existing
 // call sites keep importing them from `core`.
@@ -44,22 +54,6 @@ export const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
  */
 export const WEB_TRIAL_SIGNING_KEY = defineSecret("WEB_TRIAL_SIGNING_KEY");
 
-/** The Windows desktop build — the product with an installer behind it. */
-export const PRODUCT_KEY = "4icad_windows";
-
-/** The browser build, sold separately. */
-export const WEB_PRODUCT_KEY = "4icad_web";
-
-/**
- * Product keys checkout will sell.
- *
- * An allowlist rather than "any key with a price", so a typo or a probing
- * client cannot reach a half-configured product. A key listed here still needs
- * its own `product_config/{key}` document with a Stripe Price before it can be
- * bought — the two together are what put a platform on sale.
- */
-export const SELLABLE_PRODUCT_KEYS: readonly string[] = [PRODUCT_KEY, WEB_PRODUCT_KEY];
-
 /** Public site origin used to build Stripe return URLs. */
 export const SITE_ORIGIN = "https://4ideasapp.com";
 
@@ -74,9 +68,6 @@ export const COL = {
   stripeEvents: "stripe_events",
   webTrials: "web_trials",
 } as const;
-
-/** Storage prefix for private release binaries. Never publicly readable. */
-export const RELEASE_PREFIX = "releases/windows";
 
 let cachedStripe: Stripe | null = null;
 

@@ -72,7 +72,7 @@ class CommerceService {
     } catch (_) {
       // Rules or connectivity issue — fall through to the static defaults.
     }
-    return CommerceProduct.fourICadFallback();
+    return CommerceProduct.fallbackFor(productKey);
   }
 
   /// Live product stream so the page reflects a newly published version without
@@ -88,8 +88,8 @@ class CommerceService {
       if (doc.exists && data != null) {
         return CommerceProduct.fromMap(doc.id, data);
       }
-      return CommerceProduct.fourICadFallback();
-    }).handleError((_) => CommerceProduct.fourICadFallback());
+      return CommerceProduct.fallbackFor(productKey);
+    }).handleError((_) => CommerceProduct.fallbackFor(productKey));
   }
 
   /// Whether the signed-in user currently owns [productKey].

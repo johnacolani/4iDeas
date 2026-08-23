@@ -2,21 +2,31 @@ import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {onObjectFinalized} from "firebase-functions/v2/storage";
 import {logger} from "firebase-functions";
 import {createHash} from "crypto";
-import {COL, FieldValue, PRODUCT_KEY, RELEASE_PREFIX, db, requireAdmin, storage} from "../core";
+import {
+  COL,
+  DOWNLOADABLE_PRODUCTS,
+  FieldValue,
+  PRODUCT_KEY,
+  db,
+  requireAdmin,
+  storage,
+} from "../core";
 
 /** Accepts 1.0.8, 1.0.8.2, 2.1, and optional pre-release suffixes like 1.2.0-beta.1 */
 const VERSION_RE = /^\d+(\.\d+){1,3}(-[0-9A-Za-z.-]+)?$/;
 
 /**
  * Copies the Current release's public-safe fields onto the product document so
- * the public page can show "Latest Windows Version" without ever being able to
+ * the public page can show the latest version without ever being able to
  * read the release collection (which holds the private storage path).
  */
 async function syncCurrentReleaseToProduct(productKey: string) {
+  const downloadable = DOWNLOADABLE_PRODUCTS[productKey];
+  if (!downloadable) return;
   const q = await db
     .collection(COL.releases)
     .where("productKey", "==", productKey)
-    .where("platform", "==", "windows")
+    .where("platform", "==", downloadable.platform)
     .where("isCurrent", "==", true)
     .limit(1)
     .get();
@@ -61,15 +71,29 @@ export const publishRelease = onCall({region: "us-central1"}, async (req) => {
   const fileSizeBytes = Number(req.data?.fileSizeBytes ?? 0);
   const makeCurrent = req.data?.makeCurrent !== false;
   const productKey = String(req.data?.productKey ?? PRODUCT_KEY);
+  const downloadable = DOWNLOADABLE_PRODUCTS[productKey];
 
   if (!VERSION_RE.test(version)) {
     throw new HttpsError("invalid-argument", "Enter a version like 1.0.8.");
   }
-  if (!storagePath.startsWith(`${RELEASE_PREFIX}/`)) {
+  if (!downloadable) {
+    throw new HttpsError("invalid-argument", "Unknown downloadable product.");
+  }
+  if (!storagePath.startsWith(`${downloadable.releasePrefix}/`)) {
     throw new HttpsError("invalid-argument", "The installer must be in the release folder.");
   }
-  if (!originalFileName.toLowerCase().endsWith(".exe")) {
-    throw new HttpsError("invalid-argument", "The installer must be a .exe file.");
+  const lowerName = originalFileName.toLowerCase();
+  const validFile = downloadable.platform === "windows"
+    ? lowerName.endsWith(".exe")
+    : lowerName.endsWith(".appimage") || lowerName.endsWith(".deb") ||
+      lowerName.endsWith(".tar.gz");
+  if (!validFile) {
+    throw new HttpsError(
+      "invalid-argument",
+      downloadable.platform === "windows"
+        ? "The installer must be a .exe file."
+        : "The Linux package must be an .AppImage, .deb, or .tar.gz file."
+    );
   }
   if (!releaseNotes) {
     throw new HttpsError("invalid-argument", "Release notes are required.");
@@ -87,7 +111,7 @@ export const publishRelease = onCall({region: "us-central1"}, async (req) => {
   const dupe = await db
     .collection(COL.releases)
     .where("productKey", "==", productKey)
-    .where("platform", "==", "windows")
+    .where("platform", "==", downloadable.platform)
     .where("version", "==", version)
     .limit(1)
     .get();
@@ -98,7 +122,7 @@ export const publishRelease = onCall({region: "us-central1"}, async (req) => {
   const ref = db.collection(COL.releases).doc();
   await ref.set({
     productKey,
-    platform: "windows",
+    platform: downloadable.platform,
     version,
     storagePath,
     originalFileName,
@@ -113,7 +137,7 @@ export const publishRelease = onCall({region: "us-central1"}, async (req) => {
   });
 
   if (makeCurrent) {
-    await setCurrent(ref.id, productKey);
+    await setCurrent(ref.id, productKey, downloadable.platform);
   }
   await syncCurrentReleaseToProduct(productKey);
 
@@ -122,11 +146,11 @@ export const publishRelease = onCall({region: "us-central1"}, async (req) => {
 });
 
 /** Flips exactly one release to Current inside a batch. Nothing is deleted. */
-async function setCurrent(releaseId: string, productKey: string) {
+async function setCurrent(releaseId: string, productKey: string, platform: string) {
   const all = await db
     .collection(COL.releases)
     .where("productKey", "==", productKey)
-    .where("platform", "==", "windows")
+    .where("platform", "==", platform)
     .get();
 
   const batch = db.batch();
@@ -152,9 +176,11 @@ export const setCurrentRelease = onCall({region: "us-central1"}, async (req) => 
   requireAdmin(req);
   const releaseId = String(req.data?.releaseId ?? "");
   const productKey = String(req.data?.productKey ?? PRODUCT_KEY);
+  const downloadable = DOWNLOADABLE_PRODUCTS[productKey];
   if (!releaseId) throw new HttpsError("invalid-argument", "A release id is required.");
+  if (!downloadable) throw new HttpsError("invalid-argument", "Unknown downloadable product.");
 
-  await setCurrent(releaseId, productKey);
+  await setCurrent(releaseId, productKey, downloadable.platform);
   await syncCurrentReleaseToProduct(productKey);
   logger.info("current release changed", {releaseId});
   return {ok: true, releaseId};
@@ -168,7 +194,9 @@ export const onReleaseUploaded = onObjectFinalized(
   {region: "us-central1", memory: "1GiB", timeoutSeconds: 540},
   async (event) => {
     const path = event.data.name;
-    if (!path || !path.startsWith(`${RELEASE_PREFIX}/`)) return;
+    if (!path || !Object.values(DOWNLOADABLE_PRODUCTS).some(
+      (product) => path.startsWith(`${product.releasePrefix}/`)
+    )) return;
 
     const q = await db.collection(COL.releases).where("storagePath", "==", path).limit(1).get();
     if (q.empty) {
@@ -182,7 +210,7 @@ export const onReleaseUploaded = onObjectFinalized(
         .bucket(event.data.bucket)
         .file(path)
         .createReadStream()
-        .on("data", (chunk) => hash.update(chunk))
+        .on("data", (chunk: Buffer) => hash.update(chunk))
         .on("end", () => resolve())
         .on("error", reject);
     });

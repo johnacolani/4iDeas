@@ -132,10 +132,12 @@ class FourICadPrimaryButton extends StatelessWidget {
             disabledBackgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             foregroundColor: const Color(0xFF1A1305),
-            disabledForegroundColor: const Color(0xFF1A1305).withValues(alpha: 0.55),
+            disabledForegroundColor:
+                const Color(0xFF1A1305).withValues(alpha: 0.55),
             elevation: 0,
             padding: EdgeInsets.symmetric(horizontal: compact ? 20 : 26),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ),
@@ -175,9 +177,11 @@ class FourICadGhostButton extends StatelessWidget {
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.white,
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.42), width: 1.4),
+          side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.42), width: 1.4),
           padding: EdgeInsets.symmetric(horizontal: compact ? 20 : 26),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -331,7 +335,8 @@ class _FourICadTrialCounterState extends State<FourICadTrialCounter> {
           decoration: BoxDecoration(
             color: const Color(0xFF071223).withValues(alpha: 0.92),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: accent.withValues(alpha: 0.55), width: 1.2),
+            border:
+                Border.all(color: accent.withValues(alpha: 0.55), width: 1.2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.45),
@@ -399,7 +404,8 @@ class FourICadPurchaseController {
 
   /// Sends the visitor to sign in, remembering where to come back to.
   void goSignIn(BuildContext context) {
-    context.go('${AppRoutes.login}?redirect=${Uri.encodeComponent(AppRoutes.fourICad)}');
+    context.go(
+        '${AppRoutes.login}?redirect=${Uri.encodeComponent(AppRoutes.fourICad)}');
   }
 
   /// Re-sends the verification email using the existing auth flow.
@@ -478,7 +484,8 @@ class FourICadPurchaseController {
       final url = await _service.createCheckoutSession(productKey);
       final uri = Uri.parse(url);
       // Same tab: Stripe returns the buyer to /4icad/success afterwards.
-      await launchUrl(uri, webOnlyWindowName: '_self', mode: LaunchMode.platformDefault);
+      await launchUrl(uri,
+          webOnlyWindowName: '_self', mode: LaunchMode.platformDefault);
     } catch (e, stackTrace) {
       _logClientFailure('checkout', e, stackTrace);
       if (context.mounted) _showError(context, _checkoutMessage(e));
@@ -494,7 +501,8 @@ class FourICadPurchaseController {
   /// got a snackbar refusal from the server instead of the sign-in page — the
   /// server was right to refuse, but being told off is not a next step. This
   /// mirrors the web-trial flow, which got it right.
-  Future<void> buyPlatform(BuildContext context, String productKey, String label) async {
+  Future<void> buyPlatform(
+      BuildContext context, String productKey, String label) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -585,13 +593,19 @@ class FourICadPurchaseController {
   }
 
   /// Requests a short-lived link and starts the download.
-  Future<DownloadGrant?> download(BuildContext context) async {
+  Future<DownloadGrant?> download(
+    BuildContext context, {
+    String productKey = kFourICadWindowsKey,
+    String platformLabel = 'Windows',
+  }) async {
     try {
-      final grant = await _service.getDownloadUrl();
+      final grant = await _service.getDownloadUrl(productKey);
       await launchUrl(Uri.parse(grant.url), webOnlyWindowName: '_self');
       return grant;
     } catch (e) {
-      if (context.mounted) _showError(context, _downloadMessage(e));
+      if (context.mounted) {
+        _showError(context, _downloadMessage(e, platformLabel));
+      }
       return null;
     }
   }
@@ -635,7 +649,8 @@ class FourICadPurchaseController {
     } else {
       debugPrint('4iCAD $operation failed: ${error.runtimeType}: $error');
     }
-    debugPrintStack(label: '4iCAD $operation stack trace', stackTrace: stackTrace);
+    debugPrintStack(
+        label: '4iCAD $operation stack trace', stackTrace: stackTrace);
   }
 
   String _checkoutMessage(Object e) {
@@ -649,22 +664,22 @@ class FourICadPurchaseController {
       }
       switch (e.code) {
         case 'already-exists':
-          return 'You already own 4iCAD for Windows. Reload the page to download it.';
+          return 'You already own this 4iCAD platform. Reload the page to use it.';
         case 'failed-precondition':
-          return '4iCAD for Windows is not on sale yet. Please check back shortly.';
+          return 'This 4iCAD platform is not on sale yet. Please check back shortly.';
         case 'unauthenticated':
           return 'Sign in to continue to checkout.';
       }
     }
     final text = e.toString();
     if (text.contains('already-exists')) {
-      return 'You already own 4iCAD for Windows. Reload the page to download it.';
+      return 'You already own this 4iCAD platform. Reload the page to use it.';
     }
     if (text.contains('email_not_verified')) {
       return 'Verify your email address before purchasing 4iCAD.';
     }
     if (text.contains('failed-precondition')) {
-      return '4iCAD for Windows is not on sale yet. Please check back shortly.';
+      return 'This 4iCAD platform is not on sale yet. Please check back shortly.';
     }
     if (text.contains('unauthenticated')) {
       return 'Sign in to continue to checkout.';
@@ -672,14 +687,14 @@ class FourICadPurchaseController {
     return 'Could not start checkout. Please try again.';
   }
 
-  String _downloadMessage(Object e) {
+  String _downloadMessage(Object e, String platformLabel) {
     if (_looksOffline(e)) return _offlineMessage;
     final text = e.toString();
     if (text.contains('permission-denied')) {
-      return 'This account does not own 4iCAD for Windows.';
+      return 'This account does not own 4iCAD for $platformLabel.';
     }
     if (text.contains('not-found')) {
-      return 'No Windows release has been published yet.';
+      return 'No $platformLabel release has been published yet.';
     }
     if (text.contains('resource-exhausted')) {
       return 'Too many download requests. Please try again in a little while.';
@@ -689,7 +704,8 @@ class FourICadPurchaseController {
 
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: const Color(0xFF9B3A31)),
+      SnackBar(
+          content: Text(message), backgroundColor: const Color(0xFF9B3A31)),
     );
   }
 }
@@ -838,7 +854,8 @@ class FourICadGlassPanel extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           Colors.white.withValues(alpha: 0),
-                          Colors.white.withValues(alpha: goldBorder ? 0.28 : 0.16),
+                          Colors.white
+                              .withValues(alpha: goldBorder ? 0.28 : 0.16),
                           Colors.white.withValues(alpha: 0),
                         ],
                       ),
