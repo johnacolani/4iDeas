@@ -175,9 +175,11 @@ class ReleaseAdminService {
     bool makeCurrent = true,
     String productKey = kFourICadWindowsKey,
   }) async {
-    final result = await _functions
-        .httpsCallable('publishRelease')
-        .call<Map<String, dynamic>>({
+    // Do not request a Map<String, dynamic> result here. On native platforms
+    // (including Windows), StandardMessageCodec decodes callable objects as
+    // Map<Object?, Object?>. Asking cloud_functions to cast that map to a
+    // string-keyed map makes a successful publish look like a client failure.
+    final result = await _functions.httpsCallable('publishRelease').call({
       'version': version.trim(),
       'storagePath': storagePath,
       'originalFileName': originalFileName,
@@ -186,16 +188,24 @@ class ReleaseAdminService {
       'makeCurrent': makeCurrent,
       'productKey': productKey,
     });
-    return result.data['releaseId'] as String;
+    final data = result.data;
+    if (data is! Map) {
+      throw StateError('The publish service returned an invalid response.');
+    }
+    final releaseId = data['releaseId'];
+    if (releaseId is! String || releaseId.isEmpty) {
+      throw StateError('The publish service did not return a release id.');
+    }
+    return releaseId;
   }
 
   /// Designates an existing release as Current. Rollback and roll-forward are
   /// the same operation; no binary is ever deleted.
   Future<void> setCurrentRelease(String releaseId,
       {String productKey = kFourICadWindowsKey}) async {
-    await _functions
-        .httpsCallable('setCurrentRelease')
-        .call<Map<String, dynamic>>({
+    // Keep the response untyped for the same native-map compatibility reason
+    // as publishRelease. This call does not need to inspect its response body.
+    await _functions.httpsCallable('setCurrentRelease').call({
       'releaseId': releaseId,
       'productKey': productKey,
     });

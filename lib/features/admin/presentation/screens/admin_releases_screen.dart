@@ -166,7 +166,11 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
         text.contains('storage/unauthorized')) {
       return 'Upload denied by Storage rules. Confirm your admin access.';
     }
-    return 'Could not publish the release. Please try again.';
+    // Keep unexpected platform/plugin failures actionable instead of hiding
+    // the only diagnostic information behind a generic message.
+    return text.isNotEmpty
+        ? 'Could not publish the release: $text'
+        : 'Could not publish the release. Please try again.';
   }
 
   Future<void> _makeReleaseCurrent(ReleaseRecord release) async {
