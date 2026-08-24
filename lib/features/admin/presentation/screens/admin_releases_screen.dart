@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:four_ideas/core/ColorManager.dart';
@@ -129,6 +130,28 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
   }
 
   String _publishMessage(Object e) {
+    if (e is FirebaseFunctionsException) {
+      final message = e.message?.trim();
+      switch (e.code) {
+        case 'already-exists':
+          return message?.isNotEmpty == true
+              ? message!
+              : 'That version has already been published. Use a new version number.';
+        case 'permission-denied':
+        case 'unauthenticated':
+          return message?.isNotEmpty == true
+              ? message!
+              : 'Administrator access required.';
+        case 'invalid-argument':
+        case 'not-found':
+        case 'failed-precondition':
+          return message?.isNotEmpty == true
+              ? message!
+              : 'The release details were rejected.';
+        default:
+          if (message?.isNotEmpty == true) return message!;
+      }
+    }
     final text = e.toString();
     if (text.contains('already-exists')) {
       return 'That version has already been published. Use a new version number.';
