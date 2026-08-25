@@ -10,6 +10,11 @@ const String kFourICadWebKey = '4icad_web';
 /// The Linux desktop build, sold with protected package downloads.
 const String kFourICadLinuxKey = '4icad_linux';
 
+/// Store-distributed builds. These are never Stripe checkout products.
+const String kFourICadIosKey = '4icad_ios';
+const String kFourICadAndroidKey = '4icad_android';
+const String kFourICadMacosKey = '4icad_macos';
+
 /// How a platform can currently be obtained.
 enum PlatformAvailability {
   /// Buyable here and now through Stripe Checkout.
@@ -59,7 +64,10 @@ class FourICadPlatform {
   final String? note;
 
   bool get isSellable =>
-      availability == PlatformAvailability.buy && key != null;
+      availability == PlatformAvailability.buy &&
+      (key == kFourICadWindowsKey ||
+          key == kFourICadWebKey ||
+          key == kFourICadLinuxKey);
 
   FourICadPlatform copyWith({
     PlatformAvailability? availability,
@@ -126,7 +134,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
     note: 'Runs in any modern browser',
   ),
   FourICadPlatform(
-    key: null,
+    key: kFourICadIosKey,
     label: 'iOS',
     logoAsset: 'assets/icons/ios-logo.png',
     icon: Icons.phone_iphone,
@@ -134,7 +142,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
     note: 'iPhone and iPad',
   ),
   FourICadPlatform(
-    key: null,
+    key: kFourICadAndroidKey,
     label: 'Android',
     logoAsset: 'assets/icons/android-logo.png',
     icon: Icons.android,
@@ -142,7 +150,7 @@ const List<FourICadPlatform> kFourICadPlatforms = [
     note: 'Phones and tablets',
   ),
   FourICadPlatform(
-    key: null,
+    key: kFourICadMacosKey,
     label: 'macOS',
     logoAsset: 'assets/icons/macOS_logo.png',
     icon: Icons.laptop_mac,

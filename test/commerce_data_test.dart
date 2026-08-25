@@ -16,7 +16,8 @@ void main() {
     test('returns null when the version or id is missing', () {
       expect(ReleaseSummary.fromMap({'releaseId': 'r1'}), isNull);
       expect(ReleaseSummary.fromMap({'version': '1.0.8'}), isNull);
-      expect(ReleaseSummary.fromMap({'releaseId': 'r1', 'version': '  '}), isNull);
+      expect(
+          ReleaseSummary.fromMap({'releaseId': 'r1', 'version': '  '}), isNull);
     });
 
     test('parses a complete summary', () {
@@ -115,7 +116,8 @@ void main() {
     });
 
     test('uses a sensible name when the document omits one', () {
-      final product = CommerceProduct.fromMap(kFourICadWindowsKey, {'displayName': '  '});
+      final product =
+          CommerceProduct.fromMap(kFourICadWindowsKey, {'displayName': '  '});
       expect(product.displayName, '4iCAD for Windows');
     });
   });
@@ -131,11 +133,14 @@ void main() {
       );
     });
 
-    test('only the platforms that can actually be delivered carry a key', () {
+    test('every independently controlled platform carries its product key', () {
       expect(byLabel('Windows').key, kFourICadWindowsKey);
       expect(byLabel('Web').key, kFourICadWebKey);
+      expect(byLabel('iOS').key, kFourICadIosKey);
+      expect(byLabel('Android').key, kFourICadAndroidKey);
+      expect(byLabel('macOS').key, kFourICadMacosKey);
+      expect(byLabel('Linux').key, kFourICadLinuxKey);
       for (final label in ['iOS', 'Android', 'macOS', 'Linux']) {
-        expect(byLabel(label).key, isNull, reason: '$label has nothing to sell yet');
         expect(byLabel(label).availability, PlatformAvailability.comingSoon);
         expect(byLabel(label).isSellable, isFalse);
       }
@@ -160,18 +165,41 @@ void main() {
     });
 
     test('an explicit status puts a platform on sale without a new build', () {
-      final macos = byLabel('macOS').applyOverride(const {'platformStatus': 'buy'});
+      final macos =
+          byLabel('macOS').applyOverride(const {'platformStatus': 'buy'});
       expect(macos.availability, PlatformAvailability.buy);
-      // Still not sellable: nothing to charge for without a product key.
+      // Still not sellable: store products never become Stripe buy buttons.
       expect(macos.isSellable, isFalse);
     });
 
     test('a store link opens the store, even with no status set', () {
       final android = byLabel('Android').applyOverride(const {
-        'storeUrl': 'https://play.google.com/store/apps/details?id=com.fourideas.icad',
+        'storeUrl':
+            'https://play.google.com/store/apps/details?id=com.fourideas.icad',
       });
       expect(android.availability, PlatformAvailability.store);
       expect(android.storeUrl, contains('play.google.com'));
+    });
+
+    test('all Apple and Google platforms can independently open their store',
+        () {
+      final listings = {
+        'iOS': 'https://apps.apple.com/app/id123456789',
+        'Android':
+            'https://play.google.com/store/apps/details?id=com.fourideas.icad',
+        'macOS': 'https://apps.apple.com/app/id987654321',
+      };
+
+      for (final entry in listings.entries) {
+        final platform = byLabel(entry.key).applyOverride({
+          'platformStatus': 'store',
+          'storeUrl': entry.value,
+        });
+        expect(platform.availability, PlatformAvailability.store,
+            reason: entry.key);
+        expect(platform.storeUrl, entry.value, reason: entry.key);
+        expect(platform.isSellable, isFalse, reason: entry.key);
+      }
     });
 
     test('an empty store link is ignored rather than opening nothing', () {
@@ -184,18 +212,21 @@ void main() {
       // The tile falls back to a glyph if an asset is missing, so a typo here
       // would degrade silently rather than fail — hence asserting the paths.
       for (final platform in kFourICadPlatforms) {
-        expect(platform.logoAsset, isNotNull, reason: '${platform.label} has no logo');
+        expect(platform.logoAsset, isNotNull,
+            reason: '${platform.label} has no logo');
         expect(platform.logoAsset, startsWith('assets/icons/'));
       }
     });
 
     test('an override keeps the logo it came with', () {
-      final android = byLabel('Android').applyOverride(const {'platformStatus': 'store'});
+      final android =
+          byLabel('Android').applyOverride(const {'platformStatus': 'store'});
       expect(android.logoAsset, byLabel('Android').logoAsset);
     });
 
     test('a platform can be pushed back to coming soon', () {
-      final windows = byLabel('Windows').applyOverride(const {'platformStatus': 'soon'});
+      final windows =
+          byLabel('Windows').applyOverride(const {'platformStatus': 'soon'});
       expect(windows.availability, PlatformAvailability.comingSoon);
       expect(windows.isSellable, isFalse);
     });
@@ -204,7 +235,9 @@ void main() {
   group('WebTrial', () {
     // The document is written only by the backend; these cover how the page
     // reads a window it cannot influence.
-    Map<String, dynamic> doc(DateTime startedAt, {DateTime? expiresAt, bool? revoked}) => {
+    Map<String, dynamic> doc(DateTime startedAt,
+            {DateTime? expiresAt, bool? revoked}) =>
+        {
           'startedAt': Timestamp.fromDate(startedAt),
           if (expiresAt != null) 'expiresAt': Timestamp.fromDate(expiresAt),
           if (revoked != null) 'revoked': revoked,
@@ -229,7 +262,9 @@ void main() {
       expect(trial.remaining(now), const Duration(hours: 41));
     });
 
-    test('expires once the window elapses, without the backend writing anything', () {
+    test(
+        'expires once the window elapses, without the backend writing anything',
+        () {
       final now = DateTime(2026, 8, 17, 12);
       final trial = WebTrial.fromMap(
         doc(now.subtract(const Duration(hours: 49))),
@@ -264,7 +299,8 @@ void main() {
       expect(trial.status, WebTrialStatus.expired);
     });
 
-    test('derives the end from the stored expiry when the backend supplies one', () {
+    test('derives the end from the stored expiry when the backend supplies one',
+        () {
       final now = DateTime(2026, 8, 17, 12);
       final trial = WebTrial.fromMap(
         doc(
@@ -309,7 +345,10 @@ void main() {
 
       const refused = WebTrialLaunch(status: WebTrialStatus.expired);
       expect(refused.granted, isFalse);
-      expect(const WebTrialLaunch(status: WebTrialStatus.active, launchUrl: '').granted, isFalse);
+      expect(
+          const WebTrialLaunch(status: WebTrialStatus.active, launchUrl: '')
+              .granted,
+          isFalse);
     });
   });
 

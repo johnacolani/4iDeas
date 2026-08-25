@@ -74,7 +74,10 @@ class FourICadPlatformGrid extends StatelessWidget {
             for (final platform in platforms)
               SizedBox(
                 width: width,
-                height: isMobile ? null : 186,
+                // Store notes can legitimately wrap to three lines. Keep a
+                // shared desktop height large enough for that while clamping
+                // unexpectedly long copy below so the action never overflows.
+                height: isMobile ? null : 210,
                 child: _PlatformTile(
                   platform: platform,
                   isMobile: isMobile,
@@ -255,12 +258,20 @@ class _PlatformTileState extends State<_PlatformTile> {
                 ),
                 if (platform.note != null) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    platform.note!,
-                    style: GoogleFonts.roboto(
-                      fontSize: 13,
-                      height: 1.4,
-                      color: Colors.white.withValues(alpha: soon ? 0.45 : 0.7),
+                  Tooltip(
+                    message: platform.note!,
+                    child: Text(
+                      platform.note!,
+                      maxLines: isMobile ? null : 3,
+                      overflow: isMobile
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
+                      style: GoogleFonts.roboto(
+                        fontSize: 13,
+                        height: 1.4,
+                        color:
+                            Colors.white.withValues(alpha: soon ? 0.45 : 0.7),
+                      ),
                     ),
                   ),
                 ],
@@ -273,6 +284,8 @@ class _PlatformTileState extends State<_PlatformTile> {
                   child: action == null
                       ? _QuietState(label: label, icon: icon)
                       : (platform.availability == PlatformAvailability.buy ||
+                              platform.availability ==
+                                  PlatformAvailability.store ||
                               (platform.key == kFourICadWebKey &&
                                   widget.webTrialExpired) ||
                               (owns && platform.key == kFourICadWindowsKey)

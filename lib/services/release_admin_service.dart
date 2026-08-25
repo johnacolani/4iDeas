@@ -13,24 +13,48 @@ enum ReleaseTarget {
     storagePrefix: 'releases/windows',
     extensions: ['exe'],
   ),
+  web(
+    label: 'Web',
+    productKey: kFourICadWebKey,
+  ),
   linux(
     label: 'Linux',
     productKey: kFourICadLinuxKey,
     storagePrefix: 'releases/linux',
     extensions: ['appimage', 'deb', 'tar.gz'],
+  ),
+  ios(
+    label: 'iOS',
+    productKey: kFourICadIosKey,
+    storeUrlLabel: 'Apple App Store URL',
+  ),
+  android(
+    label: 'Android',
+    productKey: kFourICadAndroidKey,
+    storeUrlLabel: 'Google Play URL',
+  ),
+  macos(
+    label: 'macOS',
+    productKey: kFourICadMacosKey,
+    storeUrlLabel: 'Mac App Store URL',
   );
 
   const ReleaseTarget({
     required this.label,
     required this.productKey,
-    required this.storagePrefix,
-    required this.extensions,
+    this.storagePrefix,
+    this.extensions = const [],
+    this.storeUrlLabel,
   });
 
   final String label;
   final String productKey;
-  final String storagePrefix;
+  final String? storagePrefix;
   final List<String> extensions;
+  final String? storeUrlLabel;
+
+  bool get isDownloadable => this == windows || this == linux;
+  bool get isStore => storeUrlLabel != null;
 
   String get filePrompt => this == ReleaseTarget.windows
       ? '4iCAD Setup (.exe)'
@@ -56,6 +80,20 @@ class PickedInstaller {
     }
     return '${value.toStringAsFixed(value >= 100 || unit == 0 ? 0 : 1)} ${units[unit]}';
   }
+}
+
+class PlatformStoreListing {
+  const PlatformStoreListing({
+    this.storeUrl,
+    this.version,
+    this.note,
+    this.isPublished = false,
+  });
+
+  final String? storeUrl;
+  final String? version;
+  final String? note;
+  final bool isPublished;
 }
 
 /// Admin operations for protected 4iCAD Windows and Linux releases.
@@ -129,7 +167,10 @@ class ReleaseAdminService {
         version.trim().replaceAll(RegExp(r'[^0-9A-Za-z._-]'), '-');
     final safeName =
         installer.fileName.replaceAll(RegExp(r'[^0-9A-Za-z._-]'), '-');
-    final path = '${target.storagePrefix}/$safeVersion/$safeName';
+    if (!target.isDownloadable || target.storagePrefix == null) {
+      throw ArgumentError('Only Windows and Linux accept release files.');
+    }
+    final path = '${target.storagePrefix!}/$safeVersion/$safeName';
 
     final contentType = switch (safeName.toLowerCase()) {
       final name when name.endsWith('.exe') =>
@@ -162,6 +203,37 @@ class ReleaseAdminService {
     await task;
     onProgress(1.0);
     return path;
+  }
+
+  /// Publishes or unpublishes an Apple/Google store listing. The callable is
+  /// deliberately separate from release and Stripe operations.
+  Future<void> setStoreListing({
+    required String productKey,
+    required String storeUrl,
+    String? version,
+    String? note,
+  }) async {
+    await _functions
+        .httpsCallable('setPlatformStoreListing')
+        .call<Map<String, dynamic>>({
+      'productKey': productKey,
+      'storeUrl': storeUrl.trim(),
+      'storeVersion': version?.trim(),
+      'platformNote': note?.trim(),
+    });
+  }
+
+  Future<PlatformStoreListing> getStoreListing(String productKey) async {
+    final snapshot =
+        await _firestore.collection('products').doc(productKey).get();
+    final data = snapshot.data();
+    return PlatformStoreListing(
+      storeUrl: (data?['storeUrl'] as String?)?.trim(),
+      version: (data?['storeVersion'] as String?)?.trim(),
+      note: (data?['platformNote'] as String?)?.trim(),
+      isPublished: data?['platformStatus'] == 'store' &&
+          ((data?['storeUrl'] as String?)?.trim().isNotEmpty ?? false),
+    );
   }
 
   /// Registers an uploaded installer as a release. The backend validates the

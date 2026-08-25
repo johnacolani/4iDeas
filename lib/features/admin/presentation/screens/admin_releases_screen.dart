@@ -28,6 +28,9 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
   final ReleaseAdminService _service = ReleaseAdminService();
   final _versionController = TextEditingController();
   final _notesController = TextEditingController();
+  final _storeUrlController = TextEditingController();
+  final _storeVersionController = TextEditingController();
+  final _storeNoteController = TextEditingController();
 
   PickedInstaller? _picked;
   ReleaseTarget _target = ReleaseTarget.windows;
@@ -36,12 +39,107 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
   double _progress = 0;
   String? _stage;
   String? _error;
+  PlatformStoreListing? _currentStoreListing;
 
   @override
   void dispose() {
     _versionController.dispose();
     _notesController.dispose();
+    _storeUrlController.dispose();
+    _storeVersionController.dispose();
+    _storeNoteController.dispose();
     super.dispose();
+  }
+
+  String? _validateStoreUrl(String value) {
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
+      return 'Enter a valid https store URL.';
+    }
+    return null;
+  }
+
+  Future<void> _saveStoreListing({required bool unpublish}) async {
+    if (!unpublish) {
+      final problem = _validateStoreUrl(_storeUrlController.text);
+      if (problem != null) {
+        setState(() => _error = problem);
+        return;
+      }
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+      _stage = unpublish
+          ? 'Unpublishing store listing…'
+          : 'Publishing store listing…';
+    });
+    try {
+      await _service.setStoreListing(
+        productKey: _target.productKey,
+        storeUrl: unpublish ? '' : _storeUrlController.text,
+        version: _storeVersionController.text,
+        note: _storeNoteController.text,
+      );
+      if (!mounted) return;
+      if (unpublish) {
+        _storeUrlController.clear();
+        _storeVersionController.clear();
+        _storeNoteController.clear();
+      }
+      setState(() {
+        _busy = false;
+        _stage = null;
+        _currentStoreListing = PlatformStoreListing(
+          storeUrl: unpublish ? null : _storeUrlController.text.trim(),
+          version: unpublish ? null : _storeVersionController.text.trim(),
+          note: unpublish ? null : _storeNoteController.text.trim(),
+          isPublished: !unpublish,
+        );
+      });
+      if (!unpublish) {
+        _storeUrlController.clear();
+        _storeVersionController.clear();
+        _storeNoteController.clear();
+      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(unpublish
+            ? '${_target.label} is now Coming very soon.'
+            : 'Published the ${_target.label} store listing.'),
+        backgroundColor: const Color(0xFF1B7F4B),
+      ));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _stage = null;
+        _error = _publishMessage(e);
+      });
+    }
+  }
+
+  Future<void> _selectTarget(ReleaseTarget target) async {
+    setState(() {
+      _target = target;
+      _picked = null;
+      _error = null;
+      _storeUrlController.clear();
+      _storeVersionController.clear();
+      _storeNoteController.clear();
+      _currentStoreListing = null;
+    });
+    if (!target.isStore) return;
+    try {
+      final listing = await _service.getStoreListing(target.productKey);
+      if (!mounted || _target != target) return;
+      setState(() {
+        _currentStoreListing = listing;
+      });
+    } catch (_) {
+      if (mounted && _target == target) {
+        setState(() => _error = 'Could not load the current store listing.');
+      }
+    }
   }
 
   Future<void> _pick() async {
@@ -268,17 +366,31 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
                       children: [
                         const AdminClaimMigrationBanner(),
                         _uploadCard(isMobile),
-                        const SizedBox(height: 26),
-                        Text(
-                          'Release history',
-                          style: GoogleFonts.roboto(
-                            fontSize: isMobile ? 19 : 23,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                        if (_target.isDownloadable) ...[
+                          const SizedBox(height: 26),
+                          Text(
+                            '${_target.label} release history',
+                            style: GoogleFonts.roboto(
+                              fontSize: isMobile ? 19 : 23,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 14),
-                        _history(isMobile),
+                          const SizedBox(height: 14),
+                          _history(isMobile),
+                        ] else if (_target.isStore) ...[
+                          const SizedBox(height: 26),
+                          Text(
+                            'Current ${_target.label} store listing',
+                            style: GoogleFonts.roboto(
+                              fontSize: isMobile ? 19 : 23,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _currentStoreListingCard(isMobile),
+                        ],
                       ],
                     ),
                   ),
@@ -299,7 +411,11 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Publish a new ${_target.label} release',
+            _target.isStore
+                ? 'Publish ${_target.label} store listing'
+                : _target.isDownloadable
+                    ? 'Publish a new ${_target.label} release'
+                    : 'Web platform',
             style: GoogleFonts.roboto(
               fontSize: isMobile ? 18 : 21,
               fontWeight: FontWeight.w700,
@@ -308,8 +424,15 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            'The installer is stored privately. Customers only ever receive a '
-            'short-lived link generated after their entitlement is verified.',
+            _target.isStore
+                ? '${_target.label} binaries are distributed by '
+                    '${_target == ReleaseTarget.android ? 'Google' : 'Apple'}. '
+                    '4ideas stores only the public store link.'
+                : _target.isDownloadable
+                    ? 'The installer is stored privately. Customers only ever receive a '
+                        'short-lived link generated after their entitlement is verified.'
+                    : 'The Web product is managed through the existing commerce and trial '
+                        'configuration. It has no uploaded release on this screen.',
             style: GoogleFonts.roboto(
               fontSize: 13.5,
               height: 1.5,
@@ -317,7 +440,6 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
             ),
           ),
           const SizedBox(height: 20),
-
           DropdownButtonFormField<ReleaseTarget>(
             initialValue: _target,
             dropdownColor: const Color(0xFF101827),
@@ -339,157 +461,301 @@ class _AdminReleasesScreenState extends State<AdminReleasesScreen> {
                 ? null
                 : (target) {
                     if (target == null) return;
-                    setState(() {
-                      _target = target;
-                      _picked = null;
-                      _error = null;
-                    });
+                    _selectTarget(target);
                   },
           ),
           const SizedBox(height: 16),
-
-          // File picker
-          OutlinedButton.icon(
-            onPressed: _busy ? null : _pick,
-            icon: const Icon(Icons.upload_file, size: 19),
-            label: Text(
-              _picked == null
-                  ? 'Choose ${_target.filePrompt}'
-                  : 'Choose a different file',
-              style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
-            ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.4), width: 1.3),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-          if (_picked != null) ...[
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(Icons.description_outlined,
-                    size: 16, color: ColorManager.accentGold),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${_picked!.fileName}  ·  ${_picked!.formattedSize}',
-                    style: GoogleFonts.robotoMono(
-                      fontSize: 12.5,
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 18),
-
-          _field(
-            controller: _versionController,
-            label: 'Version',
-            hint: 'e.g. 1.0.8',
-            enabled: !_busy,
-          ),
-          const SizedBox(height: 14),
-          _field(
-            controller: _notesController,
-            label: 'Release notes',
-            hint: 'What changed in this build.',
-            maxLines: 5,
-            enabled: !_busy,
-          ),
-          const SizedBox(height: 6),
-          CheckboxListTile(
-            value: _makeCurrent,
-            onChanged:
-                _busy ? null : (v) => setState(() => _makeCurrent = v ?? true),
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            activeColor: ColorManager.accentGold,
-            checkColor: const Color(0xFF1A1305),
-            title: Text(
-              'Make this the current release',
-              style: GoogleFonts.roboto(color: Colors.white, fontSize: 14.5),
-            ),
-            subtitle: Text(
-              'Existing customers download this version next.',
-              style: GoogleFonts.roboto(
-                color: Colors.white.withValues(alpha: 0.6),
-                fontSize: 12.5,
+          if (_target == ReleaseTarget.web)
+            _webPlatformInfo()
+          else if (_target.isStore)
+            _storeListingForm()
+          else ...[
+            // File picker
+            OutlinedButton.icon(
+              onPressed: _busy ? null : _pick,
+              icon: const Icon(Icons.upload_file, size: 19),
+              label: Text(
+                _picked == null
+                    ? 'Choose ${_target.filePrompt}'
+                    : 'Choose a different file',
+                style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.4), width: 1.3),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
             ),
-          ),
-
-          if (_busy) ...[
-            const SizedBox(height: 12),
-            Text(
-              _stage ?? 'Working…',
-              style: GoogleFonts.roboto(color: Colors.white70, fontSize: 13.5),
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                value: _stage != null && _stage!.startsWith('Uploading')
-                    ? _progress
-                    : null,
-                minHeight: 8,
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
-                valueColor:
-                    const AlwaysStoppedAnimation(ColorManager.accentGold),
-              ),
-            ),
-            if (_stage != null && _stage!.startsWith('Uploading')) ...[
-              const SizedBox(height: 6),
-              Text(
-                '${(_progress * 100).toStringAsFixed(0)}%',
-                style:
-                    GoogleFonts.robotoMono(color: Colors.white60, fontSize: 12),
-              ),
-            ],
-          ],
-
-          if (_error != null) ...[
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF9B3A31).withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: const Color(0xFF9B3A31).withValues(alpha: 0.5)),
-              ),
-              child: Row(
+            if (_picked != null) ...[
+              const SizedBox(height: 12),
+              Row(
                 children: [
-                  const Icon(Icons.error_outline,
-                      color: Color(0xFFE98D82), size: 19),
-                  const SizedBox(width: 10),
+                  const Icon(Icons.description_outlined,
+                      size: 16, color: ColorManager.accentGold),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _error!,
-                      style: GoogleFonts.roboto(
-                          color: const Color(0xFFE98D82),
-                          fontSize: 13.5,
-                          height: 1.45),
+                      '${_picked!.fileName}  ·  ${_picked!.formattedSize}',
+                      style: GoogleFonts.robotoMono(
+                        fontSize: 12.5,
+                        color: Colors.white.withValues(alpha: 0.85),
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
+            ],
+            const SizedBox(height: 18),
+
+            _field(
+              controller: _versionController,
+              label: 'Version',
+              hint: 'e.g. 1.0.8',
+              enabled: !_busy,
+            ),
+            const SizedBox(height: 14),
+            _field(
+              controller: _notesController,
+              label: 'Release notes',
+              hint: 'What changed in this build.',
+              maxLines: 5,
+              enabled: !_busy,
+            ),
+            const SizedBox(height: 6),
+            CheckboxListTile(
+              value: _makeCurrent,
+              onChanged: _busy
+                  ? null
+                  : (v) => setState(() => _makeCurrent = v ?? true),
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              activeColor: ColorManager.accentGold,
+              checkColor: const Color(0xFF1A1305),
+              title: Text(
+                'Make this the current release',
+                style: GoogleFonts.roboto(color: Colors.white, fontSize: 14.5),
+              ),
+              subtitle: Text(
+                'Existing customers download this version next.',
+                style: GoogleFonts.roboto(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 12.5,
+                ),
+              ),
+            ),
+
+            if (_busy) ...[
+              const SizedBox(height: 12),
+              Text(
+                _stage ?? 'Working…',
+                style:
+                    GoogleFonts.roboto(color: Colors.white70, fontSize: 13.5),
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  value: _stage != null && _stage!.startsWith('Uploading')
+                      ? _progress
+                      : null,
+                  minHeight: 8,
+                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                  valueColor:
+                      const AlwaysStoppedAnimation(ColorManager.accentGold),
+                ),
+              ),
+              if (_stage != null && _stage!.startsWith('Uploading')) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '${(_progress * 100).toStringAsFixed(0)}%',
+                  style: GoogleFonts.robotoMono(
+                      color: Colors.white60, fontSize: 12),
+                ),
+              ],
+            ],
+
+            if (_error != null) ...[
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF9B3A31).withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: const Color(0xFF9B3A31).withValues(alpha: 0.5)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline,
+                        color: Color(0xFFE98D82), size: 19),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _error!,
+                        style: GoogleFonts.roboto(
+                            color: const Color(0xFFE98D82),
+                            fontSize: 13.5,
+                            height: 1.45),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 20),
+            FourICadPrimaryButton(
+              label: 'Upload and publish',
+              icon: Icons.cloud_upload_outlined,
+              busy: _busy,
+              onPressed: _uploadAndPublish,
             ),
           ],
+        ],
+      ),
+    );
+  }
 
-          const SizedBox(height: 20),
-          FourICadPrimaryButton(
-            label: 'Upload and publish',
-            icon: Icons.cloud_upload_outlined,
-            busy: _busy,
-            onPressed: _uploadAndPublish,
+  Widget _webPlatformInfo() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        'No release file is required for Web. Windows and Linux are the only '
+        'binaries distributed directly by 4ideas.',
+        style: GoogleFonts.roboto(color: Colors.white70, height: 1.5),
+      ),
+    );
+  }
+
+  Widget _storeListingForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _field(
+          controller: _storeUrlController,
+          label: _target.storeUrlLabel!,
+          hint: 'https://…',
+          enabled: !_busy,
+        ),
+        const SizedBox(height: 14),
+        _field(
+          controller: _storeVersionController,
+          label: 'Version (optional)',
+          hint: 'e.g. 1.0.0',
+          enabled: !_busy,
+        ),
+        const SizedBox(height: 14),
+        _field(
+          controller: _storeNoteController,
+          label: 'Release / status note (optional)',
+          hint: 'Public availability or compatibility note.',
+          maxLines: 4,
+          enabled: !_busy,
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 14),
+          Text(_error!, style: const TextStyle(color: Color(0xFFE98D82))),
+        ],
+        if (_busy) ...[
+          const SizedBox(height: 14),
+          const LinearProgressIndicator(color: ColorManager.accentGold),
+        ],
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 12,
+          runSpacing: 10,
+          children: [
+            FourICadPrimaryButton(
+              label: 'Save / publish store listing',
+              icon: Icons.storefront_outlined,
+              busy: _busy,
+              onPressed: () => _saveStoreListing(unpublish: false),
+            ),
+            OutlinedButton.icon(
+              onPressed:
+                  _busy ? null : () => _saveStoreListing(unpublish: true),
+              icon: const Icon(Icons.unpublished_outlined),
+              label: const Text('Unpublish'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white70,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _currentStoreListingCard(bool isMobile) {
+    final listing = _currentStoreListing;
+    if (listing == null) {
+      return const FourICadGlassPanel(
+        child: Center(
+          child: CircularProgressIndicator(color: ColorManager.accentGold),
+        ),
+      );
+    }
+    if (!listing.isPublished) {
+      return FourICadGlassPanel(
+        child: Text(
+          '${_target.label} is Coming very soon. Publish an approved store URL '
+          'above when the listing is ready.',
+          style: GoogleFonts.roboto(color: Colors.white70, fontSize: 14),
+        ),
+      );
+    }
+    return FourICadGlassPanel(
+      goldBorder: true,
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FourICadMetaChip(
+            label: 'PUBLISHED',
+            icon: Icons.check_circle_outline,
+            emphasise: true,
           ),
+          if ((listing.version ?? '').isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Version ${listing.version}',
+              style: GoogleFonts.roboto(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          SelectableText(
+            listing.storeUrl!,
+            style: GoogleFonts.robotoMono(
+              color: ColorManager.accentGold,
+              fontSize: 12.5,
+            ),
+          ),
+          if ((listing.note ?? '').isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              listing.note!,
+              style: GoogleFonts.roboto(
+                color: Colors.white.withValues(alpha: 0.82),
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+          ],
         ],
       ),
     );
