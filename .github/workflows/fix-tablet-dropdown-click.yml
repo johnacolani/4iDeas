@@ -1,0 +1,96 @@
+name: Fix tablet dropdown click
+
+on:
+  push:
+    branches:
+      - fix/tablet-dropdown-click
+    paths:
+      - .github/workflows/fix-tablet-dropdown-click.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-menu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/tablet-dropdown-click
+
+      - name: Patch dropdown pointer handling
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('lib/screens/home_screen.dart')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = [
+              (
+                  """              child: MouseRegion(
+                onEnter: (_) => _cancelCloseTimer(),
+                onExit: (_) => _scheduleClose(),
+""",
+                  """              child: MouseRegion(
+                onEnter: (event) {
+                  if (event.kind == PointerDeviceKind.mouse) {
+                    _cancelCloseTimer();
+                  }
+                },
+                onExit: (event) {
+                  if (event.kind == PointerDeviceKind.mouse) {
+                    _scheduleClose();
+                  }
+                },
+""",
+              ),
+              (
+                  """      child: MouseRegion(
+        onEnter: (_) {
+          _cancelCloseTimer();
+          _insertOverlay();
+        },
+        onExit: (_) => _scheduleClose(),
+""",
+                  """      child: MouseRegion(
+        onEnter: (event) {
+          if (event.kind != PointerDeviceKind.mouse) return;
+          _cancelCloseTimer();
+          _insertOverlay();
+        },
+        onExit: (event) {
+          if (event.kind == PointerDeviceKind.mouse) {
+            _scheduleClose();
+          }
+        },
+""",
+              ),
+              (
+                  """              child: widget.trigger,
+""",
+                  """              // The wrapper owns pointer interaction. This prevents a nested
+              // trigger button (for example Products) from navigating on an
+              // accidental desktop click while still allowing tap to open the
+              // dropdown on touch/tablet layouts.
+              child: IgnorePointer(child: widget.trigger),
+""",
+              ),
+          ]
+
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly one match, found {count}: {old!r}')
+              text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Commit targeted fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/screens/home_screen.dart
+          git commit -m "Fix dropdown click behavior on tablets"
+          git push origin HEAD:fix/tablet-dropdown-click
