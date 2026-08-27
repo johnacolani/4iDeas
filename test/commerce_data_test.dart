@@ -327,7 +327,7 @@ void main() {
         startedAt: now,
         expiresAt: DateTime.now().add(const Duration(minutes: 20)),
       );
-      expect(minutes.remainingLabel, '20m left');
+      expect(minutes.remainingLabel, anyOf('19m left', '20m left'));
 
       const owner = WebTrial.owned();
       expect(owner.remainingLabel, isNull);
