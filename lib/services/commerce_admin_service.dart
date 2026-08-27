@@ -21,6 +21,14 @@ enum PromotionCodeStatus {
   disabled,
 }
 
+enum PromotionProductScope {
+  /// Works with every 4iCAD product sold through Stripe.
+  all,
+
+  /// Legacy code restricted to the original Windows Stripe product.
+  windows,
+}
+
 /// Who spent a code, joined from the order the webhook wrote.
 class PromotionRedemption {
   const PromotionRedemption({
@@ -105,6 +113,7 @@ class PromotionCodeView {
     required this.id,
     required this.code,
     required this.active,
+    this.productScope = PromotionProductScope.all,
     this.status = PromotionCodeStatus.active,
     this.percentOff,
     this.maxRedemptions,
@@ -122,6 +131,7 @@ class PromotionCodeView {
   final String id;
   final String code;
   final bool active;
+  final PromotionProductScope productScope;
   final PromotionCodeStatus status;
   final num? percentOff;
   final int? maxRedemptions;
@@ -156,6 +166,9 @@ class PromotionCodeView {
       id: map['id'] as String,
       code: map['code'] as String,
       active: map['active'] as bool? ?? false,
+      productScope: map['productScope'] == 'windows'
+          ? PromotionProductScope.windows
+          : PromotionProductScope.all,
       status: switch (map['status'] as String?) {
         'used' => PromotionCodeStatus.used,
         'expired' => PromotionCodeStatus.expired,
