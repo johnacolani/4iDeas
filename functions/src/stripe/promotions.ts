@@ -14,6 +14,20 @@ import {
   summariseStock,
 } from "./promotion-policy";
 
+type PromotionProductScope = "all" | "windows";
+
+/**
+ * New coupons are unrestricted. Legacy coupons were explicitly restricted to
+ * the Windows Stripe product, so Stripe's applies_to list is the source of
+ * truth when separating the two generations in the admin screen.
+ */
+function productScope(promo: Stripe.PromotionCode): PromotionProductScope {
+  if (promo.metadata?.productScope === "all") return "all";
+  if (typeof promo.coupon === "string") return "windows";
+  const products = promo.coupon.applies_to?.products;
+  return products && products.length > 0 ? "windows" : "all";
+}
+
 /**
  * Creates a real Stripe Coupon + Promotion Code pair.
  *
@@ -116,6 +130,7 @@ export const createPromotionCode = onCall(
       codes: created.map((promo) => ({
         id: promo.id,
         code: promo.code,
+        productScope: "all",
         percentOff,
         active: promo.active,
         status: codeStatus(promo, now),
@@ -171,6 +186,7 @@ export const listPromotionCodes = onCall(
       codes: list.data.map((p, i) => ({
         id: p.id,
         code: p.code,
+        productScope: productScope(p),
         active: p.active,
         status: codeStatus(p, now),
         percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,
@@ -188,10 +204,12 @@ export const listPromotionCodes = onCall(
       // The counts the admin screen leads with: how many of each tier are left
       // to give away, and how many customers have spent one.
       stock: summariseStock(
-        list.data.map((p) => ({
-          percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,
-          status: codeStatus(p, now),
-        }))
+        list.data
+          .filter((p) => productScope(p) === "all")
+          .map((p) => ({
+            percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,
+            status: codeStatus(p, now),
+          }))
       ),
     };
   }
@@ -221,11 +239,7 @@ export const restockPromotionCodes = onCall(
     // Product-restricted legacy coupons do not count as reusable stock. This
     // ensures restocking creates codes that work for Windows, Web, Linux, and
     // future products, while leaving previously issued codes intact.
-    const allProductCodes = existing.data.filter((p) => {
-      if (typeof p.coupon === "string") return false;
-      const products = p.coupon.applies_to?.products;
-      return !products || products.length === 0;
-    });
+    const allProductCodes = existing.data.filter((p) => productScope(p) === "all");
     const stock = summariseStock(
       allProductCodes.map((p) => ({
         percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,

@@ -252,51 +252,82 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
 
     if (email == null || email.isEmpty || !mounted) return;
 
+    final allProducts = code.productScope == PromotionProductScope.all;
+    final percent = code.percentOff?.toInt();
+    final subjectText =
+        'Your ${percent == null ? '' : '$percent% '}discount code for '
+        '${allProducts ? '4iCAD' : '4iCAD for Windows'}';
+    final bodyText =
+        'Hello,\n\n'
+        'Here is your discount code for '
+        '${allProducts ? '4iCAD' : '4iCAD for Windows'}:\n\n'
+        '    ${code.code}\n\n'
+        '${allProducts ? 'This code works with every 4iCAD product available through our Stripe checkout.' : 'This is a legacy code and it works with 4iCAD for Windows only.'}\n\n'
+        'To use it, go to https://4ideasapp.com/4icad, sign in and press Buy. '
+        'On the payment page, choose "Add promotion code" and enter the code '
+        'above — the discount is applied before you pay.\n\n'
+        'The code works once.\n\n'
+        'Thank you,\n4iDeas';
+    final emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: _emailQuery(<String, String>{
+        'subject': subjectText,
+        'body': bodyText,
+      }),
+    );
+
+    // Launch first, while this is still part of the user's click. On Flutter
+    // Web, waiting for the Cloud Function first can lose browser user-activation
+    // and mailto then opens unreliably. _top also avoids an extra blank tab.
+    bool launched = false;
+    try {
+      launched = await launchUrl(
+        emailUri,
+        mode: LaunchMode.externalApplication,
+        webOnlyWindowName: '_top',
+      );
+    } catch (_) {
+      launched = false;
+    }
+    if (!mounted) return;
+
+    if (!launched) {
+      await Clipboard.setData(
+        ClipboardData(text: 'To: $email\nSubject: $subjectText\n\n$bodyText'),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No email app opened. The complete email is on your clipboard.'),
+        ),
+      );
+    }
+
     try {
       await _service.assignPromotionCode(id: code.id, sentTo: email);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_message(e, 'Could not record the recipient.')),
+          content: Text(
+            launched
+                ? 'Email composer opened, but the recipient could not be recorded.'
+                : _message(e, 'Could not record the recipient.'),
+          ),
           backgroundColor: const Color(0xFF9B3A31),
         ),
       );
       return;
     }
 
-    final percent = code.percentOff?.toInt();
-    final subject = Uri.encodeComponent(
-      'Your ${percent == null ? '' : '$percent% '}discount code for 4iCAD',
-    );
-    final body = Uri.encodeComponent(
-      'Hello,\n\n'
-      'Here is your discount code for 4iCAD for Windows:\n\n'
-      '    ${code.code}\n\n'
-      'To use it, go to https://4ideasapp.com/4icad, sign in and press Buy. '
-      'On the payment page, choose "Add promotion code" and enter the code '
-      'above — the discount is applied before you pay.\n\n'
-      'The code works once.\n\n'
-      'Thank you,\n4iDeas',
-    );
-    final launched = await launchUrl(
-      Uri.parse('mailto:$email?subject=$subject&body=$body'),
-      mode: LaunchMode.externalApplication,
-    );
-    if (!mounted) return;
-    if (!launched) {
-      // No mail client is a normal state on a kiosk or a fresh browser, so fall
-      // back to the clipboard rather than losing the work.
-      await Clipboard.setData(ClipboardData(text: code.code));
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No email app available. The code is on your clipboard.'),
-        ),
-      );
-    }
     await _load();
   }
+
+  static String _emailQuery(Map<String, String> values) => values.entries
+      .map((entry) =>
+          '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}')
+      .join('&');
 
   /// Puts a code on the clipboard so it can be pasted into a message or email.
   Future<void> _copy(PromotionCodeView code) async {
@@ -425,7 +456,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
             children: [
               Expanded(
                 child: Text(
-                  'Code stock',
+                  'All-products code stock',
                   style: GoogleFonts.roboto(
                     fontSize: isMobile ? 18 : 21,
                     fontWeight: FontWeight.w700,
@@ -445,8 +476,8 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Five single-use codes per discount. Send one to a customer and it '
-            'moves to used the moment they redeem it at checkout.',
+            'Five single-use all-product codes per discount. Legacy Windows-only '
+            'codes are kept separate below and do not count toward this stock.',
             style: GoogleFonts.roboto(
               fontSize: 13.5,
               height: 1.5,
@@ -467,7 +498,7 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
             ),
           const SizedBox(height: 18),
           FourICadPrimaryButton(
-            label: short == 0 ? 'All tiers full' : 'Top up to 5 per discount',
+            label: short == 0 ? 'All-product tiers full' : 'Top up all-product codes',
             icon: Icons.inventory_2_outlined,
             busy: _restocking,
             // Nothing to do when every tier is full, and a button that mints
@@ -558,9 +589,9 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Creates real Stripe Coupons and Promotion Codes scoped to 4iCAD. '
-            'Generate a batch to hand out one at a time — each is single-use, so '
-            'it shows as USED here the moment a customer redeems it.',
+            'Creates real Stripe Coupons and Promotion Codes that work across every '
+            '4iCAD product sold through Stripe. Generate a batch to hand out one '
+            'at a time — each is single-use and tracked here after redemption.',
             style: GoogleFonts.roboto(
               fontSize: 13.5,
               height: 1.5,
@@ -660,8 +691,8 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Codes look like 4ICAD$_percentOff-K7QF2P. Nothing is emailed — '
-              'copy one from the list and send it however you like.',
+              'Codes look like 4ICAD$_percentOff-K7QF2P. Use Copy or Send by '
+              'email from the list below.',
               style: GoogleFonts.roboto(
                 fontSize: 12.5,
                 height: 1.45,
@@ -827,137 +858,226 @@ class _AdminPromotionCodesScreenState extends State<AdminPromotionCodesScreen> {
         ),
       );
     }
-    // Spendable codes first: the stock you can still hand out is the thing you
-    // came here for, and spent ones are history.
+
+    // Keep usable stock above history inside each scope, then keep the two
+    // generations visibly separate so an old Windows-only code can never be
+    // mistaken for a current all-product code.
     final sorted = [...codes]..sort((a, b) {
         if (a.isSpent != b.isSpent) return a.isSpent ? 1 : -1;
         final ad = a.createdAt, bd = b.createdAt;
         if (ad == null || bd == null) return 0;
         return bd.compareTo(ad);
       });
+    final allProducts = sorted
+        .where((code) => code.productScope == PromotionProductScope.all)
+        .toList();
+    final windowsOnly = sorted
+        .where((code) => code.productScope == PromotionProductScope.windows)
+        .toList();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final code in sorted)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: FourICadGlassPanel(
-              padding: EdgeInsets.all(isMobile ? 16 : 20),
-              borderRadius: 14,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          code.code,
-                          style: GoogleFonts.robotoMono(
-                            fontSize: isMobile ? 15 : 17,
-                            fontWeight: FontWeight.w700,
-                            // A spent code is greyed so the stock still in play
-                            // reads at a glance.
-                            color: code.isSpent ? Colors.white54 : Colors.white,
-                            decoration: code.isUsed ? TextDecoration.lineThrough : null,
-                            decorationColor: Colors.white38,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => _copy(code),
-                        icon: const Icon(Icons.copy_all_outlined, size: 18),
-                        color: Colors.white70,
-                        tooltip: 'Copy code',
-                      ),
-                      // Sending a spent code would only confuse its recipient.
-                      if (!code.isSpent)
-                        IconButton(
-                          onPressed: () => _send(code),
-                          icon: const Icon(Icons.mail_outline, size: 19),
-                          color: ColorManager.accentGold,
-                          tooltip: 'Send by email',
-                        ),
-                      // Only a still-spendable code can be switched off. A used
-                      // one is finished, and the toggle would imply otherwise.
-                      if (!code.isUsed)
-                        Switch(
-                          value: code.active,
-                          onChanged: (_) => _toggle(code),
-                          activeThumbColor: ColorManager.accentGold,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _statusChip(code.status),
-                      if (code.percentOff != null)
-                        FourICadMetaChip(
-                          label: '${code.percentOff!.toInt()}% off',
-                          emphasise: !code.isSpent,
-                        ),
-                      FourICadMetaChip(
-                        label: code.maxRedemptions == null
-                            ? '${code.timesRedeemed} redeemed'
-                            : '${code.timesRedeemed}/${code.maxRedemptions} redeemed',
-                      ),
-                      if (code.expiresAt != null)
-                        FourICadMetaChip(
-                          label: 'Expires ${_date(code.expiresAt!)}',
-                          icon: Icons.event,
-                        ),
-                      if (code.firstTimeOnly)
-                        const FourICadMetaChip(label: 'FIRST-TIME ONLY'),
-                    ],
-                  ),
-                  if (code.sentTo != null && code.sentTo!.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.outgoing_mail, size: 15, color: Colors.white38),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Sent to ${code.sentTo}'
-                            '${code.sentAt == null ? '' : ' on ${_date(code.sentAt!)}'}',
-                            style: GoogleFonts.roboto(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (code.note != null && code.note!.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.sticky_note_2_outlined,
-                            size: 15, color: Colors.white38),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            code.note!,
-                            style: GoogleFonts.roboto(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (code.redeemedBy != null) _redeemedLine(code, isMobile),
-                ],
-              ),
-            ),
+        if (allProducts.isNotEmpty)
+          _scopeSection(
+            title: 'All products',
+            subtitle: 'Current codes — Windows, Web, Linux and future Stripe products.',
+            icon: Icons.public,
+            codes: allProducts,
+            isMobile: isMobile,
+          ),
+        if (allProducts.isNotEmpty && windowsOnly.isNotEmpty)
+          const SizedBox(height: 24),
+        if (windowsOnly.isNotEmpty)
+          _scopeSection(
+            title: 'Windows only · legacy',
+            subtitle: 'Older codes restricted to the original Windows Stripe product.',
+            icon: Icons.window,
+            codes: windowsOnly,
+            isMobile: isMobile,
           ),
       ],
+    );
+  }
+
+  Widget _scopeSection({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<PromotionCodeView> codes,
+    required bool isMobile,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 19, color: ColorManager.accentGold),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$title · ${codes.length}',
+                      style: GoogleFonts.roboto(
+                        color: Colors.white,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.roboto(
+                        color: Colors.white.withValues(alpha: 0.58),
+                        fontSize: 12.5,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        for (final code in codes) _codeCard(code, isMobile),
+      ],
+    );
+  }
+
+  Widget _codeCard(PromotionCodeView code, bool isMobile) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: FourICadGlassPanel(
+        padding: EdgeInsets.all(isMobile ? 16 : 20),
+        borderRadius: 14,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    code.code,
+                    style: GoogleFonts.robotoMono(
+                      fontSize: isMobile ? 15 : 17,
+                      fontWeight: FontWeight.w700,
+                      color: code.isSpent ? Colors.white54 : Colors.white,
+                      decoration: code.isUsed ? TextDecoration.lineThrough : null,
+                      decorationColor: Colors.white38,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _copy(code),
+                  icon: const Icon(Icons.copy_all_outlined, size: 18),
+                  color: Colors.white70,
+                  tooltip: 'Copy code',
+                ),
+                if (!code.isSpent)
+                  IconButton(
+                    onPressed: () => _send(code),
+                    icon: const Icon(Icons.mail_outline, size: 19),
+                    color: ColorManager.accentGold,
+                    tooltip: 'Send by email',
+                  ),
+                if (!code.isUsed)
+                  Switch(
+                    value: code.active,
+                    onChanged: (_) => _toggle(code),
+                    activeThumbColor: ColorManager.accentGold,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _statusChip(code.status),
+                FourICadMetaChip(
+                  label: code.productScope == PromotionProductScope.all
+                      ? 'ALL PRODUCTS'
+                      : 'WINDOWS ONLY',
+                  icon: code.productScope == PromotionProductScope.all
+                      ? Icons.public
+                      : Icons.window,
+                  emphasise: code.productScope == PromotionProductScope.all,
+                ),
+                if (code.percentOff != null)
+                  FourICadMetaChip(
+                    label: '${code.percentOff!.toInt()}% off',
+                    emphasise: !code.isSpent,
+                  ),
+                FourICadMetaChip(
+                  label: code.maxRedemptions == null
+                      ? '${code.timesRedeemed} redeemed'
+                      : '${code.timesRedeemed}/${code.maxRedemptions} redeemed',
+                ),
+                if (code.expiresAt != null)
+                  FourICadMetaChip(
+                    label: 'Expires ${_date(code.expiresAt!)}',
+                    icon: Icons.event,
+                  ),
+                if (code.firstTimeOnly)
+                  const FourICadMetaChip(label: 'FIRST-TIME ONLY'),
+              ],
+            ),
+            if (code.sentTo != null && code.sentTo!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.outgoing_mail, size: 15, color: Colors.white38),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Sent to ${code.sentTo}'
+                      '${code.sentAt == null ? '' : ' on ${_date(code.sentAt!)}'}',
+                      style: GoogleFonts.roboto(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (code.note != null && code.note!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.sticky_note_2_outlined,
+                      size: 15, color: Colors.white38),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      code.note!,
+                      style: GoogleFonts.roboto(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (code.redeemedBy != null) _redeemedLine(code, isMobile),
+          ],
+        ),
+      ),
     );
   }
 
