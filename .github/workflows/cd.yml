@@ -23,6 +23,8 @@ jobs:
           github.event.workflow_run.event == 'push' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      FUNCTIONS_DISCOVERY_TIMEOUT: '60'
 
     steps:
       - name: Checkout tested commit
