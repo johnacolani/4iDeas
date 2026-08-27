@@ -504,8 +504,16 @@ class _DesktopHoverNavDropdownState extends State<_DesktopHoverNavDropdown> {
               followerAnchor: Alignment.topCenter,
               offset: const Offset(0, 6),
               child: MouseRegion(
-                onEnter: (_) => _cancelCloseTimer(),
-                onExit: (_) => _scheduleClose(),
+                onEnter: (event) {
+                  if (event.kind == PointerDeviceKind.mouse) {
+                    _cancelCloseTimer();
+                  }
+                },
+                onExit: (event) {
+                  if (event.kind == PointerDeviceKind.mouse) {
+                    _scheduleClose();
+                  }
+                },
                 child: Material(
                   elevation: 12,
                   shadowColor: Colors.black54,
@@ -557,11 +565,16 @@ class _DesktopHoverNavDropdownState extends State<_DesktopHoverNavDropdown> {
     return CompositedTransformTarget(
       link: _layerLink,
       child: MouseRegion(
-        onEnter: (_) {
+        onEnter: (event) {
+          if (event.kind != PointerDeviceKind.mouse) return;
           _cancelCloseTimer();
           _insertOverlay();
         },
-        onExit: (_) => _scheduleClose(),
+        onExit: (event) {
+          if (event.kind == PointerDeviceKind.mouse) {
+            _scheduleClose();
+          }
+        },
         child: Semantics(
           button: true,
           label: widget.triggerLabel,
@@ -578,7 +591,11 @@ class _DesktopHoverNavDropdownState extends State<_DesktopHoverNavDropdown> {
               focusColor: AppColors.primaryGold.withValues(alpha: 0.16),
               hoverColor: Colors.white.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(8),
-              child: widget.trigger,
+              // The wrapper owns pointer interaction. This prevents a nested
+              // trigger button (for example Products) from navigating on an
+              // accidental desktop click while still allowing tap to open the
+              // dropdown on touch/tablet layouts.
+              child: IgnorePointer(child: widget.trigger),
             ),
           ),
         ),
