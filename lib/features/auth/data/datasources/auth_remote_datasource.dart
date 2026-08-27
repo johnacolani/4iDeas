@@ -192,22 +192,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<User> signInWithApple() async {
     try {
       if (kIsWeb) {
-        // For web, Apple Sign-In has compatibility issues with the sign_in_with_apple package
-        // We'll use Firebase Auth redirect flow instead
-        // Note: This requires proper Service ID configuration in Apple Developer Portal
-        final appleProvider = OAuthProvider("apple.com");
-        
-        // Use redirect for web (more reliable than popup)
-        await _firebaseAuth.signInWithRedirect(appleProvider);
-        
-        // After redirect, get the result
-        final userCredential = await _firebaseAuth.getRedirectResult();
-        
-        if (userCredential.user != null) {
-          return UserModel.fromFirebaseUser(userCredential.user!);
-        } else {
+        // On web, let Firebase handle the complete Apple OAuth flow in a
+        // popup. This avoids redirect-result state being lost across a full
+        // page reload (and avoids third-party storage restrictions that can
+        // affect redirect auth on custom domains).
+        final appleProvider = AppleAuthProvider();
+        final userCredential =
+            await _firebaseAuth.signInWithPopup(appleProvider);
+
+        final firebaseUser = userCredential.user;
+        if (firebaseUser == null) {
           throw 'Apple sign in was cancelled or failed';
         }
+        return UserModel.fromFirebaseUser(firebaseUser);
       } else {
         // For iOS/Android, use the sign_in_with_apple package
         // Request credential
@@ -247,7 +244,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw _handleFirebaseException(e);
     } catch (e) {
       // Better error handling for web platform issues
-      if (kIsWeb && e.toString().contains('TypeError') || e.toString().contains('JSObject')) {
+      if (kIsWeb && (e.toString().contains('TypeError') || e.toString().contains('JSObject'))) {
         throw 'Apple Sign-In on web requires proper configuration. Please ensure Service ID is configured in Apple Developer Portal and Firebase Console.';
       }
       throw 'Apple sign in failed: ${e.toString()}';
@@ -279,4 +276,3 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 }
-
