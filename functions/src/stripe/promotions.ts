@@ -1,7 +1,7 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {logger} from "firebase-functions";
 import type Stripe from "stripe";
-import {COL, PRODUCT_KEY, STRIPE_SECRET_KEY, db, requireAdmin, stripeClient} from "../core";
+import {COL, STRIPE_SECRET_KEY, db, requireAdmin, stripeClient} from "../core";
 
 import {
   ALLOWED_PERCENTS,
@@ -62,17 +62,13 @@ export const createPromotionCode = onCall(
 
     const stripe = stripeClient();
 
-    // Scope the coupon to this product so a code can't be spent on anything else.
-    const cfg = await db.collection(COL.productConfig).doc(PRODUCT_KEY).get();
-    const stripeProductId = cfg.data()?.stripeProductId as string | undefined;
-
-    // One coupon carries the discount; each code in the batch points at it.
+    // One unrestricted coupon carries the discount, so the same code works
+    // for every 4iCAD platform sold through this Stripe account.
     const coupon = await stripe.coupons.create({
       percent_off: percentOff,
       duration: "once",
-      name: `${percentOff}% off 4iCAD for Windows`,
-      ...(stripeProductId ? {applies_to: {products: [stripeProductId]}} : {}),
-      metadata: {productKey: PRODUCT_KEY, createdBy: "4ideasapp-admin"},
+      name: `${percentOff}% off 4iCAD`,
+      metadata: {productScope: "all", createdBy: "4ideasapp-admin"},
     });
 
     const created: Stripe.PromotionCode[] = [];
@@ -88,7 +84,7 @@ export const createPromotionCode = onCall(
             ...(expiresAt ? {expires_at: expiresAt} : {}),
             ...(firstTimeOnly ? {restrictions: {first_time_transaction: true}} : {}),
             metadata: {
-              productKey: PRODUCT_KEY,
+              productScope: "all",
               ...(note ? {note} : {}),
               ...(adminEmail ? {issuedBy: adminEmail} : {}),
             },
@@ -222,16 +218,21 @@ export const restockPromotionCodes = onCall(
     const now = Date.now();
 
     const existing = await stripe.promotionCodes.list({limit: 100, expand: ["data.coupon"]});
+    // Product-restricted legacy coupons do not count as reusable stock. This
+    // ensures restocking creates codes that work for Windows, Web, Linux, and
+    // future products, while leaving previously issued codes intact.
+    const allProductCodes = existing.data.filter((p) => {
+      if (typeof p.coupon === "string") return false;
+      const products = p.coupon.applies_to?.products;
+      return !products || products.length === 0;
+    });
     const stock = summariseStock(
-      existing.data.map((p) => ({
+      allProductCodes.map((p) => ({
         percentOff: typeof p.coupon === "string" ? null : p.coupon.percent_off,
         status: codeStatus(p, now),
       })),
       target
     );
-
-    const cfg = await db.collection(COL.productConfig).doc(PRODUCT_KEY).get();
-    const stripeProductId = cfg.data()?.stripeProductId as string | undefined;
 
     let created = 0;
     for (const tier of stock) {
@@ -241,9 +242,8 @@ export const restockPromotionCodes = onCall(
       const coupon = await stripe.coupons.create({
         percent_off: tier.percentOff,
         duration: "once",
-        name: `${tier.percentOff}% off 4iCAD for Windows`,
-        ...(stripeProductId ? {applies_to: {products: [stripeProductId]}} : {}),
-        metadata: {productKey: PRODUCT_KEY, createdBy: "4ideasapp-admin"},
+        name: `${tier.percentOff}% off 4iCAD`,
+        metadata: {productScope: "all", createdBy: "4ideasapp-admin"},
       });
 
       for (let i = 0; i < tier.missing; i++) {
@@ -256,7 +256,7 @@ export const restockPromotionCodes = onCall(
             // that person has used it, or the counts here mean nothing.
             max_redemptions: 1,
             metadata: {
-              productKey: PRODUCT_KEY,
+              productScope: "all",
               ...(adminEmail ? {issuedBy: adminEmail} : {}),
             },
           });
