@@ -1,4 +1,4 @@
-name: Apply coupon scope and email fix
+name: Verify coupon scope and email fix
 
 on:
   push:
@@ -7,30 +7,27 @@ on:
     paths:
       - .github/workflows/fix-coupon-scope-email.yml
 
-permissions:
-  contents: write
-
 jobs:
-  patch:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: fix/coupon-scope-email-compose
 
-      - name: Apply focused source changes
-        run: python3 .github/scripts/apply_coupon_fix.py
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Analyze changed Flutter files
+        run: flutter analyze lib/features/admin/presentation/screens/admin_promotion_codes_screen.dart lib/services/commerce_admin_service.dart
 
       - name: Verify Cloud Functions build and tests
         working-directory: functions
         run: |
           npm ci
           npm test
-
-      - name: Commit source fix
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add functions/src/stripe/promotions.ts lib/services/commerce_admin_service.dart lib/features/admin/presentation/screens/admin_promotion_codes_screen.dart
-          git commit -m "Fix promotion scope labels and email compose"
-          git push origin HEAD:fix/coupon-scope-email-compose
