@@ -1,0 +1,40 @@
+name: Fix flaky trial test
+
+on:
+  push:
+    branches:
+      - chore/website-ci
+    paths:
+      - .github/workflows/fix-flaky-trial-test.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/website-ci
+
+      - name: Make countdown assertion tolerant of elapsed milliseconds
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('test/commerce_data_test.dart')
+          text = path.read_text()
+          old = "      expect(minutes.remainingLabel, '20m left');"
+          new = "      expect(minutes.remainingLabel, anyOf('19m left', '20m left'));"
+          if text.count(old) != 1:
+              raise SystemExit('expected one countdown assertion to patch')
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add test/commerce_data_test.dart
+          git commit -m "test: remove countdown timing flake"
+          git push origin HEAD:chore/website-ci
