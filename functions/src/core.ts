@@ -67,6 +67,9 @@ export const COL = {
   entitlements: "entitlements",
   stripeEvents: "stripe_events",
   webTrials: "web_trials",
+  licenses: "licenses",
+  licenseDevices: "license_devices",
+  licenseAudit: "license_audit",
 } as const;
 
 let cachedStripe: Stripe | null = null;
