@@ -369,18 +369,18 @@ class _FourICadLicenseScreenState extends State<FourICadLicenseScreen> {
           ),
         ) ??
         false;
-    if (!ok || !mounted) return;
+    if (!ok || !context.mounted) return;
 
     setState(() => _deactivatingId = device.installationId);
     try {
       await _service.deactivateDevice(device.installationId);
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Device deactivated.')),
       );
       _refresh();
     } catch (_) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not deactivate that device.')),
       );
