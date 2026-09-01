@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:four_ideas/services/license_service.dart';
 
 class AdminLicenseView {
   const AdminLicenseView({
@@ -80,6 +81,17 @@ class LicenseAdminService {
     return rows
         .whereType<Map>()
         .map((m) => AdminLicenseView.fromMap(m.cast<String, dynamic>()))
+        .toList();
+  }
+
+  Future<List<LicenseDeviceView>> getLicenseDevices(String ownerUid) async {
+    final result = await _functions
+        .httpsCallable('getLicenseDevices')
+        .call<Map<String, dynamic>>({'ownerUid': ownerUid});
+    final rows = (result.data['devices'] as List?) ?? const [];
+    return rows
+        .whereType<Map>()
+        .map((m) => LicenseDeviceView.fromMap(m.cast<String, dynamic>()))
         .toList();
   }
 
