@@ -4,28 +4,52 @@ import {
   activateDevice,
   deactivateDevice,
   getOwnerLicense,
+  listOwnerDevices,
 } from "./license-store";
-import {
-  isLicensePlatform,
-} from "./license-policy";
+import {isDevicePlatform} from "./license-policy";
+
+function timestampMillis(value: unknown): number | null {
+  if (
+    value &&
+    typeof value === "object" &&
+    "toMillis" in value &&
+    typeof (value as {toMillis?: unknown}).toMillis === "function"
+  ) {
+    return (value as {toMillis: () => number}).toMillis();
+  }
+  return null;
+}
 
 export const getMyLicense = onCall({region: "us-central1"}, async (req) => {
   const {uid} = requireAuth(req);
   const license = await getOwnerLicense(uid);
-  if (!license) return {license: null};
+  if (!license) return {license: null, devices: []};
 
   const data = license.data;
+  const devices = await listOwnerDevices(uid);
   return {
     license: {
       id: license.id,
       plan: data.plan,
       primaryPlatform: data.primaryPlatform,
       status: data.status,
-      baseDeviceLimit: data.baseDeviceLimit,
+      primaryDeviceLimit: data.primaryDeviceLimit,
       bonusOtherPlatformLimit: data.bonusOtherPlatformLimit,
-      activeBaseDevices: data.activeBaseDevices ?? 0,
+      totalDeviceLimit: data.totalDeviceLimit,
+      activePrimaryDevices: data.activePrimaryDevices ?? 0,
       activeBonusDevices: data.activeBonusDevices ?? 0,
     },
+    devices: devices.map((device) => ({
+      installationId: device.installationId,
+      platform: device.platform,
+      bucket: device.bucket,
+      deviceName: device.deviceName ?? null,
+      appVersion: device.appVersion ?? null,
+      active: device.active,
+      activatedAt: timestampMillis(device.activatedAt),
+      lastSeenAt: timestampMillis(device.lastSeenAt),
+      deactivatedAt: timestampMillis(device.deactivatedAt),
+    })),
   };
 });
 
@@ -36,7 +60,7 @@ export const activateMyDevice = onCall({region: "us-central1"}, async (req) => {
   if (!installationId) {
     throw new HttpsError("invalid-argument", "installationId is required.");
   }
-  if (!isLicensePlatform(platform)) {
+  if (!isDevicePlatform(platform)) {
     throw new HttpsError("invalid-argument", "Unsupported platform.");
   }
 
