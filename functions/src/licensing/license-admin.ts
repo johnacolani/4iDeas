@@ -14,6 +14,7 @@ import {
   createOrUpdateLicense,
   deactivateDevice,
   licenseIdForOwner,
+  listOwnerDevices,
 } from "./license-store";
 
 const ADMIN_LIST_LIMIT = 200;
@@ -54,6 +55,28 @@ export const listLicenses = onCall({region: "us-central1"}, async (req) => {
         updatedAt: millis(data.updatedAt),
       };
     }),
+  };
+});
+
+export const getLicenseDevices = onCall({region: "us-central1"}, async (req) => {
+  requireAdmin(req);
+  const ownerUid = String(req.data?.ownerUid ?? "").trim();
+  if (!ownerUid) {
+    throw new HttpsError("invalid-argument", "ownerUid is required.");
+  }
+  const devices = await listOwnerDevices(ownerUid);
+  return {
+    devices: devices.map((device) => ({
+      installationId: device.installationId,
+      platform: device.platform,
+      bucket: device.bucket,
+      deviceName: device.deviceName ?? null,
+      appVersion: device.appVersion ?? null,
+      active: device.active,
+      activatedAt: millis(device.activatedAt),
+      lastSeenAt: millis(device.lastSeenAt),
+      deactivatedAt: millis(device.deactivatedAt),
+    })),
   };
 });
 
