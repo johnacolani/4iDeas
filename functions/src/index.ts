@@ -21,3 +21,8 @@ export {getPurchaseStatus, getDownloadUrl} from "./downloads/download";
 export {startWebTrial, verifyWebTrial} from "./trials/web-trial";
 export {publishRelease, setCurrentRelease, onReleaseUploaded} from "./releases/releases";
 export {setPlatformStoreListing} from "./platforms/store-listings";
+export {
+  getMyLicense,
+  activateMyDevice,
+  deactivateMyDevice,
+} from "./licensing/license-functions";
