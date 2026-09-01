@@ -55,6 +55,22 @@ export const LICENSE_PLAN_POLICIES: Record<LicensePlan, LicensePlanPolicy> = {
   },
 };
 
+const DEVICE_PLATFORMS = new Set<DevicePlatform>([
+  "windows",
+  "macos",
+  "linux",
+  "ios",
+  "android",
+]);
+
+export function isLicensePlan(value: unknown): value is LicensePlan {
+  return value === "individual" || value === "company";
+}
+
+export function isDevicePlatform(value: unknown): value is DevicePlatform {
+  return typeof value === "string" && DEVICE_PLATFORMS.has(value as DevicePlatform);
+}
+
 export function getLicensePlanPolicy(plan: LicensePlan): LicensePlanPolicy {
   return LICENSE_PLAN_POLICIES[plan];
 }
