@@ -27,3 +27,9 @@ export {
   activateMyDevice,
   deactivateMyDevice,
 } from "./licensing/license-functions";
+export {
+  listLicenses,
+  grantComplimentaryLicense,
+  setLicenseStatus,
+  adminDeactivateDevice,
+} from "./licensing/license-admin";
