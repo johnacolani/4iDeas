@@ -29,6 +29,7 @@ export {
 } from "./licensing/license-functions";
 export {
   listLicenses,
+  getLicenseDevices,
   grantComplimentaryLicense,
   setLicenseStatus,
   adminDeactivateDevice,
