@@ -1,5 +1,54 @@
 import 'package:cloud_functions/cloud_functions.dart';
 
+class LicensePlanView {
+  const LicensePlanView({
+    required this.plan,
+    required this.displayName,
+    required this.active,
+    required this.primaryDeviceLimit,
+    required this.bonusOtherPlatformLimit,
+    required this.totalDeviceLimit,
+    this.amountMinor,
+    this.currency,
+  });
+
+  final String plan;
+  final String displayName;
+  final bool active;
+  final int? amountMinor;
+  final String? currency;
+  final int primaryDeviceLimit;
+  final int bonusOtherPlatformLimit;
+  final int totalDeviceLimit;
+
+  String? get formattedPrice {
+    final amount = amountMinor;
+    if (amount == null) return null;
+    final code = (currency ?? 'usd').toUpperCase();
+    final symbol = switch (code) {
+      'USD' => r'$',
+      'EUR' => '€',
+      'GBP' => '£',
+      _ => '',
+    };
+    final value = (amount / 100).toStringAsFixed(2);
+    return symbol.isEmpty ? '$value $code' : '$symbol$value';
+  }
+
+  factory LicensePlanView.fromMap(Map<String, dynamic> map) => LicensePlanView(
+        plan: map['plan'] as String? ?? '',
+        displayName: map['displayName'] as String? ?? '',
+        active: map['active'] as bool? ?? false,
+        amountMinor: (map['amountMinor'] as num?)?.toInt(),
+        currency: map['currency'] as String?,
+        primaryDeviceLimit:
+            (map['primaryDeviceLimit'] as num?)?.toInt() ?? 0,
+        bonusOtherPlatformLimit:
+            (map['bonusOtherPlatformLimit'] as num?)?.toInt() ?? 0,
+        totalDeviceLimit: (map['totalDeviceLimit'] as num?)?.toInt() ?? 0,
+      );
+}
+
 enum LicensePurchaseState {
   licensed,
   processing,
@@ -119,6 +168,17 @@ class LicenseService {
             functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   final FirebaseFunctions _functions;
+
+  Future<List<LicensePlanView>> getPlans() async {
+    final result = await _functions
+        .httpsCallable('getLicensePlans')
+        .call<Map<String, dynamic>>();
+    final rows = (result.data['plans'] as List?) ?? const [];
+    return rows
+        .whereType<Map>()
+        .map((m) => LicensePlanView.fromMap(m.cast<String, dynamic>()))
+        .toList();
+  }
 
   Future<String> createCheckoutSession({
     required String plan,
