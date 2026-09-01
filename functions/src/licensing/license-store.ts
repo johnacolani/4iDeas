@@ -1,14 +1,11 @@
 import {HttpsError} from "firebase-functions/v2/https";
+import {COL, FieldValue, db} from "../core";
 import {
-  COL,
-  FieldValue,
-  db,
-} from "../core";
-import {
+  decideNewActivation,
   getLicensePlanPolicy,
-  classifyActivationSlot,
+  type ActivationBucket,
+  type DevicePlatform,
   type LicensePlan,
-  type LicensePlatform,
 } from "./license-policy";
 
 export type LicenseStatus = "active" | "suspended" | "revoked";
@@ -17,14 +14,15 @@ export interface LicenseRecord {
   ownerUid: string;
   ownerEmail?: string | null;
   plan: LicensePlan;
-  primaryPlatform: LicensePlatform;
+  primaryPlatform: DevicePlatform;
   status: LicenseStatus;
   source: string;
   orderId?: string | null;
   stripeCustomerId?: string | null;
-  baseDeviceLimit: number;
+  primaryDeviceLimit: number;
   bonusOtherPlatformLimit: number;
-  activeBaseDevices: number;
+  totalDeviceLimit: number;
+  activePrimaryDevices: number;
   activeBonusDevices: number;
   createdAt?: unknown;
   updatedAt?: unknown;
@@ -32,7 +30,7 @@ export interface LicenseRecord {
 
 export interface DeviceActivationRequest {
   installationId: string;
-  platform: LicensePlatform;
+  platform: DevicePlatform;
   deviceName?: string | null;
   appVersion?: string | null;
 }
@@ -40,12 +38,27 @@ export interface DeviceActivationRequest {
 export interface DeviceActivationResult {
   licenseId: string;
   installationId: string;
-  slotType: "base" | "bonus";
+  bucket: ActivationBucket;
   alreadyActive: boolean;
-  activeBaseDevices: number;
+  activePrimaryDevices: number;
   activeBonusDevices: number;
-  baseDeviceLimit: number;
+  primaryDeviceLimit: number;
   bonusOtherPlatformLimit: number;
+  totalDeviceLimit: number;
+}
+
+export interface LicenseDeviceRecord {
+  licenseId: string;
+  ownerUid: string;
+  installationId: string;
+  platform: DevicePlatform;
+  bucket: ActivationBucket;
+  deviceName?: string | null;
+  appVersion?: string | null;
+  active: boolean;
+  activatedAt?: unknown;
+  lastSeenAt?: unknown;
+  deactivatedAt?: unknown;
 }
 
 function normalizeInstallationId(value: string): string {
@@ -66,11 +79,15 @@ export function licenseIdForOwner(ownerUid: string): string {
   return `4icad__${ownerUid}`;
 }
 
+/**
+ * Create or refresh a license without resetting activation counters.
+ * This makes Stripe webhook retries and metadata refreshes idempotent.
+ */
 export async function createOrUpdateLicense(params: {
   ownerUid: string;
   ownerEmail?: string | null;
   plan: LicensePlan;
-  primaryPlatform: LicensePlatform;
+  primaryPlatform: DevicePlatform;
   source: string;
   orderId?: string | null;
   stripeCustomerId?: string | null;
@@ -95,11 +112,10 @@ export async function createOrUpdateLicense(params: {
         orderId: params.orderId ?? current?.orderId ?? null,
         stripeCustomerId:
           params.stripeCustomerId ?? current?.stripeCustomerId ?? null,
-        baseDeviceLimit: policy.baseDeviceLimit,
+        primaryDeviceLimit: policy.primaryDeviceLimit,
         bonusOtherPlatformLimit: policy.bonusOtherPlatformLimit,
-        // Never reset counters on an idempotent webhook retry or plan metadata
-        // refresh. Device mutations are the only place these counters change.
-        activeBaseDevices: current?.activeBaseDevices ?? 0,
+        totalDeviceLimit: policy.totalDeviceLimit,
+        activePrimaryDevices: current?.activePrimaryDevices ?? 0,
         activeBonusDevices: current?.activeBonusDevices ?? 0,
         createdAt: current?.createdAt ?? FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
@@ -121,6 +137,15 @@ export async function getOwnerLicense(ownerUid: string): Promise<{
   return {id, data: snap.data() as LicenseRecord};
 }
 
+export async function listOwnerDevices(ownerUid: string): Promise<LicenseDeviceRecord[]> {
+  const licenseId = licenseIdForOwner(ownerUid);
+  const snap = await db
+    .collection(COL.licenseDevices)
+    .where("licenseId", "==", licenseId)
+    .get();
+  return snap.docs.map((doc) => doc.data() as LicenseDeviceRecord);
+}
+
 export async function activateDevice(
   ownerUid: string,
   request: DeviceActivationRequest
@@ -133,10 +158,8 @@ export async function activateDevice(
     .doc(deviceDocId(licenseId, installationId));
 
   return db.runTransaction(async (tx) => {
-    const [licenseSnap, deviceSnap] = await Promise.all([
-      tx.get(licenseRef),
-      tx.get(deviceRef),
-    ]);
+    const licenseSnap = await tx.get(licenseRef);
+    const deviceSnap = await tx.get(deviceRef);
 
     if (!licenseSnap.exists) {
       throw new HttpsError("permission-denied", "No active 4iCAD license was found.");
@@ -147,59 +170,57 @@ export async function activateDevice(
       throw new HttpsError("permission-denied", "This 4iCAD license is not active.");
     }
 
-    const existing = deviceSnap.data() as
-      | {active?: boolean; slotType?: "base" | "bonus"; platform?: LicensePlatform}
-      | undefined;
-
+    const existing = deviceSnap.data() as Partial<LicenseDeviceRecord> | undefined;
     if (deviceSnap.exists && existing?.active === true) {
-      const slotType = existing.slotType ??
-        classifyActivationSlot(license.primaryPlatform, existing.platform ?? request.platform);
+      // Same installation is idempotent. Never let a caller change its platform
+      // to move an already-consumed seat between buckets.
+      const bucket = existing.bucket ??
+        (existing.platform === license.primaryPlatform ? "primary" : "bonus");
       tx.set(
         deviceRef,
         {
           lastSeenAt: FieldValue.serverTimestamp(),
-          deviceName: request.deviceName ?? null,
-          appVersion: request.appVersion ?? null,
+          deviceName: request.deviceName ?? existing.deviceName ?? null,
+          appVersion: request.appVersion ?? existing.appVersion ?? null,
         },
         {merge: true}
       );
       return {
         licenseId,
         installationId,
-        slotType,
+        bucket,
         alreadyActive: true,
-        activeBaseDevices: license.activeBaseDevices ?? 0,
+        activePrimaryDevices: license.activePrimaryDevices ?? 0,
         activeBonusDevices: license.activeBonusDevices ?? 0,
-        baseDeviceLimit: license.baseDeviceLimit,
+        primaryDeviceLimit: license.primaryDeviceLimit,
         bonusOtherPlatformLimit: license.bonusOtherPlatformLimit,
+        totalDeviceLimit: license.totalDeviceLimit,
       };
     }
 
-    const slotType = classifyActivationSlot(
+    const primaryActive = license.activePrimaryDevices ?? 0;
+    const bonusActive = license.activeBonusDevices ?? 0;
+    const decision = decideNewActivation(
+      license.plan,
       license.primaryPlatform,
-      request.platform
+      request.platform,
+      {primaryActive, bonusActive}
     );
-    const activeBaseDevices = license.activeBaseDevices ?? 0;
-    const activeBonusDevices = license.activeBonusDevices ?? 0;
 
-    if (slotType === "base" && activeBaseDevices >= license.baseDeviceLimit) {
-      throw new HttpsError(
-        "resource-exhausted",
-        `Primary-platform device limit reached (${license.baseDeviceLimit}).`
-      );
-    }
-    if (
-      slotType === "bonus" &&
-      activeBonusDevices >= license.bonusOtherPlatformLimit
-    ) {
-      throw new HttpsError(
-        "resource-exhausted",
-        `Other-platform bonus device limit reached (${license.bonusOtherPlatformLimit}).`
-      );
+    if (!decision.allowed) {
+      const limit =
+        decision.bucket === "primary"
+          ? license.primaryDeviceLimit
+          : license.bonusOtherPlatformLimit;
+      const message =
+        decision.bucket === "primary"
+          ? `Primary-platform device limit reached (${limit}).`
+          : `Other-platform bonus device limit reached (${limit}).`;
+      throw new HttpsError("resource-exhausted", message);
     }
 
-    const nextBase = activeBaseDevices + (slotType === "base" ? 1 : 0);
-    const nextBonus = activeBonusDevices + (slotType === "bonus" ? 1 : 0);
+    const nextPrimary = primaryActive + (decision.bucket === "primary" ? 1 : 0);
+    const nextBonus = bonusActive + (decision.bucket === "bonus" ? 1 : 0);
 
     tx.set(
       deviceRef,
@@ -208,7 +229,7 @@ export async function activateDevice(
         ownerUid,
         installationId,
         platform: request.platform,
-        slotType,
+        bucket: decision.bucket,
         deviceName: request.deviceName ?? null,
         appVersion: request.appVersion ?? null,
         active: true,
@@ -219,7 +240,7 @@ export async function activateDevice(
       {merge: true}
     );
     tx.update(licenseRef, {
-      activeBaseDevices: nextBase,
+      activePrimaryDevices: nextPrimary,
       activeBonusDevices: nextBonus,
       updatedAt: FieldValue.serverTimestamp(),
     });
@@ -231,19 +252,20 @@ export async function activateDevice(
       ownerUid,
       installationId,
       platform: request.platform,
-      slotType,
+      bucket: decision.bucket,
       createdAt: FieldValue.serverTimestamp(),
     });
 
     return {
       licenseId,
       installationId,
-      slotType,
+      bucket: decision.bucket,
       alreadyActive: false,
-      activeBaseDevices: nextBase,
+      activePrimaryDevices: nextPrimary,
       activeBonusDevices: nextBonus,
-      baseDeviceLimit: license.baseDeviceLimit,
+      primaryDeviceLimit: license.primaryDeviceLimit,
       bonusOtherPlatformLimit: license.bonusOtherPlatformLimit,
+      totalDeviceLimit: license.totalDeviceLimit,
     };
   });
 }
@@ -260,36 +282,27 @@ export async function deactivateDevice(
     .doc(deviceDocId(licenseId, installationId));
 
   return db.runTransaction(async (tx) => {
-    const [licenseSnap, deviceSnap] = await Promise.all([
-      tx.get(licenseRef),
-      tx.get(deviceRef),
-    ]);
+    const licenseSnap = await tx.get(licenseRef);
+    const deviceSnap = await tx.get(deviceRef);
     if (!licenseSnap.exists || !deviceSnap.exists) return {deactivated: false};
 
     const license = licenseSnap.data() as LicenseRecord;
-    const device = deviceSnap.data() as {
-      ownerUid?: string;
-      active?: boolean;
-      slotType?: "base" | "bonus";
-      platform?: LicensePlatform;
-    };
+    const device = deviceSnap.data() as LicenseDeviceRecord;
     if (license.ownerUid !== ownerUid || device.ownerUid !== ownerUid) {
       throw new HttpsError("permission-denied", "Device does not belong to this license.");
     }
     if (device.active !== true) return {deactivated: false};
 
-    const slotType = device.slotType ??
-      classifyActivationSlot(
-        license.primaryPlatform,
-        device.platform ?? license.primaryPlatform
-      );
-    const nextBase = Math.max(
+    const bucket: ActivationBucket =
+      device.bucket ??
+      (device.platform === license.primaryPlatform ? "primary" : "bonus");
+    const nextPrimary = Math.max(
       0,
-      (license.activeBaseDevices ?? 0) - (slotType === "base" ? 1 : 0)
+      (license.activePrimaryDevices ?? 0) - (bucket === "primary" ? 1 : 0)
     );
     const nextBonus = Math.max(
       0,
-      (license.activeBonusDevices ?? 0) - (slotType === "bonus" ? 1 : 0)
+      (license.activeBonusDevices ?? 0) - (bucket === "bonus" ? 1 : 0)
     );
 
     tx.update(deviceRef, {
@@ -298,7 +311,7 @@ export async function deactivateDevice(
       lastSeenAt: FieldValue.serverTimestamp(),
     });
     tx.update(licenseRef, {
-      activeBaseDevices: nextBase,
+      activePrimaryDevices: nextPrimary,
       activeBonusDevices: nextBonus,
       updatedAt: FieldValue.serverTimestamp(),
     });
@@ -309,7 +322,7 @@ export async function deactivateDevice(
       licenseId,
       ownerUid,
       installationId,
-      slotType,
+      bucket,
       createdAt: FieldValue.serverTimestamp(),
     });
 
