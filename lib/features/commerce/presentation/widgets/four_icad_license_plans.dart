@@ -189,7 +189,7 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
               );
             }
             return Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (var i = 0; i < plans.length; i++) ...[
                   Expanded(child: _planCard(plans[i])),
@@ -280,6 +280,15 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
       return company ? 'Buy Company License' : 'Buy Individual License';
     }
 
+    final VoidCallback? onPressed;
+    if (!widget.signedIn) {
+      onPressed = () => _buy(plan);
+    } else if (widget.emailVerified && canBuy) {
+      onPressed = () => _buy(plan);
+    } else {
+      onPressed = null;
+    }
+
     return FourICadGlassPanel(
       goldBorder: company,
       padding: EdgeInsets.all(widget.isMobile ? 18 : 22),
@@ -342,7 +351,6 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
             Icons.all_inclusive,
             '${plan.totalDeviceLimit} active ${plan.totalDeviceLimit == 1 ? 'device' : 'devices'} maximum',
           ),
-          const Spacer(),
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
@@ -350,9 +358,7 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
               label: buttonLabel(),
               icon: company ? Icons.business_center_outlined : Icons.person_outline,
               busy: busy,
-              onPressed: (!widget.signedIn || canBuy)
-                  ? () => _buy(plan)
-                  : null,
+              onPressed: onPressed,
             ),
           ),
           if (widget.signedIn && !widget.emailVerified) ...[
