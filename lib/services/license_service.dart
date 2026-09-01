@@ -1,5 +1,25 @@
 import 'package:cloud_functions/cloud_functions.dart';
 
+enum LicensePurchaseState {
+  licensed,
+  processing,
+  unpaid,
+  existing,
+  none,
+}
+
+class LicensePurchaseStatus {
+  const LicensePurchaseStatus({
+    required this.state,
+    this.plan,
+    this.primaryPlatform,
+  });
+
+  final LicensePurchaseState state;
+  final String? plan;
+  final String? primaryPlatform;
+}
+
 class LicenseDeviceView {
   const LicenseDeviceView({
     required this.installationId,
@@ -91,7 +111,7 @@ class MyLicenseView {
 }
 
 /// Client wrapper for the device-license backend. Pricing and seat decisions
-/// remain server-side; this class only sends the selected plan/platform and
+/// remain server-side; this class only sends selected plan/platform values and
 /// renders the verified answer.
 class LicenseService {
   LicenseService({FirebaseFunctions? functions})
@@ -115,6 +135,37 @@ class LicenseService {
       throw StateError('Stripe did not return a checkout URL.');
     }
     return url;
+  }
+
+  Future<LicensePurchaseStatus> getPurchaseStatus({String? sessionId}) async {
+    final result = await _functions
+        .httpsCallable('getLicensePurchaseStatus')
+        .call<Map<String, dynamic>>({
+      if (sessionId != null && sessionId.isNotEmpty) 'sessionId': sessionId,
+    });
+    final data = result.data;
+    final rawLicense = data['license'];
+    String? licensePlan;
+    String? primaryPlatform;
+    if (rawLicense is Map) {
+      final map = rawLicense.cast<String, dynamic>();
+      licensePlan = map['plan'] as String?;
+      primaryPlatform = map['primaryPlatform'] as String?;
+    } else {
+      licensePlan = data['licensePlan'] as String?;
+      primaryPlatform = data['primaryPlatform'] as String?;
+    }
+    return LicensePurchaseStatus(
+      state: switch (data['state'] as String?) {
+        'licensed' => LicensePurchaseState.licensed,
+        'processing' => LicensePurchaseState.processing,
+        'unpaid' => LicensePurchaseState.unpaid,
+        'existing' => LicensePurchaseState.existing,
+        _ => LicensePurchaseState.none,
+      },
+      plan: licensePlan,
+      primaryPlatform: primaryPlatform,
+    );
   }
 
   Future<MyLicenseView> getMyLicense() async {
