@@ -1,17 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_actions.dart';
+import 'package:four_ideas/features/commerce/presentation/widgets/four_icad_license_plans.dart';
 
-/// "One CAD. All platforms." — the claim the hero artwork makes, made
-/// actionable.
+/// "One CAD. All platforms." made actionable.
 ///
-/// Every platform 4iCAD is announced on appears here, each saying plainly what
-/// can be done about it today: buy it, open its store listing, try it, or wait.
-/// A platform that is not ready says so rather than being quietly omitted,
-/// because the artwork above already promised it.
+/// The licensing branch now renders the Individual / Company license selector
+/// directly above the platform availability grid. Native Windows/Linux purchase
+/// buttons are intentionally retired here so visitors have one purchase path,
+/// while existing entitlements, downloads, stores and the separate Web trial
+/// keep working during the licensing migration.
 class FourICadPlatformGrid extends StatelessWidget {
   const FourICadPlatformGrid({
     super.key,
@@ -34,67 +36,108 @@ class FourICadPlatformGrid extends StatelessWidget {
   final bool isTablet;
   final bool webTrialExpired;
 
-  /// Starts checkout for a sellable platform.
+  /// Kept for the separate Web purchase path after its 48-hour trial expires.
   final void Function(FourICadPlatform platform) onBuy;
 
-  /// Opens the browser build on its 48-hour trial.
   final VoidCallback onTry;
-
-  /// Opens an App Store / Play listing.
   final void Function(String url) onStore;
-
-  /// Fetches the installer for a platform the visitor owns. The tile is the
-  /// only place a purchase is acted on, so it has to serve owners too.
   final void Function(FourICadPlatform platform) onDownload;
   final bool Function(FourICadPlatform platform) downloading;
-
-  /// Whether anyone is signed in. A tile must not offer "Buy" to a visitor the
-  /// server would refuse — it offers the sign-in step instead.
   final bool signedIn;
-
-  /// Product keys the visitor already owns, so those tiles stop selling.
   final Set<String> owned;
-
-  /// Product key whose checkout is currently starting.
   final String? busyKey;
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     final columns = isMobile ? 1 : (isTablet ? 2 : 3);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const gap = 14.0;
-        final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          // Equal heights across a row: a note that wraps to two lines would
-          // otherwise leave its neighbours short and the row ragged.
-          children: [
-            for (final platform in platforms)
-              SizedBox(
-                width: width,
-                // Store notes can legitimately wrap to three lines. Keep a
-                // shared desktop height large enough for that while clamping
-                // unexpectedly long copy below so the action never overflows.
-                height: isMobile ? null : 210,
-                child: _PlatformTile(
-                  platform: platform,
-                  isMobile: isMobile,
-                  signedIn: signedIn,
-                  downloading: downloading(platform),
-                  onDownload: () => onDownload(platform),
-                  owns: platform.key != null && owned.contains(platform.key),
-                  busy: platform.key != null && platform.key == busyKey,
-                  onBuy: () => onBuy(platform),
-                  onTry: onTry,
-                  onStore: onStore,
-                  webTrialExpired: webTrialExpired,
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        FourICadLicensePlans(
+          signedIn: signedIn,
+          emailVerified: user?.emailVerified ?? false,
+          isMobile: isMobile,
+          isTablet: isTablet,
+        ),
+        SizedBox(height: isMobile ? 18 : 22),
+        FourICadGlassPanel(
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 16 : 18,
+            vertical: 14,
+          ),
+          borderRadius: 14,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 1),
+                child: Icon(
+                  Icons.verified_user_outlined,
+                  size: 19,
+                  color: ColorManager.accentGold,
                 ),
               ),
-          ],
-        );
-      },
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  'Individual and Company licenses are now the purchase path for '
+                  'native 4iCAD access. Existing platform purchases remain valid '
+                  'and still show their download/open actions below.',
+                  style: GoogleFonts.roboto(
+                    fontSize: isMobile ? 12.8 : 13.5,
+                    height: 1.45,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: isMobile ? 18 : 22),
+        Text(
+          'Platform availability',
+          style: GoogleFonts.roboto(
+            fontSize: isMobile ? 17.5 : 19,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const gap = 14.0;
+            final width =
+                (constraints.maxWidth - gap * (columns - 1)) / columns;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (final platform in platforms)
+                  SizedBox(
+                    width: width,
+                    height: isMobile ? null : 210,
+                    child: _PlatformTile(
+                      platform: platform,
+                      isMobile: isMobile,
+                      signedIn: signedIn,
+                      downloading: downloading(platform),
+                      onDownload: () => onDownload(platform),
+                      owns:
+                          platform.key != null && owned.contains(platform.key),
+                      busy: platform.key != null && platform.key == busyKey,
+                      onBuy: () => onBuy(platform),
+                      onTry: onTry,
+                      onStore: onStore,
+                      webTrialExpired: webTrialExpired,
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -143,24 +186,20 @@ class _PlatformTileState extends State<_PlatformTile> {
 
     final (String label, IconData icon, VoidCallback? action) =
         switch (platform.availability) {
-      // Owning a platform turns its tile into the way to use it: the installer
-      // for Windows, the app itself for the browser build.
       _
           when owns &&
               (platform.key == kFourICadWindowsKey ||
                   platform.key == kFourICadLinuxKey) =>
         ('Download', Icons.download, widget.onDownload),
-      _ when owns && platform.key == kFourICadWebKey => (
-          'Open web app',
-          Icons.public,
-          widget.onTry
-        ),
+      _ when owns && platform.key == kFourICadWebKey =>
+        ('Open web app', Icons.public, widget.onTry),
       _ when owns => ('You own this', Icons.check_circle_outline, null),
-      // Says the truthful next step. "Buy" to a signed-out visitor is a
-      // promise the server will refuse.
-      PlatformAvailability.buy => widget.signedIn
-          ? ('Buy', Icons.shopping_cart_outlined, widget.onBuy)
-          : ('Sign in to buy', Icons.lock_outline, widget.onBuy),
+
+      // Native per-platform checkout is retired on the licensing branch.
+      // Individual / Company checkout is shown directly above this grid.
+      PlatformAvailability.buy =>
+        ('Choose license above', Icons.badge_outlined, null),
+
       PlatformAvailability.store => (
           'Open store',
           Icons.open_in_new,
@@ -168,22 +207,15 @@ class _PlatformTileState extends State<_PlatformTile> {
               ? null
               : () => widget.onStore(platform.storeUrl!),
         ),
+
+      // Web is intentionally outside native device-seat accounting in phase 1,
+      // so its existing 48-hour trial and permanent Web purchase remain intact.
       PlatformAvailability.trial => widget.webTrialExpired
-          ? (
-              'Buy Web',
-              Icons.shopping_cart_outlined,
-              widget.onBuy,
-            )
-          : (
-              'Try free — 48h',
-              Icons.timelapse,
-              widget.onTry,
-            ),
-      PlatformAvailability.comingSoon => (
-          'Coming very soon',
-          Icons.schedule,
-          null
-        ),
+          ? ('Buy Web', Icons.shopping_cart_outlined, widget.onBuy)
+          : ('Try free - 48h', Icons.timelapse, widget.onTry),
+
+      PlatformAvailability.comingSoon =>
+        ('Coming very soon', Icons.schedule, null),
     };
 
     final interactive = action != null;
@@ -193,8 +225,6 @@ class _PlatformTileState extends State<_PlatformTile> {
       onEnter: interactive ? (_) => setState(() => _hovered = true) : null,
       onExit: interactive ? (_) => setState(() => _hovered = false) : null,
       child: AnimatedSlide(
-        // A couple of pixels is enough to say "this one responds"; more would
-        // make a six-tile grid restless.
         offset: _hovered ? const Offset(0, -0.012) : Offset.zero,
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOut,
@@ -237,12 +267,15 @@ class _PlatformTileState extends State<_PlatformTile> {
                     if (soon)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 9, vertical: 4),
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.07),
                           borderRadius: BorderRadius.circular(999),
                           border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.16)),
+                            color: Colors.white.withValues(alpha: 0.16),
+                          ),
                         ),
                         child: Text(
                           'SOON',
@@ -275,20 +308,17 @@ class _PlatformTileState extends State<_PlatformTile> {
                     ),
                   ),
                 ],
-                // Pins the action to the bottom so a row of tiles aligns. Only where
-                // the tile has a fixed height — on mobile the column is unbounded and
-                // a flexible child would throw.
                 if (!isMobile) const Spacer() else const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: action == null
                       ? _QuietState(label: label, icon: icon)
-                      : (platform.availability == PlatformAvailability.buy ||
-                              platform.availability ==
-                                  PlatformAvailability.store ||
+                      : (platform.availability == PlatformAvailability.store ||
                               (platform.key == kFourICadWebKey &&
                                   widget.webTrialExpired) ||
-                              (owns && platform.key == kFourICadWindowsKey)
+                              (owns &&
+                                  (platform.key == kFourICadWindowsKey ||
+                                      platform.key == kFourICadLinuxKey))
                           ? FourICadPrimaryButton(
                               label: label,
                               icon: icon,
@@ -312,8 +342,6 @@ class _PlatformTileState extends State<_PlatformTile> {
   }
 }
 
-/// The non-action states — coming soon, and already owned — rendered as a
-/// statement rather than a dead button nobody can press.
 class _QuietState extends StatelessWidget {
   const _QuietState({required this.label, required this.icon});
 
@@ -323,7 +351,12 @@ class _QuietState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final owned = icon == Icons.check_circle_outline;
-    final color = owned ? const Color(0xFF67C79B) : Colors.white54;
+    final licenseChoice = icon == Icons.badge_outlined;
+    final color = owned
+        ? const Color(0xFF67C79B)
+        : licenseChoice
+            ? ColorManager.accentGold
+            : Colors.white54;
 
     return Container(
       height: 48,
@@ -331,7 +364,11 @@ class _QuietState extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: owned ? 0.45 : 0.18)),
+        border: Border.all(
+          color: color.withValues(
+            alpha: owned || licenseChoice ? 0.42 : 0.18,
+          ),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -352,20 +389,10 @@ class _QuietState extends StatelessWidget {
   }
 }
 
-/// One platform logo, drawn to a consistent visual weight.
-///
-/// The source files are all different — 640px to 2400px, some square, some
-/// portrait — so uniformity cannot come from the assets. It comes from here: a
-/// fixed square box, [BoxFit.contain] so nothing is stretched or cropped, and a
-/// tinted plate behind so a dark logo (Apple's, the penguin's outline) still
-/// reads against the dark panel.
 class _PlatformLogo extends StatelessWidget {
   const _PlatformLogo({required this.platform, required this.dimmed});
 
   final FourICadPlatform platform;
-
-  /// Coming-soon platforms are stated quietly, so the ones that can be acted
-  /// on keep the visual weight.
   final bool dimmed;
 
   static const double _box = 40;
@@ -404,8 +431,6 @@ class _PlatformLogo extends StatelessWidget {
                     fit: BoxFit.contain,
                     filterQuality: FilterQuality.medium,
                     semanticLabel: platform.label,
-                    // A missing or corrupt asset must not leave an empty box —
-                    // the glyph carries the same meaning.
                     errorBuilder: (_, __, ___) => Icon(
                       platform.icon,
                       size: 21,
