@@ -7,6 +7,8 @@ export type DevicePlatform =
   | "ios"
   | "android";
 
+export type WebCheckoutPrimaryPlatform = "windows" | "macos" | "linux";
+
 export interface LicensePlanPolicy {
   plan: LicensePlan;
   primaryDeviceLimit: number;
@@ -63,12 +65,32 @@ const DEVICE_PLATFORMS = new Set<DevicePlatform>([
   "android",
 ]);
 
+const WEB_CHECKOUT_PRIMARY_PLATFORMS = new Set<WebCheckoutPrimaryPlatform>([
+  "windows",
+  "macos",
+  "linux",
+]);
+
 export function isLicensePlan(value: unknown): value is LicensePlan {
   return value === "individual" || value === "company";
 }
 
 export function isDevicePlatform(value: unknown): value is DevicePlatform {
   return typeof value === "string" && DEVICE_PLATFORMS.has(value as DevicePlatform);
+}
+
+/**
+ * Primary platforms that may be purchased directly on 4ideasapp.com.
+ * iOS and Android remain valid device platforms for cross-platform activations,
+ * but their storefront purchase path is handled by the respective app stores.
+ */
+export function isWebCheckoutPrimaryPlatform(
+  value: unknown
+): value is WebCheckoutPrimaryPlatform {
+  return (
+    typeof value === "string" &&
+    WEB_CHECKOUT_PRIMARY_PLATFORMS.has(value as WebCheckoutPrimaryPlatform)
+  );
 }
 
 export function getLicensePlanPolicy(plan: LicensePlan): LicensePlanPolicy {
