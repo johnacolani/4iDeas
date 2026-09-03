@@ -9,8 +9,8 @@ import {
   stripeClient,
 } from "../core";
 import {
-  isDevicePlatform,
   isLicensePlan,
+  isWebCheckoutPrimaryPlatform,
   type DevicePlatform,
   type LicensePlan,
 } from "./license-policy";
@@ -50,6 +50,10 @@ function checkoutOrigin(req: {
  * The browser supplies only the requested plan and primary platform. The Stripe
  * Price id remains private in `license_plan_config/{plan}` and is never accepted
  * from client input.
+ *
+ * Website checkout is intentionally limited to Windows, direct-download macOS,
+ * and Linux. iOS and Android remain valid cross-platform activation targets but
+ * their storefront purchase path belongs to the respective app stores.
  */
 export const createLicenseCheckoutSession = onCall(
   {region: "us-central1", secrets: [STRIPE_SECRET_KEY]},
@@ -63,8 +67,11 @@ export const createLicenseCheckoutSession = onCall(
     if (!isLicensePlan(rawPlan)) {
       throw new HttpsError("invalid-argument", "Unknown license plan.");
     }
-    if (!isDevicePlatform(rawPlatform)) {
-      throw new HttpsError("invalid-argument", "Unsupported primary platform.");
+    if (!isWebCheckoutPrimaryPlatform(rawPlatform)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Website checkout supports Windows, macOS direct download, and Linux only."
+      );
     }
 
     const plan: LicensePlan = rawPlan;
