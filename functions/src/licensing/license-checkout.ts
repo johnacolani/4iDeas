@@ -16,6 +16,32 @@ import {
 } from "./license-policy";
 import {getOwnerLicense} from "./license-store";
 
+function checkoutOrigin(req: Parameters<Parameters<typeof onCall>[1]>[0]): string {
+  const rawOrigin = req.rawRequest.headers.origin;
+  if (typeof rawOrigin !== "string" || rawOrigin.trim().isEmpty) {
+    return SITE_ORIGIN;
+  }
+
+  try {
+    const parsed = new URL(rawOrigin);
+    const host = parsed.hostname.toLowerCase();
+    const isProduction =
+      parsed.protocol === "https:" &&
+      (host === "4ideasapp.com" || host === "www.4ideasapp.com");
+    const isLocal =
+      (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+      (host === "localhost" || host === "127.0.0.1");
+
+    if (isProduction || isLocal) {
+      return parsed.origin;
+    }
+  } catch {
+    logger.warn("invalid checkout origin header", {rawOrigin});
+  }
+
+  return SITE_ORIGIN;
+}
+
 /**
  * Starts checkout for the new device-based license model.
  *
@@ -52,8 +78,6 @@ export const createLicenseCheckoutSession = onCall(
       if (existing.data.plan === plan || existing.data.plan === "company") {
         throw new HttpsError("already-exists", "You already have this license.");
       }
-      // The only supported in-place purchase transition for phase one is an
-      // Individual -> Company upgrade on the same primary platform.
       if (!(existing.data.plan === "individual" && plan === "company")) {
         throw new HttpsError("failed-precondition", "Unsupported license change.");
       }
@@ -97,15 +121,15 @@ export const createLicenseCheckoutSession = onCall(
       licensePlan: plan,
       primaryPlatform,
     };
+    const origin = checkoutOrigin(req);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer: customerId,
       line_items: [{price: priceId, quantity: 1}],
       allow_promotion_codes: true,
-      success_url:
-        `${SITE_ORIGIN}/4icad/license-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${SITE_ORIGIN}/4icad?checkout=cancelled`,
+      success_url: `${origin}/4icad/license`,
+      cancel_url: `${origin}/4icad?checkout=cancelled`,
       client_reference_id: uid,
       metadata,
       payment_intent_data: {metadata},
@@ -116,6 +140,7 @@ export const createLicenseCheckoutSession = onCall(
       plan,
       primaryPlatform,
       sessionId: session.id,
+      returnOrigin: origin,
     });
 
     return {sessionId: session.id, url: session.url};
