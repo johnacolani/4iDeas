@@ -21,12 +21,19 @@ class FourICadLicensePlans extends StatefulWidget {
     required this.emailVerified,
     required this.isMobile,
     required this.isTablet,
+    required this.hasLegacyNativePurchase,
   });
 
   final bool signedIn;
   final bool emailVerified;
   final bool isMobile;
   final bool isTablet;
+
+  /// True when this account already owns a legacy native platform entitlement
+  /// such as Windows or Linux. Those purchases remain valid, while the new
+  /// Individual / Company plans are presented as an upgrade rather than a
+  /// second copy of the same product.
+  final bool hasLegacyNativePurchase;
 
   @override
   State<FourICadLicensePlans> createState() => _FourICadLicensePlansState();
@@ -277,6 +284,11 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
       if (!widget.signedIn) return 'Sign in to buy';
       if (!widget.emailVerified) return 'Verify email first';
       if (!canBuy) return 'Not configured yet';
+      if (widget.hasLegacyNativePurchase) {
+        return company
+            ? 'Upgrade to Company License'
+            : 'Upgrade to Individual License';
+      }
       return company ? 'Buy Company License' : 'Buy Individual License';
     }
 
