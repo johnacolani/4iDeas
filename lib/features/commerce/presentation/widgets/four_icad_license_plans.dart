@@ -92,11 +92,14 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
       );
     } catch (error) {
       if (!mounted) return;
-      final message = error.toString().contains('already-exists')
-          ? 'This account already has that 4iCAD license.'
-          : error.toString().contains('failed-precondition')
-              ? 'This license plan is not available for checkout yet.'
-              : 'Could not start license checkout. Please try again.';
+      final rawError = error.toString();
+      final message = rawError.contains('already-exists')
+          ? 'This account already has that 4iCAD license. Open My License to manage it.'
+          : rawError.contains('current primary platform')
+              ? 'This account already has an active 4iCAD license with a different primary platform. Open My License to manage it.'
+              : rawError.contains('failed-precondition')
+                  ? 'This license plan is not available for checkout yet.'
+                  : 'Could not start license checkout. Please try again.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
@@ -128,7 +131,7 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Choose one primary platform. Your free cross-platform activations can be used on other supported native platforms.',
+                    'Choose a desktop primary platform for website checkout. iOS and Android use their app stores and can still use your free cross-platform activations.',
                     style: GoogleFonts.roboto(
                       fontSize: widget.isMobile ? 13.5 : 14.5,
                       height: 1.5,
@@ -224,10 +227,8 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
   Widget _platformChooser() {
     const platforms = <(String, String, IconData)>[
       ('windows', 'Windows', Icons.desktop_windows_outlined),
-      ('macos', 'macOS', Icons.laptop_mac_outlined),
+      ('macos', 'macOS (Direct Download)', Icons.laptop_mac_outlined),
       ('linux', 'Linux', Icons.terminal_outlined),
-      ('ios', 'iOS', Icons.phone_iphone_outlined),
-      ('android', 'Android', Icons.android_outlined),
     ];
 
     return FourICadGlassPanel(
