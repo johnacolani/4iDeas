@@ -51,6 +51,8 @@ class FourICadPlatformGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final columns = isMobile ? 1 : (isTablet ? 2 : 3);
+    final hasLegacyNativePurchase =
+        owned.contains(kFourICadWindowsKey) || owned.contains(kFourICadLinuxKey);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -60,6 +62,7 @@ class FourICadPlatformGrid extends StatelessWidget {
           emailVerified: user?.emailVerified ?? false,
           isMobile: isMobile,
           isTablet: isTablet,
+          hasLegacyNativePurchase: hasLegacyNativePurchase,
         ),
         SizedBox(height: isMobile ? 18 : 22),
         FourICadGlassPanel(
