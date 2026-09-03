@@ -113,19 +113,19 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
                   Text(
                     'Choose your license',
                     style: GoogleFonts.roboto(
-                      fontSize: widget.isMobile ? 20 : 24,
+                      fontSize: widget.isMobile ? 22 : 28,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
-                      letterSpacing: -0.3,
+                      letterSpacing: -0.35,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     'Choose one primary platform. Your free cross-platform activations can be used on other supported native platforms.',
                     style: GoogleFonts.roboto(
-                      fontSize: widget.isMobile ? 13.5 : 14.5,
+                      fontSize: widget.isMobile ? 14.5 : 16,
                       height: 1.5,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withValues(alpha: 0.74),
                     ),
                   ),
                 ],
@@ -137,15 +137,15 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
                 onPressed: widget.signedIn
                     ? () => context.go(AppRoutes.fourICadLicense)
                     : null,
-                icon: const Icon(Icons.devices_outlined, size: 18),
+                icon: const Icon(Icons.devices_outlined, size: 20),
                 label: const Text('My License'),
               ),
             ],
           ],
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
         _platformChooser(),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
         FutureBuilder<List<LicensePlanView>>(
           future: _plans,
           builder: (context, snap) {
@@ -193,7 +193,7 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
               children: [
                 for (var i = 0; i < plans.length; i++) ...[
                   Expanded(child: _planCard(plans[i])),
-                  if (i != plans.length - 1) const SizedBox(width: 14),
+                  if (i != plans.length - 1) const SizedBox(width: 16),
                 ],
               ],
             );
@@ -224,18 +224,27 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
     ];
 
     return FourICadGlassPanel(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       borderRadius: 14,
       child: Row(
         children: [
           const Icon(Icons.computer_outlined,
-              size: 21, color: ColorManager.accentGold),
-          const SizedBox(width: 12),
+              size: 23, color: ColorManager.accentGold),
+          const SizedBox(width: 13),
           Expanded(
             child: DropdownButtonFormField<String>(
               initialValue: _primaryPlatform,
-              decoration: const InputDecoration(
+              style: GoogleFonts.roboto(
+                fontSize: widget.isMobile ? 15.5 : 17,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+              decoration: InputDecoration(
                 labelText: 'Primary platform',
+                labelStyle: GoogleFonts.roboto(
+                  fontSize: widget.isMobile ? 13.5 : 14.5,
+                  color: Colors.white70,
+                ),
                 border: InputBorder.none,
                 isDense: true,
               ),
@@ -246,8 +255,8 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(item.$3, size: 18),
-                        const SizedBox(width: 8),
+                        Icon(item.$3, size: 20),
+                        const SizedBox(width: 9),
                         Text(item.$2),
                       ],
                     ),
@@ -291,7 +300,7 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
 
     return FourICadGlassPanel(
       goldBorder: company,
-      padding: EdgeInsets.all(widget.isMobile ? 18 : 22),
+      padding: EdgeInsets.all(widget.isMobile ? 20 : 26),
       borderRadius: 16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +312,7 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
                   '${plan.displayName} License',
                   style: GoogleFonts.roboto(
                     color: Colors.white,
-                    fontSize: 19,
+                    fontSize: widget.isMobile ? 20 : 22,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -316,42 +325,42 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             price ?? 'Pricing not configured',
             style: GoogleFonts.roboto(
               color: Colors.white,
-              fontSize: 31,
+              fontSize: widget.isMobile ? 34 : 38,
               height: 1,
               fontWeight: FontWeight.w800,
-              letterSpacing: -0.8,
+              letterSpacing: -0.9,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 7),
           Text(
             'one-time purchase',
             style: GoogleFonts.roboto(
-              color: Colors.white54,
-              fontSize: 12.5,
+              color: Colors.white60,
+              fontSize: widget.isMobile ? 13 : 14,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           _benefit(
             Icons.devices_outlined,
             '${plan.primaryDeviceLimit} ${plan.primaryDeviceLimit == 1 ? 'device' : 'devices'} on your primary platform',
           ),
-          const SizedBox(height: 9),
+          const SizedBox(height: 10),
           _benefit(
             Icons.add_circle_outline,
             '+${plan.bonusOtherPlatformLimit} FREE ${plan.bonusOtherPlatformLimit == 1 ? 'activation' : 'activations'} on other platforms',
             gold: true,
           ),
-          const SizedBox(height: 9),
+          const SizedBox(height: 10),
           _benefit(
             Icons.all_inclusive,
             '${plan.totalDeviceLimit} active ${plan.totalDeviceLimit == 1 ? 'device' : 'devices'} maximum',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
           SizedBox(
             width: double.infinity,
             child: FourICadPrimaryButton(
@@ -362,12 +371,12 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
             ),
           ),
           if (widget.signedIn && !widget.emailVerified) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               'Open the verification link in your email, then refresh this page.',
               style: GoogleFonts.roboto(
-                color: ColorManager.accentGold.withValues(alpha: 0.85),
-                fontSize: 12,
+                color: ColorManager.accentGold.withValues(alpha: 0.88),
+                fontSize: 13,
                 height: 1.4,
               ),
             ),
@@ -383,17 +392,17 @@ class _FourICadLicensePlansState extends State<FourICadLicensePlans> {
       children: [
         Icon(
           icon,
-          size: 18,
+          size: 19,
           color: gold ? ColorManager.accentGold : Colors.white70,
         ),
-        const SizedBox(width: 9),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.roboto(
               color: gold ? ColorManager.accentGold : Colors.white70,
-              fontSize: 13.5,
-              height: 1.4,
+              fontSize: widget.isMobile ? 14.5 : 15.5,
+              height: 1.42,
               fontWeight: gold ? FontWeight.w600 : FontWeight.w400,
             ),
           ),
