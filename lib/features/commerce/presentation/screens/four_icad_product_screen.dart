@@ -578,12 +578,14 @@ class _PriceCard extends StatelessWidget {
               children: [
                 const Icon(Icons.verified, size: 19, color: Color(0xFF67C79B)),
                 const SizedBox(width: 8),
-                Text(
-                  'You own this',
-                  style: GoogleFonts.roboto(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF67C79B),
+                Flexible(
+                  child: Text(
+                    'You own 4iCAD for Windows',
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF67C79B),
+                    ),
                   ),
                 ),
               ],
