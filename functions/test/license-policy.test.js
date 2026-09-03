@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const {
   LICENSE_PLAN_POLICIES,
   decideNewActivation,
+  isWebCheckoutPrimaryPlatform,
 } = require("../lib/licensing/license-policy.js");
 
 test("individual license is 1 primary + 1 bonus", () => {
@@ -22,6 +23,15 @@ test("company license is 10 primary + 3 bonus", () => {
     bonusOtherPlatformLimit: 3,
     totalDeviceLimit: 13,
   });
+});
+
+test("website checkout primary platforms exclude app-store platforms", () => {
+  assert.equal(isWebCheckoutPrimaryPlatform("windows"), true);
+  assert.equal(isWebCheckoutPrimaryPlatform("macos"), true);
+  assert.equal(isWebCheckoutPrimaryPlatform("linux"), true);
+  assert.equal(isWebCheckoutPrimaryPlatform("ios"), false);
+  assert.equal(isWebCheckoutPrimaryPlatform("android"), false);
+  assert.equal(isWebCheckoutPrimaryPlatform("web"), false);
 });
 
 test("individual primary seat blocks the second primary device", () => {
