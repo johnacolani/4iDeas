@@ -16,9 +16,11 @@ import {
 } from "./license-policy";
 import {getOwnerLicense} from "./license-store";
 
-function checkoutOrigin(req: Parameters<Parameters<typeof onCall>[1]>[0]): string {
+function checkoutOrigin(req: {
+  rawRequest: {headers: {origin?: string | string[]}};
+}): string {
   const rawOrigin = req.rawRequest.headers.origin;
-  if (typeof rawOrigin !== "string" || rawOrigin.trim().isEmpty) {
+  if (typeof rawOrigin !== "string" || rawOrigin.trim().length === 0) {
     return SITE_ORIGIN;
   }
 
