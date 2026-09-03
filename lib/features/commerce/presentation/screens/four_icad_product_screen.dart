@@ -238,26 +238,6 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Choose your platform',
-          style: GoogleFonts.roboto(
-            fontSize: isMobile ? 19 : 22,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'One licence per platform. Windows, Linux, and the browser build are '
-          'available separately; mobile and macOS releases are close behind.',
-          style: GoogleFonts.roboto(
-            fontSize: isMobile ? 13.5 : 14.5,
-            height: 1.5,
-            color: Colors.white.withValues(alpha: 0.7),
-          ),
-        ),
-        SizedBox(height: isMobile ? 14 : 18),
         // Streams so a platform can go on sale, or gain a store link, without
         // shipping a new build.
         StreamBuilder<List<FourICadPlatform>>(
@@ -610,7 +590,7 @@ class _PriceCard extends StatelessWidget {
             )
           else if (price != null) ...[
             Text(
-              'ONE-TIME',
+              'STARTING AT',
               style: GoogleFonts.robotoMono(
                 fontSize: 10.5,
                 letterSpacing: 1.8,
@@ -631,7 +611,7 @@ class _PriceCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'No subscription. Updates included.',
+              'One-time purchase. Updates included.',
               style: GoogleFonts.roboto(
                 fontSize: 12.5,
                 height: 1.4,
@@ -811,7 +791,7 @@ class _HeroCopy extends StatelessWidget {
               // rendered a fifth larger than the metadata around it.
               if (price != null && !windowsOwns)
                 FourICadMetaChip(
-                  label: '$price one-time',
+                  label: 'Starting at $price',
                   icon: Icons.sell_outlined,
                   emphasise: true,
                   large: true,
