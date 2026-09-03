@@ -101,14 +101,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Stream<User?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      return firebaseUser != null ? UserModel.fromFirebaseUser(firebaseUser) : null;
+      return firebaseUser != null
+          ? UserModel.fromFirebaseUser(firebaseUser)
+          : null;
     });
   }
 
   @override
   User? get currentUser {
     final firebaseUser = _firebaseAuth.currentUser;
-    return firebaseUser != null ? UserModel.fromFirebaseUser(firebaseUser) : null;
+    return firebaseUser != null
+        ? UserModel.fromFirebaseUser(firebaseUser)
+        : null;
   }
 
   @override
@@ -162,24 +166,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<User> signInWithGoogle() async {
     try {
-      // Trigger the authentication flow
+      // On web, use Firebase Auth's native OAuth popup flow. This avoids
+      // depending on the google_sign_in web implementation, its separate GIS
+      // client setup, and the historical People API failure seen by 4iDeas.
+      if (kIsWeb) {
+        final provider = GoogleAuthProvider();
+        final userCredential = await _firebaseAuth.signInWithPopup(provider);
+        final firebaseUser = userCredential.user;
+        if (firebaseUser == null) {
+          throw 'Google sign in was cancelled or failed';
+        }
+        return UserModel.fromFirebaseUser(firebaseUser);
+      }
+
+      // Native platforms keep the existing google_sign_in flow.
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       if (googleUser == null) {
         throw 'Google sign in was cancelled';
       }
 
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-      // Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase with the Google credential
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
       return UserModel.fromFirebaseUser(userCredential.user!);
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseException(e);
@@ -194,9 +210,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (kIsWeb) {
         // On web, let Firebase handle the complete Apple OAuth flow in a
         // popup. This avoids redirect-result state being lost across a full
-        // page reload (and avoids third-party storage restrictions that can
-        // affect redirect auth on custom domains).
-        final appleProvider = AppleAuthProvider();
+        // page reload and keeps both federated providers on the same Firebase
+        // Auth path.
+        final appleProvider = AppleAuthProvider()
+          ..addScope('email')
+          ..addScope('name');
         final userCredential =
             await _firebaseAuth.signInWithPopup(appleProvider);
 
@@ -206,8 +224,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
         return UserModel.fromFirebaseUser(firebaseUser);
       } else {
-        // For iOS/Android, use the sign_in_with_apple package
-        // Request credential
+        // For iOS/Android, use the sign_in_with_apple package.
         final appleCredential = await SignInWithApple.getAppleIDCredential(
           scopes: [
             AppleIDAuthorizationScopes.email,
@@ -215,18 +232,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           ],
         );
 
-        // Create OAuth credential
-        final oauthCredential = OAuthProvider("apple.com").credential(
+        final oauthCredential = OAuthProvider('apple.com').credential(
           idToken: appleCredential.identityToken,
           accessToken: appleCredential.authorizationCode,
         );
 
-        // Sign in to Firebase with the Apple credential
-        final userCredential = await _firebaseAuth.signInWithCredential(oauthCredential);
+        final userCredential =
+            await _firebaseAuth.signInWithCredential(oauthCredential);
 
-        // If this is the first time signing in, update the display name
-        if (appleCredential.givenName != null || appleCredential.familyName != null) {
-          final displayName = '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'.trim();
+        if (appleCredential.givenName != null ||
+            appleCredential.familyName != null) {
+          final displayName =
+              '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
+                  .trim();
           if (displayName.isNotEmpty && userCredential.user != null) {
             await userCredential.user!.updateDisplayName(displayName);
             await userCredential.user!.reload();
@@ -243,8 +261,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on FirebaseAuthException catch (e) {
       throw _handleFirebaseException(e);
     } catch (e) {
-      // Better error handling for web platform issues
-      if (kIsWeb && (e.toString().contains('TypeError') || e.toString().contains('JSObject'))) {
+      if (kIsWeb &&
+          (e.toString().contains('TypeError') ||
+              e.toString().contains('JSObject'))) {
         throw 'Apple Sign-In on web requires proper configuration. Please ensure Service ID is configured in Apple Developer Portal and Firebase Console.';
       }
       throw 'Apple sign in failed: ${e.toString()}';
@@ -262,15 +281,29 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       case 'user-not-found':
         return 'No user found with that email.';
       case 'wrong-password':
-        return 'Wrong password provided.';
+      case 'invalid-credential':
+        return 'The sign-in credential is invalid.';
       case 'user-disabled':
         return 'This user account has been disabled.';
       case 'too-many-requests':
         return 'Too many requests. Please try again later.';
       case 'operation-not-allowed':
-        return 'This operation is not allowed.';
+        return 'This sign-in method is not enabled in Firebase Authentication.';
       case 'requires-recent-login':
         return 'This operation requires recent authentication. Please log in again.';
+      case 'unauthorized-domain':
+        return 'This website domain is not authorized for sign-in in Firebase Authentication.';
+      case 'popup-blocked':
+        return 'The browser blocked the sign-in window. Please allow pop-ups and try again.';
+      case 'popup-closed-by-user':
+      case 'cancelled-popup-request':
+        return 'Sign in was cancelled.';
+      case 'account-exists-with-different-credential':
+        return 'An account already exists with this email using a different sign-in method.';
+      case 'operation-not-supported-in-this-environment':
+        return 'This sign-in method is not supported in the current browser environment.';
+      case 'network-request-failed':
+        return 'Network error. Check your connection and try again.';
       default:
         return e.message ?? 'An authentication error occurred.';
     }
