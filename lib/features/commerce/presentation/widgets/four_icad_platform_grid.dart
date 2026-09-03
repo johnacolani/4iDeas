@@ -61,11 +61,11 @@ class FourICadPlatformGrid extends StatelessWidget {
           isMobile: isMobile,
           isTablet: isTablet,
         ),
-        SizedBox(height: isMobile ? 18 : 22),
+        SizedBox(height: isMobile ? 18 : 24),
         FourICadGlassPanel(
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 16 : 18,
-            vertical: 14,
+            horizontal: isMobile ? 16 : 20,
+            vertical: isMobile ? 14 : 16,
           ),
           borderRadius: 14,
           child: Row(
@@ -75,36 +75,36 @@ class FourICadPlatformGrid extends StatelessWidget {
                 padding: EdgeInsets.only(top: 1),
                 child: Icon(
                   Icons.verified_user_outlined,
-                  size: 19,
+                  size: 20,
                   color: ColorManager.accentGold,
                 ),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Individual and Company licenses are now the purchase path for '
                   'native 4iCAD access. Existing platform purchases remain valid '
                   'and still show their download/open actions below.',
                   style: GoogleFonts.roboto(
-                    fontSize: isMobile ? 12.8 : 13.5,
-                    height: 1.45,
-                    color: Colors.white.withValues(alpha: 0.72),
+                    fontSize: isMobile ? 13.5 : 15,
+                    height: 1.5,
+                    color: Colors.white.withValues(alpha: 0.74),
                   ),
                 ),
               ),
             ],
           ),
         ),
-        SizedBox(height: isMobile ? 18 : 22),
+        SizedBox(height: isMobile ? 20 : 26),
         Text(
           'Platform availability',
           style: GoogleFonts.roboto(
-            fontSize: isMobile ? 17.5 : 19,
+            fontSize: isMobile ? 19 : 22,
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         LayoutBuilder(
           builder: (context, constraints) {
             const gap = 14.0;
@@ -117,7 +117,7 @@ class FourICadPlatformGrid extends StatelessWidget {
                 for (final platform in platforms)
                   SizedBox(
                     width: width,
-                    height: isMobile ? null : 210,
+                    height: isMobile ? null : 226,
                     child: _PlatformTile(
                       platform: platform,
                       isMobile: isMobile,
@@ -244,7 +244,7 @@ class _PlatformTileState extends State<_PlatformTile> {
                 : const [],
           ),
           child: FourICadGlassPanel(
-            padding: EdgeInsets.all(isMobile ? 18 : 20),
+            padding: EdgeInsets.all(isMobile ? 18 : 21),
             borderRadius: 14,
             goldBorder: _hovered && interactive,
             child: Column(
@@ -253,12 +253,12 @@ class _PlatformTileState extends State<_PlatformTile> {
                 Row(
                   children: [
                     _PlatformLogo(platform: platform, dimmed: soon),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 13),
                     Expanded(
                       child: Text(
                         platform.label,
                         style: GoogleFonts.roboto(
-                          fontSize: 17,
+                          fontSize: isMobile ? 17.5 : 18.5,
                           fontWeight: FontWeight.w700,
                           color: soon ? Colors.white70 : Colors.white,
                         ),
@@ -280,7 +280,7 @@ class _PlatformTileState extends State<_PlatformTile> {
                         child: Text(
                           'SOON',
                           style: GoogleFonts.robotoMono(
-                            fontSize: 10.5,
+                            fontSize: 11,
                             letterSpacing: 1.1,
                             fontWeight: FontWeight.w700,
                             color: Colors.white54,
@@ -290,7 +290,7 @@ class _PlatformTileState extends State<_PlatformTile> {
                   ],
                 ),
                 if (platform.note != null) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 9),
                   Tooltip(
                     message: platform.note!,
                     child: Text(
@@ -300,10 +300,10 @@ class _PlatformTileState extends State<_PlatformTile> {
                           ? TextOverflow.visible
                           : TextOverflow.ellipsis,
                       style: GoogleFonts.roboto(
-                        fontSize: 13,
-                        height: 1.4,
+                        fontSize: isMobile ? 13.5 : 14.5,
+                        height: 1.45,
                         color:
-                            Colors.white.withValues(alpha: soon ? 0.45 : 0.7),
+                            Colors.white.withValues(alpha: soon ? 0.48 : 0.74),
                       ),
                     ),
                   ),
@@ -359,7 +359,7 @@ class _QuietState extends StatelessWidget {
             : Colors.white54;
 
     return Container(
-      height: 48,
+      height: 50,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.04),
@@ -373,12 +373,12 @@ class _QuietState extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 17, color: color),
+          Icon(icon, size: 18, color: color),
           const SizedBox(width: 9),
           Text(
             label,
             style: GoogleFonts.roboto(
-              fontSize: 14.5,
+              fontSize: 15.5,
               fontWeight: FontWeight.w600,
               color: color,
             ),
@@ -395,8 +395,8 @@ class _PlatformLogo extends StatelessWidget {
   final FourICadPlatform platform;
   final bool dimmed;
 
-  static const double _box = 40;
-  static const double _logo = 26;
+  static const double _box = 42;
+  static const double _logo = 28;
 
   @override
   Widget build(BuildContext context) {
@@ -421,7 +421,7 @@ class _PlatformLogo extends StatelessWidget {
           child: asset == null
               ? Icon(
                   platform.icon,
-                  size: 21,
+                  size: 22,
                   color: dimmed ? Colors.white38 : ColorManager.accentGold,
                 )
               : Opacity(
@@ -433,7 +433,7 @@ class _PlatformLogo extends StatelessWidget {
                     semanticLabel: platform.label,
                     errorBuilder: (_, __, ___) => Icon(
                       platform.icon,
-                      size: 21,
+                      size: 22,
                       color: dimmed ? Colors.white38 : ColorManager.accentGold,
                     ),
                   ),
