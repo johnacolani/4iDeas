@@ -62,11 +62,15 @@ export const SITE_ORIGIN = "https://4ideasapp.com";
 export const COL = {
   products: "products",
   productConfig: "product_config",
+  licensePlanConfig: "license_plan_config",
   releases: "releases",
   productOrders: "product_orders",
   entitlements: "entitlements",
   stripeEvents: "stripe_events",
   webTrials: "web_trials",
+  licenses: "licenses",
+  licenseDevices: "license_devices",
+  licenseAudit: "license_audit",
 } as const;
 
 let cachedStripe: Stripe | null = null;

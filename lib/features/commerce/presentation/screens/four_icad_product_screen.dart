@@ -238,26 +238,6 @@ class _FourICadProductScreenState extends State<FourICadProductScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Choose your platform',
-          style: GoogleFonts.roboto(
-            fontSize: isMobile ? 19 : 22,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'One licence per platform. Windows, Linux, and the browser build are '
-          'available separately; mobile and macOS releases are close behind.',
-          style: GoogleFonts.roboto(
-            fontSize: isMobile ? 13.5 : 14.5,
-            height: 1.5,
-            color: Colors.white.withValues(alpha: 0.7),
-          ),
-        ),
-        SizedBox(height: isMobile ? 14 : 18),
         // Streams so a platform can go on sale, or gain a store link, without
         // shipping a new build.
         StreamBuilder<List<FourICadPlatform>>(
@@ -598,19 +578,21 @@ class _PriceCard extends StatelessWidget {
               children: [
                 const Icon(Icons.verified, size: 19, color: Color(0xFF67C79B)),
                 const SizedBox(width: 8),
-                Text(
-                  'You own this',
-                  style: GoogleFonts.roboto(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF67C79B),
+                Flexible(
+                  child: Text(
+                    'You own 4iCAD for Windows',
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF67C79B),
+                    ),
                   ),
                 ),
               ],
             )
           else if (price != null) ...[
             Text(
-              'ONE-TIME',
+              'STARTING AT',
               style: GoogleFonts.robotoMono(
                 fontSize: 10.5,
                 letterSpacing: 1.8,
@@ -631,7 +613,7 @@ class _PriceCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'No subscription. Updates included.',
+              'One-time purchase. Updates included.',
               style: GoogleFonts.roboto(
                 fontSize: 12.5,
                 height: 1.4,
@@ -767,10 +749,8 @@ class _HeroCopy extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        // Larger and tighter than before: at this size the name is the anchor
-        // of the page, and the negative tracking keeps it from sprawling.
         Text(
-          product.displayName,
+          'Mobile-first CAD',
           style: GoogleFonts.roboto(
             fontSize: isMobile ? 36 : 52,
             height: 1.02,
@@ -779,19 +759,15 @@ class _HeroCopy extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        if (product.tagline != null) ...[
-          const SizedBox(height: 16),
-          Text(
-            product.tagline!,
-            style: GoogleFonts.roboto(
-              fontSize: isMobile ? 16 : 18.5,
-              height: 1.55,
-              // Brighter than the old 0.82: on the darker panel this is the
-              // difference between "quiet" and "washed out".
-              color: Colors.white.withValues(alpha: 0.88),
-            ),
+        const SizedBox(height: 16),
+        Text(
+          'Connected to the cloud, built for phones, tablets, and desktops.',
+          style: GoogleFonts.roboto(
+            fontSize: isMobile ? 16 : 18.5,
+            height: 1.55,
+            color: Colors.white.withValues(alpha: 0.88),
           ),
-        ],
+        ),
         const SizedBox(height: 24),
         // Desktop lifts this into the price card beside the pitch; stacked
         // narrow layouts keep it inline, where there is no void to fill.
@@ -811,7 +787,7 @@ class _HeroCopy extends StatelessWidget {
               // rendered a fifth larger than the metadata around it.
               if (price != null && !windowsOwns)
                 FourICadMetaChip(
-                  label: '$price one-time',
+                  label: 'Starting at $price',
                   icon: Icons.sell_outlined,
                   emphasise: true,
                   large: true,
