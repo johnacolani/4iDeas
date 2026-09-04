@@ -45,7 +45,12 @@ async function verifyIcadIdentity(
   if (!match) {
     throw new HttpsError("unauthenticated", "4iCAD sign-in is required.");
   }
-  const decoded = await icadAuth().verifyIdToken(match[1], true);
+  // Signature, issuer, audience and expiry are verified against icad-75d53.
+  // Revocation lookup is intentionally not requested here because the function
+  // runs under the separate 4iDeas project service account; Firebase ID tokens
+  // are short-lived and a foreign-project revocation lookup would require
+  // cross-project IAM solely for this bridge.
+  const decoded = await icadAuth().verifyIdToken(match[1]);
   const email = typeof decoded.email === "string" ? normalizeEmail(decoded.email) : "";
   if (!email || decoded.email_verified !== true) {
     throw new HttpsError(
