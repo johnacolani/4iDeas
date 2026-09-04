@@ -77,6 +77,24 @@ async function resolveLinkedIdentity(
         "The saved 4iCAD license link no longer matches this account."
       );
     }
+
+    try {
+      const websiteUser = await auth.getUser(websiteUid);
+      const websiteEmail = normalizeEmail(websiteUser.email ?? "");
+      if (websiteUser.emailVerified !== true || websiteEmail !== icad.email) {
+        throw new HttpsError(
+          "permission-denied",
+          "The linked 4iDeas account no longer has the same verified email."
+        );
+      }
+    } catch (error: unknown) {
+      if (error instanceof HttpsError) throw error;
+      throw new HttpsError(
+        "permission-denied",
+        "The linked 4iDeas account is no longer available."
+      );
+    }
+
     return {icadUid: icad.uid, websiteUid, email: icad.email};
   }
 
