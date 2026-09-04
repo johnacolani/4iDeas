@@ -24,6 +24,7 @@ export {setPlatformStoreListing} from "./platforms/store-listings";
 export {getLicensePlans} from "./licensing/license-catalog";
 export {createLicenseCheckoutSession} from "./licensing/license-checkout";
 export {getLicensePurchaseStatus} from "./licensing/license-status";
+export {fourICadLicenseBridge} from "./licensing/icad-license-bridge";
 export {
   getMyLicense,
   activateMyDevice,
