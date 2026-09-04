@@ -749,10 +749,8 @@ class _HeroCopy extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        // Larger and tighter than before: at this size the name is the anchor
-        // of the page, and the negative tracking keeps it from sprawling.
         Text(
-          product.displayName,
+          'Mobile-first CAD',
           style: GoogleFonts.roboto(
             fontSize: isMobile ? 36 : 52,
             height: 1.02,
@@ -761,19 +759,15 @@ class _HeroCopy extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        if (product.tagline != null) ...[
-          const SizedBox(height: 16),
-          Text(
-            product.tagline!,
-            style: GoogleFonts.roboto(
-              fontSize: isMobile ? 16 : 18.5,
-              height: 1.55,
-              // Brighter than the old 0.82: on the darker panel this is the
-              // difference between "quiet" and "washed out".
-              color: Colors.white.withValues(alpha: 0.88),
-            ),
+        const SizedBox(height: 16),
+        Text(
+          'Connected to the cloud, built for phones, tablets, and desktops.',
+          style: GoogleFonts.roboto(
+            fontSize: isMobile ? 16 : 18.5,
+            height: 1.55,
+            color: Colors.white.withValues(alpha: 0.88),
           ),
-        ],
+        ),
         const SizedBox(height: 24),
         // Desktop lifts this into the price card beside the pitch; stacked
         // narrow layouts keep it inline, where there is no void to fill.
