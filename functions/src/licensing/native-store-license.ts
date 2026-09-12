@@ -51,6 +51,9 @@ export async function getNativeStoreOwnerUid(
  * Claim verified store evidence exactly once and ensure it results in one
  * durable Individual license. The external transaction/token can never be
  * attached to a different 4iCAD account after it has been claimed.
+ *
+ * Raw Google Play purchase tokens are intentionally not persisted. The
+ * deterministic SHA-256 document id is sufficient for replay prevention.
  */
 export async function grantNativeStoreLicense(params: {
   icadUid: string;
@@ -86,7 +89,7 @@ export async function grantNativeStoreLicense(params: {
       purchaseRef,
       {
         store: purchase.store,
-        externalPurchaseId: purchase.externalPurchaseId,
+        purchaseEvidenceHash: purchaseId,
         productId: purchase.productId,
         platform: purchase.platform,
         environment: purchase.environment,
@@ -125,7 +128,7 @@ export async function grantNativeStoreLicense(params: {
       plan: "individual",
       primaryPlatform: purchase.platform,
       source: purchase.store === "apple" ? "app_store" : "google_play",
-      orderId: purchase.orderId ?? purchase.externalPurchaseId,
+      orderId: purchase.orderId ?? purchaseId,
     });
     license = await getOwnerLicense(ownerUid);
   }
@@ -147,6 +150,7 @@ export async function grantNativeStoreLicense(params: {
     platform: purchase.platform,
     environment: purchase.environment,
     orderId: purchase.orderId ?? null,
+    purchaseEvidenceHash: purchaseId,
     createdAt: FieldValue.serverTimestamp(),
   });
 
