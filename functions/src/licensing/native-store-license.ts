@@ -1,6 +1,6 @@
 import {createHash} from "node:crypto";
 import {HttpsError} from "firebase-functions/v2/https";
-import {COL, FieldValue, db} from "../core";
+import {COL, FieldValue, auth, db} from "../core";
 import type {DevicePlatform} from "./license-policy";
 import {
   createOrUpdateLicense,
@@ -48,6 +48,30 @@ export async function getNativeStoreOwnerUid(
 }
 
 /**
+ * If the same verified email already owns a 4iDeas website license, reuse that
+ * license owner instead of manufacturing a second independent entitlement.
+ */
+async function preferredLicenseOwner(
+  icadUid: string,
+  email: string
+): Promise<string> {
+  try {
+    const websiteUser = await auth.getUserByEmail(email);
+    if (websiteUser.emailVerified === true) {
+      const websiteLicense = await getOwnerLicense(websiteUser.uid);
+      if (websiteLicense) return websiteUser.uid;
+    }
+  } catch (error: unknown) {
+    const code =
+      typeof error === "object" && error !== null && "code" in error
+        ? String((error as {code?: unknown}).code)
+        : "";
+    if (code !== "auth/user-not-found") throw error;
+  }
+  return syntheticOwnerUid(icadUid);
+}
+
+/**
  * Claim verified store evidence exactly once and ensure it results in one
  * durable Individual license. The external transaction/token can never be
  * attached to a different 4iCAD account after it has been claimed.
@@ -64,6 +88,7 @@ export async function grantNativeStoreLicense(params: {
   const purchaseId = purchaseDocId(purchase.store, purchase.externalPurchaseId);
   const purchaseRef = db.collection(COL.nativeStorePurchases).doc(purchaseId);
   const linkRef = db.collection(COL.nativeStoreLicenseLinks).doc(icadUid);
+  const preferredOwnerUid = await preferredLicenseOwner(icadUid, email);
 
   const ownerUid = await db.runTransaction(async (tx) => {
     const [purchaseSnap, linkSnap] = await Promise.all([
@@ -82,7 +107,7 @@ export async function grantNativeStoreLicense(params: {
     }
 
     const existingOwnerUid = String(linkSnap.data()?.ownerUid ?? "").trim();
-    const resolvedOwnerUid = existingOwnerUid || syntheticOwnerUid(icadUid);
+    const resolvedOwnerUid = existingOwnerUid || preferredOwnerUid;
     const now = FieldValue.serverTimestamp();
 
     tx.set(
