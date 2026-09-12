@@ -37,7 +37,23 @@ function syntheticOwnerUid(icadUid: string): string {
   return `icad-store:${icadUid}`;
 }
 
-/** Return a previously established native-store license owner for a 4iCAD UID. */
+function normalizedEnvironment(purchase: VerifiedNativePurchase): string {
+  return purchase.environment.trim().toLowerCase();
+}
+
+function isTestPurchase(purchase: VerifiedNativePurchase): boolean {
+  const environment = normalizedEnvironment(purchase);
+  return environment === "sandbox" || environment === "test";
+}
+
+function syntheticTestOwnerUid(
+  icadUid: string,
+  purchase: VerifiedNativePurchase
+): string {
+  return `icad-store-test:${purchase.store}:${normalizedEnvironment(purchase)}:${icadUid}`;
+}
+
+/** Return a previously established production native-store license owner for a 4iCAD UID. */
 export async function getNativeStoreOwnerUid(
   icadUid: string
 ): Promise<string | null> {
@@ -77,6 +93,11 @@ async function preferredLicenseOwner(
  * durable Individual license. The external transaction/token can never be
  * attached to a different 4iCAD account after it has been claimed.
  *
+ * Sandbox / license-tester purchases are deliberately isolated from production
+ * native-store links and website licenses. They get a deterministic test owner
+ * so restore/reinstall can be exercised without creating a production
+ * cross-platform entitlement that would survive launch.
+ *
  * Raw Google Play purchase tokens are intentionally not persisted. The
  * deterministic SHA-256 document id is sufficient for replay prevention.
  */
@@ -86,16 +107,19 @@ export async function grantNativeStoreLicense(params: {
   purchase: VerifiedNativePurchase;
 }): Promise<NativeStoreLicenseGrant> {
   const {icadUid, email, purchase} = params;
+  const testPurchase = isTestPurchase(purchase);
   const purchaseId = purchaseDocId(purchase.store, purchase.externalPurchaseId);
   const purchaseRef = db.collection(COL.nativeStorePurchases).doc(purchaseId);
-  const linkRef = db.collection(COL.nativeStoreLicenseLinks).doc(icadUid);
-  const preferredOwnerUid = await preferredLicenseOwner(icadUid, email);
+  const linkRef = testPurchase
+    ? null
+    : db.collection(COL.nativeStoreLicenseLinks).doc(icadUid);
+  const preferredOwnerUid = testPurchase
+    ? syntheticTestOwnerUid(icadUid, purchase)
+    : await preferredLicenseOwner(icadUid, email);
 
   const ownerUid = await db.runTransaction(async (tx) => {
-    const [purchaseSnap, linkSnap] = await Promise.all([
-      tx.get(purchaseRef),
-      tx.get(linkRef),
-    ]);
+    const purchaseSnap = await tx.get(purchaseRef);
+    const linkSnap = linkRef ? await tx.get(linkRef) : null;
 
     if (purchaseSnap.exists) {
       const claimedIcadUid = String(purchaseSnap.data()?.icadUid ?? "").trim();
@@ -107,7 +131,9 @@ export async function grantNativeStoreLicense(params: {
       }
     }
 
-    const existingOwnerUid = String(linkSnap.data()?.ownerUid ?? "").trim();
+    const existingOwnerUid = linkSnap
+      ? String(linkSnap.data()?.ownerUid ?? "").trim()
+      : "";
     const resolvedOwnerUid = existingOwnerUid || preferredOwnerUid;
     const now = FieldValue.serverTimestamp();
 
@@ -119,6 +145,7 @@ export async function grantNativeStoreLicense(params: {
         productId: purchase.productId,
         platform: purchase.platform,
         environment: purchase.environment,
+        testPurchase,
         orderId: purchase.orderId ?? null,
         icadUid,
         ownerUid: resolvedOwnerUid,
@@ -130,30 +157,35 @@ export async function grantNativeStoreLicense(params: {
       {merge: true}
     );
 
-    tx.set(
-      linkRef,
-      {
-        icadUid,
-        ownerUid: resolvedOwnerUid,
-        email,
-        source: "native_store",
-        createdAt: linkSnap.data()?.createdAt ?? now,
-        updatedAt: now,
-      },
-      {merge: true}
-    );
+    if (linkRef) {
+      tx.set(
+        linkRef,
+        {
+          icadUid,
+          ownerUid: resolvedOwnerUid,
+          email,
+          source: "native_store",
+          createdAt: linkSnap?.data()?.createdAt ?? now,
+          updatedAt: now,
+        },
+        {merge: true}
+      );
+    }
 
     return resolvedOwnerUid;
   });
 
   let license = await getOwnerLicense(ownerUid);
   if (!license) {
+    const source = purchase.store === "apple"
+      ? testPurchase ? "app_store_test" : "app_store"
+      : testPurchase ? "google_play_test" : "google_play";
     await createOrUpdateLicense({
       ownerUid,
       ownerEmail: email,
       plan: "individual",
       primaryPlatform: purchase.platform,
-      source: purchase.store === "apple" ? "app_store" : "google_play",
+      source,
       orderId: purchase.orderId ?? purchaseId,
     });
     license = await getOwnerLicense(ownerUid);
@@ -175,6 +207,7 @@ export async function grantNativeStoreLicense(params: {
     productId: purchase.productId,
     platform: purchase.platform,
     environment: purchase.environment,
+    testPurchase,
     orderId: purchase.orderId ?? null,
     purchaseEvidenceHash: purchaseId,
     createdAt: FieldValue.serverTimestamp(),
