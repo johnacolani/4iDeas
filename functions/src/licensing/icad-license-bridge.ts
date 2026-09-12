@@ -1,70 +1,49 @@
-import {applicationDefault, getApps, initializeApp} from "firebase-admin/app";
-import {getAuth} from "firebase-admin/auth";
-import {onRequest, HttpsError} from "firebase-functions/v2/https";
+import {HttpsError, onRequest} from "firebase-functions/v2/https";
 import {auth, db, FieldValue} from "../core";
+import {normalizeEmail, verifyIcadIdentity} from "./icad-auth";
 import {isDevicePlatform} from "./license-policy";
 import {
   activateDevice,
   deactivateDevice,
   getOwnerLicense,
 } from "./license-store";
+import {getNativeStoreOwnerUid} from "./native-store-license";
 
-const ICAD_AUTH_PROJECT_ID = "icad-75d53";
-const ICAD_AUTH_APP_NAME = "icad-license-bridge";
 const LINK_COLLECTION = "license_account_links";
 const REVERSE_LINK_COLLECTION = "license_account_links_by_website";
 
 interface BridgeIdentity {
   icadUid: string;
-  websiteUid: string;
+  ownerUid: string;
   email: string;
+  source: "native_store" | "website";
 }
 
-function normalizeEmail(value: string): string {
-  return value.trim().toLowerCase();
-}
-
-function icadAuth() {
-  const existing = getApps().find((app) => app.name === ICAD_AUTH_APP_NAME);
-  const app =
-    existing ??
-    initializeApp(
-      {
-        credential: applicationDefault(),
-        projectId: ICAD_AUTH_PROJECT_ID,
-      },
-      ICAD_AUTH_APP_NAME
-    );
-  return getAuth(app);
-}
-
-async function verifyIcadIdentity(
-  authorizationHeader: string | undefined
-): Promise<{uid: string; email: string}> {
-  const match = authorizationHeader?.match(/^Bearer\s+(.+)$/i);
-  if (!match) {
-    throw new HttpsError("unauthenticated", "4iCAD sign-in is required.");
-  }
-  // Signature, issuer, audience and expiry are verified against icad-75d53.
-  // Revocation lookup is intentionally not requested here because the function
-  // runs under the separate 4iDeas project service account; Firebase ID tokens
-  // are short-lived and a foreign-project revocation lookup would require
-  // cross-project IAM solely for this bridge.
-  const decoded = await icadAuth().verifyIdToken(match[1]);
-  const email = typeof decoded.email === "string" ? normalizeEmail(decoded.email) : "";
-  if (!email || decoded.email_verified !== true) {
-    throw new HttpsError(
-      "failed-precondition",
-      "Verify the email on your 4iCAD account before linking a license."
-    );
-  }
-  return {uid: decoded.uid, email};
-}
-
+/**
+ * Resolve the trusted license owner for a signed-in 4iCAD identity.
+ *
+ * A previously verified native-store purchase takes precedence because it is
+ * already bound to the 4iCAD UID. Otherwise we fall back to the existing
+ * verified-email bridge into a 4iDeas website account.
+ */
 async function resolveLinkedIdentity(
   authorizationHeader: string | undefined
 ): Promise<BridgeIdentity> {
   const icad = await verifyIcadIdentity(authorizationHeader);
+
+  const nativeOwnerUid = await getNativeStoreOwnerUid(icad.uid);
+  if (nativeOwnerUid) {
+    const nativeLicense = await getOwnerLicense(nativeOwnerUid);
+    if (nativeLicense) {
+      return {
+        icadUid: icad.uid,
+        ownerUid: nativeOwnerUid,
+        email: icad.email,
+        source: "native_store",
+      };
+    }
+  }
+
   const linkRef = db.collection(LINK_COLLECTION).doc(icad.uid);
   const existing = await linkRef.get();
 
@@ -95,7 +74,12 @@ async function resolveLinkedIdentity(
       );
     }
 
-    return {icadUid: icad.uid, websiteUid, email: icad.email};
+    return {
+      icadUid: icad.uid,
+      ownerUid: websiteUid,
+      email: icad.email,
+      source: "website",
+    };
   }
 
   let websiteUser;
@@ -109,7 +93,7 @@ async function resolveLinkedIdentity(
     if (code === "auth/user-not-found") {
       throw new HttpsError(
         "not-found",
-        "No 4iDeas account was found with the same verified email."
+        "No verified 4iCAD license or matching 4iDeas account was found."
       );
     }
     throw error;
@@ -123,9 +107,7 @@ async function resolveLinkedIdentity(
   }
 
   const websiteUid = websiteUser.uid;
-  const reverseRef = db
-    .collection(REVERSE_LINK_COLLECTION)
-    .doc(websiteUid);
+  const reverseRef = db.collection(REVERSE_LINK_COLLECTION).doc(websiteUid);
 
   await db.runTransaction(async (tx) => {
     const [linkSnap, reverseSnap] = await Promise.all([
@@ -170,7 +152,12 @@ async function resolveLinkedIdentity(
     });
   });
 
-  return {icadUid: icad.uid, websiteUid, email: icad.email};
+  return {
+    icadUid: icad.uid,
+    ownerUid: websiteUid,
+    email: icad.email,
+    source: "website",
+  };
 }
 
 function serializeLicense(license: NonNullable<Awaited<ReturnType<typeof getOwnerLicense>>>) {
@@ -180,6 +167,7 @@ function serializeLicense(license: NonNullable<Awaited<ReturnType<typeof getOwne
     plan: data.plan,
     primaryPlatform: data.primaryPlatform,
     status: data.status,
+    source: data.source,
     primaryDeviceLimit: data.primaryDeviceLimit,
     bonusOtherPlatformLimit: data.bonusOtherPlatformLimit,
     totalDeviceLimit: data.totalDeviceLimit,
@@ -226,11 +214,11 @@ export const fourICadLicenseBridge = onRequest(
 
     try {
       const identity = await resolveLinkedIdentity(req.get("authorization"));
-      const license = await getOwnerLicense(identity.websiteUid);
+      const license = await getOwnerLicense(identity.ownerUid);
       if (!license) {
         throw new HttpsError(
           "not-found",
-          "No 4iCAD license was found on the linked 4iDeas account."
+          "No 4iCAD license was found for this verified account."
         );
       }
       if (license.data.status !== "active") {
@@ -244,6 +232,7 @@ export const fourICadLicenseBridge = onRequest(
       if (action === "status") {
         res.status(200).json({
           linked: true,
+          source: identity.source,
           license: serializeLicense(license),
         });
         return;
@@ -262,7 +251,7 @@ export const fourICadLicenseBridge = onRequest(
         if (!isDevicePlatform(platform)) {
           throw new HttpsError("invalid-argument", "Unsupported platform.");
         }
-        const activation = await activateDevice(identity.websiteUid, {
+        const activation = await activateDevice(identity.ownerUid, {
           installationId,
           platform,
           deviceName: req.body?.deviceName
@@ -274,6 +263,7 @@ export const fourICadLicenseBridge = onRequest(
         });
         res.status(200).json({
           linked: true,
+          source: identity.source,
           license: serializeLicense(license),
           activation,
         });
@@ -281,11 +271,8 @@ export const fourICadLicenseBridge = onRequest(
       }
 
       if (action === "deactivate") {
-        const result = await deactivateDevice(
-          identity.websiteUid,
-          installationId
-        );
-        res.status(200).json({linked: true, ...result});
+        const result = await deactivateDevice(identity.ownerUid, installationId);
+        res.status(200).json({linked: true, source: identity.source, ...result});
         return;
       }
 
