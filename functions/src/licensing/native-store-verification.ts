@@ -4,6 +4,7 @@ import {
   APPLE_IAP_ISSUER_ID,
   APPLE_IAP_KEY_ID,
   APPLE_IAP_PRIVATE_KEY,
+  APPLE_IAP_SANDBOX_ENABLED,
   GOOGLE_PLAY_SERVICE_ACCOUNT_JSON,
 } from "../core";
 import {verifyIcadIdentity} from "./icad-auth";
@@ -106,6 +107,11 @@ function createAppleApiToken(): string {
   return `${signingInput}.${signature}`;
 }
 
+function appleSandboxEnabled(): boolean {
+  const value = APPLE_IAP_SANDBOX_ENABLED.value().trim().toLowerCase();
+  return value === "1" || value === "true" || value === "yes" || value === "on";
+}
+
 function decodeAppleSignedTransaction(jws: string): JsonObject {
   const parts = jws.split(".");
   if (parts.length !== 3 || !parts[1]) {
@@ -128,16 +134,19 @@ async function verifyApplePurchase(
 
   const bearer = createAppleApiToken();
   const encodedTransactionId = encodeURIComponent(transactionId);
-  const environments = [
+  const allowSandbox = appleSandboxEnabled();
+  const environments: Array<{name: "production" | "sandbox"; url: string}> = [
     {
       name: "production",
       url: `https://api.storekit.apple.com/inApps/v1/transactions/${encodedTransactionId}`,
     },
-    {
+  ];
+  if (allowSandbox) {
+    environments.push({
       name: "sandbox",
       url: `https://api.storekit-sandbox.apple.com/inApps/v1/transactions/${encodedTransactionId}`,
-    },
-  ] as const;
+    });
+  }
 
   for (const environment of environments) {
     let response;
@@ -151,6 +160,16 @@ async function verifyApplePurchase(
     }
 
     if (response.status === 404) continue;
+    if (
+      environment.name === "production" &&
+      allowSandbox &&
+      response.status === 401
+    ) {
+      // Before an app is live, Apple's production transaction endpoint can
+      // reject the same valid API key that works in Sandbox. Only fall back
+      // when the server-side test gate is explicitly enabled.
+      continue;
+    }
     if (!response.ok) {
       throw new HttpsError(
         response.status === 401 ? "failed-precondition" : "unavailable",
@@ -176,6 +195,9 @@ async function verifyApplePurchase(
     const originalTransactionId = String(
       transaction.originalTransactionId ?? verifiedTransactionId
     );
+    const verifiedEnvironment = String(
+      transaction.environment ?? environment.name
+    ).toLowerCase();
 
     if (bundleId !== APPLE_BUNDLE_ID || productId !== FULL_ACCESS_PRODUCT_ID) {
       throw new HttpsError(
@@ -198,13 +220,19 @@ async function verifyApplePurchase(
         "This App Store purchase has been revoked or refunded."
       );
     }
+    if (verifiedEnvironment === "sandbox" && !allowSandbox) {
+      throw new HttpsError(
+        "permission-denied",
+        "Sandbox App Store purchases are disabled on this server."
+      );
+    }
 
     return {
       store: "apple",
       externalPurchaseId: originalTransactionId || verifiedTransactionId,
       productId,
       platform,
-      environment: String(transaction.environment ?? environment.name).toLowerCase(),
+      environment: verifiedEnvironment,
       orderId: verifiedTransactionId || transactionId,
     };
   }
@@ -444,6 +472,7 @@ export const fourICadVerifyNativePurchase = onRequest(
       APPLE_IAP_KEY_ID,
       APPLE_IAP_ISSUER_ID,
       APPLE_IAP_PRIVATE_KEY,
+      APPLE_IAP_SANDBOX_ENABLED,
       GOOGLE_PLAY_SERVICE_ACCOUNT_JSON,
     ],
   },
