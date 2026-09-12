@@ -48,8 +48,9 @@ export async function getNativeStoreOwnerUid(
 }
 
 /**
- * If the same verified email already owns a 4iDeas website license, reuse that
- * license owner instead of manufacturing a second independent entitlement.
+ * If the same verified email already owns an ACTIVE 4iDeas website license,
+ * reuse that license owner instead of manufacturing a second entitlement.
+ * Suspended/revoked website licenses never absorb a newly paid native purchase.
  */
 async function preferredLicenseOwner(
   icadUid: string,
@@ -59,7 +60,7 @@ async function preferredLicenseOwner(
     const websiteUser = await auth.getUserByEmail(email);
     if (websiteUser.emailVerified === true) {
       const websiteLicense = await getOwnerLicense(websiteUser.uid);
-      if (websiteLicense) return websiteUser.uid;
+      if (websiteLicense?.data.status === "active") return websiteUser.uid;
     }
   } catch (error: unknown) {
     const code =
