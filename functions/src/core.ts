@@ -43,6 +43,7 @@ export {FieldValue};
  *   firebase functions:secrets:set APPLE_IAP_KEY_ID
  *   firebase functions:secrets:set APPLE_IAP_ISSUER_ID
  *   firebase functions:secrets:set APPLE_IAP_PRIVATE_KEY
+ *   firebase functions:secrets:set APPLE_IAP_SANDBOX_ENABLED
  *   firebase functions:secrets:set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
  */
 export const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
@@ -51,6 +52,9 @@ export const WEB_TRIAL_SIGNING_KEY = defineSecret("WEB_TRIAL_SIGNING_KEY");
 export const APPLE_IAP_KEY_ID = defineSecret("APPLE_IAP_KEY_ID");
 export const APPLE_IAP_ISSUER_ID = defineSecret("APPLE_IAP_ISSUER_ID");
 export const APPLE_IAP_PRIVATE_KEY = defineSecret("APPLE_IAP_PRIVATE_KEY");
+export const APPLE_IAP_SANDBOX_ENABLED = defineSecret(
+  "APPLE_IAP_SANDBOX_ENABLED"
+);
 export const GOOGLE_PLAY_SERVICE_ACCOUNT_JSON = defineSecret(
   "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
 );
