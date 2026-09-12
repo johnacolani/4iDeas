@@ -15,9 +15,6 @@ export {
 } from "./product-catalog";
 export type {DownloadPlatform, DownloadableProduct} from "./product-catalog";
 
-// Authorization guards live in their own side-effect-free module so they can be
-// unit tested without initialising the Admin SDK. Re-exported here so existing
-// call sites keep importing them from `core`.
 export {
   LEGACY_ADMIN_EMAILS,
   requireAuth,
@@ -37,22 +34,26 @@ export {FieldValue};
  * Secrets live in Google Secret Manager and are injected at runtime. They are
  * never bundled into client code and never logged.
  *
- * Set them with:
+ * Stripe / trial:
  *   firebase functions:secrets:set STRIPE_SECRET_KEY
  *   firebase functions:secrets:set STRIPE_WEBHOOK_SECRET
  *   firebase functions:secrets:set WEB_TRIAL_SIGNING_KEY
+ *
+ * Native store verification:
+ *   firebase functions:secrets:set APPLE_IAP_KEY_ID
+ *   firebase functions:secrets:set APPLE_IAP_ISSUER_ID
+ *   firebase functions:secrets:set APPLE_IAP_PRIVATE_KEY
+ *   firebase functions:secrets:set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
  */
 export const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 export const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
-
-/**
- * HMAC key for 4iCAD web-app trial tokens.
- *
- * Only this backend ever holds it: the web app verifies a token by calling
- * `verifyWebTrial`, never by checking a signature itself. Any long random
- * string works — e.g. `openssl rand -base64 48`.
- */
 export const WEB_TRIAL_SIGNING_KEY = defineSecret("WEB_TRIAL_SIGNING_KEY");
+export const APPLE_IAP_KEY_ID = defineSecret("APPLE_IAP_KEY_ID");
+export const APPLE_IAP_ISSUER_ID = defineSecret("APPLE_IAP_ISSUER_ID");
+export const APPLE_IAP_PRIVATE_KEY = defineSecret("APPLE_IAP_PRIVATE_KEY");
+export const GOOGLE_PLAY_SERVICE_ACCOUNT_JSON = defineSecret(
+  "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
+);
 
 /** Public site origin used to build Stripe return URLs. */
 export const SITE_ORIGIN = "https://4ideasapp.com";
@@ -71,6 +72,8 @@ export const COL = {
   licenses: "licenses",
   licenseDevices: "license_devices",
   licenseAudit: "license_audit",
+  nativeStorePurchases: "native_store_purchases",
+  nativeStoreLicenseLinks: "native_store_license_links",
 } as const;
 
 let cachedStripe: Stripe | null = null;
@@ -78,8 +81,6 @@ let cachedStripe: Stripe | null = null;
 /** Lazily construct Stripe so the secret is only read inside a request. */
 export function stripeClient(): Stripe {
   if (!cachedStripe) {
-    // Pin to the API version this SDK build targets, so a future SDK bump is a
-    // deliberate, reviewable change rather than a silent behaviour shift.
     cachedStripe = new Stripe(STRIPE_SECRET_KEY.value(), {
       apiVersion: "2025-02-24.acacia",
       typescript: true,
