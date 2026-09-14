@@ -79,6 +79,7 @@ export const COL = {
   nativeStorePurchases: "native_store_purchases",
   nativeStoreLicenseLinks: "native_store_license_links",
   appleStoreNotifications: "apple_store_notifications",
+  googlePlayNotifications: "google_play_notifications",
 } as const;
 
 let cachedStripe: Stripe | null = null;
