@@ -27,6 +27,7 @@ export {getLicensePurchaseStatus} from "./licensing/license-status";
 export {fourICadLicenseBridge} from "./licensing/icad-license-bridge";
 export {fourICadVerifyNativePurchase} from "./licensing/native-store-verification";
 export {fourICadAppleStoreNotifications} from "./licensing/apple-store-notifications";
+export {fourICadGooglePlayNotifications} from "./licensing/google-play-rtdn";
 export {
   getMyLicense,
   activateMyDevice,
