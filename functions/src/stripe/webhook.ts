@@ -4,18 +4,26 @@ import type Stripe from "stripe";
 import {
   COL,
   FieldValue,
+  LINUX_PRODUCT_KEY,
+  PRODUCT_KEY,
   STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET,
   db,
   entitlementId,
   stripeClient,
 } from "../core";
+import {
+  isDevicePlatform,
+  isLicensePlan,
+  type DevicePlatform,
+} from "../licensing/license-policy";
+import {createOrUpdateLicense} from "../licensing/license-store";
 
 /**
  * A Checkout Session is fulfillable when Stripe says the money question is
  * settled. That is `paid` for a normal purchase and `no_payment_required` for a
  * fully-discounted (100% off) order — which is a real order, not a bypass.
- * Anything else (notably `unpaid`) must never grant an entitlement.
+ * Anything else (notably `unpaid`) must never grant access.
  */
 function isFulfillable(session: Stripe.Checkout.Session): boolean {
   return session.payment_status === "paid" || session.payment_status === "no_payment_required";
@@ -38,52 +46,76 @@ function discountInfo(session: Stripe.Checkout.Session) {
   };
 }
 
-/**
- * Writes the order and entitlement for a fulfillable session.
- *
- * Idempotency has two layers: the event id is claimed in a transaction before
- * any work happens, and the order document is keyed by Checkout Session id. A
- * Stripe retry therefore cannot produce a duplicate order or a second
- * entitlement, no matter how many times it is delivered.
- */
-async function fulfill(session: Stripe.Checkout.Session, eventId: string, eventType: string) {
-  const uid = (session.metadata?.firebaseUid ?? session.client_reference_id) as string | undefined;
-  const productKey = session.metadata?.productKey as string | undefined;
+function downloadableProductForPrimaryPlatform(
+  platform: DevicePlatform
+): string | null {
+  if (platform === "windows") return PRODUCT_KEY;
+  if (platform === "linux") return LINUX_PRODUCT_KEY;
+  return null;
+}
 
-  if (!uid || !productKey) {
-    logger.error("session missing firebaseUid/productKey metadata", {sessionId: session.id});
-    return;
-  }
-  if (!isFulfillable(session)) {
-    logger.info("session not fulfillable; no entitlement granted", {
-      sessionId: session.id,
-      paymentStatus: session.payment_status,
-    });
-    return;
+function stripeCustomerId(session: Stripe.Checkout.Session): string | null {
+  return typeof session.customer === "string"
+    ? session.customer
+    : session.customer?.id ?? null;
+}
+
+function paymentIntentId(session: Stripe.Checkout.Session): string | null {
+  return typeof session.payment_intent === "string"
+    ? session.payment_intent
+    : session.payment_intent?.id ?? null;
+}
+
+function customerEmail(session: Stripe.Checkout.Session): string | null {
+  return session.customer_details?.email ?? session.customer_email ?? null;
+}
+
+/**
+ * New license purchase fulfillment. A paid license is created first, then the
+ * order and any compatible protected-download entitlement are persisted.
+ * Retries are safe: license creation preserves counters and order ids are keyed
+ * by Checkout Session id.
+ */
+async function fulfillLicensePurchase(
+  session: Stripe.Checkout.Session,
+  eventId: string,
+  eventType: string,
+  uid: string
+) {
+  const rawPlan = session.metadata?.licensePlan;
+  const rawPlatform = session.metadata?.primaryPlatform;
+  if (!isLicensePlan(rawPlan) || !isDevicePlatform(rawPlatform)) {
+    throw new Error(`Malformed license checkout metadata for ${session.id}`);
   }
 
   const d = discountInfo(session);
-  const orderRef = db.collection(COL.productOrders).doc(session.id);
-  const entRef = db.collection(COL.entitlements).doc(entitlementId(uid, productKey));
+  const legacyProductKey = downloadableProductForPrimaryPlatform(rawPlatform);
 
+  await createOrUpdateLicense({
+    ownerUid: uid,
+    ownerEmail: customerEmail(session),
+    plan: rawPlan,
+    primaryPlatform: rawPlatform,
+    source: "stripe_checkout",
+    orderId: session.id,
+    stripeCustomerId: stripeCustomerId(session),
+  });
+
+  const orderRef = db.collection(COL.productOrders).doc(session.id);
   await db.runTransaction(async (tx) => {
     const existing = await tx.get(orderRef);
-
     tx.set(
       orderRef,
       {
         uid,
-        productKey,
-        customerEmail:
-          session.customer_details?.email ?? session.customer_email ?? null,
-        stripeCustomerId:
-          typeof session.customer === "string" ? session.customer : session.customer?.id ?? null,
+        purchaseKind: "4icad_license",
+        licensePlan: rawPlan,
+        primaryPlatform: rawPlatform,
+        productKey: legacyProductKey,
+        customerEmail: customerEmail(session),
+        stripeCustomerId: stripeCustomerId(session),
         checkoutSessionId: session.id,
-        paymentIntentId:
-          typeof session.payment_intent === "string"
-            ? session.payment_intent
-            : session.payment_intent?.id ?? null,
-        // amount_subtotal is the pre-discount total; amount_total is what was charged.
+        paymentIntentId: paymentIntentId(session),
         originalAmount: session.amount_subtotal ?? null,
         amountPaid: session.amount_total ?? 0,
         currency: session.currency ?? null,
@@ -95,7 +127,6 @@ async function fulfill(session: Stripe.Checkout.Session, eventId: string, eventT
         percentOff: d.percentOff,
         paymentStatus: session.payment_status,
         status: "completed",
-        // A 100%-off order is a real order that simply required no payment.
         isFreeRedemption: (session.amount_total ?? 0) === 0,
         purchasedAt: existing.exists
           ? existing.data()?.purchasedAt ?? FieldValue.serverTimestamp()
@@ -107,8 +138,85 @@ async function fulfill(session: Stripe.Checkout.Session, eventId: string, eventT
       {merge: true}
     );
 
-    // Entitlement is product-scoped, not release-scoped, so a buyer keeps
-    // access to every future Current release without a new purchase.
+    // Windows/Linux still use the existing protected-download flow. Mirroring
+    // the license into the legacy product entitlement keeps that flow working
+    // while the website UI is migrated to the new plan model.
+    if (legacyProductKey) {
+      const entRef = db
+        .collection(COL.entitlements)
+        .doc(entitlementId(uid, legacyProductKey));
+      tx.set(
+        entRef,
+        {
+          uid,
+          productKey: legacyProductKey,
+          active: true,
+          source: "4icad_license",
+          licensePlan: rawPlan,
+          primaryPlatform: rawPlatform,
+          orderId: session.id,
+          grantedAt: FieldValue.serverTimestamp(),
+        },
+        {merge: true}
+      );
+    }
+  });
+
+  logger.info("license order fulfilled", {
+    uid,
+    licensePlan: rawPlan,
+    primaryPlatform: rawPlatform,
+    sessionId: session.id,
+  });
+}
+
+/** Existing platform-product purchase fulfillment retained during migration. */
+async function fulfillLegacyProductPurchase(
+  session: Stripe.Checkout.Session,
+  eventId: string,
+  eventType: string,
+  uid: string,
+  productKey: string
+) {
+  const d = discountInfo(session);
+  const orderRef = db.collection(COL.productOrders).doc(session.id);
+  const entRef = db.collection(COL.entitlements).doc(entitlementId(uid, productKey));
+
+  await db.runTransaction(async (tx) => {
+    const existing = await tx.get(orderRef);
+
+    tx.set(
+      orderRef,
+      {
+        uid,
+        purchaseKind: "legacy_product",
+        productKey,
+        customerEmail: customerEmail(session),
+        stripeCustomerId: stripeCustomerId(session),
+        checkoutSessionId: session.id,
+        paymentIntentId: paymentIntentId(session),
+        originalAmount: session.amount_subtotal ?? null,
+        amountPaid: session.amount_total ?? 0,
+        currency: session.currency ?? null,
+        amountDiscount: d.amountDiscount,
+        promotionCode: d.promotionCode,
+        promotionCodeId: d.promotionCodeId,
+        couponId: d.couponId,
+        couponName: d.couponName,
+        percentOff: d.percentOff,
+        paymentStatus: session.payment_status,
+        status: "completed",
+        isFreeRedemption: (session.amount_total ?? 0) === 0,
+        purchasedAt: existing.exists
+          ? existing.data()?.purchasedAt ?? FieldValue.serverTimestamp()
+          : FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        lastEventId: eventId,
+        lastEventType: eventType,
+      },
+      {merge: true}
+    );
+
     tx.set(
       entRef,
       {
@@ -123,14 +231,44 @@ async function fulfill(session: Stripe.Checkout.Session, eventId: string, eventT
     );
   });
 
-  logger.info("order fulfilled", {uid, productKey, sessionId: session.id});
+  logger.info("legacy product order fulfilled", {
+    uid,
+    productKey,
+    sessionId: session.id,
+  });
+}
+
+async function fulfill(session: Stripe.Checkout.Session, eventId: string, eventType: string) {
+  const uid = (session.metadata?.firebaseUid ?? session.client_reference_id) as
+    | string
+    | undefined;
+
+  if (!uid) {
+    throw new Error(`Session ${session.id} missing firebase uid metadata`);
+  }
+  if (!isFulfillable(session)) {
+    logger.info("session not fulfillable; no access granted", {
+      sessionId: session.id,
+      paymentStatus: session.payment_status,
+    });
+    return;
+  }
+
+  if (session.metadata?.purchaseKind === "4icad_license") {
+    await fulfillLicensePurchase(session, eventId, eventType, uid);
+    return;
+  }
+
+  const productKey = session.metadata?.productKey;
+  if (!productKey) {
+    throw new Error(`Session ${session.id} missing productKey metadata`);
+  }
+  await fulfillLegacyProductPurchase(session, eventId, eventType, uid, productKey);
 }
 
 /**
- * Stripe webhook endpoint. This — not `/4icad/success` — is what grants access.
- *
- * Requires the raw request body for signature verification, which
- * `onRequest` preserves via `req.rawBody`.
+ * Stripe webhook endpoint. This — not any success page — is what grants access.
+ * Requires the raw request body for signature verification.
  */
 export const stripeWebhook = onRequest(
   {region: "us-central1", secrets: [STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET], cors: false},
@@ -154,15 +292,12 @@ export const stripeWebhook = onRequest(
         signature,
         STRIPE_WEBHOOK_SECRET.value()
       );
-    } catch (err) {
-      // Never echo the error detail to the caller.
+    } catch {
       logger.warn("webhook signature verification failed");
       res.status(400).send("Invalid signature");
       return;
     }
 
-    // Claim the event id first. If it is already claimed, this is a retry of
-    // something we finished, so acknowledge without repeating the work.
     const eventRef = db.collection(COL.stripeEvents).doc(event.id);
     const fresh = await db.runTransaction(async (tx) => {
       const snap = await tx.get(eventRef);
@@ -190,8 +325,6 @@ export const stripeWebhook = onRequest(
       switch (event.type) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded": {
-        // Re-fetch with discounts expanded — the event payload does not carry
-        // the coupon/promotion objects we record on the order.
         const raw = event.data.object as Stripe.Checkout.Session;
         const session = await stripe.checkout.sessions.retrieve(raw.id, {
           expand: ["discounts.promotion_code", "discounts.coupon", "payment_intent"],
@@ -206,7 +339,10 @@ export const stripeWebhook = onRequest(
           {
             checkoutSessionId: session.id,
             uid: session.metadata?.firebaseUid ?? session.client_reference_id ?? null,
+            purchaseKind: session.metadata?.purchaseKind ?? "legacy_product",
             productKey: session.metadata?.productKey ?? null,
+            licensePlan: session.metadata?.licensePlan ?? null,
+            primaryPlatform: session.metadata?.primaryPlatform ?? null,
             status: event.type === "checkout.session.expired" ? "expired" : "failed",
             paymentStatus: session.payment_status,
             updatedAt: FieldValue.serverTimestamp(),
@@ -227,7 +363,6 @@ export const stripeWebhook = onRequest(
       );
       res.status(200).send("ok");
     } catch (err) {
-      // Leave the event un-processed so Stripe's retry can complete it.
       await eventRef.set(
         {status: "error", error: String(err), erroredAt: FieldValue.serverTimestamp()},
         {merge: true}

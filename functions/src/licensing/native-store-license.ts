@@ -1,0 +1,217 @@
+import {createHash} from "node:crypto";
+import {HttpsError} from "firebase-functions/v2/https";
+import {COL, FieldValue, auth, db} from "../core";
+import type {DevicePlatform} from "./license-policy";
+import {
+  createOrUpdateLicense,
+  getOwnerLicense,
+  type LicenseRecord,
+} from "./license-store";
+
+export type NativeStoreName = "apple" | "google_play";
+
+export interface VerifiedNativePurchase {
+  store: NativeStoreName;
+  externalPurchaseId: string;
+  productId: string;
+  platform: DevicePlatform;
+  environment: string;
+  orderId?: string | null;
+}
+
+export interface NativeStoreLicenseGrant {
+  ownerUid: string;
+  license: {
+    id: string;
+    data: LicenseRecord;
+  };
+}
+
+function purchaseDocId(store: NativeStoreName, externalPurchaseId: string): string {
+  return createHash("sha256")
+    .update(`${store}:${externalPurchaseId}`, "utf8")
+    .digest("hex");
+}
+
+function syntheticOwnerUid(icadUid: string): string {
+  return `icad-store:${icadUid}`;
+}
+
+function normalizedEnvironment(purchase: VerifiedNativePurchase): string {
+  return purchase.environment.trim().toLowerCase();
+}
+
+function isTestPurchase(purchase: VerifiedNativePurchase): boolean {
+  const environment = normalizedEnvironment(purchase);
+  return environment === "sandbox" || environment === "test";
+}
+
+function syntheticTestOwnerUid(
+  icadUid: string,
+  purchase: VerifiedNativePurchase
+): string {
+  return `icad-store-test:${purchase.store}:${normalizedEnvironment(purchase)}:${icadUid}`;
+}
+
+/** Return a previously established production native-store license owner for a 4iCAD UID. */
+export async function getNativeStoreOwnerUid(
+  icadUid: string
+): Promise<string | null> {
+  const snap = await db.collection(COL.nativeStoreLicenseLinks).doc(icadUid).get();
+  if (!snap.exists) return null;
+  const ownerUid = String(snap.data()?.ownerUid ?? "").trim();
+  return ownerUid || null;
+}
+
+/**
+ * If the same verified email already owns an ACTIVE 4iDeas website license,
+ * reuse that license owner instead of manufacturing a second entitlement.
+ * Suspended/revoked website licenses never absorb a newly paid native purchase.
+ */
+async function preferredLicenseOwner(
+  icadUid: string,
+  email: string
+): Promise<string> {
+  try {
+    const websiteUser = await auth.getUserByEmail(email);
+    if (websiteUser.emailVerified === true) {
+      const websiteLicense = await getOwnerLicense(websiteUser.uid);
+      if (websiteLicense?.data.status === "active") return websiteUser.uid;
+    }
+  } catch (error: unknown) {
+    const code =
+      typeof error === "object" && error !== null && "code" in error
+        ? String((error as {code?: unknown}).code)
+        : "";
+    if (code !== "auth/user-not-found") throw error;
+  }
+  return syntheticOwnerUid(icadUid);
+}
+
+/**
+ * Claim verified store evidence exactly once and ensure it results in one
+ * durable Individual license. The external transaction/token can never be
+ * attached to a different 4iCAD account after it has been claimed.
+ *
+ * Sandbox / license-tester purchases are deliberately isolated from production
+ * native-store links and website licenses. They get a deterministic test owner
+ * so restore/reinstall can be exercised without creating a production
+ * cross-platform entitlement that would survive launch.
+ *
+ * Raw Google Play purchase tokens are intentionally not persisted. The
+ * deterministic SHA-256 document id is sufficient for replay prevention.
+ */
+export async function grantNativeStoreLicense(params: {
+  icadUid: string;
+  email: string;
+  purchase: VerifiedNativePurchase;
+}): Promise<NativeStoreLicenseGrant> {
+  const {icadUid, email, purchase} = params;
+  const testPurchase = isTestPurchase(purchase);
+  const purchaseId = purchaseDocId(purchase.store, purchase.externalPurchaseId);
+  const purchaseRef = db.collection(COL.nativeStorePurchases).doc(purchaseId);
+  const linkRef = testPurchase
+    ? null
+    : db.collection(COL.nativeStoreLicenseLinks).doc(icadUid);
+  const preferredOwnerUid = testPurchase
+    ? syntheticTestOwnerUid(icadUid, purchase)
+    : await preferredLicenseOwner(icadUid, email);
+
+  const ownerUid = await db.runTransaction(async (tx) => {
+    const purchaseSnap = await tx.get(purchaseRef);
+    const linkSnap = linkRef ? await tx.get(linkRef) : null;
+
+    if (purchaseSnap.exists) {
+      const claimedIcadUid = String(purchaseSnap.data()?.icadUid ?? "").trim();
+      if (claimedIcadUid && claimedIcadUid !== icadUid) {
+        throw new HttpsError(
+          "permission-denied",
+          "This store purchase is already linked to another 4iCAD account."
+        );
+      }
+    }
+
+    const existingOwnerUid = linkSnap
+      ? String(linkSnap.data()?.ownerUid ?? "").trim()
+      : "";
+    const resolvedOwnerUid = existingOwnerUid || preferredOwnerUid;
+    const now = FieldValue.serverTimestamp();
+
+    tx.set(
+      purchaseRef,
+      {
+        store: purchase.store,
+        purchaseEvidenceHash: purchaseId,
+        productId: purchase.productId,
+        platform: purchase.platform,
+        environment: purchase.environment,
+        testPurchase,
+        orderId: purchase.orderId ?? null,
+        icadUid,
+        ownerUid: resolvedOwnerUid,
+        ownerEmail: email,
+        active: true,
+        createdAt: purchaseSnap.data()?.createdAt ?? now,
+        updatedAt: now,
+      },
+      {merge: true}
+    );
+
+    if (linkRef) {
+      tx.set(
+        linkRef,
+        {
+          icadUid,
+          ownerUid: resolvedOwnerUid,
+          email,
+          source: "native_store",
+          createdAt: linkSnap?.data()?.createdAt ?? now,
+          updatedAt: now,
+        },
+        {merge: true}
+      );
+    }
+
+    return resolvedOwnerUid;
+  });
+
+  let license = await getOwnerLicense(ownerUid);
+  if (!license) {
+    const source = purchase.store === "apple"
+      ? testPurchase ? "app_store_test" : "app_store"
+      : testPurchase ? "google_play_test" : "google_play";
+    await createOrUpdateLicense({
+      ownerUid,
+      ownerEmail: email,
+      plan: "individual",
+      primaryPlatform: purchase.platform,
+      source,
+      orderId: purchase.orderId ?? purchaseId,
+    });
+    license = await getOwnerLicense(ownerUid);
+  }
+
+  if (!license) {
+    throw new HttpsError(
+      "internal",
+      "The verified purchase could not be converted into a 4iCAD license."
+    );
+  }
+
+  await db.collection(COL.licenseAudit).add({
+    action: "native_store_purchase_verified",
+    licenseId: license.id,
+    ownerUid,
+    icadUid,
+    store: purchase.store,
+    productId: purchase.productId,
+    platform: purchase.platform,
+    environment: purchase.environment,
+    testPurchase,
+    orderId: purchase.orderId ?? null,
+    purchaseEvidenceHash: purchaseId,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  return {ownerUid, license};
+}

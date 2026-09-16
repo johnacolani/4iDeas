@@ -34,10 +34,12 @@ import 'package:four_ideas/features/admin/presentation/screens/admin_privacy_pol
 import 'package:four_ideas/features/admin/presentation/screens/admin_releases_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_product_orders_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_product_order_detail_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_licenses_screen.dart';
 import 'package:four_ideas/data/commerce_data.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_promotion_codes_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_product_screen.dart';
 import 'package:four_ideas/features/commerce/presentation/screens/four_icad_success_screen.dart';
+import 'package:four_ideas/features/commerce/presentation/screens/four_icad_license_screen.dart';
 import 'package:four_ideas/screens/products_screen.dart';
 import 'package:four_ideas/screens/four_i_installer_screen.dart';
 
@@ -71,17 +73,10 @@ abstract class AppRoutes {
   static const String privacyPolicies = '/privacy';
   static String privacyPolicyPath(String slug) => '$privacyPolicies/$slug';
 
-  /// 4iCAD for Windows product and sales pages.
-  ///
-  /// A short, top-level slug matching the rest of the site (`/portfolio`,
-  /// `/services`, …) rather than a `/products/` namespace, because this is the
-  /// URL that goes on ads, QR codes and invoices. If more products are ever
-  /// sold, they take sibling slugs and `/products` becomes an index.
-  ///
-  /// There is deliberately no `/4icad/buy`: checkout is a redirect to Stripe's
-  /// hosted page, so Buy is an action rather than a route.
+  /// 4iCAD product, purchase confirmation and device-license management.
   static const String fourICad = '/4icad';
   static const String fourICadSuccess = '/4icad/success';
+  static const String fourICadLicense = '/4icad/license';
   static const String products = '/products';
   static const String fourIInstaller = '/4iinstaller';
 
@@ -120,6 +115,7 @@ abstract class AppRoutes {
   static String adminProductOrderPath(String sessionId) =>
       '$adminProductOrders/$sessionId';
   static const String adminPromotionCodes = '/admin/4icad/promotions';
+  static const String adminLicenses = '/admin/4icad/licenses';
   static const String payment = '/payment';
   static const String contractView = '/contract-view';
 }
@@ -213,18 +209,19 @@ GoRouter createAppRouter() {
         path: AppRoutes.qrCodeGenerator,
         builder: (context, state) => const QrCodeGeneratorScreen(),
       ),
-      // 4iCAD commerce. Declared before the parameterised portfolio routes and
-      // resolved purely from the URL — no `state.extra` — so a pasted link, a
-      // refresh and a QR scan all render the same page.
+      // 4iCAD commerce. Declared before the product page so deep links resolve
+      // directly and survive refreshes.
       GoRoute(
         path: AppRoutes.fourICadSuccess,
         builder: (context, state) => FourICadSuccessScreen(
           sessionId: state.uri.queryParameters['session_id'],
-          // Stripe returns the platform that was bought, so the page confirms
-          // that entitlement rather than assuming Windows.
           productKey:
               state.uri.queryParameters['product'] ?? kFourICadWindowsKey,
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.fourICadLicense,
+        builder: (context, state) => const FourICadLicenseScreen(),
       ),
       GoRoute(
         path: AppRoutes.fourICad,
@@ -369,8 +366,7 @@ GoRouter createAppRouter() {
         builder: (context, state) => const AdminPrivacyPolicyScreen(),
       ),
       // 4iCAD commerce admin. The order detail addresses its record by
-      // Checkout Session id in the path, so it survives a refresh — unlike the
-      // older `extra`-only admin detail routes.
+      // Checkout Session id in the path, so it survives a refresh.
       GoRoute(
         path: AppRoutes.adminReleases,
         builder: (context, state) => const AdminReleasesScreen(),
@@ -388,6 +384,10 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.adminPromotionCodes,
         builder: (context, state) => const AdminPromotionCodesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminLicenses,
+        builder: (context, state) => const AdminLicensesScreen(),
       ),
       GoRoute(
         path: AppRoutes.adminOrderDetail,
