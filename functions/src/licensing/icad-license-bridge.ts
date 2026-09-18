@@ -8,6 +8,7 @@ import {
   getOwnerLicense,
 } from "./license-store";
 import {getNativeStoreOwnerUid} from "./native-store-license";
+import {isTestStoreLicenseSource} from "./native-store-source-policy";
 
 const LINK_COLLECTION = "license_account_links";
 const REVERSE_LINK_COLLECTION = "license_account_links_by_website";
@@ -34,7 +35,15 @@ async function resolveLinkedIdentity(
   const nativeOwnerUid = await getNativeStoreOwnerUid(icad.uid);
   if (nativeOwnerUid) {
     const nativeLicense = await getOwnerLicense(nativeOwnerUid);
-    if (nativeLicense) {
+    const isLegacyTestLicense = isTestStoreLicenseSource(
+      nativeLicense?.data.source
+    );
+
+    // Current sandbox/test purchases never create native-store links. Ignore
+    // links left by older deployments so they cannot shadow a verified website
+    // or complimentary license. Production native-store licenses still take
+    // precedence, including suspended/revoked records.
+    if (nativeLicense && !isLegacyTestLicense) {
       return {
         icadUid: icad.uid,
         ownerUid: nativeOwnerUid,
