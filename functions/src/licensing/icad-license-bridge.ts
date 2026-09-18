@@ -8,6 +8,7 @@ import {
   getOwnerLicense,
 } from "./license-store";
 import {getNativeStoreOwnerUid} from "./native-store-license";
+import {isTestStoreLicenseSource} from "./native-store-source-policy";
 
 const LINK_COLLECTION = "license_account_links";
 const REVERSE_LINK_COLLECTION = "license_account_links_by_website";
@@ -34,10 +35,9 @@ async function resolveLinkedIdentity(
   const nativeOwnerUid = await getNativeStoreOwnerUid(icad.uid);
   if (nativeOwnerUid) {
     const nativeLicense = await getOwnerLicense(nativeOwnerUid);
-    const nativeSource = nativeLicense?.data.source ?? "";
-    const isLegacyTestLicense =
-      nativeSource === "app_store_test" ||
-      nativeSource === "google_play_test";
+    const isLegacyTestLicense = isTestStoreLicenseSource(
+      nativeLicense?.data.source
+    );
 
     // Current sandbox/test purchases never create native-store links. Ignore
     // links left by older deployments so they cannot shadow a verified website
