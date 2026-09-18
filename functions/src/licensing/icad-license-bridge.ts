@@ -34,7 +34,16 @@ async function resolveLinkedIdentity(
   const nativeOwnerUid = await getNativeStoreOwnerUid(icad.uid);
   if (nativeOwnerUid) {
     const nativeLicense = await getOwnerLicense(nativeOwnerUid);
-    if (nativeLicense) {
+    const nativeSource = nativeLicense?.data.source ?? "";
+    const isLegacyTestLicense =
+      nativeSource === "app_store_test" ||
+      nativeSource === "google_play_test";
+
+    // Current sandbox/test purchases never create native-store links. Ignore
+    // links left by older deployments so they cannot shadow a verified website
+    // or complimentary license. Production native-store licenses still take
+    // precedence, including suspended/revoked records.
+    if (nativeLicense && !isLegacyTestLicense) {
       return {
         icadUid: icad.uid,
         ownerUid: nativeOwnerUid,
