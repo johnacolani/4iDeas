@@ -2,7 +2,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  ALL_PLATFORMS_DEVICE_LIMIT,
   LICENSE_PLAN_POLICIES,
+  decideAllPlatformsActivation,
   decideNewActivation,
   isDevicePlatform,
 } = require("../lib/licensing/license-policy.js");
@@ -11,6 +13,18 @@ test("individual and company limits stay fixed", () => {
   assert.equal(LICENSE_PLAN_POLICIES.individual.primaryDeviceLimit, 1);
   assert.equal(LICENSE_PLAN_POLICIES.individual.bonusOtherPlatformLimit, 1);
   assert.equal(LICENSE_PLAN_POLICIES.company.primaryDeviceLimit, 10);
+  assert.equal(LICENSE_PLAN_POLICIES.company.bonusOtherPlatformLimit, 3);
+});
+
+test("all-platform complimentary access does not alter paid limits", () => {
+  assert.equal(ALL_PLATFORMS_DEVICE_LIMIT, 5);
+  assert.equal(
+    decideAllPlatformsActivation("windows", "linux", {
+      primaryActive: 1,
+      bonusActive: 3,
+    }).allowed,
+    true
+  );
   assert.equal(LICENSE_PLAN_POLICIES.company.bonusOtherPlatformLimit, 3);
 });
 

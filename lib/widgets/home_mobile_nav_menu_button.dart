@@ -104,6 +104,11 @@ class HomeNavMenuItems {
       icon: Icons.receipt_long_outlined,
     ),
     (
+      label: '4iCAD licenses',
+      route: AppRoutes.adminLicenses,
+      icon: Icons.badge_outlined,
+    ),
+    (
       label: 'Promotion codes',
       route: AppRoutes.adminPromotionCodes,
       icon: Icons.local_offer_outlined,

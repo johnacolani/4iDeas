@@ -31,6 +31,7 @@ export const getMyLicense = onCall({region: "us-central1"}, async (req) => {
     license: {
       id: license.id,
       plan: data.plan,
+      accessScope: data.accessScope ?? "standard",
       primaryPlatform: data.primaryPlatform,
       status: data.status,
       primaryDeviceLimit: data.primaryDeviceLimit,

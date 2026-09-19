@@ -6,6 +6,7 @@ class AdminLicenseView {
     required this.id,
     required this.ownerUid,
     required this.plan,
+    required this.accessScope,
     required this.primaryPlatform,
     required this.status,
     required this.primaryDeviceLimit,
@@ -24,6 +25,7 @@ class AdminLicenseView {
   final String ownerUid;
   final String? ownerEmail;
   final String plan;
+  final String accessScope;
   final String primaryPlatform;
   final String status;
   final String? source;
@@ -49,6 +51,7 @@ class AdminLicenseView {
       ownerUid: map['ownerUid'] as String? ?? '',
       ownerEmail: map['ownerEmail'] as String?,
       plan: map['plan'] as String? ?? '',
+      accessScope: map['accessScope'] as String? ?? 'standard',
       primaryPlatform: map['primaryPlatform'] as String? ?? '',
       status: map['status'] as String? ?? '',
       source: map['source'] as String?,
@@ -99,6 +102,7 @@ class LicenseAdminService {
     required String email,
     required String plan,
     required String primaryPlatform,
+    bool allPlatforms = false,
   }) async {
     final result = await _functions
         .httpsCallable('grantComplimentaryLicense')
@@ -106,6 +110,7 @@ class LicenseAdminService {
       'email': email,
       'plan': plan,
       'primaryPlatform': primaryPlatform,
+      'allPlatforms': allPlatforms,
     });
     return result.data['licenseId'] as String? ?? '';
   }

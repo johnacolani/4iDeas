@@ -66,6 +66,7 @@ void main() {
       expect(routes, contains(AppRoutes.adminPromotionCodes));
       expect(routes, contains(AppRoutes.adminProductOrders));
       expect(routes, contains(AppRoutes.adminReleases));
+      expect(routes, contains(AppRoutes.adminLicenses));
     });
 
     test('no /4icad/buy route exists — buying is an action, not a page', () {
