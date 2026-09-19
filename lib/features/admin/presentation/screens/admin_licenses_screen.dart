@@ -219,16 +219,23 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
             runSpacing: 8,
             children: [
               FourICadMetaChip(label: _title(license.plan)),
+              if (license.accessScope == 'all_platforms')
+                const FourICadMetaChip(
+                  label: 'All Platforms',
+                  emphasise: true,
+                ),
               FourICadMetaChip(
                   label: 'Primary: ${_title(license.primaryPlatform)}'),
-              FourICadMetaChip(
+              if (license.accessScope != 'all_platforms') ...[
+                FourICadMetaChip(
+                    label:
+                        '${license.activePrimaryDevices}/${license.primaryDeviceLimit} primary'),
+                FourICadMetaChip(
                   label:
-                      '${license.activePrimaryDevices}/${license.primaryDeviceLimit} primary'),
-              FourICadMetaChip(
-                label:
-                    '${license.activeBonusDevices}/${license.bonusOtherPlatformLimit} bonus',
-                emphasise: true,
-              ),
+                      '${license.activeBonusDevices}/${license.bonusOtherPlatformLimit} bonus',
+                  emphasise: true,
+                ),
+              ],
               FourICadMetaChip(
                   label: '${license.activeTotal}/${license.totalDeviceLimit} total'),
               if (license.source != null)
@@ -361,6 +368,7 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
     final emailController = TextEditingController();
     var plan = 'individual';
     var platform = 'windows';
+    var allPlatforms = false;
     final submitted = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -406,6 +414,18 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
                     if (value != null) setDialogState(() => platform = value);
                   },
                 ),
+                const SizedBox(height: 10),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  value: allPlatforms,
+                  title: const Text('All Platforms'),
+                  subtitle: const Text(
+                    'Complimentary access for up to 5 native devices across Windows, macOS, Linux, iOS, and Android.',
+                  ),
+                  onChanged: (value) {
+                    setDialogState(() => allPlatforms = value);
+                  },
+                ),
               ],
             ),
           ),
@@ -433,6 +453,7 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
         email: email,
         plan: plan,
         primaryPlatform: platform,
+        allPlatforms: allPlatforms,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

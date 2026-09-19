@@ -32,6 +32,7 @@ export const getLicensePurchaseStatus = onCall(
         state: "licensed",
         license: {
           plan: license.data.plan,
+          accessScope: license.data.accessScope ?? "standard",
           primaryPlatform: license.data.primaryPlatform,
           status: license.data.status,
           primaryDeviceLimit: license.data.primaryDeviceLimit,

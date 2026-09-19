@@ -174,6 +174,7 @@ function serializeLicense(license: NonNullable<Awaited<ReturnType<typeof getOwne
   return {
     id: license.id,
     plan: data.plan,
+    accessScope: data.accessScope ?? "standard",
     primaryPlatform: data.primaryPlatform,
     status: data.status,
     source: data.source,

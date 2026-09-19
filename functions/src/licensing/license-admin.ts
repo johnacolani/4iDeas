@@ -42,6 +42,7 @@ export const listLicenses = onCall({region: "us-central1"}, async (req) => {
         ownerUid: data.ownerUid ?? null,
         ownerEmail: data.ownerEmail ?? null,
         plan: data.plan ?? null,
+        accessScope: data.accessScope ?? "standard",
         primaryPlatform: data.primaryPlatform ?? null,
         status: data.status ?? null,
         source: data.source ?? null,
@@ -89,6 +90,8 @@ export const grantComplimentaryLicense = onCall(
     const primaryPlatform = String(req.data?.primaryPlatform ?? "")
       .trim()
       .toLowerCase();
+    const accessScope =
+      req.data?.allPlatforms === true ? "all_platforms" : "standard";
 
     if (!email || !email.includes("@")) {
       throw new HttpsError("invalid-argument", "A valid customer email is required.");
@@ -115,6 +118,7 @@ export const grantComplimentaryLicense = onCall(
       ownerEmail: customer.email ?? email,
       plan,
       primaryPlatform,
+      accessScope,
       source: "admin_complimentary",
     });
 
@@ -125,6 +129,7 @@ export const grantComplimentaryLicense = onCall(
       ownerEmail: customer.email ?? email,
       plan,
       primaryPlatform,
+      accessScope,
       grantedByUid: adminCaller.uid,
       grantedByEmail: adminCaller.email,
       createdAt: FieldValue.serverTimestamp(),

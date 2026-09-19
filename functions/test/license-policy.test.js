@@ -2,7 +2,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  ALL_PLATFORMS_DEVICE_LIMIT,
   LICENSE_PLAN_POLICIES,
+  decideAllPlatformsActivation,
   decideNewActivation,
   isWebCheckoutPrimaryPlatform,
 } = require("../lib/licensing/license-policy.js");
@@ -23,6 +25,28 @@ test("company license is 10 primary + 3 bonus", () => {
     bonusOtherPlatformLimit: 3,
     totalDeviceLimit: 13,
   });
+});
+
+test("complimentary all-platform access allows five native devices", () => {
+  assert.equal(ALL_PLATFORMS_DEVICE_LIMIT, 5);
+  assert.equal(
+    decideAllPlatformsActivation("macos", "linux", {
+      primaryActive: 1,
+      bonusActive: 3,
+    }).allowed,
+    true
+  );
+  assert.deepEqual(
+    decideAllPlatformsActivation("macos", "windows", {
+      primaryActive: 1,
+      bonusActive: 4,
+    }),
+    {
+      allowed: false,
+      bucket: "bonus",
+      reason: "total_limit_reached",
+    }
+  );
 });
 
 test("website checkout primary platforms exclude app-store platforms", () => {

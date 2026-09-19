@@ -1,5 +1,7 @@
 export type LicensePlan = "individual" | "company";
 
+export type LicenseAccessScope = "standard" | "all_platforms";
+
 export type DevicePlatform =
   | "windows"
   | "macos"
@@ -26,8 +28,15 @@ export type ActivationBucket = "primary" | "bonus";
 export interface ActivationDecision {
   allowed: boolean;
   bucket: ActivationBucket;
-  reason: "available" | "primary_limit_reached" | "bonus_limit_reached";
+  reason:
+    | "available"
+    | "primary_limit_reached"
+    | "bonus_limit_reached"
+    | "total_limit_reached";
 }
+
+/** One native installation for each supported device platform. */
+export const ALL_PLATFORMS_DEVICE_LIMIT = 5;
 
 /**
  * The first production licensing rules agreed for 4iCAD.
@@ -73,6 +82,12 @@ const WEB_CHECKOUT_PRIMARY_PLATFORMS = new Set<WebCheckoutPrimaryPlatform>([
 
 export function isLicensePlan(value: unknown): value is LicensePlan {
   return value === "individual" || value === "company";
+}
+
+export function isLicenseAccessScope(
+  value: unknown
+): value is LicenseAccessScope {
+  return value === "standard" || value === "all_platforms";
 }
 
 export function isDevicePlatform(value: unknown): value is DevicePlatform {
@@ -128,4 +143,22 @@ export function decideNewActivation(
         bucket: "bonus",
         reason: "bonus_limit_reached",
       };
+}
+
+/**
+ * Complimentary all-platform access is deliberately separate from paid plan
+ * limits. It grants five native device activations, enough for one Windows,
+ * macOS, Linux, iOS, and Android installation. Paid Individual and Company
+ * policies remain unchanged.
+ */
+export function decideAllPlatformsActivation(
+  primaryPlatform: DevicePlatform,
+  requestedPlatform: DevicePlatform,
+  usage: ActivationUsage
+): ActivationDecision {
+  const bucket =
+    requestedPlatform === primaryPlatform ? "primary" : "bonus";
+  return usage.primaryActive + usage.bonusActive < ALL_PLATFORMS_DEVICE_LIMIT
+    ? {allowed: true, bucket, reason: "available"}
+    : {allowed: false, bucket, reason: "total_limit_reached"};
 }

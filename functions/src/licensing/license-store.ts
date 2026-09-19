@@ -1,11 +1,14 @@
 import {HttpsError} from "firebase-functions/v2/https";
 import {COL, FieldValue, db} from "../core";
 import {
+  ALL_PLATFORMS_DEVICE_LIMIT,
+  decideAllPlatformsActivation,
   decideNewActivation,
   getLicensePlanPolicy,
   type ActivationBucket,
   type DevicePlatform,
   type LicensePlan,
+  type LicenseAccessScope,
 } from "./license-policy";
 
 export type LicenseStatus = "active" | "suspended" | "revoked";
@@ -14,6 +17,7 @@ export interface LicenseRecord {
   ownerUid: string;
   ownerEmail?: string | null;
   plan: LicensePlan;
+  accessScope?: LicenseAccessScope;
   primaryPlatform: DevicePlatform;
   status: LicenseStatus;
   source: string;
@@ -89,6 +93,7 @@ export async function createOrUpdateLicense(params: {
   plan: LicensePlan;
   primaryPlatform: DevicePlatform;
   source: string;
+  accessScope?: LicenseAccessScope;
   orderId?: string | null;
   stripeCustomerId?: string | null;
 }): Promise<string> {
@@ -99,6 +104,9 @@ export async function createOrUpdateLicense(params: {
   await db.runTransaction(async (tx) => {
     const existing = await tx.get(ref);
     const current = existing.data() as Partial<LicenseRecord> | undefined;
+    const accessScope =
+      params.accessScope ?? current?.accessScope ?? "standard";
+    const allPlatforms = accessScope === "all_platforms";
 
     tx.set(
       ref,
@@ -106,15 +114,22 @@ export async function createOrUpdateLicense(params: {
         ownerUid: params.ownerUid,
         ownerEmail: params.ownerEmail ?? current?.ownerEmail ?? null,
         plan: params.plan,
+        accessScope,
         primaryPlatform: params.primaryPlatform,
         status: current?.status ?? "active",
         source: params.source,
         orderId: params.orderId ?? current?.orderId ?? null,
         stripeCustomerId:
           params.stripeCustomerId ?? current?.stripeCustomerId ?? null,
-        primaryDeviceLimit: policy.primaryDeviceLimit,
-        bonusOtherPlatformLimit: policy.bonusOtherPlatformLimit,
-        totalDeviceLimit: policy.totalDeviceLimit,
+        primaryDeviceLimit: allPlatforms
+          ? ALL_PLATFORMS_DEVICE_LIMIT
+          : policy.primaryDeviceLimit,
+        bonusOtherPlatformLimit: allPlatforms
+          ? ALL_PLATFORMS_DEVICE_LIMIT
+          : policy.bonusOtherPlatformLimit,
+        totalDeviceLimit: allPlatforms
+          ? ALL_PLATFORMS_DEVICE_LIMIT
+          : policy.totalDeviceLimit,
         activePrimaryDevices: current?.activePrimaryDevices ?? 0,
         activeBonusDevices: current?.activeBonusDevices ?? 0,
         createdAt: current?.createdAt ?? FieldValue.serverTimestamp(),
@@ -200,20 +215,27 @@ export async function activateDevice(
 
     const primaryActive = license.activePrimaryDevices ?? 0;
     const bonusActive = license.activeBonusDevices ?? 0;
-    const decision = decideNewActivation(
-      license.plan,
-      license.primaryPlatform,
-      request.platform,
-      {primaryActive, bonusActive}
-    );
+    const decision = license.accessScope === "all_platforms"
+      ? decideAllPlatformsActivation(
+          license.primaryPlatform,
+          request.platform,
+          {primaryActive, bonusActive}
+        )
+      : decideNewActivation(
+          license.plan,
+          license.primaryPlatform,
+          request.platform,
+          {primaryActive, bonusActive}
+        );
 
     if (!decision.allowed) {
       const limit =
         decision.bucket === "primary"
           ? license.primaryDeviceLimit
           : license.bonusOtherPlatformLimit;
-      const message =
-        decision.bucket === "primary"
+      const message = decision.reason === "total_limit_reached"
+        ? `All-platform device limit reached (${license.totalDeviceLimit}).`
+        : decision.bucket === "primary"
           ? `Primary-platform device limit reached (${limit}).`
           : `Other-platform bonus device limit reached (${limit}).`;
       throw new HttpsError("resource-exhausted", message);
