@@ -35,8 +35,8 @@ export interface ActivationDecision {
     | "total_limit_reached";
 }
 
-/** One native installation for each supported device platform. */
-export const ALL_PLATFORMS_DEVICE_LIMIT = 5;
+/** Six native installations shared across all supported device platforms. */
+export const ALL_PLATFORMS_DEVICE_LIMIT = 6;
 
 /**
  * The first production licensing rules agreed for 4iCAD.
@@ -147,9 +147,9 @@ export function decideNewActivation(
 
 /**
  * Complimentary all-platform access is deliberately separate from paid plan
- * limits. It grants five native device activations, enough for one Windows,
- * macOS, Linux, iOS, and Android installation. Paid Individual and Company
- * policies remain unchanged.
+ * limits. It grants six native device activations shared across Windows,
+ * macOS, Linux, iOS, and Android. Paid Individual and Company policies remain
+ * unchanged.
  */
 export function decideAllPlatformsActivation(
   primaryPlatform: DevicePlatform,

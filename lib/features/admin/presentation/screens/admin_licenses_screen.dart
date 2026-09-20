@@ -420,7 +420,7 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
                   value: allPlatforms,
                   title: const Text('All Platforms'),
                   subtitle: const Text(
-                    'Complimentary access for up to 5 native devices across Windows, macOS, Linux, iOS, and Android.',
+                    'Complimentary access for up to 6 native devices across Windows, macOS, Linux, iOS, and Android.',
                   ),
                   onChanged: (value) {
                     setDialogState(() => allPlatforms = value);

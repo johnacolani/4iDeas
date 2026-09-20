@@ -17,7 +17,7 @@ test("individual and company limits stay fixed", () => {
 });
 
 test("all-platform complimentary access does not alter paid limits", () => {
-  assert.equal(ALL_PLATFORMS_DEVICE_LIMIT, 5);
+  assert.equal(ALL_PLATFORMS_DEVICE_LIMIT, 6);
   assert.equal(
     decideAllPlatformsActivation("windows", "linux", {
       primaryActive: 1,

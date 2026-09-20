@@ -83,6 +83,19 @@ export function licenseIdForOwner(ownerUid: string): string {
   return `4icad__${ownerUid}`;
 }
 
+/** Apply current policy limits to older all-platform license records. */
+export function withEffectiveLicenseLimits(
+  license: LicenseRecord
+): LicenseRecord {
+  if (license.accessScope !== "all_platforms") return license;
+  return {
+    ...license,
+    primaryDeviceLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+    bonusOtherPlatformLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+    totalDeviceLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+  };
+}
+
 /**
  * Create or refresh a license without resetting activation counters.
  * This makes Stripe webhook retries and metadata refreshes idempotent.
@@ -149,7 +162,7 @@ export async function getOwnerLicense(ownerUid: string): Promise<{
   const id = licenseIdForOwner(ownerUid);
   const snap = await db.collection(COL.licenses).doc(id).get();
   if (!snap.exists) return null;
-  return {id, data: snap.data() as LicenseRecord};
+  return {id, data: withEffectiveLicenseLimits(snap.data() as LicenseRecord)};
 }
 
 export async function listOwnerDevices(ownerUid: string): Promise<LicenseDeviceRecord[]> {
@@ -180,7 +193,9 @@ export async function activateDevice(
       throw new HttpsError("permission-denied", "No active 4iCAD license was found.");
     }
 
-    const license = licenseSnap.data() as LicenseRecord;
+    const license = withEffectiveLicenseLimits(
+      licenseSnap.data() as LicenseRecord
+    );
     if (license.ownerUid !== ownerUid || license.status !== "active") {
       throw new HttpsError("permission-denied", "This 4iCAD license is not active.");
     }
@@ -200,6 +215,18 @@ export async function activateDevice(
         },
         {merge: true}
       );
+      if (license.accessScope === "all_platforms") {
+        tx.set(
+          licenseRef,
+          {
+            primaryDeviceLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+            bonusOtherPlatformLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+            totalDeviceLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          {merge: true}
+        );
+      }
       return {
         licenseId,
         installationId,
@@ -264,6 +291,13 @@ export async function activateDevice(
     tx.update(licenseRef, {
       activePrimaryDevices: nextPrimary,
       activeBonusDevices: nextBonus,
+      ...(license.accessScope === "all_platforms"
+        ? {
+            primaryDeviceLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+            bonusOtherPlatformLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+            totalDeviceLimit: ALL_PLATFORMS_DEVICE_LIMIT,
+          }
+        : {}),
       updatedAt: FieldValue.serverTimestamp(),
     });
 
