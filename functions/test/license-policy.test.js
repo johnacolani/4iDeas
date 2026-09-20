@@ -27,19 +27,19 @@ test("company license is 10 primary + 3 bonus", () => {
   });
 });
 
-test("complimentary all-platform access allows five native devices", () => {
-  assert.equal(ALL_PLATFORMS_DEVICE_LIMIT, 5);
+test("complimentary all-platform access allows six native devices", () => {
+  assert.equal(ALL_PLATFORMS_DEVICE_LIMIT, 6);
   assert.equal(
     decideAllPlatformsActivation("macos", "linux", {
       primaryActive: 1,
-      bonusActive: 3,
+      bonusActive: 4,
     }).allowed,
     true
   );
   assert.deepEqual(
     decideAllPlatformsActivation("macos", "windows", {
       primaryActive: 1,
-      bonusActive: 4,
+      bonusActive: 5,
     }),
     {
       allowed: false,
