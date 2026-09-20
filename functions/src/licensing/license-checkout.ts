@@ -15,6 +15,7 @@ import {
   type LicensePlan,
 } from "./license-policy";
 import {getOwnerLicense} from "./license-store";
+import {getOrCreateStripeCustomer} from "../stripe/customer";
 
 function checkoutOrigin(req: {
   rawRequest: {headers: {origin?: string | string[]}};
@@ -110,19 +111,7 @@ export const createLicenseCheckoutSession = onCall(
     }
 
     const stripe = stripeClient();
-    const customerDoc = await db.collection("stripe_customers").doc(uid).get();
-    let customerId = customerDoc.data()?.customerId as string | undefined;
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: email ?? undefined,
-        metadata: {firebaseUid: uid},
-      });
-      customerId = customer.id;
-      await db.collection("stripe_customers").doc(uid).set(
-        {customerId, email: email ?? null, uid},
-        {merge: true}
-      );
-    }
+    const customerId = await getOrCreateStripeCustomer(stripe, uid, email);
 
     const metadata = {
       firebaseUid: uid,
