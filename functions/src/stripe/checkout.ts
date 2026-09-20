@@ -11,6 +11,7 @@ import {
   requireVerifiedAuth,
   stripeClient,
 } from "../core";
+import {getOrCreateStripeCustomer} from "./customer";
 
 /**
  * Creates a Stripe Checkout Session for the signed-in caller.
@@ -56,20 +57,9 @@ export const createCheckoutSession = onCall(
 
     const stripe = stripeClient();
 
-    // Reuse one Stripe customer per Firebase uid so a buyer's history stays joined up.
-    const customerDoc = await db.collection("stripe_customers").doc(uid).get();
-    let customerId = customerDoc.data()?.customerId as string | undefined;
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: email ?? undefined,
-        metadata: {firebaseUid: uid},
-      });
-      customerId = customer.id;
-      await db.collection("stripe_customers").doc(uid).set(
-        {customerId, email: email ?? null, uid},
-        {merge: true}
-      );
-    }
+    // Reuse one customer per Firebase uid, but replace a saved test-mode id
+    // automatically after the project switches to a live Stripe key.
+    const customerId = await getOrCreateStripeCustomer(stripe, uid, email);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
