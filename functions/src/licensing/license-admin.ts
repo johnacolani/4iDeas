@@ -15,6 +15,8 @@ import {
   deactivateDevice,
   licenseIdForOwner,
   listOwnerDevices,
+  withEffectiveLicenseLimits,
+  type LicenseRecord,
 } from "./license-store";
 
 const ADMIN_LIST_LIMIT = 200;
@@ -36,7 +38,7 @@ export const listLicenses = onCall({region: "us-central1"}, async (req) => {
   const snap = await db.collection(COL.licenses).limit(ADMIN_LIST_LIMIT).get();
   return {
     licenses: snap.docs.map((doc) => {
-      const data = doc.data();
+      const data = withEffectiveLicenseLimits(doc.data() as LicenseRecord);
       return {
         id: doc.id,
         ownerUid: data.ownerUid ?? null,
