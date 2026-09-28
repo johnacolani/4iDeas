@@ -3,12 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 
+import 'package:four_ideas/app_router.dart';
 import 'package:four_ideas/config/lead_capture_config.dart';
 import 'package:four_ideas/core/ColorManager.dart';
 import 'package:four_ideas/core/home_warm_colors.dart';
+import 'package:four_ideas/services/project_inquiry_service.dart';
 
-/// Lightweight project inquiry for the contact page—Formspree POST, no account required.
+/// Public project inquiry. Saved in 4iDeas first; Formspree is only a backup notification.
 class ProjectInquiryForm extends StatefulWidget {
   const ProjectInquiryForm({super.key});
 
@@ -146,7 +149,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Project inquiry sent to 4iDeas. We will review it and get back to you soon.',
+                'Your inquiry is saved in 4iDeas. Sign in with this email to track replies and continue the project here.',
                 style: GoogleFonts.roboto(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -155,6 +158,11 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
               ),
             ),
           ],
+        ),
+        action: SnackBarAction(
+          label: 'Track request',
+          textColor: Colors.white,
+          onPressed: () => context.go(AppRoutes.login),
         ),
       ),
     );
@@ -177,52 +185,64 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
 
     setState(() => _submitting = true);
 
-    final uri = Uri.parse(LeadCaptureConfig.projectInquiryFormspreeEndpoint);
+    final name = _name.text.trim();
+    final email = _email.text.trim();
+    final company = _company.text.trim();
+    final description = _description.text.trim();
+    final projectType = _projectType!;
+    final budgetRange = _budgetRange!;
+    final timeline = _timeline!;
+
     try {
-      final response = await http.post(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
-          'name': _name.text.trim(),
-          'email': _email.text.trim(),
-          'company': _company.text.trim().isEmpty ? '—' : _company.text.trim(),
-          'project_type': _projectType,
-          'budget_range': _budgetRange,
-          'timeline': _timeline,
-          'message': _description.text.trim(),
-          '_subject': '4iDeas: project inquiry',
-          'form_source': 'project_inquiry_contact_page',
-        }),
+      await ProjectInquiryService().submitPublicInquiry(
+        name: name,
+        email: email,
+        company: company,
+        projectType: projectType,
+        budgetRange: budgetRange,
+        timeline: timeline,
+        message: description,
       );
+
+      // Keep the existing Formspree notification as best-effort backup only.
+      // The inquiry is already safely stored in 4iDeas even if this email fails.
+      try {
+        final uri =
+            Uri.parse(LeadCaptureConfig.projectInquiryFormspreeEndpoint);
+        await http.post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'name': name,
+            'email': email,
+            'company': company.isEmpty ? '—' : company,
+            'project_type': projectType,
+            'budget_range': budgetRange,
+            'timeline': timeline,
+            'message': description,
+            '_subject': '4iDeas: project inquiry',
+            'form_source': 'project_inquiry_contact_page',
+          }),
+        );
+      } catch (_) {
+        // Notification email is non-critical because Firestore is the source of truth.
+      }
 
       if (!mounted) return;
       setState(() => _submitting = false);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        FocusScope.of(context).unfocus();
-        _clearFormFields();
-        _showProjectSentSnackBar();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Something went wrong. Please email info@4ideasapp.com directly.',
-              style: GoogleFonts.roboto(),
-            ),
-            backgroundColor: Colors.red.shade800,
-          ),
-        );
-      }
+      FocusScope.of(context).unfocus();
+      _clearFormFields();
+      _showProjectSentSnackBar();
     } catch (_) {
       if (!mounted) return;
       setState(() => _submitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Network error. Try again or email info@4ideasapp.com.',
+            'We could not save your inquiry. Please try again or email info@4ideasapp.com.',
             style: GoogleFonts.roboto(),
           ),
           backgroundColor: Colors.red.shade800,
@@ -413,7 +433,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             ),
             const SizedBox(height: 10),
             Text(
-              'By sending this, you agree I may reply using your email. No spam, no lists—just project conversation.',
+              'Your inquiry is stored securely in 4iDeas. Sign in with the same email to track responses and continue the conversation.',
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
                 fontSize: 12.5,

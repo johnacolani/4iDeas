@@ -16,6 +16,7 @@ import 'package:four_ideas/features/auth/presentation/screens/forgot_password_sc
 import 'package:four_ideas/features/auth/presentation/screens/email_verification_screen.dart';
 import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_orders_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_project_inquiries_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_order_detail_screen.dart';
 import 'package:four_ideas/features/payment/presentation/screens/payment_screen.dart';
 import 'package:four_ideas/features/contract/presentation/screens/contract_view_screen.dart';
@@ -105,6 +106,7 @@ abstract class AppRoutes {
   static const String profile = '/profile';
 
   static const String adminOrders = '/admin/orders';
+  static const String adminProjectInquiries = '/admin/project-inquiries';
   static const String adminOrderDetail = '/admin/orders/detail';
   static const String adminPrivacyPolicies = '/admin/privacy';
 
@@ -360,6 +362,10 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.adminOrders,
         builder: (context, state) => const AdminOrdersScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminProjectInquiries,
+        builder: (context, state) => const AdminProjectInquiriesScreen(),
       ),
       GoRoute(
         path: AppRoutes.adminPrivacyPolicies,
