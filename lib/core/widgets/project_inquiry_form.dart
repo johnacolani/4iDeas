@@ -433,7 +433,7 @@ class _ProjectInquiryFormState extends State<ProjectInquiryForm> {
             ),
             const SizedBox(height: 10),
             Text(
-              'By sending this, you agree I may reply using your email. No spam, no lists—just project conversation.',
+              'Your inquiry is stored securely in 4iDeas. Sign in with the same email to track responses and continue the conversation.',
               textAlign: TextAlign.center,
               style: GoogleFonts.roboto(
                 fontSize: 12.5,
