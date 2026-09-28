@@ -7,6 +7,7 @@ import '../../../../core/ColorManager.dart';
 import '../../../../core/widgets/frosted_app_bar.dart';
 import '../../../../helper/app_background.dart';
 import '../../../../services/order_service.dart';
+import '../../../../services/project_inquiry_service.dart';
 import '../../../../app_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -27,10 +28,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _ordersError;
   final OrderService _orderService = OrderService();
 
+  final List<Map<String, dynamic>> _inquiries = [];
+  bool _isLoadingInquiries = true;
+  String? _inquiriesError;
+  final ProjectInquiryService _inquiryService = ProjectInquiryService();
+
   @override
   void initState() {
     super.initState();
     _loadOrders();
+    _loadInquiries();
   }
 
   Future<void> _loadOrders() async {
@@ -63,6 +70,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           _isLoadingOrders = false;
         });
+      }
+    }
+  }
+
+  Future<void> _loadInquiries() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoadingInquiries = true;
+      _inquiriesError = null;
+    });
+
+    try {
+      final inquiries = await _inquiryService.getMyInquiriesOnce();
+      if (mounted) {
+        setState(() {
+          _inquiries
+            ..clear()
+            ..addAll(inquiries);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _inquiries.clear();
+          _inquiriesError = 'Failed to load inquiries: ' + e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingInquiries = false);
       }
     }
   }
@@ -144,6 +181,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               _buildProfileHero(user, isMobile),
                               SizedBox(height: isMobile ? 18 : 24),
+                              if (_isLoadingInquiries ||
+                                  _inquiriesError != null ||
+                                  _inquiries.isNotEmpty) ...[
+                                _buildInquiriesSection(isMobile),
+                                SizedBox(height: isMobile ? 18 : 24),
+                              ],
                               _buildMyOrdersSection(isMobile),
                             ],
                           ),
@@ -212,7 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: user.emailVerified
               ? Icons.verified_rounded
               : Icons.mark_email_unread_rounded,
-          label: user.emailVerified ? 'Verified client' : 'Email pending',
+          label: user.emailVerified ? 'Email verified' : 'Email pending',
           color: user.emailVerified
               ? Colors.greenAccent.shade400
               : ColorManager.accentGold,
@@ -287,6 +330,285 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
     );
+  }
+
+  Widget _buildInquiriesSection(bool isMobile) {
+    return _glassPanel(
+      borderColor: ColorManager.accentGold.withValues(alpha: 0.34),
+      padding: EdgeInsets.all(isMobile ? 18 : 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.mark_chat_unread_outlined,
+                color: ColorManager.accentGold,
+                size: 26,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Project Inquiries',
+                  style: GoogleFonts.roboto(
+                    color: ColorManager.onDarkPrimary,
+                    fontSize: isMobile ? 21 : 26,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Refresh inquiries',
+                onPressed: _isLoadingInquiries ? null : _loadInquiries,
+                icon: Icon(
+                  Icons.refresh_rounded,
+                  color: ColorManager.accentGold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Messages you sent before starting a full project appear here. 4iDeas replies stay attached to the same inquiry.',
+            style: TextStyle(
+              color: ColorManager.onDarkSecondary,
+              fontSize: isMobile ? 13.5 : 15,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 18),
+          if (_isLoadingInquiries)
+            const Center(child: CircularProgressIndicator())
+          else if (_inquiriesError != null)
+            _emptyState(
+              icon: Icons.cloud_off_rounded,
+              title: 'Could not load inquiries',
+              message: _inquiriesError!,
+              actionLabel: 'Retry',
+              onPressed: _loadInquiries,
+              isMobile: isMobile,
+            )
+          else
+            Column(
+              children: [
+                for (final inquiry in _inquiries)
+                  _buildInquiryCard(inquiry, isMobile),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInquiryCard(
+    Map<String, dynamic> inquiry,
+    bool isMobile,
+  ) {
+    final projectType = inquiry['projectType']?.toString() ?? 'Project inquiry';
+    final budget = inquiry['budgetRange']?.toString() ?? '';
+    final timeline = inquiry['timeline']?.toString() ?? '';
+    final message = inquiry['message']?.toString() ?? '';
+    final status = inquiry['status']?.toString() ?? 'new';
+    final adminReply = inquiry['adminReply']?.toString() ?? '';
+    final clientReply = inquiry['clientReply']?.toString() ?? '';
+    final linkedOrderId = inquiry['linkedOrderId']?.toString() ?? '';
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(isMobile ? 14 : 18),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: ColorManager.accentGold.withValues(alpha: 0.20),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            runSpacing: 8,
+            children: [
+              Text(
+                projectType,
+                style: GoogleFonts.roboto(
+                  color: ColorManager.onDarkPrimary,
+                  fontSize: isMobile ? 16 : 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              _statusPill(
+                icon: linkedOrderId.isNotEmpty
+                    ? Icons.check_circle_outline
+                    : Icons.schedule_outlined,
+                label: status.replaceAll('_', ' '),
+                color: linkedOrderId.isNotEmpty
+                    ? Colors.greenAccent.shade400
+                    : ColorManager.accentGold,
+              ),
+            ],
+          ),
+          if (budget.isNotEmpty || timeline.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              [budget, timeline].where((value) => value.isNotEmpty).join(' | '),
+              style: TextStyle(color: ColorManager.onDarkSecondary),
+            ),
+          ],
+          if (message.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              message,
+              style: TextStyle(
+                color: ColorManager.onDarkPrimary,
+                height: 1.4,
+              ),
+            ),
+          ],
+          if (adminReply.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: ColorManager.primaryTeal.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: ColorManager.primaryTeal.withValues(alpha: 0.35),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '4iDeas Response',
+                    style: TextStyle(
+                      color: ColorManager.primaryTeal,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    adminReply,
+                    style: TextStyle(color: ColorManager.onDarkPrimary),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (clientReply.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Your latest reply: ' + clientReply,
+              style: TextStyle(
+                color: ColorManager.onDarkSecondary,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+          if (linkedOrderId.isEmpty && status != 'closed') ...[
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: () => _showInquiryReplyDialog(inquiry),
+              icon: const Icon(Icons.reply),
+              label: const Text('Reply to 4iDeas'),
+            ),
+          ],
+          if (linkedOrderId.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'This inquiry has been converted into a full project below.',
+              style: TextStyle(
+                color: Colors.greenAccent.shade400,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showInquiryReplyDialog(Map<String, dynamic> inquiry) {
+    final controller = TextEditingController(
+      text: inquiry['clientReply']?.toString() ?? '',
+    );
+    var submitting = false;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setLocal) => AlertDialog(
+          backgroundColor: ColorManager.containerSurface,
+          title: Text(
+            'Reply to 4iDeas',
+            style: GoogleFonts.roboto(
+              color: ColorManager.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: TextField(
+            controller: controller,
+            minLines: 4,
+            maxLines: 8,
+            decoration: const InputDecoration(
+              hintText: 'Type your message...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: submitting
+                  ? null
+                  : () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: submitting
+                  ? null
+                  : () async {
+                      final response = controller.text.trim();
+                      if (response.isEmpty) return;
+                      setLocal(() => submitting = true);
+                      try {
+                        await _inquiryService.addClientReply(
+                          inquiryId: inquiry['id'].toString(),
+                          response: response,
+                        );
+                        if (!mounted) return;
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Reply saved in 4iDeas.'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        await _loadInquiries();
+                      } catch (e) {
+                        if (!mounted) return;
+                        setLocal(() => submitting = false);
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(
+                            content: Text('Could not send reply: ' + e.toString()),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+              child: submitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Send'),
+            ),
+          ],
+        ),
+      ),
+    ).whenComplete(controller.dispose);
   }
 
   Widget _buildMyOrdersSection(bool isMobile) {
