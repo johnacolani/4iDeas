@@ -84,8 +84,8 @@ class HomeNavMenuItems {
       icon: Icons.admin_panel_settings_outlined,
     ),
     (
-      label: 'Contact inbox',
-      route: AppRoutes.contact,
+      label: 'Project inquiries',
+      route: AppRoutes.adminProjectInquiries,
       icon: Icons.mark_chat_unread_outlined,
     ),
     (
