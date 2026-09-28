@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         setState(() {
           _inquiries.clear();
-          _inquiriesError = 'Failed to load inquiries: ' + e.toString();
+          _inquiriesError = 'Failed to load inquiries: $e';
         });
       }
     } finally {
@@ -501,7 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (clientReply.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
-              'Your latest reply: ' + clientReply,
+              'Your latest reply: $clientReply',
               style: TextStyle(
                 color: ColorManager.onDarkSecondary,
                 fontStyle: FontStyle.italic,
@@ -577,7 +577,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           inquiryId: inquiry['id'].toString(),
                           response: response,
                         );
-                        if (!mounted) return;
+                        if (!dialogContext.mounted || !mounted) return;
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(this.context).showSnackBar(
                           const SnackBar(
@@ -591,7 +591,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         setLocal(() => submitting = false);
                         ScaffoldMessenger.of(this.context).showSnackBar(
                           SnackBar(
-                            content: Text('Could not send reply: ' + e.toString()),
+                            content: Text('Could not send reply: $e'),
                             backgroundColor: Colors.red,
                           ),
                         );
