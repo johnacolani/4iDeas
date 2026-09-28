@@ -1,4 +1,5 @@
 import {createHash} from "node:crypto";
+import type {UserRecord} from "firebase-admin/auth";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 
 import {
@@ -225,7 +226,7 @@ export const convertProjectInquiryToOrder = onCall(async (request) => {
     );
   }
 
-  let client;
+  let client: UserRecord;
   try {
     client = await auth.getUserByEmail(emailLower);
   } catch {
