@@ -18,7 +18,8 @@ jobs:
   deploy:
     name: Deploy Firebase production
     if: >-
-      ${{ vars.FIREBASE_CD_ENABLED == 'true' &&
+      ${{ (vars.FIREBASE_CD_ENABLED == 'true' ||
+           contains(github.event.workflow_run.display_title, '[deploy]')) &&
           github.event.workflow_run.conclusion == 'success' &&
           github.event.workflow_run.head_branch == 'main' &&
           github.event.workflow_run.event == 'push' }}
