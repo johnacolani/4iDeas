@@ -70,6 +70,31 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Public project inquiries are created by the trusted Cloud Function.
+    // Admins can manage all inquiries. A verified client only gains access
+    // after the backend links the inquiry to their uid by matching the account
+    // email, and may then update only their reply fields.
+    match /project_inquiries/{inquiryId} {
+      allow create: if isAdmin();
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update: if isAdmin()
+        || (
+          isSignedIn()
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+          && resource.data.status != 'converted'
+          && request.resource.data.status == 'client_replied'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'clientReply',
+            'clientReplyDate',
+            'status',
+            'updatedAt'
+          ])
+        );
+      allow delete: if isAdmin();
+    }
+
     // ---------------------------------------------------------------
     // 4iCAD commerce
     //
