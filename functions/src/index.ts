@@ -40,3 +40,9 @@ export {
   setLicenseStatus,
   adminDeactivateDevice,
 } from "./licensing/license-admin";
+
+export {
+  submitProjectInquiry,
+  claimMyProjectInquiries,
+  convertProjectInquiryToOrder,
+} from "./inquiries/project-inquiries";
