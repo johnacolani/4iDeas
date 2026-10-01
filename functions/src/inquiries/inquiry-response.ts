@@ -1,11 +1,11 @@
 import {encode} from "html-entities";
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 
-import {db, FieldValue, requireAdmin, SITE_ORIGIN} from "../core";
+import {db, FieldValue, GMAIL_APP_PASSWORD, requireAdmin, SITE_ORIGIN} from "../core";
+import {sendGmailEmail} from "../email/gmail-smtp";
 
 const PROJECT_INQUIRIES = "project_inquiries";
 const SHARED_FILES = "shared_files";
-const MAIL = "mail";
 
 function readText(
   value: unknown,
@@ -37,13 +37,16 @@ function isExpired(value: unknown): boolean {
 }
 
 /**
- * Saves the admin response and queues the matching email in Firestore.
- *
- * Delivery is handled by Firebase's Trigger Email extension watching the
- * `mail` collection. This keeps SMTP credentials out of this repository and
- * lets 4iDeas send from info@4ideasapp.com once the extension is configured.
+ * Saves the admin response and sends the matching email directly through Gmail
+ * SMTP. The App Password is injected from Secret Manager at runtime and is
+ * never stored in source code or Firestore.
  */
-export const sendProjectInquiryResponse = onCall(async (request) => {
+export const sendProjectInquiryResponse = onCall(
+  {
+    secrets: [GMAIL_APP_PASSWORD],
+    timeoutSeconds: 60,
+  },
+  async (request) => {
   requireAdmin(request);
 
   const inquiryId = readText(request.data?.inquiryId, "Inquiry id", 200);
@@ -143,36 +146,40 @@ ${htmlFiles}
 <p>Best regards,<br>John<br>4iDeas<br><a href="mailto:info@4ideasapp.com">info@4ideasapp.com</a></p>
 </div>`;
 
-  const mailRef = db.collection(MAIL).doc();
-  const batch = db.batch();
-  batch.update(inquiryRef, {
+  let delivery;
+  try {
+    delivery = await sendGmailEmail({
+      to: email,
+      subject: "A response from 4iDeas about your project",
+      text,
+      html,
+      appPassword: GMAIL_APP_PASSWORD.value(),
+    });
+  } catch (error) {
+    console.error("Project inquiry email delivery failed", {
+      inquiryId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw new HttpsError(
+      "internal",
+      "The response was not sent. Please try again."
+    );
+  }
+
+  await inquiryRef.update({
     adminReply: response,
     adminNotes,
     status: "awaiting_client",
     adminRepliedAt: FieldValue.serverTimestamp(),
-    emailQueuedAt: FieldValue.serverTimestamp(),
-    emailQueueId: mailRef.id,
+    emailSentAt: FieldValue.serverTimestamp(),
+    emailMessageId: delivery.messageId,
     updatedAt: FieldValue.serverTimestamp(),
   });
-  batch.set(mailRef, {
-    from: "4iDeas <info@4ideasapp.com>",
-    to: [email],
-    replyTo: "info@4ideasapp.com",
-    message: {
-      subject: "A response from 4iDeas about your project",
-      text,
-      html,
-    },
-    metadata: {
-      kind: "project_inquiry_response",
-      inquiryId,
-    },
-  });
-  await batch.commit();
 
   return {
-    queued: true,
+    sent: true,
     fileCount: links.length,
-    mailId: mailRef.id,
+    messageId: delivery.messageId,
   };
-});
+  }
+);
