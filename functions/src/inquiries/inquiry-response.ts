@@ -155,6 +155,7 @@ ${htmlFiles}
     updatedAt: FieldValue.serverTimestamp(),
   });
   batch.set(mailRef, {
+    from: "4iDeas <info@4ideasapp.com>",
     to: [email],
     replyTo: "info@4ideasapp.com",
     message: {
