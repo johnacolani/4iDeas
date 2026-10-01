@@ -58,6 +58,7 @@ export const APPLE_IAP_SANDBOX_ENABLED = defineSecret(
 export const GOOGLE_PLAY_SERVICE_ACCOUNT_JSON = defineSecret(
   "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
 );
+export const GMAIL_APP_PASSWORD = defineSecret("GMAIL_APP_PASSWORD");
 
 /** Public site origin used to build Stripe return URLs. */
 export const SITE_ORIGIN = "https://4ideasapp.com";

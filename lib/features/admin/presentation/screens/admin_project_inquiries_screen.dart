@@ -280,7 +280,7 @@ class _AdminProjectInquiriesScreenState
                           ScaffoldMessenger.of(this.context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Response saved and email queued'
+                                'Response saved and email sent'
                                 '${fileCount == 0 ? '.' : ' with $fileCount file link(s).'}',
                               ),
                               backgroundColor: Colors.green,
