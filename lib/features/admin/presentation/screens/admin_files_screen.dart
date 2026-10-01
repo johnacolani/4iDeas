@@ -90,7 +90,7 @@ class _AdminFilesScreenState extends State<AdminFilesScreen> {
     final slug = TextEditingController(
       text: widget.initialInquiryId.isEmpty
           ? ''
-          : 'client/${widget.initialInquiryId.substring(0, widget.initialInquiryId.length.clamp(0, 10))}',
+          : 'client/${widget.initialInquiryId.substring(0, widget.initialInquiryId.length > 10 ? 10 : widget.initialInquiryId.length)}',
     );
     final clientEmail =
         TextEditingController(text: widget.initialClientEmail);
