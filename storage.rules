@@ -38,6 +38,16 @@ service firebase.storage {
       allow write: if isAdmin();
     }
 
+    // Admin-managed client / Apple review files. Bytes are never directly
+    // readable from Firebase Storage. The public 4iDeas share endpoint checks
+    // Firestore metadata and returns only a short-lived signed URL.
+    match /shared_files/{fileId}/{allPaths=**} {
+      allow read: if false;
+      allow create, update: if isAdmin()
+        && request.resource.size < 100 * 1024 * 1024;
+      allow delete: if isAdmin();
+    }
+
     // Paid Windows installers.
     //
     // Read is denied to every client, including admins — there is deliberately
