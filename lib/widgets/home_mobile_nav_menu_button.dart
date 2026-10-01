@@ -89,6 +89,11 @@ class HomeNavMenuItems {
       icon: Icons.mark_chat_unread_outlined,
     ),
     (
+      label: 'Files & documents',
+      route: AppRoutes.adminFiles,
+      icon: Icons.folder_copy_outlined,
+    ),
+    (
       label: 'Privacy policies',
       route: AppRoutes.adminPrivacyPolicies,
       icon: Icons.privacy_tip_outlined,

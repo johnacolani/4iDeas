@@ -135,6 +135,21 @@ class ProjectInquiryService {
     });
   }
 
+  Future<Map<String, dynamic>> sendAdminResponse({
+    required String inquiryId,
+    required String response,
+    String adminNotes = '',
+  }) async {
+    final callable =
+        _functions.httpsCallable('sendProjectInquiryResponse');
+    final result = await callable.call(<String, dynamic>{
+      'inquiryId': inquiryId,
+      'response': response.trim(),
+      'adminNotes': adminNotes.trim(),
+    });
+    return Map<String, dynamic>.from(result.data as Map);
+  }
+
   Future<void> addClientReply({
     required String inquiryId,
     required String response,

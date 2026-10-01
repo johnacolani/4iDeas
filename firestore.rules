@@ -95,6 +95,19 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Admin-managed files shared through 4ideasapp.com/share/*.
+    // File bytes stay private in Storage. Public/unlisted access is resolved
+    // by the sharedFileRedirect Cloud Function, which issues short-lived URLs.
+    match /shared_files/{fileId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    // Outbound email queue is backend/extension only. Admin clients never need
+    // to read or write raw mail documents from the browser.
+    match /mail/{mailId} {
+      allow read, write: if false;
+    }
+
     // ---------------------------------------------------------------
     // 4iCAD commerce
     //

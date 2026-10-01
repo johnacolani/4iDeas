@@ -68,6 +68,6 @@ jobs:
       - name: Deploy Hosting and Functions
         run: >-
           firebase deploy
-          --only functions,hosting,firestore:rules
+          --only functions,hosting,firestore:rules,storage
           --project my-web-page-ef286
           --non-interactive
