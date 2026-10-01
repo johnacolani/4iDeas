@@ -17,6 +17,7 @@ import 'package:four_ideas/features/auth/presentation/screens/email_verification
 import 'package:four_ideas/features/auth/presentation/screens/profile_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_orders_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_project_inquiries_screen.dart';
+import 'package:four_ideas/features/admin/presentation/screens/admin_files_screen.dart';
 import 'package:four_ideas/features/admin/presentation/screens/admin_order_detail_screen.dart';
 import 'package:four_ideas/features/payment/presentation/screens/payment_screen.dart';
 import 'package:four_ideas/features/contract/presentation/screens/contract_view_screen.dart';
@@ -107,6 +108,7 @@ abstract class AppRoutes {
 
   static const String adminOrders = '/admin/orders';
   static const String adminProjectInquiries = '/admin/project-inquiries';
+  static const String adminFiles = '/admin/files';
   static const String adminOrderDetail = '/admin/orders/detail';
   static const String adminPrivacyPolicies = '/admin/privacy';
 
@@ -366,6 +368,19 @@ GoRouter createAppRouter() {
       GoRoute(
         path: AppRoutes.adminProjectInquiries,
         builder: (context, state) => const AdminProjectInquiriesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminFiles,
+        builder: (context, state) {
+          final extra = state.extra is Map<String, dynamic>
+              ? state.extra as Map<String, dynamic>
+              : const <String, dynamic>{};
+          return AdminFilesScreen(
+            initialInquiryId: extra['inquiryId']?.toString() ?? '',
+            initialClientEmail: extra['clientEmail']?.toString() ?? '',
+            initialClientName: extra['clientName']?.toString() ?? '',
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.adminPrivacyPolicies,
