@@ -46,3 +46,6 @@ export {
   claimMyProjectInquiries,
   convertProjectInquiryToOrder,
 } from "./inquiries/project-inquiries";
+
+export {sharedFileRedirect} from "./files/shared-files";
+export {sendProjectInquiryResponse} from "./inquiries/inquiry-response";
