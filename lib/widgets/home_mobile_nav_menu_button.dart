@@ -236,6 +236,11 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
 
     _overlayEntry = OverlayEntry(
       builder: (overlayContext) {
+        final viewportHeight = MediaQuery.sizeOf(overlayContext).height;
+        final bottomInset = MediaQuery.paddingOf(overlayContext).bottom;
+        final maxMenuHeight =
+            (viewportHeight - bottomInset - 180).clamp(160.0, 720.0).toDouble();
+
         return Stack(
           clipBehavior: Clip.none,
           children: [
@@ -265,8 +270,9 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(
+                    constraints: BoxConstraints(
                       minWidth: _kHamburgerMenuMinWidth,
+                      maxHeight: maxMenuHeight,
                     ),
                     child: IntrinsicWidth(
                       child: Theme(
@@ -278,8 +284,12 @@ class _HomeMobileNavMenuButtonState extends State<HomeMobileNavMenuButton> {
                             thickness: 1,
                           ),
                         ),
-                        child: _MobileNavDropdownBody(
-                          onClose: _closeMenu,
+                        child: SingleChildScrollView(
+                          primary: false,
+                          physics: const ClampingScrollPhysics(),
+                          child: _MobileNavDropdownBody(
+                            onClose: _closeMenu,
+                          ),
                         ),
                       ),
                     ),
