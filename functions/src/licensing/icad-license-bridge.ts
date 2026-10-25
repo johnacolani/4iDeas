@@ -1,6 +1,7 @@
 import {HttpsError, onRequest} from "firebase-functions/v2/https";
 import {auth, db, FieldValue} from "../core";
 import {normalizeEmail, verifyIcadIdentity} from "./icad-auth";
+import {claimIcadComplimentaryGrant} from "./icad-complimentary";
 import {isDevicePlatform} from "./license-policy";
 import {
   activateDevice,
@@ -17,7 +18,7 @@ interface BridgeIdentity {
   icadUid: string;
   ownerUid: string;
   email: string;
-  source: "native_store" | "website";
+  source: "native_store" | "website" | "complimentary_icad";
 }
 
 /**
@@ -88,6 +89,19 @@ async function resolveLinkedIdentity(
       ownerUid: websiteUid,
       email: icad.email,
       source: "website",
+    };
+  }
+
+  // A complimentary 4iCAD gift is redeemed with this verified Firebase
+  // identity, not with an account from the unrelated 4iDeas website.
+  // Existing paid native-store and established website links retain priority.
+  const giftOwner = await claimIcadComplimentaryGrant(icad.uid, icad.email);
+  if (giftOwner) {
+    return {
+      icadUid: icad.uid,
+      ownerUid: giftOwner,
+      email: icad.email,
+      source: "complimentary_icad",
     };
   }
 
