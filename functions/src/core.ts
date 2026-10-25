@@ -77,6 +77,7 @@ export const COL = {
   licenses: "licenses",
   licenseDevices: "license_devices",
   licenseAudit: "license_audit",
+  icadComplimentaryGrants: "icad_complimentary_grants",
   nativeStorePurchases: "native_store_purchases",
   nativeStoreLicenseLinks: "native_store_license_links",
   appleStoreNotifications: "apple_store_notifications",
