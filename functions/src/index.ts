@@ -35,6 +35,7 @@ export {
 } from "./licensing/license-functions";
 export {
   listLicenses,
+  listPendingIcadGifts,
   getLicenseDevices,
   grantComplimentaryLicense,
   setLicenseStatus,
