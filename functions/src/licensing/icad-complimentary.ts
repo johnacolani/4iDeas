@@ -11,6 +11,7 @@ import {
 } from "./license-policy";
 import {licenseIdForOwner, type LicenseRecord} from "./license-store";
 import {
+  decideGiftClaim,
   giftIdForEmail,
   giftOwnerUid,
   normalizeGiftEmail,
@@ -110,13 +111,12 @@ export async function claimIcadComplimentaryGrant(
     ]);
     if (!grantSnap.exists) return null;
     const gift = grantSnap.data() as GiftGrant;
-    if (gift.email !== email) return null;
-    if (gift.status === "claimed") {
+    const decision = decideGiftClaim(gift, email, icadUid, licenseSnap.exists);
+    if (decision === "existing") {
       // Never create a replacement or re-enable a revoked gift.
-      return gift.claimedByIcadUid === icadUid && licenseSnap.exists
-        ? ownerUid : null;
+      return ownerUid;
     }
-    if (gift.status !== "pending") return null;
+    if (decision !== "new") return null;
     if (!isLicensePlan(gift.plan) || !isDevicePlatform(gift.primaryPlatform) ||
         !["standard", "all_platforms"].includes(gift.accessScope)) {
       throw new HttpsError("failed-precondition", "Invalid reserved license.");
