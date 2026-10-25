@@ -69,6 +69,28 @@ class AdminLicenseView {
   }
 }
 
+class PendingIcadGift {
+  const PendingIcadGift({
+    required this.email,
+    required this.plan,
+    required this.primaryPlatform,
+    required this.accessScope,
+  });
+
+  final String email;
+  final String plan;
+  final String primaryPlatform;
+  final String accessScope;
+
+  factory PendingIcadGift.fromMap(Map<String, dynamic> map) =>
+      PendingIcadGift(
+        email: map['email'] as String? ?? '',
+        plan: map['plan'] as String? ?? '',
+        primaryPlatform: map['primaryPlatform'] as String? ?? '',
+        accessScope: map['accessScope'] as String? ?? 'standard',
+      );
+}
+
 class LicenseAdminService {
   LicenseAdminService({FirebaseFunctions? functions})
       : _functions =
@@ -84,6 +106,17 @@ class LicenseAdminService {
     return rows
         .whereType<Map>()
         .map((m) => AdminLicenseView.fromMap(m.cast<String, dynamic>()))
+        .toList();
+  }
+
+  Future<List<PendingIcadGift>> listPendingIcadGifts() async {
+    final result = await _functions
+        .httpsCallable('listPendingIcadGifts')
+        .call<Map<String, dynamic>>();
+    final rows = (result.data['grants'] as List?) ?? const [];
+    return rows
+        .whereType<Map>()
+        .map((m) => PendingIcadGift.fromMap(m.cast<String, dynamic>()))
         .toList();
   }
 
@@ -103,6 +136,7 @@ class LicenseAdminService {
     required String plan,
     required String primaryPlatform,
     bool allPlatforms = false,
+    String accountType = 'icad',
   }) async {
     final result = await _functions
         .httpsCallable('grantComplimentaryLicense')
@@ -111,8 +145,11 @@ class LicenseAdminService {
       'plan': plan,
       'primaryPlatform': primaryPlatform,
       'allPlatforms': allPlatforms,
+      'accountType': accountType,
     });
-    return result.data['licenseId'] as String? ?? '';
+    return result.data['grantId'] as String? ??
+        result.data['licenseId'] as String? ??
+        '';
   }
 
   Future<void> setLicenseStatus({
