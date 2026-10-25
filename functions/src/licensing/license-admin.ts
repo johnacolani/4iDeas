@@ -1,5 +1,5 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
-import {reserveIcadComplimentaryGrant} from "./icad-complimentary";
+import {cancelPendingIcadGrant, reserveIcadComplimentaryGrant} from "./icad-complimentary";
 import {
   COL,
   FieldValue,
@@ -104,6 +104,19 @@ export const listPendingIcadGifts = onCall(
         };
       }),
     };
+  }
+);
+
+export const cancelIcadComplimentaryGrant = onCall(
+  {region: "us-central1"}, async (req) => {
+    const adminCaller = requireAdmin(req);
+    const email = String(req.data?.email ?? "").trim().toLowerCase();
+    await cancelPendingIcadGrant({
+      email,
+      adminUid: adminCaller.uid,
+      adminEmail: adminCaller.email,
+    });
+    return {cancelled: true};
   }
 );
 
