@@ -120,6 +120,12 @@ class LicenseAdminService {
         .toList();
   }
 
+  Future<void> cancelPendingIcadGift(String email) async {
+    await _functions
+        .httpsCallable('cancelIcadComplimentaryGrant')
+        .call<Map<String, dynamic>>({'email': email});
+  }
+
   Future<List<LicenseDeviceView>> getLicenseDevices(String ownerUid) async {
     final result = await _functions
         .httpsCallable('getLicenseDevices')
