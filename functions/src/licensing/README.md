@@ -20,6 +20,45 @@ This directory is the trusted server-side foundation for device-based 4iCAD lice
 - One 4iCAD account maps to one stored native-license owner. Website reverse links continue to prevent one paid website account being attached to multiple 4iCAD identities.
 - All activation still goes through the same transactional seat-limit code.
 
+## Complimentary licenses for 4iCAD-only customers
+
+The administrator can select **4iCAD app account** from the Grant License
+dialog. This does NOT create a website account, clone a Firebase user, or
+trust an email or UID supplied by a mobile client.
+
+1. Admin callable `grantComplimentaryLicense(accountType: "icad")` stores a
+   server-only **pending** grant for a normalized email. No access exists yet.
+   `listPendingIcadGifts` displays unclaimed reservations in the Admin panel.
+2. The customer signs into the 4iCAD app and verifies their account email in
+   Firebase project `icad-75d53`.
+3. When the app calls the existing `fourICadLicenseBridge` (Check License),
+   the bridge first verifies its signed Firebase ID token and verified email.
+   It then atomically claims the reserved grant, creates a normal license
+   under a private `icad-gift:<uid>` owner namespace, and activates the device
+   under the same seat-limits as other licenses.
+4. No 4iDeas website registration is required at any point.
+5. The admin can cancel an unclaimed reservation in the pending list.
+   Claimed licenses use the existing Suspend/Revoke controls, and redemption
+   never reactivates a suspended/revoked license.
+
+**Precedence:** A verified production App Store / Play Store license retains
+priority over gifts. Already-linked, verified website licenses also retain
+priority. Do not use a gift to silently replace an existing paid license.
+A user who already displays Full Access Active may already have store or other
+entitlement; check that source before issuing a duplicate grant.
+
+**Security:** Reservation and cancellation require the existing website admin
+claim. Redemption requires a signed, verified 4iCAD identity and is a Firestore
+transaction. The `icad_complimentary_grants` collection is never readable or
+writable by browser/mobile Firestore clients. Email reservations are private,
+not emailed automatically, and are not a license until claimed.
+
+**Release checklist:** Run `npm --prefix functions test`, inspect the admin
+UI on mobile, deploy the updated Firebase Functions (including bridge and the
+new list/cancel callables), Firestore rules, and rebuilt web hosting. Confirm
+pending -> active and cancelled -> denied on actual iOS login. Publishing the
+GitHub feature branch alone does not deploy any of these changes.
+
 ## Native App Store / Google Play verification
 
 `fourICadVerifyNativePurchase` is the only path that may convert a native store event into a durable cross-platform license.
