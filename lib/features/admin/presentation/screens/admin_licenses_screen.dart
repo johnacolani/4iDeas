@@ -20,15 +20,20 @@ class AdminLicensesScreen extends StatefulWidget {
 class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
   final LicenseAdminService _service = LicenseAdminService();
   late Future<List<AdminLicenseView>> _future;
+  late Future<List<PendingIcadGift>> _pendingFuture;
 
   @override
   void initState() {
     super.initState();
     _future = _service.listLicenses();
+    _pendingFuture = _service.listPendingIcadGifts();
   }
 
   void _refresh() {
-    setState(() => _future = _service.listLicenses());
+    setState(() {
+      _future = _service.listLicenses();
+      _pendingFuture = _service.listPendingIcadGifts();
+    });
   }
 
   @override
@@ -111,6 +116,63 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
                               ],
                             ),
                             const SizedBox(height: 14),
+                            FutureBuilder<List<PendingIcadGift>>(
+                              future: _pendingFuture,
+                              builder: (context, pendingSnapshot) {
+                                if (!pendingSnapshot.hasData ||
+                                    pendingSnapshot.data!.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                final gifts = pendingSnapshot.data!;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: FourICadGlassPanel(
+                                    padding: const EdgeInsets.all(16),
+                                    borderRadius: 14,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Pending 4iCAD gifts',
+                                          style: TextStyle(
+                                            color: ColorManager.accentGold,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'No 4iDeas website account is needed. '
+                                          'The recipient must sign in to 4iCAD with '
+                                          'the verified email and select Check License.',
+                                          style: TextStyle(color: Colors.white70),
+                                        ),
+                                        for (final gift in gifts)
+                                          ListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            leading: const Icon(
+                                              Icons.card_giftcard_outlined,
+                                              color: ColorManager.accentGold,
+                                            ),
+                                            title: Text(
+                                              gift.email,
+                                              style: const TextStyle(color: Colors.white),
+                                            ),
+                                            subtitle: Text(
+                                              '${gift.plan} · ${gift.primaryPlatform} · ${gift.accessScope}',
+                                              style: const TextStyle(color: Colors.white70),
+                                            ),
+                                            trailing: const Text(
+                                              'PENDING',
+                                              style: TextStyle(color: ColorManager.accentGold),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             if (licenses.isEmpty)
                               _message('No device licenses yet.')
                             else
@@ -367,13 +429,15 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
   Future<void> _showGrantDialog() async {
     final emailController = TextEditingController();
     var plan = 'individual';
-    var platform = 'windows';
+    var platform = 'ios';
+    var accountType = 'icad';
     var allPlatforms = false;
     final submitted = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: const Text('Grant complimentary 4iCAD license'),
+          scrollable: true,
           content: SizedBox(
             width: 430,
             child: Column(
@@ -384,6 +448,41 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(labelText: 'Customer email'),
                 ),
+                const SizedBox(height: 14),
+                DropdownButtonFormField<String>(
+                  initialValue: accountType,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Customer account'),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'icad',
+                      child: Text('4iCAD app account (no 4iDeas signup)'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'website',
+                      child: Text('Existing 4iDeas website account'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() {
+                        accountType = value;
+                        platform = value == 'icad' ? 'ios' : 'windows';
+                      });
+                    }
+                  },
+                ),
+                if (accountType == 'icad')
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      'This reserves a free license for the email. '
+                      'It activates when that person signs in to 4iCAD '
+                      'with their verified email and checks their license. '
+                      'No separate website account is necessary.',
+                      style: TextStyle(fontSize: 12, color: Colors.white70),
+                    ),
+                  ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
                   initialValue: plan,
@@ -454,10 +553,18 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
         plan: plan,
         primaryPlatform: platform,
         allPlatforms: allPlatforms,
+        accountType: accountType,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Complimentary license granted.')),
+        SnackBar(
+          duration: const Duration(seconds: 7),
+          content: Text(accountType == 'icad'
+              ? 'Gift reserved for this 4iCAD email. '
+                'Ask the recipient to verify their email and tap Check License. '
+                'No 4iDeas website registration is needed.'
+              : 'Complimentary website license granted.'),
+        ),
       );
       _refresh();
     } catch (error) {
