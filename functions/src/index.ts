@@ -36,6 +36,7 @@ export {
 export {
   listLicenses,
   listPendingIcadGifts,
+  cancelIcadComplimentaryGrant,
   getLicenseDevices,
   grantComplimentaryLicense,
   setLicenseStatus,
