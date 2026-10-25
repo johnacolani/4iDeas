@@ -18,7 +18,7 @@ import {
 
 type GiftGrant = {
   email: string;
-  status: "pending" | "claimed";
+  status: "pending" | "claimed" | "cancelled";
   plan: LicensePlan;
   primaryPlatform: DevicePlatform;
   accessScope: LicenseAccessScope;
@@ -167,5 +167,48 @@ export async function claimIcadComplimentaryGrant(
       createdAt: now,
     });
     return ownerUid;
+  });
+}
+
+/** Only a website administrator can cancel a gift that has not been claimed. */
+export async function cancelPendingIcadGrant(params: {
+  email: string;
+  adminUid: string;
+  adminEmail: string | null;
+}): Promise<void> {
+  let email: string;
+  try {
+    email = normalizeGiftEmail(params.email);
+  } catch {
+    throw new HttpsError("invalid-argument", "A valid customer email is required.");
+  }
+  const ref = db.collection(COL.icadComplimentaryGrants)
+    .doc(giftIdForEmail(email));
+  const auditRef = db.collection(COL.licenseAudit).doc();
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const grant = snap.data() as GiftGrant | undefined;
+    if (!grant || grant.email !== email) {
+      throw new HttpsError("not-found", "Pending gift was not found.");
+    }
+    if (grant.status !== "pending") {
+      throw new HttpsError("failed-precondition",
+        "Only unclaimed gifts can be cancelled. Revoke claimed licenses from the license list.");
+    }
+    const now = FieldValue.serverTimestamp();
+    tx.update(ref, {
+      status: "cancelled",
+      cancelledByUid: params.adminUid,
+      cancelledAt: now,
+      updatedAt: now,
+    });
+    tx.set(auditRef, {
+      action: "icad_gift_cancelled",
+      grantId: ref.id,
+      ownerEmail: email,
+      changedByUid: params.adminUid,
+      changedByEmail: params.adminEmail,
+      createdAt: now,
+    });
   });
 }
