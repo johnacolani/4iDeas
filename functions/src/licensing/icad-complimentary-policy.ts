@@ -23,3 +23,28 @@ export function giftOwnerUid(icadUid: string): string {
   }
   return `icad-gift:${uid}`;
 }
+
+export type GiftClaimDecision = "new" | "existing" | "none";
+
+/**
+ * Only a signed, verified 4iCAD email is accepted by the caller.
+ * A claimed gift belongs exclusively to its first verified 4iCAD UID.
+ */
+export function decideGiftClaim(
+  gift: {
+    email: string;
+    status: string;
+    claimedByIcadUid?: string;
+  } | undefined,
+  verifiedEmail: string,
+  icadUid: string,
+  licenseExists: boolean
+): GiftClaimDecision {
+  if (!gift || gift.email !== normalizeGiftEmail(verifiedEmail)) return "none";
+  if (gift.status === "pending") return "new";
+  if (gift.status === "claimed" &&
+      gift.claimedByIcadUid === icadUid && licenseExists) {
+    return "existing";
+  }
+  return "none";
+}
