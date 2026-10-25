@@ -162,9 +162,13 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
                                               '${gift.plan} · ${gift.primaryPlatform} · ${gift.accessScope}',
                                               style: const TextStyle(color: Colors.white70),
                                             ),
-                                            trailing: const Text(
-                                              'PENDING',
-                                              style: TextStyle(color: ColorManager.accentGold),
+                                            trailing: IconButton(
+                                              icon: const Icon(
+                                                Icons.cancel_outlined,
+                                                color: ColorManager.accentGold,
+                                              ),
+                                              tooltip: 'Cancel pending gift',
+                                              onPressed: () => _cancelPendingGift(gift.email),
                                             ),
                                           ),
                                       ],
@@ -426,6 +430,43 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
     }
   }
 
+  Future<void> _cancelPendingGift(String email) async {
+    final approved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel pending gift?'),
+        content: Text(
+          'The unclaimed complimentary license for $email will no longer '
+          'be available. Already activated licenses are not affected.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Cancel gift'),
+          ),
+        ],
+      ),
+    );
+    if (approved != true || !mounted) return;
+    try {
+      await _service.cancelPendingIcadGift(email);
+      if (!mounted) return;
+      _refresh();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pending gift cancelled.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not cancel gift: $error')),
+      );
+    }
+  }
+
   Future<void> _showGrantDialog() async {
     final emailController = TextEditingController();
     var plan = 'individual';
@@ -499,6 +540,7 @@ class _AdminLicensesScreenState extends State<AdminLicensesScreen> {
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
+                  key: ValueKey('primary-platform-$accountType'),
                   initialValue: platform,
                   decoration:
                       const InputDecoration(labelText: 'Primary platform'),
