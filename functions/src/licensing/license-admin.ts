@@ -1,4 +1,5 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {cancelPendingIcadGrant, reserveIcadComplimentaryGrant} from "./icad-complimentary";
 import {
   COL,
   FieldValue,
@@ -83,6 +84,42 @@ export const getLicenseDevices = onCall({region: "us-central1"}, async (req) => 
   };
 });
 
+/** Only verified administrators may see email reservations awaiting 4iCAD login. */
+export const listPendingIcadGifts = onCall(
+  {region: "us-central1"}, async (req) => {
+    requireAdmin(req);
+    const snap = await db.collection(COL.icadComplimentaryGrants)
+      .where("status", "==", "pending").limit(ADMIN_LIST_LIMIT).get();
+    return {
+      grants: snap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          email: data.email,
+          plan: data.plan,
+          primaryPlatform: data.primaryPlatform,
+          accessScope: data.accessScope,
+          status: "pending",
+          createdAt: millis(data.createdAt),
+        };
+      }),
+    };
+  }
+);
+
+export const cancelIcadComplimentaryGrant = onCall(
+  {region: "us-central1"}, async (req) => {
+    const adminCaller = requireAdmin(req);
+    const email = String(req.data?.email ?? "").trim().toLowerCase();
+    await cancelPendingIcadGrant({
+      email,
+      adminUid: adminCaller.uid,
+      adminEmail: adminCaller.email,
+    });
+    return {cancelled: true};
+  }
+);
+
 export const grantComplimentaryLicense = onCall(
   {region: "us-central1"},
   async (req) => {
@@ -105,14 +142,39 @@ export const grantComplimentaryLicense = onCall(
       throw new HttpsError("invalid-argument", "Unsupported primary platform.");
     }
 
+    // Explicit account target prevents cross-project UID confusion.
+    // Existing callers without accountType retain the original website route.
+    const accountType = String(req.data?.accountType ?? "website");
+    if (accountType === "icad") {
+      const grantId = await reserveIcadComplimentaryGrant({
+        email,
+        plan,
+        primaryPlatform,
+        accessScope,
+        grantedByUid: adminCaller.uid,
+        grantedByEmail: adminCaller.email,
+      });
+      return {grantId, status: "pending", accountType: "icad"};
+    }
+    if (accountType !== "website") {
+      throw new HttpsError("invalid-argument", "Unknown customer account type.");
+    }
+
     let customer;
     try {
       customer = await auth.getUserByEmail(email);
-    } catch {
-      throw new HttpsError(
-        "not-found",
-        "That customer must create a 4ideas account before a license can be granted."
-      );
+    } catch (error: unknown) {
+      const code =
+        typeof error === "object" && error !== null && "code" in error
+          ? String((error as {code?: unknown}).code)
+          : "";
+      if (code === "auth/user-not-found") {
+        throw new HttpsError("not-found",
+          "No 4iDeas website account exists for this email. Select 4iCAD account to grant without a website login.");
+      }
+      // Never mask configuration/service/permission failures as missing users.
+      throw new HttpsError("internal",
+        "Firebase could not look up this customer. Try again or check server logs.");
     }
 
     const licenseId = await createOrUpdateLicense({

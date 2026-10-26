@@ -166,6 +166,12 @@ service cloud.firestore {
 
     // Webhook idempotency records, Stripe customer mapping and download audit
     // trail are backend-only bookkeeping with no client-facing use.
+    // Complimentary 4iCAD invitations contain customer email addresses.
+    // Only trusted Cloud Functions may issue, redeem, or cancel them.
+    match /icad_complimentary_grants/{grantId} {
+      allow read, write: if false;
+    }
+
     match /stripe_events/{eventId} {
       allow read, write: if false;
     }
